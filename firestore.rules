@@ -1,0 +1,48 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // REGLAS PARA BANCOS
+    match /bancos/{bancoId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // REGLAS PARA ÓRDENES DE COMPRA
+    match /ordenesCompra/{ordenId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // REGLAS PARA VENTAS
+    match /ventas/{ventaId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // REGLAS PARA DISTRIBUIDORES
+    match /distribuidores/{distribuidorId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // REGLAS PARA CLIENTES
+    match /clientes/{clienteId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // REGLAS PARA ALMACÉN
+    match /almacen/{productoId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // REGLAS PARA PRODUCTOS
+    match /productos/{productoId} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}
