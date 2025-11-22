@@ -335,4 +335,4 @@ El sistema Chronos está **100% funcional** y listo para producción. Todos los 
 **Tecnologías:** Next.js 16, React 19, TypeScript, Tailwind CSS v4, Framer Motion, Firestore, Recharts
 \`\`\`
 
-```tsx file="" isHidden
+\`\`\`tsx file="" isHidden
