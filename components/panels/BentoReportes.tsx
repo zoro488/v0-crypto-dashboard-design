@@ -205,38 +205,46 @@ export default function BentoReportes() {
             className="bento-lg crystal-card p-6 ambient-glow"
           >
             <h3 className="text-xl font-bold text-white mb-4">Tendencia de Ventas vs Compras</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={ventas}>
-                <defs>
-                  <linearGradient id="colorVentas" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="colorCompras" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
-                <XAxis dataKey="month" stroke="#fff" opacity={0.5} />
-                <YAxis stroke="#fff" opacity={0.5} />
-                <Tooltip
-                  contentStyle={{
-                    background: "rgba(15, 23, 42, 0.9)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: "12px",
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="precioTotalVenta"
-                  stroke="#3b82f6"
-                  fillOpacity={1}
-                  fill="url(#colorVentas)"
-                />
-                <Area type="monotone" dataKey="costoTotal" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorCompras)" />
-              </AreaChart>
-            </ResponsiveContainer>
+            <div className="w-full" style={{ height: 300 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={ventas}>
+                  <defs>
+                    <linearGradient id="colorVentas" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="colorCompras" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
+                  <XAxis dataKey="month" stroke="#fff" opacity={0.5} />
+                  <YAxis stroke="#fff" opacity={0.5} />
+                  <Tooltip
+                    contentStyle={{
+                      background: "rgba(15, 23, 42, 0.9)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      borderRadius: "12px",
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="precioTotalVenta"
+                    stroke="#3b82f6"
+                    fillOpacity={1}
+                    fill="url(#colorVentas)"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="costoTotal"
+                    stroke="#8b5cf6"
+                    fillOpacity={1}
+                    fill="url(#colorCompras)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </motion.div>
 
           {/* Product distribution */}
@@ -247,25 +255,27 @@ export default function BentoReportes() {
             className="bento-md crystal-card p-6 ambient-glow"
           >
             <h3 className="text-xl font-bold text-white mb-4">Distribución de Productos</h3>
-            <ResponsiveContainer width="100%" height={250}>
-              <RechartsPieChart>
-                <Pie
-                  data={productosData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                  label
-                >
-                  {productosData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </RechartsPieChart>
-            </ResponsiveContainer>
+            <div className="w-full" style={{ height: 250 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartsPieChart>
+                  <Pie
+                    data={productosData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label
+                  >
+                    {productosData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </RechartsPieChart>
+              </ResponsiveContainer>
+            </div>
           </motion.div>
 
           {/* Performance radar */}
@@ -276,14 +286,16 @@ export default function BentoReportes() {
             className="bento-md crystal-card p-6 ambient-glow"
           >
             <h3 className="text-xl font-bold text-white mb-4">Performance General</h3>
-            <ResponsiveContainer width="100%" height={250}>
-              <RadarChart data={ventas}>
-                <PolarGrid stroke="#ffffff20" />
-                <PolarAngleAxis dataKey="subject" stroke="#fff" tick={{ fill: "#ffffff80" }} />
-                <PolarRadiusAxis stroke="#ffffff20" />
-                <Radar name="Actual" dataKey="precioTotalVenta" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} />
-              </RadarChart>
-            </ResponsiveContainer>
+            <div className="w-full" style={{ height: 250 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <RadarChart data={ventas}>
+                  <PolarGrid stroke="#ffffff20" />
+                  <PolarAngleAxis dataKey="subject" stroke="#fff" tick={{ fill: "#ffffff80" }} />
+                  <PolarRadiusAxis stroke="#ffffff20" />
+                  <Radar name="Actual" dataKey="precioTotalVenta" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} />
+                </RadarChart>
+              </ResponsiveContainer>
+            </div>
           </motion.div>
         </>
       )}
