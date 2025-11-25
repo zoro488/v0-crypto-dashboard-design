@@ -40,6 +40,12 @@
     "backend",
     "scripts",
     "node_modules",
-    "components/ui"
+    "components/ui",
+    "jest.setup.ts",
+    "jest.setup.js",
+    "jest.config.js",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "__tests__"
   ]
 }

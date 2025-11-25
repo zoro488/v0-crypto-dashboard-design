@@ -17,6 +17,7 @@ import {
   Settings,
   HelpCircle,
 } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 import { Dialog, DialogContent } from "@/frontend/app/components/ui/dialog"
 import { Input } from "@/frontend/app/components/ui/input"
 import { ScrollArea } from "@/frontend/app/components/ui/scroll-area"
@@ -27,7 +28,7 @@ interface Command {
   id: string
   title: string
   description: string
-  icon: React.ElementType
+  icon: LucideIcon
   keywords: string[]
   action: () => void
   badge?: string
@@ -210,7 +211,7 @@ export function CommandMenu() {
                   className="space-y-1"
                 >
                   {filteredCommands.map((command, index) => {
-                    const Icon = command.icon
+                    const IconComponent = command.icon
                     return (
                       <motion.button
                         key={command.id}
@@ -221,7 +222,7 @@ export function CommandMenu() {
                         className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors text-left group"
                       >
                         <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 text-primary group-hover:scale-110 transition-transform">
-                          <Icon className="w-5 h-5" />
+                          <IconComponent className="w-5 h-5" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">

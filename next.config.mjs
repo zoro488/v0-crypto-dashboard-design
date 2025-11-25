@@ -1,12 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Directorio de la app dentro de frontend
+  distDir: '.next',
+  
   typescript: {
     ignoreBuildErrors: false,
     tsconfigPath: './tsconfig.json',
-  },
-  eslint: {
-    ignoreDuringBuilds: false,
-    dirs: ['app', 'components', 'lib', 'backend'],
   },
   images: {
     formats: ['image/avif', 'image/webp'],

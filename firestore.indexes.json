@@ -229,6 +229,48 @@
       "density": "SPARSE_ALL"
     },
     {
+      "collectionGroup": "movimientos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "bancoId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ],
+      "density": "SPARSE_ALL"
+    },
+    {
+      "collectionGroup": "movimientos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "bancoId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "tipoMovimiento",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ],
+      "density": "SPARSE_ALL"
+    },
+    {
       "collectionGroup": "movimientosBancarios",
       "queryScope": "COLLECTION",
       "fields": [
@@ -280,6 +322,25 @@
         },
         {
           "fieldPath": "fecha",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ],
+      "density": "SPARSE_ALL"
+    },
+    {
+      "collectionGroup": "cortes_bancarios",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "bancoId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fechaInicio",
           "order": "DESCENDING"
         },
         {

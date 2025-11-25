@@ -67,8 +67,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" suppressHydrationWarning className="dark">
-      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`} suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning className="dark" style={{ backgroundColor: 'hsl(240 10% 3.9%)', colorScheme: 'dark' }}>
+      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground`} suppressHydrationWarning style={{ backgroundColor: 'hsl(240 10% 3.9%)', color: 'hsl(0 0% 98%)', minHeight: '100vh' }}>
         <Script
           id="disable-devtools"
           strategy="beforeInteractive"
@@ -91,14 +91,7 @@ export default function RootLayout({
             __html: `
               if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js').then(
-                    function(registration) {
-                      console.log('[SW] Registered successfully:', registration.scope);
-                    },
-                    function(err) {
-                      console.log('[SW] Registration failed:', err);
-                    }
-                  );
+                  navigator.serviceWorker.register('/sw.js').catch(function() {});
                 });
               }
             `,

@@ -1,9 +1,11 @@
 import '@testing-library/jest-dom'
 import { TextEncoder, TextDecoder } from 'util'
 
-// Polyfills para jsdom
-global.TextEncoder = TextEncoder
-global.TextDecoder = TextDecoder as any
+// Polyfills para jsdom - usando type assertion para evitar incompatibilidades
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(global as Record<string, unknown>).TextEncoder = TextEncoder
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(global as Record<string, unknown>).TextDecoder = TextDecoder
 
 // Mock de IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {

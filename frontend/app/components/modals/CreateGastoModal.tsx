@@ -7,6 +7,7 @@ import { X, Receipt, DollarSign, Building2 } from "lucide-react"
 import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
 import { firestoreService } from "@/frontend/app/lib/firebase/firestore-service"
 import { useToast } from "@/frontend/app/hooks/use-toast"
+import { logger } from "@/frontend/app/lib/utils/logger"
 
 interface CreateGastoModalProps {
   isOpen: boolean
@@ -73,7 +74,7 @@ export default function CreateGastoModal({ isOpen, onClose }: CreateGastoModalPr
       onClose()
       setFormData({ bancoId: "", concepto: "", monto: "", descripcion: "" })
     } catch (error) {
-      console.error("Error creating gasto:", error)
+      logger.error("Error creating gasto:", error)
       toast({
         title: "Error",
         description: "Error al registrar el gasto. Por favor intenta de nuevo.",
