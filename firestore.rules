@@ -140,6 +140,30 @@ service cloud.firestore {
     }
 
     // ═══════════════════════════════════════════════════════════════
+    // TRANSFERENCIAS ENTRE BANCOS
+    // ═══════════════════════════════════════════════════════════════
+    match /transferencias/{transferenciaId} {
+      allow read: if isAuthenticated();
+      allow create: if canWrite() && 
+                      request.resource.data.keys().hasAll(['bancoOrigen', 'bancoDestino', 'monto', 'fecha']) &&
+                      request.resource.data.monto > 0;
+      allow update: if isManager();
+      allow delete: if isAdmin();
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ABONOS DE CLIENTES/DISTRIBUIDORES
+    // ═══════════════════════════════════════════════════════════════
+    match /abonos/{abonoId} {
+      allow read: if isAuthenticated();
+      allow create: if canWrite() && 
+                      request.resource.data.keys().hasAll(['monto', 'fecha', 'bancoDestino']) &&
+                      request.resource.data.monto > 0;
+      allow update: if isManager();
+      allow delete: if isAdmin();
+    }
+
+    // ═══════════════════════════════════════════════════════════════
     // REPORTES
     // ═══════════════════════════════════════════════════════════════
     match /reportes/{reporteId} {

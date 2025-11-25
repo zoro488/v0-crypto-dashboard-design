@@ -63,6 +63,7 @@ export function SplineWidget3D({
           <Spline
             scene="https://prod.spline.design/EMUFQmxEYeuyK46H/scene.splinecode"
             onLoad={handleLoad}
+            style={{ width: '100%', height: '100%' }}
           />
         </motion.div>
       </Suspense>

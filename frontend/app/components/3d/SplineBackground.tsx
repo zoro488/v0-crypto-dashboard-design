@@ -18,8 +18,8 @@ export default function SplineBackground() {
           </div>
         }
       >
-        {/* @ts-ignore - Spline async component */}
-        <Spline scene="https://prod.spline.design/Z1JMEPmko2vVo-lL/scene.splinecode" />
+        {/* Escena 3D de fondo - Widget Spline */}
+        <Spline scene="https://prod.spline.design/EMUFQmxEYeuyK46H/scene.splinecode" />
       </Suspense>
     </div>
   )

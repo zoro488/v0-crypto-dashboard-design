@@ -29,7 +29,7 @@ export function SplineBot3D({
   const [currentState, setCurrentState] = useState<BotState>(state)
 
   // URL de la escena Spline del bot 3D (R_4_X_Bot)
-  const sceneUrl = "https://prod.spline.design/EMUFQmxEYeuyK46H/scene.splinecode"
+  const sceneUrl = "https://prod.spline.design/cZAGZ7v6TaqZrhFN/scene.splinecode"
 
   useEffect(() => {
     // Determinar estado basado en props
@@ -68,7 +68,7 @@ export function SplineBot3D({
           break
       }
     } catch (error) {
-      console.log('Spline animation trigger skipped:', error)
+      // Animación Spline no disponible (escena aún cargando)
     }
   }
 
@@ -84,7 +84,7 @@ export function SplineBot3D({
         }
       })
     } catch (error) {
-      console.log('Spline event listener setup skipped:', error)
+      // Event listener Spline no disponible
     }
     
     onLoad?.()
