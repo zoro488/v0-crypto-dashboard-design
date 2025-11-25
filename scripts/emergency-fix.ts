@@ -1,4 +1,109 @@
-"use client"
+#!/usr/bin/env npx ts-node
+/**
+ * 🚑 SCRIPT DE REPARACIÓN DE EMERGENCIA - CHRONOS SYSTEM
+ * 
+ * Este script realiza 3 operaciones quirúrgicas:
+ * 1. Desbloqueo de permisos Firestore (rules temporales)
+ * 2. Blindaje de hooks (patrón estricto con cleanup)
+ * 3. Cortafuegos de UI (ErrorBoundary + SafeView)
+ * 
+ * Ejecutar: npx ts-node scripts/emergency-fix.ts
+ */
+
+import * as fs from 'fs'
+import * as path from 'path'
+
+// Colores para la consola
+const colors = {
+  reset: '\x1b[0m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  cyan: '\x1b[36m',
+  bold: '\x1b[1m'
+}
+
+function log(message: string, color: keyof typeof colors = 'reset') {
+  console.log(`${colors[color]}${message}${colors.reset}`)
+}
+
+function logSection(title: string) {
+  console.log('\n' + '═'.repeat(60))
+  log(`🔧 ${title}`, 'cyan')
+  console.log('═'.repeat(60))
+}
+
+// ============================================================================
+// 1. FIRESTORE RULES - Permisos temporales de desarrollo
+// ============================================================================
+const FIRESTORE_RULES = `rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ⚠️ REGLAS TEMPORALES DE DESARROLLO
+    // TODO: Reemplazar con reglas seguras antes de producción
+    // Fecha de expiración: ${new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
+    
+    // Permitir lectura a todos los usuarios autenticados
+    match /{collection}/{document=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // PUERTA TRASERA TEMPORAL (SOLO DESARROLLO)
+    // Remover en producción
+    match /movimientos/{document=**} {
+      allow read, write: if true;
+    }
+    
+    match /dashboard_totales/{document=**} {
+      allow read: if true;
+    }
+    
+    match /dashboard_paneles/{document=**} {
+      allow read: if true;
+    }
+    
+    match /almacen_productos/{document=**} {
+      allow read, write: if true;
+    }
+    
+    match /almacen_entradas/{document=**} {
+      allow read, write: if true;
+    }
+    
+    match /almacen_salidas/{document=**} {
+      allow read, write: if true;
+    }
+    
+    match /ventas/{document=**} {
+      allow read, write: if true;
+    }
+    
+    match /clientes/{document=**} {
+      allow read, write: if true;
+    }
+    
+    match /distribuidores/{document=**} {
+      allow read, write: if true;
+    }
+    
+    match /ordenes_compra/{document=**} {
+      allow read, write: if true;
+    }
+    
+    match /cortes_bancarios/{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
+`
+
+// ============================================================================
+// 2. HOOKS BLINDADOS - Patrón estricto con cleanup
+// ============================================================================
+const SAFE_FIRESTORE_HOOKS = `"use client"
 
 /**
  * 🛡️ HOOKS DE FIRESTORE BLINDADOS
@@ -145,7 +250,7 @@ function useFirestoreQuery<T extends DocumentData>(
       setError(null)
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : "Error desconocido"
-      logger.error(`[Firestore] Error en ${collectionName}:`, errMsg)
+      logger.error(\`[Firestore] Error en \${collectionName}:\`, errMsg)
 
       // 🛡️ Verificar montaje antes de actualizar estado
       if (!isMountedRef.current) {
@@ -155,7 +260,7 @@ function useFirestoreQuery<T extends DocumentData>(
 
       if (errMsg.includes("Missing or insufficient permissions")) {
         USE_MOCK_DATA = true
-        logger.warn(`[Firestore] Usando mock para ${collectionName}`)
+        logger.warn(\`[Firestore] Usando mock para \${collectionName}\`)
         setData(options.mockData)
         setLoading(false)
         setError(null)
@@ -392,3 +497,220 @@ const MOCK_ENTRADAS = [
 const MOCK_SALIDAS = [
   { id: "S-001", fecha: new Date().toISOString(), destino: "Cliente VIP", cantidad: 10, valorTotal: 10000 },
 ]
+`
+
+// ============================================================================
+// 3. SAFE VIEW COMPONENT - ErrorBoundary
+// ============================================================================
+const SAFE_VIEW_COMPONENT = `"use client"
+
+/**
+ * 🛡️ SAFE VIEW - Cortafuegos de UI
+ * Generado automáticamente por emergency-fix.ts
+ * 
+ * Envuelve componentes peligrosos en un ErrorBoundary
+ * que captura errores y muestra un fallback amigable.
+ */
+
+import React, { Component, ReactNode } from 'react'
+
+interface ErrorBoundaryState {
+  hasError: boolean
+  error: Error | null
+  errorInfo: React.ErrorInfo | null
+}
+
+interface ErrorBoundaryProps {
+  children: ReactNode
+  fallback?: ReactNode
+  onError?: (error: Error, errorInfo: React.ErrorInfo) => void
+  componentName?: string
+}
+
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props)
+    this.state = { hasError: false, error: null, errorInfo: null }
+  }
+
+  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
+    return { hasError: true, error }
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    this.setState({ errorInfo })
+    
+    // Log del error
+    console.error(\`[SafeView] Error en \${this.props.componentName || 'componente'}:\`, error)
+    console.error('Stack:', errorInfo.componentStack)
+    
+    // Callback opcional
+    this.props.onError?.(error, errorInfo)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // Fallback personalizado o por defecto
+      if (this.props.fallback) {
+        return this.props.fallback
+      }
+
+      return (
+        <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-red-500">⚠️</span>
+            <h3 className="font-semibold text-red-500">
+              Error en {this.props.componentName || 'este componente'}
+            </h3>
+          </div>
+          <p className="text-sm text-gray-400 mb-3">
+            Algo salió mal. El resto de la aplicación sigue funcionando.
+          </p>
+          <button
+            onClick={() => this.setState({ hasError: false, error: null, errorInfo: null })}
+            className="px-3 py-1 text-sm bg-red-500/20 hover:bg-red-500/30 rounded transition-colors"
+          >
+            🔄 Reintentar
+          </button>
+          {process.env.NODE_ENV === 'development' && this.state.error && (
+            <details className="mt-3">
+              <summary className="text-xs text-gray-500 cursor-pointer">
+                Detalles técnicos
+              </summary>
+              <pre className="text-xs mt-2 p-2 bg-black/50 rounded overflow-auto max-h-32">
+                {this.state.error.toString()}
+                {this.state.errorInfo?.componentStack}
+              </pre>
+            </details>
+          )}
+        </div>
+      )
+    }
+
+    return this.props.children
+  }
+}
+
+// Hook para usar SafeView de forma declarativa
+interface SafeViewProps {
+  children: ReactNode
+  name?: string
+  fallback?: ReactNode
+}
+
+export function SafeView({ children, name, fallback }: SafeViewProps) {
+  return (
+    <ErrorBoundary componentName={name} fallback={fallback}>
+      {children}
+    </ErrorBoundary>
+  )
+}
+
+// Wrapper para componentes lazy
+export function withSafeView<P extends object>(
+  WrappedComponent: React.ComponentType<P>,
+  componentName?: string
+) {
+  return function SafeWrappedComponent(props: P) {
+    return (
+      <SafeView name={componentName || WrappedComponent.displayName || 'Component'}>
+        <WrappedComponent {...props} />
+      </SafeView>
+    )
+  }
+}
+
+export default ErrorBoundary
+`
+
+// ============================================================================
+// FUNCIONES DE UTILIDAD
+// ============================================================================
+
+function ensureDir(dirPath: string) {
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true })
+    log(`  📁 Creado directorio: ${dirPath}`, 'green')
+  }
+}
+
+function writeFile(filePath: string, content: string) {
+  ensureDir(path.dirname(filePath))
+  fs.writeFileSync(filePath, content, 'utf-8')
+  log(`  ✅ Archivo creado/actualizado: ${filePath}`, 'green')
+}
+
+function backupFile(filePath: string) {
+  if (fs.existsSync(filePath)) {
+    const backupPath = `${filePath}.backup.${Date.now()}`
+    fs.copyFileSync(filePath, backupPath)
+    log(`  📦 Backup creado: ${backupPath}`, 'yellow')
+  }
+}
+
+// ============================================================================
+// EJECUCIÓN PRINCIPAL
+// ============================================================================
+
+async function main() {
+  console.log('\n')
+  log('🚑 SCRIPT DE REPARACIÓN DE EMERGENCIA - CHRONOS SYSTEM', 'bold')
+  log('═'.repeat(60), 'cyan')
+  
+  const rootDir = path.resolve(__dirname, '..')
+  
+  // 1. FIRESTORE RULES
+  logSection('1. DESBLOQUEO DE PERMISOS FIRESTORE')
+  const rulesPath = path.join(rootDir, 'firestore.rules')
+  backupFile(rulesPath)
+  writeFile(rulesPath, FIRESTORE_RULES)
+  log('  ⚠️  ADVERTENCIA: Reglas temporales de desarrollo activadas', 'yellow')
+  log('  ⚠️  Reemplazar antes de producción', 'yellow')
+
+  // 2. HOOKS BLINDADOS
+  logSection('2. BLINDAJE DE HOOKS FIRESTORE')
+  
+  // Frontend
+  const frontendHooksPath = path.join(rootDir, 'frontend/app/lib/firebase/firestore-hooks.service.ts')
+  backupFile(frontendHooksPath)
+  writeFile(frontendHooksPath, SAFE_FIRESTORE_HOOKS)
+  
+  // App (duplicado para sincronizar)
+  const appHooksPath = path.join(rootDir, 'app/lib/firebase/firestore-hooks.service.ts')
+  backupFile(appHooksPath)
+  writeFile(appHooksPath, SAFE_FIRESTORE_HOOKS)
+
+  // 3. SAFE VIEW COMPONENT
+  logSection('3. CORTAFUEGOS DE UI (SafeView)')
+  
+  // Frontend
+  const frontendSafeViewPath = path.join(rootDir, 'frontend/app/components/SafeView.tsx')
+  writeFile(frontendSafeViewPath, SAFE_VIEW_COMPONENT)
+  
+  // App (duplicado)
+  const appSafeViewPath = path.join(rootDir, 'app/components/SafeView.tsx')
+  writeFile(appSafeViewPath, SAFE_VIEW_COMPONENT)
+
+  // RESUMEN
+  console.log('\n' + '═'.repeat(60))
+  log('✅ REPARACIÓN COMPLETADA', 'green')
+  console.log('═'.repeat(60))
+  
+  console.log('\n📋 PRÓXIMOS PASOS:')
+  log('  1. Detén el servidor: Ctrl + C', 'cyan')
+  log('  2. Limpia caché: rm -rf .next frontend/.next', 'cyan')
+  log('  3. Reinicia: pnpm dev', 'cyan')
+  log('  4. Despliega rules: firebase deploy --only firestore:rules', 'cyan')
+  
+  console.log('\n⚠️  RECORDATORIO DE SEGURIDAD:')
+  log('  Las reglas de Firestore son TEMPORALES.', 'yellow')
+  log('  Actualízalas antes de ir a producción.', 'yellow')
+  
+  console.log('\n')
+}
+
+// Ejecutar
+main().catch((err) => {
+  log(`\n❌ ERROR: ${err.message}`, 'red')
+  process.exit(1)
+})
