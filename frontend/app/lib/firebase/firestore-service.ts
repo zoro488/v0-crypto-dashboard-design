@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore"
 import { db } from "./config"
 import type { Banco, OrdenCompra, Venta, Distribuidor, Cliente, Producto } from "@/frontend/app/types"
+import { logger } from "../utils/logger"
 
 // ============================================================
 // COLECCIONES
@@ -44,13 +45,13 @@ export const suscribirBancos = (callback: (bancos: Banco[]) => void) => {
         callback(bancos)
       },
       (error) => {
-        console.error("[v0] Error fetching bancos:", error.message)
+        logger.error("Error fetching bancos", error, { context: "FirestoreService" })
         // Return empty array on error
         callback([])
       },
     )
   } catch (error) {
-    console.error("[v0] Error subscribing to bancos:", error)
+    logger.error("Error subscribing to bancos", error, { context: "FirestoreService" })
     callback([])
     return () => {} // Return empty unsubscribe function
   }
@@ -62,7 +63,7 @@ export const obtenerBanco = async (bancoId: string): Promise<Banco | null> => {
     const docSnap = await getDoc(docRef)
     return docSnap.exists() ? ({ id: docSnap.id, ...docSnap.data() } as Banco) : null
   } catch (error) {
-    console.error("[v0] Error fetching banco:", error)
+    logger.error("Error fetching banco", error, { context: "FirestoreService" })
     return null
   }
 }
@@ -92,7 +93,7 @@ export const actualizarCapitalBanco = async (
 
     await batch.commit()
   } catch (error) {
-    console.error("[v0] Error updating banco capital:", error)
+    logger.error("Error updating banco capital", error, { context: "FirestoreService" })
   }
 }
 
@@ -206,7 +207,7 @@ export const crearOrdenCompra = async (data: Omit<OrdenCompra, "id">) => {
     await batch.commit()
     return ocRef.id
   } catch (error) {
-    console.error("[v0] Error creating orden de compra:", error)
+    logger.error("Error creating orden de compra", error, { context: "FirestoreService" })
     return null
   }
 }
@@ -224,12 +225,12 @@ export const suscribirOrdenesCompra = (callback: (ordenes: OrdenCompra[]) => voi
         callback(ordenes)
       },
       (error) => {
-        console.error("[v0] Error fetching ordenes compra:", error.message)
+        logger.error("Error fetching ordenes compra", error, { context: "FirestoreService" })
         callback([])
       },
     )
   } catch (error) {
-    console.error("[v0] Error subscribing to ordenes compra:", error)
+    logger.error("Error subscribing to ordenes compra", error, { context: "FirestoreService" })
     callback([])
     return () => {}
   }
@@ -345,7 +346,7 @@ export const crearVenta = async (data: Omit<Venta, "id">) => {
     await batch.commit()
     return ventaRef.id
   } catch (error) {
-    console.error("[v0] Error creating venta:", error)
+    logger.error("Error creating venta", error, { context: "FirestoreService" })
     return null
   }
 }
@@ -363,12 +364,12 @@ export const suscribirVentas = (callback: (ventas: Venta[]) => void) => {
         callback(ventas)
       },
       (error) => {
-        console.error("[v0] Error fetching ventas:", error.message)
+        logger.error("Error fetching ventas", error, { context: "FirestoreService" })
         callback([])
       },
     )
   } catch (error) {
-    console.error("[v0] Error subscribing to ventas:", error)
+    logger.error("Error subscribing to ventas", error, { context: "FirestoreService" })
     callback([])
     return () => {}
   }
@@ -391,12 +392,12 @@ export const suscribirDistribuidores = (callback: (distribuidores: Distribuidor[
         callback(distribuidores)
       },
       (error) => {
-        console.error("[v0] Error fetching distribuidores:", error.message)
+        logger.error("Error fetching distribuidores", error, { context: "FirestoreService" })
         callback([])
       },
     )
   } catch (error) {
-    console.error("[v0] Error subscribing to distribuidores:", error)
+    logger.error("Error subscribing to distribuidores", error, { context: "FirestoreService" })
     callback([])
     return () => {}
   }
@@ -457,7 +458,7 @@ export const pagarDistribuidor = async (
 
     await batch.commit()
   } catch (error) {
-    console.error("[v0] Error paying distribuidor:", error)
+    logger.error("Error paying distribuidor", error, { context: "FirestoreService" })
   }
 }
 
@@ -478,12 +479,12 @@ export const suscribirClientes = (callback: (clientes: Cliente[]) => void) => {
         callback(clientes)
       },
       (error) => {
-        console.error("[v0] Error fetching clientes:", error.message)
+        logger.error("Error fetching clientes", error, { context: "FirestoreService" })
         callback([])
       },
     )
   } catch (error) {
-    console.error("[v0] Error subscribing to clientes:", error)
+    logger.error("Error subscribing to clientes", error, { context: "FirestoreService" })
     callback([])
     return () => {}
   }
@@ -552,7 +553,7 @@ export const cobrarCliente = async (clienteId: string, ventaId: string, monto: n
 
     await batch.commit()
   } catch (error) {
-    console.error("[v0] Error collecting cliente:", error)
+    logger.error("Error collecting cliente", error, { context: "FirestoreService" })
   }
 }
 
@@ -573,12 +574,12 @@ export const suscribirAlmacen = (callback: (productos: Producto[]) => void) => {
         callback(productos)
       },
       (error) => {
-        console.error("[v0] Error fetching almacen:", error.message)
+        logger.error("Error fetching almacen", error, { context: "FirestoreService" })
         callback([])
       },
     )
   } catch (error) {
-    console.error("[v0] Error subscribing to almacen:", error)
+    logger.error("Error subscribing to almacen", error, { context: "FirestoreService" })
     callback([])
     return () => {}
   }
@@ -615,7 +616,7 @@ export const crearTransferencia = async (
 
     await batch.commit()
   } catch (error) {
-    console.error("[v0] Error creating transferencia:", error)
+    logger.error("Error creating transferencia", error, { context: "FirestoreService" })
   }
 }
 

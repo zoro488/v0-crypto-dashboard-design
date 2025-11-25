@@ -1,5 +1,6 @@
 import { create } from "zustand"
 import { devtools, persist } from "zustand/middleware"
+import { firestoreService } from "../firebase/firestore-service"
 
 interface Distribuidor {
   id: string
@@ -322,6 +323,7 @@ export const useAppStore = create<AppState>()(
           const cliente = state.clientes.find((c) => c.id === clienteId)
 
           if (!cliente) return
+          if (monto <= 0) return
 
           // Actualizar deuda del cliente
           set({
@@ -336,46 +338,63 @@ export const useAppStore = create<AppState>()(
             ),
           })
 
-          const ventasCliente = state.ventas.filter((v) => v.clienteId === clienteId && v.montoRestante > 0)
+          // FIFO: Obtener ventas pendientes ordenadas por fecha (más antigua primero)
+          const ventasPendientes = state.ventas
+            .filter((v) => v.clienteId === clienteId && v.montoRestante > 0)
+            .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())
 
-          if (ventasCliente.length > 0) {
-            // Tomar la venta más antigua con saldo pendiente
-            const venta = ventasCliente[0]
+          if (ventasPendientes.length === 0) return
 
-            // Calcular montos correctos según las fórmulas
+          let montoRestanteAbono = monto
+          const ventasActualizadas = [...state.ventas]
+
+          // Procesar cada venta en orden FIFO hasta agotar el abono
+          for (const venta of ventasPendientes) {
+            if (montoRestanteAbono <= 0) break
+
+            const montoAAplicar = Math.min(montoRestanteAbono, venta.montoRestante)
+            
+            // Calcular montos de distribución por unidad
             const montoBovedaMonte = venta.precioCompraUnidad * venta.cantidad
             const montoFletes = venta.precioFlete * venta.cantidad
             const montoUtilidades =
               (venta.precioVentaUnidad - venta.precioCompraUnidad - venta.precioFlete) * venta.cantidad
 
-            // Calcular proporción del abono sobre el total de la venta
-            const proporcionAbono = monto / venta.precioTotalVenta
+            // Calcular proporción del abono aplicado a esta venta
+            const proporcionAbono = montoAAplicar / venta.precioTotalVenta
 
-            // Distribuir proporcionalmente
+            // Distribuir proporcionalmente a los bancos
             const bancoBovedaMonte = state.bancos.find((b) => b.id === "boveda-monte")
             const bancoFletes = state.bancos.find((b) => b.id === "fletes")
             const bancoUtilidades = state.bancos.find((b) => b.id === "utilidades")
 
-            if (bancoBovedaMonte)
+            if (bancoBovedaMonte) {
               get().updateBancoSaldo("boveda-monte", bancoBovedaMonte.saldo + montoBovedaMonte * proporcionAbono)
-            if (bancoFletes) get().updateBancoSaldo("fletes", bancoFletes.saldo + montoFletes * proporcionAbono)
-            if (bancoUtilidades)
+            }
+            if (bancoFletes) {
+              get().updateBancoSaldo("fletes", bancoFletes.saldo + montoFletes * proporcionAbono)
+            }
+            if (bancoUtilidades) {
               get().updateBancoSaldo("utilidades", bancoUtilidades.saldo + montoUtilidades * proporcionAbono)
+            }
 
-            // Actualizar el monto restante de la venta
-            set({
-              ventas: state.ventas.map((v) =>
-                v.id === venta.id
-                  ? {
-                      ...v,
-                      montoPagado: v.montoPagado + monto,
-                      montoRestante: Math.max(0, v.montoRestante - monto),
-                      estadoPago: v.montoRestante - monto <= 0 ? "completo" : "parcial",
-                    }
-                  : v,
-              ),
-            })
+            // Actualizar la venta en el array
+            const ventaIndex = ventasActualizadas.findIndex((v) => v.id === venta.id)
+            if (ventaIndex !== -1) {
+              const nuevoRestante = venta.montoRestante - montoAAplicar
+              ventasActualizadas[ventaIndex] = {
+                ...venta,
+                montoPagado: venta.montoPagado + montoAAplicar,
+                montoRestante: Math.max(0, nuevoRestante),
+                estadoPago: nuevoRestante <= 0 ? "completo" : "parcial",
+              }
+            }
+
+            montoRestanteAbono -= montoAAplicar
           }
+
+          // Aplicar todas las actualizaciones de ventas
+          set({ ventas: ventasActualizadas })
         },
         crearTransferencia: (origen, destino, monto) => {
           const state = get()
@@ -383,8 +402,21 @@ export const useAppStore = create<AppState>()(
           const bancoDestino = state.bancos.find((b) => b.id === destino)
 
           if (bancoOrigen && bancoDestino && bancoOrigen.saldo >= monto) {
+            // Actualizar estado local
             get().updateBancoSaldo(origen, bancoOrigen.saldo - monto)
             get().updateBancoSaldo(destino, bancoDestino.saldo + monto)
+
+            // Persistir en Firestore
+            firestoreService.crearTransferencia(
+              origen,
+              destino,
+              monto,
+              `Transferencia de ${bancoOrigen.nombre} a ${bancoDestino.nombre}`
+            ).catch((error) => {
+              // Si falla Firestore, revertir cambios locales
+              get().updateBancoSaldo(origen, bancoOrigen.saldo)
+              get().updateBancoSaldo(destino, bancoDestino.saldo)
+            })
           }
         },
         registrarGasto: (banco, monto, concepto) => {
