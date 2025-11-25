@@ -1,13 +1,14 @@
 "use client"
 
-import { useAppStore } from "@/frontend/app/lib/store/useAppStore" // Fixed import path
+import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
 import { AnimatePresence, motion } from "framer-motion"
-import { X, ArrowRightLeft } from "lucide-react" // Fixed import to use lucide-react
-import { BANCOS } from "@/frontend/app/lib/constants" // Fixed import path
+import { X, ArrowRightLeft } from "lucide-react"
+import { BANCOS } from "@/frontend/app/lib/constants"
 import { useState } from "react"
 import { firestoreService } from "@/frontend/app/lib/firebase/firestore-service"
 import { useToast } from "@/frontend/app/hooks/use-toast"
 import { logger } from "@/frontend/app/lib/utils/logger"
+import { validarTransferencia } from "@/frontend/app/lib/schemas/ventas.schema"
 
 export default function CreateTransferenciaModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { toast } = useToast()
@@ -55,20 +56,34 @@ export default function CreateTransferenciaModal({ isOpen, onClose }: { isOpen: 
     }
 
     try {
-      const transferencia = {
-        id: `TRANS_${Date.now()}`,
-        bancoOrigen: formData.bancoOrigen,
-        bancoDestino: formData.bancoDestino,
+      // Validar con Zod
+      const validacion = validarTransferencia({
+        bancoOrigenId: formData.bancoOrigen,
+        bancoDestinoId: formData.bancoDestino,
         monto,
-        concepto: formData.concepto,
-        referencia: formData.referencia,
-        notas: formData.notas,
-        fecha: new Date(),
-        createdAt: new Date(),
+        concepto: formData.concepto || "Transferencia entre bancos",
+      })
+
+      if (!validacion.success) {
+        toast({
+          title: "Error de Validación",
+          description: validacion.errors?.join(", ") || "Datos inválidos",
+          variant: "destructive",
+        })
+        return
       }
 
-      // TODO: Implement addTransferencia method in firestoreService
-      // await firestoreService.addTransferencia(transferencia)
+      // Persistir en Firestore
+      await firestoreService.addTransferencia({
+        bancoOrigenId: formData.bancoOrigen,
+        bancoDestinoId: formData.bancoDestino,
+        monto,
+        concepto: formData.concepto || "Transferencia entre bancos",
+        referencia: formData.referencia,
+        notas: formData.notas,
+      })
+
+      // Actualizar estado local
       crearTransferencia(formData.bancoOrigen, formData.bancoDestino, monto)
 
       toast({

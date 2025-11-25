@@ -1,5 +1,5 @@
 /**
- * Esquemas de validación Zod para el módulo de Ventas
+ * Esquemas de validación Zod para el Sistema CHRONOS
  * @module schemas/ventas
  * 
  * Estos esquemas garantizan la integridad de datos antes de
@@ -38,6 +38,21 @@ export const FechaSchema = z
   .string()
   .datetime({ message: "Formato de fecha inválido. Use formato ISO 8601" })
   .or(z.date())
+
+/**
+ * IDs de bancos válidos en el sistema
+ */
+export const BancoIdSchema = z.enum([
+  "boveda-monte",
+  "boveda-usa", 
+  "utilidades",
+  "fletes",
+  "azteca",
+  "leftie",
+  "profit"
+], {
+  errorMap: () => ({ message: "Banco inválido" }),
+})
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ESQUEMAS DE VENTA

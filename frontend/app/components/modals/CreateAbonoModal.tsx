@@ -1,12 +1,14 @@
 "use client"
 
-import { useAppStore } from "@/frontend/app/lib/store/useAppStore" // Fixed import path
+import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
 import { AnimatePresence, motion } from "framer-motion"
-import { X, Users, User } from "lucide-react" // Fixed import to use lucide-react
+import { X, Users, User } from "lucide-react"
 import { useState } from "react"
-import { BANCOS } from "@/frontend/app/lib/constants" // Fixed import path
+import { BANCOS } from "@/frontend/app/lib/constants"
 import { firestoreService } from "@/frontend/app/lib/firebase/firestore-service"
-import { useToast } from "@/frontend/app/hooks/use-toast" // Import toast hook
+import { useToast } from "@/frontend/app/hooks/use-toast"
+import { logger } from "@/frontend/app/lib/utils/logger"
+import { validarAbono } from "@/frontend/app/lib/schemas/ventas.schema"
 
 export default function CreateAbonoModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { toast } = useToast() // Initialize toast
@@ -40,8 +42,23 @@ export default function CreateAbonoModal({ isOpen, onClose }: { isOpen: boolean;
     const monto = Number.parseFloat(formData.monto)
 
     try {
-      const abono = {
-        id: `ABONO_${Date.now()}`,
+      // Validar con Zod
+      const validacion = validarAbono({
+        clienteId: formData.entidadId,
+        monto,
+      })
+
+      if (!validacion.success) {
+        toast({
+          title: "Error de Validación",
+          description: validacion.errors?.join(", ") || "Datos inválidos",
+          variant: "destructive",
+        })
+        return
+      }
+
+      // Persistir en Firestore
+      await firestoreService.addAbono({
         tipo: formData.tipo,
         entidadId: formData.entidadId,
         monto,
@@ -49,12 +66,9 @@ export default function CreateAbonoModal({ isOpen, onClose }: { isOpen: boolean;
         metodo: formData.metodo,
         referencia: formData.referencia,
         notas: formData.notas,
-        fecha: new Date(),
-        createdAt: new Date(),
-      }
+      })
 
-      // TODO: Implement addAbono method in firestoreService
-      // await firestoreService.addAbono(abono)
+      // Actualizar estado local
 
       if (formData.tipo === "distribuidor") {
         abonarDistribuidor(formData.entidadId, monto, formData.bancoDestino)
@@ -80,13 +94,12 @@ export default function CreateAbonoModal({ isOpen, onClose }: { isOpen: boolean;
         notas: "",
       })
     } catch (error) {
-      console.error("Error creating abono:", error)
+      logger.error("Error creating abono", error, { context: "CreateAbonoModal" })
       toast({
         title: "Error",
         description: "Error al registrar el abono. Por favor intenta de nuevo.",
         variant: "destructive",
       })
-      // </CHANGE>
     }
   }
 

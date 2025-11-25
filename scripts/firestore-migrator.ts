@@ -8,6 +8,35 @@ import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import fs from 'fs';
 import path from 'path';
 
+// Logger simple para scripts CLI (diferente del logger de la aplicación)
+const scriptLogger = {
+  info: (message: string, ...args: unknown[]) => {
+    if (process.env.NODE_ENV !== 'test') {
+      console.info(`ℹ️  ${message}`, ...args);
+    }
+  },
+  success: (message: string, ...args: unknown[]) => {
+    if (process.env.NODE_ENV !== 'test') {
+      console.log(`✅ ${message}`, ...args);
+    }
+  },
+  warn: (message: string, ...args: unknown[]) => {
+    if (process.env.NODE_ENV !== 'test') {
+      console.warn(`⚠️  ${message}`, ...args);
+    }
+  },
+  error: (message: string, error?: unknown) => {
+    if (process.env.NODE_ENV !== 'test') {
+      console.error(`❌ ${message}`, error || '');
+    }
+  },
+  progress: (message: string) => {
+    if (process.env.NODE_ENV !== 'test') {
+      console.log(message);
+    }
+  },
+};
+
 interface MigrationProgress {
   collection: string;
   total: number;
@@ -68,7 +97,7 @@ class FirestoreMigrator {
     if (prog) {
       prog.endTime = new Date();
       const duration = (prog.endTime.getTime() - prog.startTime.getTime()) / 1000;
-      console.log(`\n   ✅ Completado en ${duration.toFixed(2)}s`);
+      scriptLogger.success(`${collection}: Completado en ${duration.toFixed(2)}s`);
     }
   }
 
@@ -76,7 +105,7 @@ class FirestoreMigrator {
    * 1. Migrar Bancos (7 documentos + 28 subcolecciones)
    */
   async migrateBancos(bancos: any) {
-    console.log('\n💰 Migrando Bancos...');
+    scriptLogger.progress('\n💰 Migrando Bancos...');
     const bankIds = Object.keys(bancos);
     this.initProgress('bancos', bankIds.length);
 
@@ -119,7 +148,7 @@ class FirestoreMigrator {
 
         this.updateProgress('bancos');
       } catch (error) {
-        console.error(`\n❌ Error migrando banco ${bankId}:`, error);
+        scriptLogger.error(`Error migrando banco ${bankId}`, error);
         this.updateProgress('bancos', false);
       }
     }
@@ -170,7 +199,7 @@ class FirestoreMigrator {
    * 2. Migrar Ventas
    */
   async migrateVentas(ventas: any[]) {
-    console.log('\n💰 Migrando Ventas...');
+    scriptLogger.progress('\n💰 Migrando Ventas...');
     this.initProgress('ventas', ventas.length);
 
     const batchSize = 450;
@@ -191,7 +220,7 @@ class FirestoreMigrator {
 
           this.updateProgress('ventas');
         } catch (error) {
-          console.error(`\n❌ Error en venta ${venta.id}:`, error);
+          scriptLogger.error(`Error en venta ${venta.id}`, error);
           this.updateProgress('ventas', false);
         }
       });
@@ -206,7 +235,7 @@ class FirestoreMigrator {
    * 3. Migrar Órdenes de Compra
    */
   async migrateOrdenesCompra(compras: any[]) {
-    console.log('\n📦 Migrando Órdenes de Compra...');
+    scriptLogger.progress('\n📦 Migrando Órdenes de Compra...');
     this.initProgress('ordenesCompra', compras.length);
 
     const batch = this.db.batch();
@@ -224,7 +253,7 @@ class FirestoreMigrator {
 
         this.updateProgress('ordenesCompra');
       } catch (error) {
-        console.error(`\n❌ Error en orden ${compra.id}:`, error);
+        scriptLogger.error(`Error en orden ${compra.id}`, error);
         this.updateProgress('ordenesCompra', false);
       }
     });
@@ -237,7 +266,7 @@ class FirestoreMigrator {
    * 4. Migrar Clientes
    */
   async migrateClientes(clientes: any[]) {
-    console.log('\n👥 Migrando Clientes...');
+    scriptLogger.progress('\n👥 Migrando Clientes...');
     this.initProgress('clientes', clientes.length);
 
     const batch = this.db.batch();
@@ -254,7 +283,7 @@ class FirestoreMigrator {
 
         this.updateProgress('clientes');
       } catch (error) {
-        console.error(`\n❌ Error en cliente ${cliente.nombre}:`, error);
+        scriptLogger.error(`Error en cliente ${cliente.nombre}`, error);
         this.updateProgress('clientes', false);
       }
     });
@@ -267,7 +296,7 @@ class FirestoreMigrator {
    * 5. Migrar Distribuidores
    */
   async migrateDistribuidores(distribuidores: any[]) {
-    console.log('\n🚚 Migrando Distribuidores...');
+    scriptLogger.progress('\n🚚 Migrando Distribuidores...');
     this.initProgress('distribuidores', distribuidores.length);
 
     const batch = this.db.batch();
@@ -284,7 +313,7 @@ class FirestoreMigrator {
 
         this.updateProgress('distribuidores');
       } catch (error) {
-        console.error(`\n❌ Error en distribuidor ${dist.nombre}:`, error);
+        scriptLogger.error(`Error en distribuidor ${dist.nombre}`, error);
         this.updateProgress('distribuidores', false);
       }
     });
@@ -297,7 +326,7 @@ class FirestoreMigrator {
    * 6. Migrar Almacén
    */
   async migrateAlmacen(almacen: any) {
-    console.log('\n📦 Migrando Almacén...');
+    scriptLogger.progress('\n📦 Migrando Almacén...');
     
     // Documento principal de almacén
     await this.db.collection('almacen').doc('stock').set({
@@ -325,29 +354,29 @@ class FirestoreMigrator {
       this.finalizeProgress('almacen_movimientos');
     }
 
-    console.log('   ✅ Almacén migrado');
+    scriptLogger.success('Almacén migrado');
   }
 
   /**
    * 7. Migrar Métricas Financieras
    */
   async migrateMetrics(metrics: any) {
-    console.log('\n📊 Migrando Métricas Financieras...');
+    scriptLogger.progress('\n📊 Migrando Métricas Financieras...');
 
     await this.db.collection('metricas').doc('financieras').set({
       ...metrics,
       updatedAt: Timestamp.now(),
     });
 
-    console.log('   ✅ Métricas migradas');
+    scriptLogger.success('Métricas migradas');
   }
 
   /**
    * Ejecutar migración completa
    */
   async migrateAll(dataPath: string) {
-    console.log('\n🚀 INICIANDO MIGRACIÓN A FIRESTORE\n');
-    console.log('='.repeat(60));
+    scriptLogger.progress('\n🚀 INICIANDO MIGRACIÓN A FIRESTORE\n');
+    scriptLogger.progress('='.repeat(60));
 
     try {
       // Cargar datos limpios - ajustar ruta relativa
@@ -371,13 +400,13 @@ class FirestoreMigrator {
 
       const duration = ((Date.now() - startTime) / 1000).toFixed(2);
 
-      console.log('\n' + '='.repeat(60));
-      console.log(`✅ MIGRACIÓN COMPLETADA EN ${duration}s\n`);
+      scriptLogger.progress('\n' + '='.repeat(60));
+      scriptLogger.success(`MIGRACIÓN COMPLETADA EN ${duration}s`);
 
       // Resumen
       this.printSummary();
     } catch (error) {
-      console.error('\n❌ Error durante la migración:', error);
+      scriptLogger.error('Error durante la migración', error);
       throw error;
     }
   }
@@ -386,7 +415,7 @@ class FirestoreMigrator {
    * Imprimir resumen de migración
    */
   private printSummary() {
-    console.log('📋 RESUMEN DE MIGRACIÓN:\n');
+    scriptLogger.progress('\n📋 RESUMEN DE MIGRACIÓN:\n');
     
     let totalProcessed = 0;
     let totalErrors = 0;
@@ -396,22 +425,22 @@ class FirestoreMigrator {
       totalErrors += prog.errors;
       
       const successRate = ((prog.processed - prog.errors) / prog.total * 100).toFixed(1);
-      console.log(`   ${prog.collection}:`);
-      console.log(`      Total: ${prog.total}`);
-      console.log(`      Exitosos: ${prog.processed - prog.errors} (${successRate}%)`);
-      console.log(`      Errores: ${prog.errors}`);
+      scriptLogger.progress(`   ${prog.collection}:`);
+      scriptLogger.progress(`      Total: ${prog.total}`);
+      scriptLogger.progress(`      Exitosos: ${prog.processed - prog.errors} (${successRate}%)`);
+      scriptLogger.progress(`      Errores: ${prog.errors}`);
     });
 
-    console.log(`\n   TOTAL: ${totalProcessed} documentos`);
-    console.log(`   Errores: ${totalErrors}`);
-    console.log(`   Tasa de éxito: ${((totalProcessed - totalErrors) / totalProcessed * 100).toFixed(1)}%`);
+    scriptLogger.progress(`\n   TOTAL: ${totalProcessed} documentos`);
+    scriptLogger.progress(`   Errores: ${totalErrors}`);
+    scriptLogger.progress(`   Tasa de éxito: ${((totalProcessed - totalErrors) / totalProcessed * 100).toFixed(1)}%`);
   }
 
   /**
    * Verificar migración
    */
   async verify() {
-    console.log('\n🔍 Verificando migración...\n');
+    scriptLogger.progress('\n🔍 Verificando migración...\n');
 
     const collections = [
       'bancos',
@@ -425,10 +454,10 @@ class FirestoreMigrator {
 
     for (const coll of collections) {
       const snapshot = await this.db.collection(coll).count().get();
-      console.log(`   ${coll}: ${snapshot.data().count} documentos`);
+      scriptLogger.progress(`   ${coll}: ${snapshot.data().count} documentos`);
     }
 
-    console.log('\n✅ Verificación completada');
+    scriptLogger.success('Verificación completada');
   }
 }
 
@@ -442,10 +471,10 @@ if (require.main === module) {
       await migrator.migrateAll(dataPath);
       await migrator.verify();
 
-      console.log('\n✨ PROCESO COMPLETADO EXITOSAMENTE\n');
+      scriptLogger.success('\n✨ PROCESO COMPLETADO EXITOSAMENTE\n');
       process.exit(0);
     } catch (error) {
-      console.error('❌ Error fatal:', error);
+      scriptLogger.error('Error fatal', error);
       process.exit(1);
     }
   })();

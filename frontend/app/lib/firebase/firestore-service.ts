@@ -26,6 +26,8 @@ const COLLECTIONS = {
   CLIENTES: "clientes",
   PRODUCTOS: "productos",
   ALMACEN: "almacen",
+  TRANSFERENCIAS: "transferencias",
+  ABONOS: "abonos",
 }
 
 // ============================================================
@@ -589,34 +591,159 @@ export const suscribirAlmacen = (callback: (productos: Producto[]) => void) => {
 // TRANSFERENCIAS
 // ============================================================
 
+export interface TransferenciaData {
+  bancoOrigenId: string
+  bancoDestinoId: string
+  monto: number
+  concepto: string
+  referencia?: string
+  notas?: string
+}
+
+export const addTransferencia = async (data: TransferenciaData): Promise<string | null> => {
+  try {
+    const batch = writeBatch(db)
+
+    // Crear documento en colección transferencias
+    const transRef = doc(collection(db, COLLECTIONS.TRANSFERENCIAS))
+    batch.set(transRef, {
+      id: transRef.id,
+      bancoOrigenId: data.bancoOrigenId,
+      bancoDestinoId: data.bancoDestinoId,
+      monto: data.monto,
+      concepto: data.concepto,
+      referencia: data.referencia || "",
+      notas: data.notas || "",
+      fecha: Timestamp.now(),
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    })
+
+    // Actualizar banco origen
+    const origenRef = doc(db, COLLECTIONS.BANCOS, data.bancoOrigenId)
+    batch.update(origenRef, {
+      capitalActual: increment(-data.monto),
+      historicoTransferencias: increment(data.monto),
+      updatedAt: Timestamp.now(),
+    })
+
+    // Actualizar banco destino
+    const destinoRef = doc(db, COLLECTIONS.BANCOS, data.bancoDestinoId)
+    batch.update(destinoRef, {
+      capitalActual: increment(data.monto),
+      historicoIngresos: increment(data.monto),
+      updatedAt: Timestamp.now(),
+    })
+
+    await batch.commit()
+    logger.info("Transferencia creada exitosamente", { data: { id: transRef.id, monto: data.monto } })
+    return transRef.id
+  } catch (error) {
+    logger.error("Error creating transferencia", error, { context: "FirestoreService" })
+    throw error
+  }
+}
+
+// Mantener compatibilidad con función anterior
 export const crearTransferencia = async (
   bancoOrigenId: string,
   bancoDestinoId: string,
   monto: number,
   concepto: string,
 ) => {
+  return addTransferencia({ bancoOrigenId, bancoDestinoId, monto, concepto })
+}
+
+// ============================================================
+// ABONOS
+// ============================================================
+
+export interface AbonoData {
+  tipo: "distribuidor" | "cliente"
+  entidadId: string
+  monto: number
+  bancoDestino: string
+  metodo: "efectivo" | "transferencia" | "cheque"
+  referencia?: string
+  notas?: string
+}
+
+export const addAbono = async (data: AbonoData): Promise<string | null> => {
   try {
     const batch = writeBatch(db)
 
-    // Actualizar banco origen
-    const origenRef = doc(db, COLLECTIONS.BANCOS, bancoOrigenId)
-    batch.update(origenRef, {
-      capitalActual: increment(-monto),
-      historicoTransferencias: increment(monto),
+    // Crear documento en colección abonos
+    const abonoRef = doc(collection(db, COLLECTIONS.ABONOS))
+    batch.set(abonoRef, {
+      id: abonoRef.id,
+      tipo: data.tipo,
+      entidadId: data.entidadId,
+      monto: data.monto,
+      bancoDestino: data.bancoDestino,
+      metodo: data.metodo,
+      referencia: data.referencia || "",
+      notas: data.notas || "",
+      fecha: Timestamp.now(),
+      createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
     })
 
-    // Actualizar banco destino
-    const destinoRef = doc(db, COLLECTIONS.BANCOS, bancoDestinoId)
-    batch.update(destinoRef, {
-      capitalActual: increment(monto),
-      historicoIngresos: increment(monto),
+    // Actualizar entidad (distribuidor o cliente)
+    if (data.tipo === "distribuidor") {
+      const distRef = doc(db, COLLECTIONS.DISTRIBUIDORES, data.entidadId)
+      const distSnap = await getDoc(distRef)
+      if (distSnap.exists()) {
+        const distData = distSnap.data()
+        batch.update(distRef, {
+          deudaTotal: increment(-data.monto),
+          totalPagado: increment(data.monto),
+          historialPagos: [
+            ...(distData.historialPagos || []),
+            {
+              fecha: Timestamp.now(),
+              monto: data.monto,
+              bancoDestino: data.bancoDestino,
+              abonoId: abonoRef.id,
+            },
+          ],
+          updatedAt: Timestamp.now(),
+        })
+      }
+    } else {
+      const clienteRef = doc(db, COLLECTIONS.CLIENTES, data.entidadId)
+      const clienteSnap = await getDoc(clienteRef)
+      if (clienteSnap.exists()) {
+        const clienteData = clienteSnap.data()
+        batch.update(clienteRef, {
+          deudaTotal: increment(-data.monto),
+          totalPagado: increment(data.monto),
+          historialPagos: [
+            ...(clienteData.historialPagos || []),
+            {
+              fecha: Timestamp.now(),
+              monto: data.monto,
+              abonoId: abonoRef.id,
+            },
+          ],
+          updatedAt: Timestamp.now(),
+        })
+      }
+    }
+
+    // Actualizar banco destino (ingreso)
+    const bancoRef = doc(db, COLLECTIONS.BANCOS, data.bancoDestino)
+    batch.update(bancoRef, {
+      capitalActual: increment(data.monto),
+      historicoIngresos: increment(data.monto),
       updatedAt: Timestamp.now(),
     })
 
     await batch.commit()
+    logger.info("Abono creado exitosamente", { data: { id: abonoRef.id, monto: data.monto, tipo: data.tipo } })
+    return abonoRef.id
   } catch (error) {
-    logger.error("Error creating transferencia", error, { context: "FirestoreService" })
+    logger.error("Error creating abono", error, { context: "FirestoreService" })
+    throw error
   }
 }
 
@@ -634,4 +761,6 @@ export const firestoreService = {
   cobrarCliente,
   suscribirAlmacen,
   crearTransferencia,
+  addTransferencia,
+  addAbono,
 }
