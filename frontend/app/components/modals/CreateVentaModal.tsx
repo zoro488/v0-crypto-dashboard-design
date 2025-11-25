@@ -7,6 +7,8 @@ import { Dialog, DialogContent, DialogDescription } from "@/frontend/app/compone
 import { useToast } from "@/frontend/app/hooks/use-toast"
 import { firestoreService } from "@/frontend/app/lib/firebase/firestore-service"
 import { useAlmacenData } from "@/frontend/app/lib/firebase/firestore-hooks.service"
+import { validarVenta, type CrearVentaInput } from "@/frontend/app/lib/schemas/ventas.schema"
+import type { Producto } from "@/frontend/app/types"
 
 interface CreateVentaModalProps {
   open: boolean
@@ -30,7 +32,7 @@ export function CreateVentaModal({ open, onClose }: CreateVentaModalProps) {
     montoPagado: 0,
   })
 
-  const [productoSeleccionado, setProductoSeleccionado] = useState<any>(null)
+  const [productoSeleccionado, setProductoSeleccionado] = useState<Producto | null>(null)
 
   useEffect(() => {
     if (formData.productoId) {
@@ -49,16 +51,22 @@ export function CreateVentaModal({ open, onClose }: CreateVentaModalProps) {
   const precioTotalUnidad = formData.precioVentaUnidad + formData.precioFlete
   const precioTotalVenta = precioTotalUnidad * formData.cantidad
 
+  // ✅ FÓRMULA CORRECTA: Utilidades = (Venta - Compra - Flete) × Cantidad
   const distribucionBancos = {
     bovedaMonte: formData.precioCompraUnidad * formData.cantidad,
     fletes: formData.precioFlete * formData.cantidad,
-    utilidades: (formData.precioVentaUnidad - formData.precioCompraUnidad) * formData.cantidad,
+    utilidades: (formData.precioVentaUnidad - formData.precioCompraUnidad - formData.precioFlete) * formData.cantidad,
   }
 
   const nextStep = () => setStep((s) => Math.min(s + 1, 4))
   const prevStep = () => setStep((s) => Math.max(s - 1, 1))
 
   const handleSubmit = async () => {
+    if (!productoSeleccionado) {
+      toast({ title: "Error", description: "Debe seleccionar un producto", variant: "destructive" })
+      return
+    }
+
     setLoading(true)
     try {
       const montoRealPagado =
@@ -68,7 +76,7 @@ export function CreateVentaModal({ open, onClose }: CreateVentaModalProps) {
             ? formData.montoPagado
             : 0
 
-      const venta = {
+      const ventaData = {
         fecha: new Date().toISOString(),
         cliente: formData.cliente,
         producto: productoSeleccionado.nombre,
@@ -76,12 +84,28 @@ export function CreateVentaModal({ open, onClose }: CreateVentaModalProps) {
         precioVentaUnidad: formData.precioVentaUnidad,
         precioCompraUnidad: formData.precioCompraUnidad,
         precioFlete: formData.precioFlete,
-        precioTotalUnidad,
         precioTotalVenta,
         montoPagado: montoRealPagado,
         montoRestante: precioTotalVenta - montoRealPagado,
         estadoPago: formData.estadoPago,
         distribucionBancos,
+      }
+
+      // Validar con Zod antes de enviar
+      const validacion = validarVenta(ventaData)
+      if (!validacion.success) {
+        toast({
+          title: "Error de Validación",
+          description: validacion.errors?.join(", ") || "Datos inválidos",
+          variant: "destructive",
+        })
+        setLoading(false)
+        return
+      }
+
+      const venta = {
+        ...ventaData,
+        precioTotalUnidad,
         createdAt: new Date(),
         updatedAt: new Date(),
       }
