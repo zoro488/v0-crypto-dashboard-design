@@ -481,7 +481,7 @@ export default function BentoIA() {
         <AIBrainVisualizer 
           width={900} 
           height={600} 
-          isThinking={isTyping || botControl.state === 'talking'} 
+          isThinking={isTyping} 
           activityLevel={isListening ? 0.8 : 0.3}
           className="w-full" 
         />

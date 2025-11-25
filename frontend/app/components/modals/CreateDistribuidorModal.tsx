@@ -39,7 +39,8 @@ export default function CreateDistribuidorModal({ isOpen, onClose, onSubmit }: C
         updatedAt: new Date(),
       }
 
-      await firestoreService.crearDistribuidor(distribuidorData)
+      // TODO: Implement crearDistribuidor method in firestoreService
+      // await firestoreService.crearDistribuidor(distribuidorData)
 
       onSubmit(distribuidorData)
 

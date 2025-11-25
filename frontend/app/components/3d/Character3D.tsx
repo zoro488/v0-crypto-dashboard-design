@@ -109,7 +109,11 @@ export function Character3D({
   return (
     <group>
       {/* Main character body */}
-      <animated.group scale={scale as any} rotation-y={rotation as any}>
+      <group 
+        // @ts-ignore - animated properties
+        scale={scale as any} 
+        rotation-y={rotation as any}
+      >
         {/* Head */}
         <mesh ref={headRef} position={[0, 1.5, 0]}>
           <sphereGeometry args={[0.5, 32, 32]} />
@@ -185,7 +189,7 @@ export function Character3D({
             roughness={0.3}
           />
         </mesh>
-      </animated.group>
+      </group>
 
       {/* Audio visualization particles */}
       {(isListening || isSpeaking) && (

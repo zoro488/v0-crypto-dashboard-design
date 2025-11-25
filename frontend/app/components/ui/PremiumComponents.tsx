@@ -8,18 +8,19 @@ import { useHoverGlow, useCountUp, useRipple, premiumVariants } from '@/frontend
 import { cn } from '@/frontend/app/lib/utils';
 
 // Premium Card con hover glow effect
-interface PremiumCardProps extends HTMLMotionProps<'div'> {
-  children: React.ReactNode;
+interface PremiumCardProps {
+  children?: any;
   glowColor?: string;
   className?: string;
+  [key: string]: any;
 }
 
-export const PremiumCard: React.FC<PremiumCardProps> = ({
+export const PremiumCard = ({
   children,
   glowColor = 'rgba(59, 130, 246, 0.5)',
   className,
   ...props
-}) => {
+}: PremiumCardProps) => {
   const { isHovered, handleMouseEnter, handleMouseLeave, glowStyle } = useHoverGlow(glowColor);
 
   return (
@@ -49,7 +50,7 @@ export const PremiumCard: React.FC<PremiumCardProps> = ({
       {isHovered && (
         <motion.div
           className="absolute inset-0 -z-10"
-          style={glowStyle}
+          style={glowStyle as any}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -64,7 +65,7 @@ export const PremiumCard: React.FC<PremiumCardProps> = ({
         transition={{ duration: 0.6, ease: 'easeInOut' }}
       />
 
-      {children}
+      {children as any}
     </motion.div>
   );
 };
@@ -158,7 +159,7 @@ export const RippleButton: React.FC<RippleButtonProps> = ({
       onClick={handleClick}
       {...(props as any)}
     >
-      {children}
+      {children as any}
 
       {/* Ripple effects */}
       {ripples.map((ripple) => (
@@ -246,7 +247,7 @@ export const StatCard: React.FC<StatCardProps> = ({
             whileHover={{ rotate: 360, scale: 1.1 }}
             transition={{ duration: 0.6 }}
           >
-            {icon}
+            {icon as any}
           </motion.div>
         )}
       </div>
@@ -359,7 +360,7 @@ export const AnimatedBadge: React.FC<BadgeProps> = ({
           }}
         />
       )}
-      {children}
+      {children as any}
     </motion.span>
   );
 };

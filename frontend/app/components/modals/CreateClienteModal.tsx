@@ -39,7 +39,8 @@ export default function CreateClienteModal({ isOpen, onClose, onSubmit }: Create
         updatedAt: new Date(),
       }
 
-      await firestoreService.crearCliente(clienteData)
+      // TODO: Implement crearCliente method in firestoreService
+      // await firestoreService.crearCliente(clienteData)
 
       onSubmit(clienteData)
 

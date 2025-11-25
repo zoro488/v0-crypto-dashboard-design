@@ -47,9 +47,9 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function BentoDashboard() {
   const { bancos } = useAppStore()
-  const { ventas, loading: loadingVentas } = useVentas()
-  const { ordenesCompra, loading: loadingOC } = useOrdenesCompra()
-  const { productos, loading: loadingProductos } = useProductos()
+  const { data: ventas, loading: loadingVentas } = useVentas()
+  const { data: ordenesCompra, loading: loadingOC } = useOrdenesCompra()
+  const { data: productos, loading: loadingProductos } = useProductos()
 
   const [mounted, setMounted] = useState(false)
   const [showChronos, setShowChronos] = useState(true)
@@ -67,17 +67,17 @@ export default function BentoDashboard() {
     return () => clearTimeout(timer)
   }, [])
 
-  const capitalTotal = bancos.reduce((acc, b) => acc + b.saldo, 0)
-  const ventasMes = ventas?.reduce((acc, v) => acc + v.montoTotal, 0) || 0
-  const stockActual = productos?.reduce((acc, p) => acc + p.stock, 0) || 0
-  const ordenesActivas = ordenesCompra?.filter((oc) => oc.estado === "pendiente").length || 0
+  const capitalTotal = bancos?.reduce((acc, b) => acc + (b?.saldo || 0), 0) || 0
+  const ventasMes = ventas?.reduce((acc, v) => acc + (v?.montoTotal || 0), 0) || 0
+  const stockActual = productos?.reduce((acc, p) => acc + (p?.stock || 0), 0) || 0
+  const ordenesActivas = ordenesCompra?.filter((oc) => oc?.estado === "pendiente")?.length || 0
 
   const mockChartData =
     ventas?.slice(-7).map((v, i) => ({
-      name: new Date(v.fecha.seconds * 1000).toLocaleDateString("es-MX", { month: "short" }),
-      value: v.montoTotal,
-      sales: v.precioVenta * v.cantidad,
-      profit: v.ganancia || 0,
+      name: v?.fecha?.seconds ? new Date(v.fecha.seconds * 1000).toLocaleDateString("es-MX", { month: "short" }) : "N/A",
+      value: v?.montoTotal || 0,
+      sales: (v?.precioVenta || 0) * (v?.cantidad || 0),
+      profit: v?.ganancia || 0,
     })) || []
 
   const radarData = [
@@ -137,7 +137,7 @@ export default function BentoDashboard() {
   }
 
   return (
-    <div className="bento-container relative min-h-screen">
+    <div className="grid grid-cols-12 gap-6 p-6 relative min-h-screen">
       <AnimatePresence mode="wait">
         {showChronos && (
           <motion.div
@@ -380,8 +380,8 @@ export default function BentoDashboard() {
             <Filter className="w-4 h-4 text-white/60" />
           </motion.button>
         </div>
-        <div className="space-y-3 max-h-[280px] overflow-y-auto custom-scrollbar pr-2">
-          {bancos.slice(0, 5).map((banco, index) => (
+        <div className="space-y-3 max-h-[280px] overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.2) transparent' }}>
+          {bancos?.slice(0, 5).map((banco, index) => (
             <motion.div
               key={banco.id}
               initial={{ opacity: 0, x: 20 }}
@@ -439,16 +439,8 @@ export default function BentoDashboard() {
             </motion.div>
           </div>
 
-          <div className="h-[200px] w-full relative">
-            <ResponsiveContainer width="100%" height="100%">
-              <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
-                <PolarGrid stroke="#ffffff10" />
-                <PolarAngleAxis dataKey="subject" tick={{ fill: "#ffffff60", fontSize: 10 }} />
-                <PolarRadiusAxis angle={30} domain={[0, 150]} tick={false} axisLine={false} />
-                <Radar name="Performance" dataKey="A" stroke="#8b5cf6" strokeWidth={2} fill="#8b5cf6" fillOpacity={0.3} />
-                <Tooltip content={<CustomTooltip />} />
-              </RadarChart>
-            </ResponsiveContainer>
+          <div className="h-[200px] w-full relative flex items-center justify-center">
+            <p className="text-white/40 text-sm">RadarChart temporarily disabled - Recharts React 19 compatibility</p>
           </div>
         </div>
       </motion.div>

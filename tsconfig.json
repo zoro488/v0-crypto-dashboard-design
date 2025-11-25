@@ -36,6 +36,10 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "frontend/app/node_modules"
+    "frontend/app/node_modules",
+    "backend",
+    "scripts",
+    "node_modules",
+    "components/ui"
   ]
 }

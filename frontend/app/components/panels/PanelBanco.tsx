@@ -16,7 +16,7 @@ import {
   Filter,
   Download,
 } from "lucide-react"
-import { Card } from "@/frontend/app/components/ui/card"
+import { Card, CardHeader, CardTitle, CardContent } from "@/frontend/app/components/ui/card"
 import { Button } from "@/frontend/app/components/ui/button"
 import { Badge } from "@/frontend/app/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/frontend/app/components/ui/tabs"
@@ -645,7 +645,7 @@ export default function PanelBanco({ banco }: PanelBancoProps) {
             <div className="bg-white/10 backdrop-blur-xl rounded-xl p-6 border border-white/20">
               <p className="text-white/80 text-sm mb-2">Saldo Actual</p>
               <h2 className="text-4xl font-bold text-white">
-                $<AnimatedNumber value={banco.saldo} />
+                $<AnimatedNumber value={banco.capitalActual} />
               </h2>
             </div>
             <div className="bg-white/10 backdrop-blur-xl rounded-xl p-6 border border-white/20">
@@ -671,30 +671,23 @@ export default function PanelBanco({ banco }: PanelBancoProps) {
           value={totalIngresos}
           prefix="$"
           icon={ArrowDownRight}
-          gradient="from-green-500 to-emerald-500"
-          change={12.5}
         />
         <StatsCard
           title="Gastos Totales"
           value={totalGastos}
           prefix="$"
           icon={ArrowUpRight}
-          gradient="from-red-500 to-pink-500"
-          change={-8.3}
         />
         <StatsCard
           title="Transferencias"
           value={totalTransferencias}
           icon={ArrowLeftRight}
-          gradient="from-blue-500 to-cyan-500"
-          subtitle="Realizadas"
         />
         <StatsCard
           title="Promedio Diario"
           value={Math.round((totalIngresos - totalGastos) / 7)}
           prefix="$"
           icon={TrendingUp}
-          gradient="from-purple-500 to-pink-500"
         />
       </div>
 

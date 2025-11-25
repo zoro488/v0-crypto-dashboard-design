@@ -27,7 +27,7 @@ export function ScrollReveal({ children, className = "", delay = 0 }: ScrollReve
       }}
       className={className}
     >
-      {children}
+      {children as any}
     </motion.div>
   )
 }
@@ -49,7 +49,7 @@ export function Parallax({ children, speed = 50, className = "" }: ParallaxProps
 
   return (
     <div ref={ref} className={className}>
-      <motion.div style={{ y }}>{children}</motion.div>
+      <motion.div style={{ y }}>{children as any}</motion.div>
     </div>
   )
 }

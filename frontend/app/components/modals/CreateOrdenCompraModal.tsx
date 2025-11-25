@@ -44,6 +44,10 @@ export function CreateOrdenCompraModal({ open, onClose }: CreateOrdenCompraModal
       const costoPorUnidad = formData.costoDistribuidor + formData.costoTransporte
       const costoTotal = costoPorUnidad * formData.cantidad
 
+      const estado: "pagado" | "parcial" | "pendiente" = 
+        formData.pagoInicial === costoTotal ? "pagado" : 
+        formData.pagoInicial > 0 ? "parcial" : "pendiente"
+
       const ordenCompra = {
         fecha: new Date().toISOString(),
         distribuidor: formData.distribuidor,
@@ -56,8 +60,10 @@ export function CreateOrdenCompraModal({ open, onClose }: CreateOrdenCompraModal
         costoTotal,
         pagoDistribuidor: formData.pagoInicial,
         deuda: costoTotal - formData.pagoInicial,
-        estado: formData.pagoInicial === costoTotal ? "pagado" : formData.pagoInicial > 0 ? "parcial" : "pendiente",
+        estado,
         bancoOrigen: formData.bancoOrigen,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }
 
       await firestoreService.crearOrdenCompra(ordenCompra)

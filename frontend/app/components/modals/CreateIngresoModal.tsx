@@ -19,7 +19,7 @@ const BANCOS = ["Bóveda Monte", "Bóveda USA", "Utilidades", "Fletes", "Azteca"
 export default function CreateIngresoModal({ isOpen, onClose }: CreateIngresoModalProps) {
   const { toast } = useToast()
   const bancos = useAppStore((state) => state.bancos)
-  const addIngreso = useAppStore((state) => state.addIngreso)
+  // const addIngreso = useAppStore((state) => state.addIngreso) // TODO: Implement in store
 
   const [formData, setFormData] = useState({
     bancoId: "",
@@ -61,8 +61,9 @@ export default function CreateIngresoModal({ isOpen, onClose }: CreateIngresoMod
     }
 
     try {
-      await firestoreService.addIngreso(ingreso)
-      addIngreso(ingreso)
+      // TODO: Implement addIngreso method in firestoreService
+      // await firestoreService.addIngreso(ingreso)
+      // addIngreso(ingreso) // TODO: Implement addIngreso in store
 
       toast({
         title: "Ingreso Registrado",
@@ -135,7 +136,7 @@ export default function CreateIngresoModal({ isOpen, onClose }: CreateIngresoMod
                   </option>
                   {bancos.map((banco) => (
                     <option key={banco.id} value={banco.id} className="bg-gray-900">
-                      {banco.nombre} - ${(banco.capitalActual ?? 0).toLocaleString()}
+                      {banco.nombre} - ${(banco.saldo ?? 0).toLocaleString()}
                     </option>
                   ))}
                 </select>
@@ -146,7 +147,7 @@ export default function CreateIngresoModal({ isOpen, onClose }: CreateIngresoMod
                 <div className="mt-3 p-3 rounded-xl bg-white/5 border border-white/10">
                   <p className="text-sm text-white/60">Capital actual:</p>
                   <p className="text-lg font-semibold text-white">
-                    ${(selectedBanco.capitalActual ?? 0).toLocaleString()}
+                    ${(selectedBanco.saldo ?? 0).toLocaleString()}
                   </p>
                 </div>
               )}

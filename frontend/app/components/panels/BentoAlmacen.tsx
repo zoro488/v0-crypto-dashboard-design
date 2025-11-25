@@ -389,14 +389,24 @@ export default function BentoAlmacen() {
           <h3 className="text-xl font-bold text-white">Mapa de Calor de Inventario</h3>
           <p className="text-sm text-white/60">Visualización isométrica de niveles de stock</p>
         </div>
-        <InventoryHeatGrid width={900} height={600} className="w-full" />
+        <InventoryHeatGrid className="w-full" />
       </motion.div>
     </div>
   )
 }
 
-function KPI_Card({ title, value, subValue, icon: Icon, color, delay, highlight = false }: any) {
-  const colors = {
+interface KPI_CardProps {
+  title: string
+  value: string | number
+  subValue?: string
+  icon: React.ComponentType<{ className?: string }>
+  color: "green" | "red" | "blue" | "purple"
+  delay: number
+  highlight?: boolean
+}
+
+function KPI_Card({ title, value, subValue, icon: Icon, color, delay, highlight = false }: KPI_CardProps) {
+  const colors: Record<KPI_CardProps["color"], string> = {
     green: "from-emerald-500 to-teal-600 text-emerald-400 bg-emerald-500/10",
     red: "from-rose-500 to-pink-600 text-rose-400 bg-rose-500/10",
     blue: "from-blue-500 to-cyan-600 text-cyan-400 bg-cyan-500/10",

@@ -156,31 +156,23 @@ export default function Ventas() {
           title="Ventas del Día"
           value={72000}
           prefix="$"
-          change={12.5}
           icon={DollarSign}
-          gradient="from-green-500 to-emerald-500"
         />
         <StatsCard
           title="Ventas del Mes"
           value={1850000}
           prefix="$"
-          change={8.3}
           icon={TrendingUp}
-          gradient="from-blue-500 to-cyan-500"
         />
         <StatsCard
           title="Clientes Activos"
           value={45}
           icon={Users}
-          gradient="from-purple-500 to-pink-500"
-          subtitle="Este mes"
         />
         <StatsCard
           title="Productos Vendidos"
           value={328}
           icon={Package}
-          gradient="from-orange-500 to-red-500"
-          subtitle="Esta semana"
         />
       </div>
 

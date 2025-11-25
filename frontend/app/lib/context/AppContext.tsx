@@ -60,15 +60,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const initBancos: Banco[] = BANCOS.map((banco) => ({
       id: banco.id,
       nombre: banco.nombre,
+      icon: banco.icon || "DollarSign",
       color: banco.color,
+      tipo: banco.tipo || "operativo",
+      descripcion: banco.descripcion || "",
       capitalActual: 0,
       historicoIngresos: 0,
       historicoGastos: 0,
       historicoTransferencias: 0,
-      ingresos: [],
-      gastos: [],
-      cortes: [],
-      transferencias: [],
+      estado: "activo" as const,
+      operaciones: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }))
 
     setBancos(initBancos)

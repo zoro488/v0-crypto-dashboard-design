@@ -201,31 +201,24 @@ export default function Clientes() {
           title="Total Clientes"
           value={clientesData.length}
           icon={Users}
-          gradient="from-green-500 to-emerald-500"
-          subtitle="Activos"
         />
         <StatsCard
           title="Ventas Totales"
           value={745000}
           prefix="$"
           icon={ShoppingCart}
-          gradient="from-blue-500 to-cyan-500"
-          change={22.4}
         />
         <StatsCard
           title="Saldo Pendiente"
           value={57000}
           prefix="$"
           icon={TrendingUp}
-          gradient="from-orange-500 to-red-500"
-          subtitle="Por cobrar"
         />
         <StatsCard
           title="Promedio por Cliente"
           value={248333}
           prefix="$"
           icon={DollarSign}
-          gradient="from-purple-500 to-pink-500"
         />
       </div>
 

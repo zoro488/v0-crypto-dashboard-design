@@ -14,7 +14,7 @@ import { ClientNetworkGraph } from "@/frontend/app/components/visualizations/Cli
 export default function BentoClientes() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showAbonoModal, setShowAbonoModal] = useState(false) // State for Abono Modal
-  const { clientes, loading } = useClientes()
+  const { data: clientes, loading } = useClientes()
 
   const topClientes = clientes?.sort((a, b) => b.totalVentas - a.totalVentas).slice(0, 5) || []
   const totalDeuda = clientes?.reduce((acc, c) => acc + c.deudaTotal, 0) || 0
@@ -226,7 +226,11 @@ export default function BentoClientes() {
         </div>
       </motion.div>
       {/* Create Cliente Modal */}
-      <CreateClienteModal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} />
+      <CreateClienteModal 
+        isOpen={showCreateModal} 
+        onClose={() => setShowCreateModal(false)} 
+        onSubmit={() => {}} 
+      />
       <CreateAbonoModal isOpen={showAbonoModal} onClose={() => setShowAbonoModal(false)} /> {/* Add Abono Modal */}
 
       {/* Client Network Graph - Premium Visualization */}

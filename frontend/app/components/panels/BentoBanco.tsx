@@ -549,19 +549,18 @@ const TableHeader = ({ children }: { children: React.ReactNode }) => (
 // Helper component for Status Badges
 const StatusBadge = ({
   status,
-  type = "default",
+  type = "info",
 }: { status: string; type?: "success" | "warning" | "error" | "info" }) => {
   const styles = {
     success: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
     warning: "bg-amber-500/10 text-amber-400 border-amber-500/20",
     error: "bg-rose-500/10 text-rose-400 border-rose-500/20",
     info: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    default: "bg-white/5 text-white/60 border-white/10",
   }
 
   return (
     <span
-      className={`px-3 py-1 rounded-full text-xs font-medium border backdrop-blur-md ${styles[type] || styles.default}`}
+      className={`px-3 py-1 rounded-full text-xs font-medium border backdrop-blur-md ${styles[type]}`}
     >
       {status}
     </span>

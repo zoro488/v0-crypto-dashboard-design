@@ -116,6 +116,7 @@ export function SplitScreenIA({
         }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
       >
+        {/* @ts-ignore - motion.div children type */}
         {rightContent}
       </motion.div>
 

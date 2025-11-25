@@ -14,8 +14,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/frontend/app/components/u
 export default function BentoDistribuidores() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showAbonoModal, setShowAbonoModal] = useState(false)
-  const { distribuidores, loading: loadingDist, error: errorDist } = useDistribuidores()
-  const { ordenesCompra = [], loading: loadingOC, error: errorOC } = useOrdenesCompra()
+  const { data: distribuidores, loading: loadingDist, error: errorDist } = useDistribuidores()
+  const { data: ordenesCompra = [], loading: loadingOC, error: errorOC } = useOrdenesCompra()
 
   const [internalLoading, setInternalLoading] = useState(true)
 
@@ -274,7 +274,11 @@ export default function BentoDistribuidores() {
       </motion.div>
 
       {/* Create Distribuidor Modal */}
-      <CreateDistribuidorModal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} />
+      <CreateDistribuidorModal 
+        isOpen={showCreateModal} 
+        onClose={() => setShowCreateModal(false)} 
+        onSubmit={() => {}} 
+      />
       <CreateAbonoModal isOpen={showAbonoModal} onClose={() => setShowAbonoModal(false)} />
     </div>
   )

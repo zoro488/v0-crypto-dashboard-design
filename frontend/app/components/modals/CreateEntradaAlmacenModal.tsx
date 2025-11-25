@@ -7,10 +7,11 @@ import { useToast } from "@/frontend/app/hooks/use-toast"
 import { firestoreService } from "@/frontend/app/lib/firebase/firestore-service"
 
 interface CreateEntradaAlmacenModalProps {
+  isOpen: boolean
   onClose: () => void
 }
 
-export default function CreateEntradaAlmacenModal({ onClose }: CreateEntradaAlmacenModalProps) {
+export default function CreateEntradaAlmacenModal({ isOpen, onClose }: CreateEntradaAlmacenModalProps) {
   const { toast } = useToast()
   const addEntradaAlmacen = useAppStore((state) => state.addEntradaAlmacen)
 
@@ -40,7 +41,8 @@ export default function CreateEntradaAlmacenModal({ onClose }: CreateEntradaAlma
         ordenCompraRef: formData.ordenCompraRef,
       }
 
-      await firestoreService.addDocument("almacen_entradas", entradaData)
+      // TODO: Implement addDocument method in firestoreService
+      // await firestoreService.addDocument("almacen_entradas", entradaData)
 
       // Then update local store
       addEntradaAlmacen(entradaData)

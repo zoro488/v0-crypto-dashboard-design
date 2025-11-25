@@ -277,14 +277,9 @@ export default function BentoReportes() {
             className="bento-md crystal-card p-6 ambient-glow"
           >
             <h3 className="text-xl font-bold text-white mb-4">Performance General</h3>
-            <ResponsiveContainer width="100%" height={250}>
-              <RadarChart data={ventas}>
-                <PolarGrid stroke="#ffffff20" />
-                <PolarAngleAxis dataKey="subject" stroke="#fff" tick={{ fill: "#ffffff80" }} />
-                <PolarRadiusAxis stroke="#ffffff20" />
-                <Radar name="Actual" dataKey="precioTotalVenta" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} />
-              </RadarChart>
-            </ResponsiveContainer>
+            <div className="h-[250px] flex items-center justify-center">
+              <p className="text-white/40 text-sm">RadarChart temporarily disabled - Recharts React 19 compatibility</p>
+            </div>
           </motion.div>
         </>
       )}

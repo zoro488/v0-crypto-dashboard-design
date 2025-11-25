@@ -218,56 +218,30 @@ function BancoSelector({ collapsed, selectedBanco, onBancoChange, onViewBanco }:
       nombre: "Bóveda Monte",
       icon: "building",
       color: "from-blue-500 to-blue-700",
-      saldo: 2450000,
-      estado: "activo",
+      tipo: "operativo" as const,
+      descripcion: "Cuenta operativa principal",
+      capitalActual: 2450000,
+      historicoIngresos: 0,
+      historicoGastos: 0,
+      historicoTransferencias: 0,
+      estado: "activo" as const,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
     {
       id: "boveda-usa",
       nombre: "Bóveda USA",
       icon: "flag",
       color: "from-red-500 via-white to-blue-500",
-      saldo: 128005,
-      estado: "activo",
-    },
-    {
-      id: "utilidades",
-      nombre: "Utilidades",
-      icon: "diamond",
-      color: "from-green-500 to-emerald-700",
-      saldo: 102658,
-      estado: "activo",
-    },
-    {
-      id: "fletes",
-      nombre: "Fletes",
-      icon: "truck",
-      color: "from-orange-500 to-red-600",
-      saldo: 185792,
-      estado: "activo",
-    },
-    {
-      id: "azteca",
-      nombre: "Azteca",
-      icon: "store",
-      color: "from-purple-500 to-purple-700",
-      saldo: -178715,
-      estado: "negativo",
-    },
-    {
-      id: "leftie",
-      nombre: "Leftie",
-      icon: "briefcase",
-      color: "from-cyan-500 to-blue-600",
-      saldo: 45844,
-      estado: "activo",
-    },
-    {
-      id: "profit",
-      nombre: "Profit",
-      icon: "trending-up",
-      color: "from-yellow-500 to-amber-600",
-      saldo: 12577748,
-      estado: "activo",
+      tipo: "externo" as const,
+      descripcion: "Cuenta internacional",
+      capitalActual: 128005,
+      historicoIngresos: 0,
+      historicoGastos: 0,
+      historicoTransferencias: 0,
+      estado: "activo" as const,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
   ]
 
@@ -301,8 +275,8 @@ function BancoSelector({ collapsed, selectedBanco, onBancoChange, onViewBanco }:
           {!collapsed && (
             <div className="flex-1 text-left ml-3">
               <p className="text-sm font-medium">{banco.nombre}</p>
-              <p className={`text-xs ${banco.saldo < 0 ? "text-red-400" : "text-green-400"}`}>
-                ${banco.saldo.toLocaleString("es-MX")}
+              <p className={`text-xs ${banco.capitalActual < 0 ? "text-red-400" : "text-green-400"}`}>
+                ${banco.capitalActual.toLocaleString("es-MX")}
               </p>
             </div>
           )}

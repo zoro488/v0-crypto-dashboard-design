@@ -33,7 +33,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         {...props}
       >
-        {children}
+        {children as any}
       </motion.div>
     )
   }

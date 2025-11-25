@@ -32,7 +32,7 @@ const ventasData = [
 
 const distribucionBancosData = BANCOS.map((banco) => ({
   name: banco.nombre,
-  value: Math.abs(banco.saldo),
+  value: Math.abs(banco.capitalActual),
   color: banco.color,
 }))
 
@@ -55,33 +55,25 @@ export default function Dashboard() {
         <KPICard
           title="Ventas del Día"
           value={`$${MOCK_DATA.ventasHoy.toLocaleString("es-MX")}`}
-          change={cambioVentas}
           icon={TrendingUp}
-          gradient="from-blue-500 to-purple-600"
         />
         <KPICard
           title="Órdenes Pendientes"
           value={MOCK_DATA.ordenesPendientes.toString()}
-          change={5}
           icon={ShoppingCart}
-          gradient="from-orange-500 to-red-600"
           valuePrefix=""
         />
         <KPICard
           title="Stock Crítico"
           value={MOCK_DATA.stockCritico.toString()}
-          change={-2}
           icon={AlertTriangle}
-          gradient="from-red-500 to-pink-600"
           valuePrefix=""
           isNegativeGood
         />
         <KPICard
           title="Capital Total"
           value={`$${MOCK_DATA.capitalTotal.toLocaleString("es-MX")}`}
-          change={cambioCapital}
           icon={Wallet}
-          gradient="from-green-500 to-emerald-600"
         />
       </div>
 
@@ -252,9 +244,9 @@ export default function Dashboard() {
 interface KPICardProps {
   title: string
   value: string
-  change: number
+  change?: number
   icon: any
-  gradient: string
+  gradient?: string
   valuePrefix?: string
   isNegativeGood?: boolean
 }
@@ -262,9 +254,9 @@ interface KPICardProps {
 function KPICard({
   title,
   value,
-  change,
+  change = 0,
   icon: Icon,
-  gradient,
+  gradient = "from-blue-500 to-purple-600",
   valuePrefix = "$",
   isNegativeGood = false,
 }: KPICardProps) {

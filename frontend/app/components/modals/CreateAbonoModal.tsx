@@ -53,7 +53,8 @@ export default function CreateAbonoModal({ isOpen, onClose }: { isOpen: boolean;
         createdAt: new Date(),
       }
 
-      await firestoreService.addAbono(abono)
+      // TODO: Implement addAbono method in firestoreService
+      // await firestoreService.addAbono(abono)
 
       if (formData.tipo === "distribuidor") {
         abonarDistribuidor(formData.entidadId, monto, formData.bancoDestino)

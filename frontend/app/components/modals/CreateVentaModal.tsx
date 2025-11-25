@@ -82,6 +82,8 @@ export function CreateVentaModal({ open, onClose }: CreateVentaModalProps) {
         montoRestante: precioTotalVenta - montoRealPagado,
         estadoPago: formData.estadoPago,
         distribucionBancos,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }
 
       await firestoreService.crearVenta(venta)

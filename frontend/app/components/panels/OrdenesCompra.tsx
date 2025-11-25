@@ -169,23 +169,17 @@ export default function OrdenesCompra() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatsCard title="Total Órdenes" value={245} subtitle="Desde inicio" gradient="from-blue-500 to-cyan-500" />
         <StatsCard
           title="Pendientes"
           value={23}
-          subtitle="Por pagar"
-          gradient="from-orange-500 to-red-500"
-          badgeColor="orange"
+          icon={Clock}
         />
         <StatsCard
           title="Este Mes"
           value={1245000}
           prefix="$"
-          subtitle="+15.3% vs mes anterior"
-          gradient="from-green-500 to-emerald-500"
-          change={15.3}
+          icon={CheckCircle}
         />
-        <StatsCard title="Distribuidores" value={6} subtitle="Activos" gradient="from-purple-500 to-pink-500" />
       </div>
 
       {/* Tabla */}

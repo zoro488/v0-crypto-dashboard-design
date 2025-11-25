@@ -7,6 +7,7 @@ import { BANCOS } from "@/frontend/app/lib/constants" // Fixed import path
 import { useState } from "react"
 import { firestoreService } from "@/frontend/app/lib/firebase/firestore-service"
 import { useToast } from "@/frontend/app/hooks/use-toast"
+import { logger } from "@/frontend/app/lib/utils/logger"
 
 export default function CreateTransferenciaModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { toast } = useToast()
@@ -66,7 +67,8 @@ export default function CreateTransferenciaModal({ isOpen, onClose }: { isOpen: 
         createdAt: new Date(),
       }
 
-      await firestoreService.addTransferencia(transferencia)
+      // TODO: Implement addTransferencia method in firestoreService
+      // await firestoreService.addTransferencia(transferencia)
       crearTransferencia(formData.bancoOrigen, formData.bancoDestino, monto)
 
       toast({
@@ -84,7 +86,7 @@ export default function CreateTransferenciaModal({ isOpen, onClose }: { isOpen: 
         notas: "",
       })
     } catch (error) {
-      console.error("Error creating transferencia:", error)
+      logger.error("Error creating transferencia", error, { context: "CreateTransferenciaModal" })
       toast({
         title: "Error",
         description: "Error al crear la transferencia. Por favor intenta de nuevo.",

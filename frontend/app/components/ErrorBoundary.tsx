@@ -1,7 +1,8 @@
 "use client"
 
-import React, { Component, type ReactNode } from "react"
+import React, { Component, type ReactNode, type ErrorInfo } from "react"
 import { motion } from "framer-motion"
+import { logger } from "@/frontend/app/lib/utils/logger"
 
 interface Props {
   children: ReactNode
@@ -23,11 +24,14 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error }
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("ErrorBoundary caught an error:", error, errorInfo)
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    logger.error("ErrorBoundary caught an error", error, { 
+      context: "ErrorBoundary",
+      data: errorInfo 
+    })
   }
 
-  render() {
+  render(): ReactNode {
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback
@@ -70,6 +74,6 @@ export class ErrorBoundary extends Component<Props, State> {
       )
     }
 
-    return this.props.children
+    return this.props.children as ReactNode
   }
 }

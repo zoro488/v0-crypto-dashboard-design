@@ -197,30 +197,23 @@ export default function Distribuidores() {
           title="Total Distribuidores"
           value={distribuidoresData.length}
           icon={Users}
-          gradient="from-blue-500 to-cyan-500"
-          subtitle="Activos"
         />
         <StatsCard
           title="Compras Totales"
           value={1350000}
           prefix="$"
           icon={ShoppingBag}
-          gradient="from-green-500 to-emerald-500"
-          change={18.5}
         />
         <StatsCard
           title="Órdenes Activas"
           value={9}
           icon={TrendingUp}
-          gradient="from-orange-500 to-red-500"
-          subtitle="En proceso"
         />
         <StatsCard
           title="Promedio por Distribuidor"
           value={450000}
           prefix="$"
           icon={DollarSign}
-          gradient="from-purple-500 to-pink-500"
         />
       </div>
 

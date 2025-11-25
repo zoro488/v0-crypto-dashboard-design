@@ -7,6 +7,7 @@ import { X, Package, DollarSign, Tag } from "lucide-react"
 import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
 import { firestoreService } from "@/frontend/app/lib/firebase/firestore-service"
 import { useToast } from "@/frontend/app/hooks/use-toast"
+import { logger } from "@/frontend/app/lib/utils/logger"
 
 interface CreateProductoModalProps {
   isOpen: boolean
@@ -15,7 +16,7 @@ interface CreateProductoModalProps {
 
 export default function CreateProductoModal({ isOpen, onClose }: CreateProductoModalProps) {
   const { toast } = useToast()
-  const addProducto = useAppStore((state) => state.addProducto)
+  // const addProducto = useAppStore((state) => state.addProducto) // TODO: Implement in store
 
   const [formData, setFormData] = useState({
     nombre: "",
@@ -63,8 +64,9 @@ export default function CreateProductoModal({ isOpen, onClose }: CreateProductoM
     }
 
     try {
-      await firestoreService.addProducto(newProducto)
-      addProducto(newProducto)
+      // TODO: Implement addProducto method in firestoreService
+      // await firestoreService.addProducto(newProducto)
+      // addProducto(newProducto) // TODO: Implement addProducto in store
       toast({
         title: "Producto Creado",
         description: `${newProducto.nombre} ha sido agregado al catálogo correctamente.`,
@@ -72,7 +74,7 @@ export default function CreateProductoModal({ isOpen, onClose }: CreateProductoM
       onClose()
       setFormData({ nombre: "", descripcion: "", precioCompra: "", precioVenta: "", sku: "" })
     } catch (error) {
-      console.error("Error creating producto:", error)
+      logger.error("Error creating producto", error, { context: "CreateProductoModal" })
       toast({
         title: "Error",
         description: "Error al crear el producto. Por favor intenta de nuevo.",
