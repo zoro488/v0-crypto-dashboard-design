@@ -1,0 +1,49 @@
+{
+  "fecha": "2025-11-23T14:42:31.347Z",
+  "totalFixes": 23,
+  "totalIssues": 0,
+  "fixes": [
+    "✅ Cliente \"Ax\": Adeudo -317380 → 0 (Crédito a favor: $317,380)",
+    "✅ Venta VENTA-2025-08-25T00:00:00-Trámite Chucho-10: Precio trámite 0 → $500",
+    "✅ Venta VENTA-2025-09-02T00:00:00-Trámite Güerito-25: Precio trámite 0 → $500",
+    "✅ Venta VENTA-2025-09-03T00:00:00-Trámite Playa Azul-30: Precio trámite 0 → $500",
+    "✅ Venta VENTA-2025-09-04T00:00:00-Trámite Chucho-33: Precio trámite 0 → $500",
+    "✅ Venta VENTA-2025-09-08T00:00:00-Trámite Chucho-38: Precio trámite 0 → $500",
+    "✅ Venta VENTA-2025-09-09T00:00:00-Trámite Chucho-41: Precio trámite 0 → $500",
+    "✅ Venta VENTA-2025-09-15T00:00:00-Trámite Chucho-51: Precio trámite 0 → $500",
+    "✅ Venta VENTA-2025-09-18T00:00:00-Trámite Chucho-57: Precio trámite 0 → $500",
+    "✅ Venta VENTA-2025-09-23T00:00:00-Trámite Chucho-67: Precio trámite 0 → $500",
+    "✅ Venta VENTA-2025-10-06T00:00:00-Trámite Playa Azul-79: Precio trámite 0 → $500",
+    "✅ Venta VENTA-2025-10-06T00:00:00-Trámite Chucho-80: Precio trámite 0 → $500",
+    "✅ Venta VENTA-2025-10-06T00:00:00-Trámite Chucho-81: Precio trámite 0 → $500",
+    "✅ Venta VENTA-2025-10-20T00:00:00-Trámite Chucho-99: Precio trámite 0 → $500",
+    "✅ Cliente creado: \"Trámite Chucho\" (Adeudo: $0)",
+    "✅ Cliente creado: \"470.0\" (Adeudo: $0)",
+    "✅ Banco \"bovedaMonte\": Capital inicializado → $0",
+    "✅ Banco \"bovedaUsa\": Capital inicializado → $128,005",
+    "✅ Banco \"utilidades\": Capital inicializado → $102,658",
+    "✅ Banco \"fleteSur\": Capital inicializado → $185,792",
+    "✅ Banco \"azteca\": Capital inicializado → $36,278.32",
+    "✅ Banco \"leftie\": Capital inicializado → $45,844",
+    "✅ Banco \"profit\": Capital inicializado → $12,577,748"
+  ],
+  "issues": [],
+  "resumenDatos": {
+    "ventas": 96,
+    "clientes": 33,
+    "distribuidores": 6,
+    "compras": 9,
+    "bancos": 7
+  },
+  "metricasFinancieras": {
+    "capitalTotal": 13076325.32,
+    "inventarioActual": 17,
+    "carteraPorCobrar": 2952300,
+    "cuentasPorPagar": 12240900,
+    "utilidadTotal": -5842200,
+    "costoTotalInventario": 14478800,
+    "ventasTotales": 8636600,
+    "comprasTotales": 14478800,
+    "fechaActualizacion": "2025-11-23T14:42:31.345Z"
+  }
+}

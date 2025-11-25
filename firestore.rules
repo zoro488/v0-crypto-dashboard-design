@@ -3,46 +3,174 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // REGLAS PARA BANCOS
+    // ═══════════════════════════════════════════════════════════════
+    // HELPER FUNCTIONS
+    // ═══════════════════════════════════════════════════════════════
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    function isManager() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'manager'];
+    }
+    
+    function canWrite() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'manager', 'operator'];
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function validateTimestamps() {
+      return request.resource.data.keys().hasAll(['createdAt', 'updatedAt']) &&
+             request.resource.data.createdAt is timestamp &&
+             request.resource.data.updatedAt is timestamp;
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // USERS COLLECTION
+    // ═══════════════════════════════════════════════════════════════
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // BANCOS (4 principales)
+    // ═══════════════════════════════════════════════════════════════
     match /bancos/{bancoId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isAuthenticated();
+      allow create: if isManager();
+      allow update: if canWrite();
+      allow delete: if isAdmin();
+      
+      // Subcolecciones: ingresos, gastos, transferencias, cuentas_por_cobrar
+      match /{subcollection}/{docId} {
+        allow read: if isAuthenticated();
+        allow create: if canWrite() && validateTimestamps();
+        allow update: if canWrite() && validateTimestamps();
+        allow delete: if isManager();
+      }
     }
-    
-    // REGLAS PARA ÓRDENES DE COMPRA
+
+    // ═══════════════════════════════════════════════════════════════
+    // ÓRDENES DE COMPRA
+    // ═══════════════════════════════════════════════════════════════
     match /ordenesCompra/{ordenId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isAuthenticated();
+      allow create: if canWrite() && 
+                      request.resource.data.keys().hasAll(['folio', 'fecha', 'proveedor', 'monto']) &&
+                      request.resource.data.monto >= 0;
+      allow update: if canWrite();
+      allow delete: if isManager();
     }
-    
-    // REGLAS PARA VENTAS
+
+    // ═══════════════════════════════════════════════════════════════
+    // VENTAS
+    // ═══════════════════════════════════════════════════════════════
     match /ventas/{ventaId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isAuthenticated();
+      allow create: if canWrite() && 
+                      request.resource.data.keys().hasAll(['folio', 'fecha', 'cliente', 'total']) &&
+                      request.resource.data.total >= 0;
+      allow update: if canWrite();
+      allow delete: if isManager();
     }
-    
-    // REGLAS PARA DISTRIBUIDORES
+
+    // ═══════════════════════════════════════════════════════════════
+    // DISTRIBUIDORES
+    // ═══════════════════════════════════════════════════════════════
     match /distribuidores/{distribuidorId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isAuthenticated();
+      allow create: if canWrite();
+      allow update: if canWrite();
+      allow delete: if isManager();
     }
-    
-    // REGLAS PARA CLIENTES
+
+    // ═══════════════════════════════════════════════════════════════
+    // CLIENTES
+    // ═══════════════════════════════════════════════════════════════
     match /clientes/{clienteId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isAuthenticated();
+      allow create: if canWrite();
+      allow update: if canWrite();
+      allow delete: if isManager();
     }
-    
-    // REGLAS PARA ALMACÉN
+
+    // ═══════════════════════════════════════════════════════════════
+    // ALMACÉN Y PRODUCTOS
+    // ═══════════════════════════════════════════════════════════════
     match /almacen/{productoId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isAuthenticated();
+      allow create: if canWrite() && 
+                      request.resource.data.stockActual >= 0;
+      allow update: if canWrite() && 
+                      request.resource.data.stockActual >= 0;
+      allow delete: if isManager();
     }
     
-    // REGLAS PARA PRODUCTOS
     match /productos/{productoId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isAuthenticated();
+      allow create: if canWrite();
+      allow update: if canWrite();
+      allow delete: if isManager();
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // MOVIMIENTOS DE ALMACÉN
+    // ═══════════════════════════════════════════════════════════════
+    match /movimientos/{movimientoId} {
+      allow read: if isAuthenticated();
+      allow create: if canWrite() && 
+                      request.resource.data.tipo in ['entrada', 'salida'] &&
+                      request.resource.data.cantidad > 0;
+      allow update: if isManager();
+      allow delete: if isAdmin();
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // REPORTES
+    // ═══════════════════════════════════════════════════════════════
+    match /reportes/{reporteId} {
+      allow read: if isAuthenticated();
+      allow create: if isManager();
+      allow update: if isManager();
+      allow delete: if isAdmin();
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // CONFIGURACIÓN DEL SISTEMA
+    // ═══════════════════════════════════════════════════════════════
+    match /config/{configId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // LOGS DE AUDITORÍA
+    // ═══════════════════════════════════════════════════════════════
+    match /audit_logs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // BLOQUEAR TODO LO DEMÁS
+    // ═══════════════════════════════════════════════════════════════
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

@@ -1,0 +1,238 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CHRONOS SYSTEM - GITIGNORE COMPLETO
+# ═══════════════════════════════════════════════════════════════════════════
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DEPENDENCIES
+# ═══════════════════════════════════════════════════════════════════════════
+node_modules/
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.npm
+.npmrc
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ENVIRONMENT VARIABLES (CRÍTICO)
+# ═══════════════════════════════════════════════════════════════════════════
+.env
+.env.local
+.env*.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+
+# Firebase Admin SDK credentials
+firebase-admin-key.json
+firebase-service-account.json
+*-service-account.json
+serviceAccountKey.json
+
+# AWS/GCP credentials
+.aws/
+.gcp/
+credentials.json
+service-account-*.json
+
+# API Keys y secrets
+secrets/
+*.pem
+*.key
+*.cert
+*.p12
+*.pfx
+
+# ═══════════════════════════════════════════════════════════════════════════
+# NEXT.JS
+# ═══════════════════════════════════════════════════════════════════════════
+.next/
+out/
+dist/
+build/
+.swc/
+*.tsbuildinfo
+next-env.d.ts
+
+# ═══════════════════════════════════════════════════════════════════════════
+# TESTING
+# ═══════════════════════════════════════════════════════════════════════════
+coverage/
+.nyc_output/
+*.lcov
+test-results/
+playwright-report/
+playwright/.cache/
+.vitest/
+
+# ═══════════════════════════════════════════════════════════════════════════
+# FIREBASE
+# ═══════════════════════════════════════════════════════════════════════════
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+firestore-debug.log
+ui-debug.log
+.firebaserc.local
+
+# Emulator data
+*-debug.log
+firestore-export-*/
+firebase-export-*/
+
+# ═══════════════════════════════════════════════════════════════════════════
+# LOGGING
+# ═══════════════════════════════════════════════════════════════════════════
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+combined.log
+error.log
+access.log
+debug.log
+
+# ═══════════════════════════════════════════════════════════════════════════
+# OPERATING SYSTEM
+# ═══════════════════════════════════════════════════════════════════════════
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ═══════════════════════════════════════════════════════════════════════════
+# IDEs Y EDITORES
+# ═══════════════════════════════════════════════════════════════════════════
+# VSCode
+.vscode/
+.vscode-test/
+*.code-workspace
+.history/
+
+# JetBrains
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.vim/
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DEPLOYMENT PLATFORMS
+# ═══════════════════════════════════════════════════════════════════════════
+.vercel
+.vercel.json
+.railway/
+.netlify/
+.heroku/
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DATABASES
+# ═══════════════════════════════════════════════════════════════════════════
+*.sqlite
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
+*.mongo
+dump.rdb
+
+# ═══════════════════════════════════════════════════════════════════════════
+# TEMPORARY FILES
+# ═══════════════════════════════════════════════════════════════════════════
+tmp/
+temp/
+*.tmp
+*.temp
+*.cache
+.cache/
+.temp/
+
+# ═══════════════════════════════════════════════════════════════════════════
+# BACKUP FILES
+# ═══════════════════════════════════════════════════════════════════════════
+*.bak
+*.backup
+*.old
+*.orig
+*-backup.*
+*_backup.*
+
+# ═══════════════════════════════════════════════════════════════════════════
+# PACKAGE MANAGERS
+# ═══════════════════════════════════════════════════════════════════════════
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# ═══════════════════════════════════════════════════════════════════════════
+# MISC
+# ═══════════════════════════════════════════════════════════════════════════
+.eslintcache
+.stylelintcache
+.prettiercache
+.turbo/
+.docusaurus/
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+.vscode-test
+
+# Bundle analysis
+.next/analyze/
+stats.json
+bundle-stats.html
+
+# Sentry
+.sentryclirc
+sentry.properties
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SECURITY SCAN RESULTS
+# ═══════════════════════════════════════════════════════════════════════════
+.snyk
+snyk-report.json
+security-audit.json
+
+# ═══════════════════════════════════════════════════════════════════════════
+# KEEP THESE FILES (EXCEPTIONS)
+# ═══════════════════════════════════════════════════════════════════════════
+!.env.example
+!.env.local.example
+!firebase-admin-key.example.json

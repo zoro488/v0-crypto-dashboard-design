@@ -1,0 +1,65 @@
+{
+  "fecha": "2025-10-20T20:43:29.053Z",
+  "archivoProcesado": "excel_data.json",
+  "estructura": {
+    "ventas": 80,
+    "clientes": 29,
+    "ordenesCompra": 9,
+    "distribuidores": 6,
+    "bancos": 0
+  },
+  "inconsistencias": {
+    "total": 25,
+    "detalle": {
+      "clientesNumericos": 1,
+      "estatusMixtos": 2,
+      "adeudosNegativos": 2,
+      "preciosEnCero": 22,
+      "calculosIncorrectos": 0,
+      "ocFaltantes": 0,
+      "clientesFaltantes": 9
+    },
+    "ejemplos": {
+      "clientesNumericos": [
+        {
+          "indice": 25,
+          "cliente": 470,
+          "venta": "VENTA-2025-09-03-470.0-29"
+        }
+      ],
+      "adeudosNegativos": [
+        {
+          "indice": 0,
+          "nombre": "Primo",
+          "adeudo": -3000
+        },
+        {
+          "indice": 2,
+          "nombre": "Ax",
+          "adeudo": -317380
+        }
+      ],
+      "preciosEnCero": [
+        {
+          "indice": 21,
+          "cliente": "Trámite Güerito"
+        },
+        {
+          "indice": 26,
+          "cliente": "Trámite Playa Azul"
+        },
+        {
+          "indice": 29,
+          "cliente": "Trámite Chucho"
+        }
+      ],
+      "calculosIncorrectos": []
+    }
+  },
+  "integridad": {
+    "ocFaltantes": 0,
+    "clientesFaltantes": 9,
+    "ocsTotales": 9,
+    "clientesTotales": 29
+  }
+}
