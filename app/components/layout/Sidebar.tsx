@@ -58,7 +58,7 @@ export default function Sidebar({
     <motion.aside
       animate={{ width: collapsed ? 80 : 288 }}
       transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-      className="fixed left-0 top-18 h-[calc(100vh-72px)] border-r border-white/10 glass-ultra z-20"
+      className="fixed left-0 top-18 h-[calc(100vh-72px)] bg-black/30 backdrop-blur-xl border-r border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] z-20"
     >
       <ScrollArea className="h-full">
         <div className="p-4 space-y-6">
@@ -138,7 +138,7 @@ export default function Sidebar({
 
         {/* Footer */}
         {!collapsed && (
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10 glass-strong">
+          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10 bg-black/20 backdrop-blur-xl">
             <div className="text-xs text-slate-400 space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-apple">v3.0.0 Ultra</span>

@@ -1,5 +1,8 @@
 import { Timestamp } from "firebase/firestore"
 
+// Re-exportar tipos del sistema inmersivo 3D
+export * from "./immersive"
+
 // Tipo para timestamps de Firestore
 export type FirestoreTimestamp = Timestamp | Date | string
 
