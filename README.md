@@ -94,6 +94,35 @@ npm run dev      # Desarrollo
 npm run build    # Build de producción
 npm run start    # Servidor de producción
 npm run lint     # Linting
+npm run test     # E2E tests con Playwright
+npm run test:ui  # E2E tests con UI
+npm run test:debug # E2E tests en modo debug
+\`\`\`
+
+## CI/CD
+
+Este proyecto utiliza GitHub Actions para CI/CD:
+
+- **CI**: Linting, type checking, build y tests E2E en cada push/PR
+- **Deploy**: Deploy automático a Vercel en push a `main`
+
+### Secrets Requeridos en GitHub
+
+Para el funcionamiento completo del CI/CD, configurar los siguientes secrets en GitHub:
+
+\`\`\`
+# Vercel
+VERCEL_TOKEN           - Token de Vercel para deploy
+VERCEL_ORG_ID          - ID de organización de Vercel
+VERCEL_PROJECT_ID      - ID del proyecto en Vercel
+
+# Firebase
+NEXT_PUBLIC_FIREBASE_API_KEY
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+NEXT_PUBLIC_FIREBASE_PROJECT_ID
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+NEXT_PUBLIC_FIREBASE_APP_ID
 \`\`\`
 
 ## Documentación Completa
