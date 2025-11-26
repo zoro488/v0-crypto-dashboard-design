@@ -1,0 +1,105 @@
+name: ✨ Feature Request
+description: Sugerir una nueva funcionalidad o mejora
+title: "[FEATURE]: "
+labels: ["enhancement", "needs-triage"]
+assignees:
+  - zoro488
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ¡Gracias por sugerir una mejora! 💡
+        Por favor llena la información a continuación para ayudarnos a entender tu solicitud.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: ¿Está relacionado con un problema?
+      description: Una descripción clara y concisa del problema. Ej. "Me frustra cuando..."
+      placeholder: Describe el problema que estás experimentando...
+    validations:
+      required: false
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solución Propuesta
+      description: Una descripción clara y concisa de lo que te gustaría que pasara.
+      placeholder: Me gustaría que...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas Consideradas
+      description: Una descripción clara de cualquier solución alternativa que hayas considerado.
+      placeholder: También consideré...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioridad
+      description: ¿Qué tan importante es esta feature para ti?
+      options:
+        - Baja - Sería bueno tenerla
+        - Media - Mejoraría mi experiencia
+        - Alta - La necesito pronto
+        - Crítica - Bloquea mi trabajo
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área del Sistema
+      description: ¿A qué parte del sistema afecta?
+      multiple: true
+      options:
+        - Dashboard
+        - Órdenes de Compra
+        - Ventas
+        - Distribuidores
+        - Clientes
+        - Banco
+        - Almacén
+        - Reportes
+        - IA
+        - Profit
+        - Casa de Cambio
+        - UI/UX General
+        - Performance
+        - Otro
+    validations:
+      required: true
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Mockups o Screenshots
+      description: Si tienes mockups o referencias visuales, agrégalas aquí.
+      placeholder: Arrastra y suelta imágenes aquí...
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Contexto Adicional
+      description: Cualquier otra información o contexto sobre la feature request.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Confirmación
+      description: Por favor confirma lo siguiente
+      options:
+        - label: He buscado en los issues existentes y esta feature no ha sido solicitada antes
+          required: true
+        - label: Estoy dispuesto a ayudar con la implementación de esta feature
+          required: false

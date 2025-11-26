@@ -6,7 +6,11 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint .",
-    "start": "next start"
+    "lint:fix": "eslint . --fix",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "build:analyze": "ANALYZE=true next build",
+    "test": "echo 'No tests configured yet' && exit 0"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "latest",
@@ -61,11 +65,14 @@
     "zustand": "latest"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4.1.9",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/three": "^0.171.0",
+    "eslint": "^9",
+    "eslint-config-next": "^15",
     "postcss": "^8.5",
     "tailwindcss": "^4.1.9",
     "typescript": "^5"
