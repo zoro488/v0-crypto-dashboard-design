@@ -51,7 +51,7 @@ export interface AIAction {
 }
 
 export interface AIVisualization {
-  type: 'line' | 'bar' | 'pie' | 'area' | 'heatmap';
+  type: 'line' | 'bar' | 'pie' | 'area' | 'heatmap' | 'donut' | 'scatter';
   title: string;
   data: unknown[];
   config?: Record<string, unknown>;
@@ -163,7 +163,7 @@ export class MegaAIAgentService {
   async sendMessage(request: AIRequest): Promise<AIResponse> {
     try {
       // Registrar interacción para aprendizaje
-      await this.learningService.logInteraction(
+      await this.learningService.trackActivity(
         request.userId, 
         'chat_message', 
         'general',
@@ -436,8 +436,13 @@ export class MegaAIAgentService {
       const stats = this.calculateStats(data, collectionName);
       const visualizations = this.generateVisualizations(data, collectionName);
 
-      // Actualizar aprendizaje
-      await this.learningService.updateUsedCollection(request.userId, collectionName);
+      // Actualizar aprendizaje - registrar uso de colección
+      await this.learningService.trackActivity(
+        request.userId, 
+        'query_collection', 
+        collectionName,
+        { timeframe }
+      );
 
       const formattedMessage = this.formatQueryResponse(collectionName, stats, timeframe);
 
@@ -774,7 +779,7 @@ export class MegaAIAgentService {
       message: `📊 **Reporte de ${entity} - ${timeframe}**\n\n` +
         `He generado un análisis completo con KPIs, visualizaciones e insights.`,
       data: dashboard.dashboard,
-      visualizations: dashboard.dashboard?.visualizations,
+      visualizations: dashboard.dashboard?.visualizations as AIVisualization[] | undefined,
       actions: [
         {
           type: 'export',
@@ -878,7 +883,7 @@ export class MegaAIAgentService {
       type: 'visualization',
       message: `📈 **Análisis de ${entity} - ${timeframe}**${insightsText}${recommendationsText}`,
       data: dashboard.dashboard,
-      visualizations: dashboard.dashboard?.visualizations,
+      visualizations: dashboard.dashboard?.visualizations as AIVisualization[] | undefined,
       suggestions: [
         'Ver detalles de insights',
         'Exportar análisis',
@@ -1062,7 +1067,7 @@ export class MegaAIAgentService {
     const docRef = await addDoc(collectionRef, docData);
     
     // Registrar para aprendizaje
-    await this.learningService.logInteraction(
+    await this.learningService.trackActivity(
       this.userId,
       'create_record',
       collectionName,

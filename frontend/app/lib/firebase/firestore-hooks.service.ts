@@ -318,7 +318,10 @@ export function useGastos(bancoId: string): HookResult<DocumentData> {
   
   return {
     ...result,
-    data: result.data.filter(m => m.tipoMovimiento === 'gasto' || m.tipoMovimiento === 'transferencia_salida')
+    data: result.data.filter(m => {
+      const mov = m as Record<string, unknown>;
+      return mov.tipoMovimiento === 'gasto' || mov.tipoMovimiento === 'transferencia_salida';
+    })
   }
 }
 
@@ -334,7 +337,7 @@ export function useTransferencias(bancoId: string): HookResult<DocumentData> {
   
   return {
     ...result,
-    data: result.data.filter(m => m.tipoMovimiento?.includes('transferencia'))
+    data: result.data.filter(m => (m as Record<string, unknown>).tipoMovimiento?.toString().includes('transferencia'))
   }
 }
 

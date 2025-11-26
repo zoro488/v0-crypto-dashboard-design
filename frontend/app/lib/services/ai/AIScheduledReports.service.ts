@@ -21,6 +21,45 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/frontend/app/lib/firebase/config';
 
+// Interfaces para datos de Firestore
+interface FirestoreVenta {
+  id: string;
+  total?: number;
+  cantidad?: number;
+  fecha?: { toDate: () => Date } | Date;
+  cliente?: string;
+  producto?: string;
+}
+
+interface FirestoreCompra {
+  id: string;
+  total?: number;
+  fecha?: { toDate: () => Date } | Date;
+  proveedor?: string;
+}
+
+interface FirestoreProducto {
+  id: string;
+  nombre?: string;
+  stockActual?: number;
+  stockMinimo?: number;
+  costo?: number;
+}
+
+interface FirestoreBanco {
+  id: string;
+  nombre?: string;
+  capitalActual?: number;
+  saldo?: number;
+}
+
+interface FirestoreCliente {
+  id: string;
+  nombre?: string;
+  estado?: string;
+  deuda?: number;
+}
+
 // Tipos
 export interface ScheduledReport {
   id?: string;
@@ -108,11 +147,12 @@ export interface ReportInsight {
 }
 
 // Cron patterns predefinidos
-const CRON_PATTERNS = {
+const CRON_PATTERNS: Record<string, string> = {
   daily: '0 8 * * *',      // 8am todos los días
   weekly: '0 8 * * 1',     // Lunes 8am
   monthly: '0 8 1 * *',    // Día 1 de cada mes 8am
-} as const;
+  custom: '0 8 * * *',     // Default para custom
+};
 
 export class AIScheduledReportsService {
   private readonly collectionName = 'scheduled_reports';
@@ -286,7 +326,10 @@ export class AIScheduledReportsService {
   private async generateVentasReport(filters?: ReportFilters): Promise<ReportData> {
     const ventasRef = collection(db, 'ventas');
     const snapshot = await getDocs(ventasRef);
-    const ventas = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const ventas: FirestoreVenta[] = snapshot.docs.map(doc => ({ 
+      id: doc.id, 
+      ...(doc.data() as Omit<FirestoreVenta, 'id'>) 
+    }));
 
     const totalVentas = ventas.reduce((sum, v) => sum + (Number(v.total) || 0), 0);
     const promedioVenta = ventas.length > 0 ? totalVentas / ventas.length : 0;
@@ -294,8 +337,15 @@ export class AIScheduledReportsService {
     // Agrupar por día para gráfico
     const ventasPorDia: Record<string, number> = {};
     ventas.forEach(v => {
-      const fecha = v.fecha?.toDate?.()?.toISOString().split('T')[0] || 'Sin fecha';
-      ventasPorDia[fecha] = (ventasPorDia[fecha] || 0) + (Number(v.total) || 0);
+      let fechaStr = 'Sin fecha';
+      if (v.fecha) {
+        if (typeof v.fecha === 'object' && 'toDate' in v.fecha) {
+          fechaStr = v.fecha.toDate().toISOString().split('T')[0];
+        } else if (v.fecha instanceof Date) {
+          fechaStr = v.fecha.toISOString().split('T')[0];
+        }
+      }
+      ventasPorDia[fechaStr] = (ventasPorDia[fechaStr] || 0) + (Number(v.total) || 0);
     });
 
     return {
@@ -341,7 +391,10 @@ export class AIScheduledReportsService {
   private async generateComprasReport(filters?: ReportFilters): Promise<ReportData> {
     const comprasRef = collection(db, 'compras');
     const snapshot = await getDocs(comprasRef);
-    const compras = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const compras: FirestoreCompra[] = snapshot.docs.map(doc => ({ 
+      id: doc.id, 
+      ...(doc.data() as Omit<FirestoreCompra, 'id'>) 
+    }));
 
     const totalCompras = compras.reduce((sum, c) => sum + (Number(c.total) || 0), 0);
 
@@ -373,7 +426,10 @@ export class AIScheduledReportsService {
   private async generateInventarioReport(filters?: ReportFilters): Promise<ReportData> {
     const productosRef = collection(db, 'productos');
     const snapshot = await getDocs(productosRef);
-    const productos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const productos: FirestoreProducto[] = snapshot.docs.map(doc => ({ 
+      id: doc.id, 
+      ...(doc.data() as Omit<FirestoreProducto, 'id'>) 
+    }));
 
     const stockBajo = productos.filter(p => 
       Number(p.stockActual) <= Number(p.stockMinimo)
@@ -429,7 +485,10 @@ export class AIScheduledReportsService {
     // Obtener datos de bancos
     const bancosRef = collection(db, 'bancos');
     const bancosSnapshot = await getDocs(bancosRef);
-    const bancos = bancosSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const bancos: FirestoreBanco[] = bancosSnapshot.docs.map(doc => ({ 
+      id: doc.id, 
+      ...(doc.data() as Omit<FirestoreBanco, 'id'>) 
+    }));
 
     const capitalTotal = bancos.reduce((sum, b) => 
       sum + (Number(b.capitalActual) || Number(b.saldo) || 0), 0
@@ -473,7 +532,10 @@ export class AIScheduledReportsService {
   private async generateClientesReport(filters?: ReportFilters): Promise<ReportData> {
     const clientesRef = collection(db, 'clientes');
     const snapshot = await getDocs(clientesRef);
-    const clientes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const clientes: FirestoreCliente[] = snapshot.docs.map(doc => ({ 
+      id: doc.id, 
+      ...(doc.data() as Omit<FirestoreCliente, 'id'>) 
+    }));
 
     const activos = clientes.filter(c => c.estado === 'activo');
 

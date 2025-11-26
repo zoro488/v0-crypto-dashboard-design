@@ -134,7 +134,7 @@ export class UserLearningService {
   private sessionId: string;
   private sessionStart: Date;
   private activityBuffer: UserActivity[] = [];
-  private flushInterval: NodeJS.Timer | null = null;
+  private flushInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     this.sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -376,10 +376,11 @@ export class UserLearningService {
     const timePatterns: TimePattern[] = Object.entries(timeActivity)
       .map(([key, data]) => {
         const [day, hour] = key.split('_').map(Number);
+        const level = data.count > 10 ? 'high' : data.count > 5 ? 'medium' : 'low';
         return {
           dayOfWeek: day,
           hour,
-          activityLevel: data.count > 10 ? 'high' : data.count > 5 ? 'medium' : 'low',
+          activityLevel: level as 'low' | 'medium' | 'high',
           commonActivities: data.activities.slice(0, 5)
         };
       })

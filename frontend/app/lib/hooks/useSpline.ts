@@ -6,7 +6,15 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import type { Application, SPEObject } from '@splinetool/runtime';
+import type { Application, SPEObject, SplineEventName } from '@splinetool/runtime';
+
+// Tipos extendidos para eventos de Spline
+interface SplineEvent {
+  target?: {
+    name?: string;
+    id?: string;
+  };
+}
 
 // Tipos
 export interface SplineState {
@@ -23,7 +31,7 @@ export interface SplineControls {
   
   // Métodos de control
   onLoad: (spline: Application) => void;
-  setVariable: (name: string, value: unknown) => void;
+  setVariable: (name: string, value: string | number | boolean) => void;
   getVariable: (name: string) => unknown;
   triggerEvent: (objectName: string, eventName: string) => void;
   
@@ -98,8 +106,8 @@ export function useSpline(): SplineControls {
     }));
 
     // Configurar eventos de interacción
-    spline.addEventListener('mouseDown', (e) => {
-      const objectName = (e.target as SPEObject)?.name;
+    spline.addEventListener('mouseDown', (e: SplineEvent) => {
+      const objectName = e.target?.name;
       if (objectName && clickCallbackRef.current) {
         clickCallbackRef.current(objectName);
       }
@@ -117,8 +125,8 @@ export function useSpline(): SplineControls {
       }));
     });
 
-    spline.addEventListener('mouseHover', (e) => {
-      const objectName = (e.target as SPEObject)?.name || null;
+    spline.addEventListener('mouseHover', (e: SplineEvent) => {
+      const objectName = e.target?.name || null;
       if (hoverCallbackRef.current) {
         hoverCallbackRef.current(objectName);
       }
@@ -130,7 +138,7 @@ export function useSpline(): SplineControls {
   }, []);
 
   // Establecer variable en Spline
-  const setVariable = useCallback((name: string, value: unknown) => {
+  const setVariable = useCallback((name: string, value: string | number | boolean) => {
     if (appRef.current) {
       try {
         appRef.current.setVariable(name, value);
@@ -164,7 +172,8 @@ export function useSpline(): SplineControls {
   const triggerEvent = useCallback((objectName: string, eventName: string) => {
     if (appRef.current) {
       try {
-        appRef.current.emitEvent(eventName, objectName);
+        // emitEvent requiere SplineEventName, usamos type assertion
+        appRef.current.emitEvent(eventName as SplineEventName, objectName);
       } catch (error) {
         console.warn(`Error triggering event ${eventName} on ${objectName}:`, error);
       }

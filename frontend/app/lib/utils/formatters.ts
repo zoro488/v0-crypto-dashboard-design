@@ -177,12 +177,14 @@ export function formatDate(
     return 'Fecha inválida';
   }
 
-  const dateOptions: Intl.DateTimeFormatOptions = {
+  const formatOptionsMap: Record<string, Intl.DateTimeFormatOptions> = {
     short: { day: '2-digit', month: '2-digit', year: '2-digit' },
     medium: { day: 'numeric', month: 'short', year: 'numeric' },
     long: { day: 'numeric', month: 'long', year: 'numeric' },
     full: { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' },
-  }[format];
+  };
+
+  const dateOptions: Intl.DateTimeFormatOptions = { ...formatOptionsMap[format] };
 
   if (includeTime) {
     dateOptions.hour = '2-digit';

@@ -14,30 +14,36 @@ export { UserLearningService } from './UserLearning.service';
 export type {
   AIRequest,
   AIResponse,
-  Message,
-  Visualization,
-  IntentType,
-  CollectionName
+  AIAction,
+  AIVisualization,
+  ConversationMessage,
 } from './MegaAIAgent.service';
 
 // Tipos de AIScheduledReports
 export type {
-  ReportSchedule,
-  ReportConfig,
   ScheduledReport,
   ReportType,
-  ReportFrequency,
-  GeneratedReport
+  RecurrenceType,
+  ExportFormat,
+  ReportFilters,
+  GeneratedReport,
+  ReportData,
+  ChartData,
+  KPIData,
+  ReportInsight,
 } from './AIScheduledReports.service';
 
 // Tipos de AIFormAutomation
 export type {
-  FormPrediction,
-  ValidationResult,
+  FormTemplate,
+  FormType,
   FormField,
-  FormPattern,
-  AutoFillResult,
-  ValidationRule
+  FieldValidation,
+  FormSuggestion,
+  FormAnalysis,
+  ValidationResult,
+  UserFormPattern,
+  PatternData,
 } from './AIFormAutomation.service';
 
 // Tipos de AIPowerBI
@@ -47,41 +53,46 @@ export type {
   DashboardFilters,
   DashboardResult,
   KPI,
+  Visualization,
+  ChartDataPoint,
+  VisualizationConfig,
   Insight,
   Recommendation,
-  ChartDataPoint,
-  VisualizationConfig
 } from './AIPowerBI.service';
 
 // Tipos de UserLearning
 export type {
   UserProfile,
   UserPreferences,
+  NotificationPreferences,
+  AIAssistantPreferences,
   UserPatterns,
-  UserAnalytics,
-  UserActivity,
-  LearningInsight,
   ActionPattern,
   TimePattern,
-  FeatureUsage
+  SearchPattern,
+  NavigationPattern,
+  UserAnalytics,
+  FeatureUsage,
+  UserActivity,
+  LearningInsight,
 } from './UserLearning.service';
 
-// Instancias singleton para uso global
-let megaAIAgentInstance: InstanceType<typeof import('./MegaAIAgent.service').MegaAIAgentService> | null = null;
+// Instancias singleton para uso global (por userId)
+const megaAIAgentInstances: Map<string, InstanceType<typeof import('./MegaAIAgent.service').MegaAIAgentService>> = new Map();
 let scheduledReportsInstance: InstanceType<typeof import('./AIScheduledReports.service').AIScheduledReportsService> | null = null;
 let formAutomationInstance: InstanceType<typeof import('./AIFormAutomation.service').AIFormAutomationService> | null = null;
 let powerBIInstance: InstanceType<typeof import('./AIPowerBI.service').AIPowerBIService> | null = null;
 let userLearningInstance: InstanceType<typeof import('./UserLearning.service').UserLearningService> | null = null;
 
 /**
- * Obtiene instancia singleton del MegaAIAgent
+ * Obtiene instancia singleton del MegaAIAgent para un usuario
  */
-export async function getMegaAIAgent() {
-  if (!megaAIAgentInstance) {
+export async function getMegaAIAgent(userId: string) {
+  if (!megaAIAgentInstances.has(userId)) {
     const { MegaAIAgentService } = await import('./MegaAIAgent.service');
-    megaAIAgentInstance = new MegaAIAgentService();
+    megaAIAgentInstances.set(userId, new MegaAIAgentService(userId));
   }
-  return megaAIAgentInstance;
+  return megaAIAgentInstances.get(userId)!;
 }
 
 /**
@@ -129,11 +140,10 @@ export async function getUserLearning() {
 }
 
 /**
- * Inicializa todos los servicios de IA
+ * Inicializa todos los servicios de IA (excepto MegaAIAgent que requiere userId)
  */
 export async function initializeAIServices() {
-  const [megaAI, reports, forms, powerBI, learning] = await Promise.all([
-    getMegaAIAgent(),
+  const [reports, forms, powerBI, learning] = await Promise.all([
     getScheduledReports(),
     getFormAutomation(),
     getPowerBI(),
@@ -141,7 +151,6 @@ export async function initializeAIServices() {
   ]);
 
   return {
-    megaAI,
     reports,
     forms,
     powerBI,
@@ -157,7 +166,7 @@ export function cleanupAIServices() {
     userLearningInstance.destroy();
   }
   
-  megaAIAgentInstance = null;
+  megaAIAgentInstances.clear();
   scheduledReportsInstance = null;
   formAutomationInstance = null;
   powerBIInstance = null;

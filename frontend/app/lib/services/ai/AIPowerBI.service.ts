@@ -517,7 +517,18 @@ export class AIPowerBIService {
   private async getCapitalDistribucionVisualization(): Promise<Visualization> {
     const bancosRef = collection(db, 'bancos');
     const snapshot = await getDocs(bancosRef);
-    const bancos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    
+    interface BancoData {
+      id: string;
+      nombre?: string;
+      capitalActual?: number;
+      saldo?: number;
+    }
+    
+    const bancos: BancoData[] = snapshot.docs.map(doc => ({ 
+      id: doc.id, 
+      ...(doc.data() as Omit<BancoData, 'id'>) 
+    }));
 
     const data = bancos
       .map(b => ({
@@ -736,12 +747,22 @@ export class AIPowerBIService {
     const now = new Date();
     const data: number[] = [];
 
+    interface ItemWithFecha {
+      fecha?: { toDate?: () => Date } | string | Date;
+      total?: number;
+    }
+
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
       const dateStr = date.toISOString().split('T')[0];
       
-      const dayTotal = (items as Record<string, unknown>[]).reduce((sum, item) => {
-        const itemDate = item.fecha?.toDate?.() || new Date(item.fecha as string);
+      const dayTotal = (items as ItemWithFecha[]).reduce((sum, item) => {
+        let itemDate: Date;
+        if (item.fecha && typeof item.fecha === 'object' && 'toDate' in item.fecha && typeof item.fecha.toDate === 'function') {
+          itemDate = item.fecha.toDate();
+        } else {
+          itemDate = new Date(item.fecha as string);
+        }
         if (itemDate.toISOString().split('T')[0] === dateStr) {
           return sum + (Number(item.total) || 0);
         }

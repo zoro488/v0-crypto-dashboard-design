@@ -33,6 +33,10 @@ import {
 import { db } from '@/frontend/app/lib/firebase/config';
 
 // Tipos
+export interface BaseDocument {
+  id: string;
+}
+
 export interface FirestoreState<T> {
   data: T | T[] | null;
   loading: boolean;
@@ -84,7 +88,7 @@ export interface UseFirestoreResult<T> {
 /**
  * Hook principal para operaciones Firestore
  */
-export function useFirestore<T extends DocumentData>(
+export function useFirestore<T extends BaseDocument>(
   collectionName: string
 ): UseFirestoreResult<T> {
   const [state, setState] = useState<FirestoreState<T>>({
@@ -95,7 +99,7 @@ export function useFirestore<T extends DocumentData>(
     hasMore: true,
   });
 
-  const currentOptionsRef = useRef<QueryOptions | undefined>();
+  const currentOptionsRef = useRef<QueryOptions | undefined>(undefined);
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
   // Referencia a la colección
@@ -138,7 +142,7 @@ export function useFirestore<T extends DocumentData>(
       const documents = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
-      })) as T[];
+      } as unknown as T));
 
       const lastVisible = snapshot.docs[snapshot.docs.length - 1] || null;
       const hasMoreDocs = snapshot.docs.length === (options?.limitCount || 50);
@@ -168,7 +172,7 @@ export function useFirestore<T extends DocumentData>(
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        const document = { id: docSnap.id, ...docSnap.data() } as T;
+        const document = { id: docSnap.id, ...docSnap.data() } as unknown as T;
         setState(prev => ({ ...prev, data: document, loading: false }));
         return document;
       }
@@ -328,7 +332,7 @@ export function useFirestore<T extends DocumentData>(
         const documents = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
-        })) as T[];
+        } as unknown as T));
 
         const lastVisible = snapshot.docs[snapshot.docs.length - 1] || null;
 
@@ -367,7 +371,7 @@ export function useFirestore<T extends DocumentData>(
       docRef,
       (docSnap) => {
         if (docSnap.exists()) {
-          const document = { id: docSnap.id, ...docSnap.data() } as T;
+          const document = { id: docSnap.id, ...docSnap.data() } as unknown as T;
           setState(prev => ({ ...prev, data: document, loading: false }));
         } else {
           setState(prev => ({ ...prev, data: null, loading: false }));
@@ -404,7 +408,7 @@ export function useFirestore<T extends DocumentData>(
       const newDocuments = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
-      })) as T[];
+      } as unknown as T));
 
       const lastVisible = snapshot.docs[snapshot.docs.length - 1] || null;
       const hasMoreDocs = snapshot.docs.length === (options.limitCount || 50);
