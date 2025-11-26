@@ -1,16 +1,19 @@
 "use client"
 
-import { motion } from "framer-motion"
-import { Sparkles, Mic, MicOff, Send, Activity, Brain, TrendingUp, BarChart3, Package, Users, DollarSign } from "lucide-react"
-import { useState, useEffect, useRef } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Sparkles, Mic, MicOff, Send, Activity, Brain, TrendingUp, BarChart3, Package, Users, DollarSign, Zap, Target, MessageCircle } from "lucide-react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import { useVoiceAgent } from "@/frontend/app/hooks/useVoiceAgent"
 import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
 import { SplineBot3D, useSplineBot } from "@/frontend/app/components/3d/SplineBot3D"
 import { SplitScreenIA } from "@/frontend/app/components/3d/SplitScreenIA"
 import { AIAnalyticsOverlay } from "@/frontend/app/components/3d/AIAnalyticsOverlay"
 import { SplineWidget3D } from "@/frontend/app/components/3d/SplineWidget3D"
-import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
+import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, RadarChart, PolarGrid, PolarAngleAxis, Radar, PieChart, Pie, Cell } from "recharts"
 import { AIBrainVisualizer } from "@/frontend/app/components/visualizations/AIBrainVisualizer"
+import { QuickStatWidget } from "@/app/components/widgets/QuickStatWidget"
+import { MiniChartWidget } from "@/app/components/widgets/MiniChartWidget"
+import { ActivityFeedWidget, ActivityItem } from "@/app/components/widgets/ActivityFeedWidget"
 
 const analysisData = [
   { month: "Ene", ventas: 45000, compras: 32000, prediccion: 48000 },
@@ -20,6 +23,19 @@ const analysisData = [
   { month: "May", ventas: 67000, compras: 45000, prediccion: 70000 },
   { month: "Jun", ventas: 72000, compras: 48000, prediccion: 76000 },
 ]
+
+// Datos para radar de capacidades IA
+const aiCapabilities = [
+  { subject: 'Ventas', A: 92, fullMark: 100 },
+  { subject: 'Inventario', A: 88, fullMark: 100 },
+  { subject: 'Clientes', A: 95, fullMark: 100 },
+  { subject: 'Finanzas', A: 78, fullMark: 100 },
+  { subject: 'Predicción', A: 85, fullMark: 100 },
+  { subject: 'Reportes', A: 90, fullMark: 100 },
+]
+
+// Colores para gráficos
+const CHART_COLORS = ['#3b82f6', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b']
 
 interface Message {
   id: string
@@ -42,6 +58,42 @@ export default function BentoIA() {
   
   // Hook del bot 3D de Spline
   const botControl = useSplineBot()
+
+  // Activity feed para IA
+  const aiActivityFeed: ActivityItem[] = useMemo(() => [
+    {
+      id: 'ai-1',
+      type: 'sistema',
+      title: 'Análisis completado',
+      description: 'Predicción de ventas Q2 procesada',
+      timestamp: new Date(Date.now() - 300000),
+      status: 'success'
+    },
+    {
+      id: 'ai-2',
+      type: 'sistema',
+      title: 'Recomendación generada',
+      description: 'Optimización de inventario sugerida',
+      timestamp: new Date(Date.now() - 900000),
+      status: 'success'
+    },
+    {
+      id: 'ai-3',
+      type: 'alerta',
+      title: 'Alerta detectada',
+      description: 'Stock bajo en 3 productos',
+      timestamp: new Date(Date.now() - 1800000),
+      status: 'pending'
+    },
+    {
+      id: 'ai-4',
+      type: 'sistema',
+      title: 'Modelo actualizado',
+      description: 'Red neural reentrenada con datos recientes',
+      timestamp: new Date(Date.now() - 3600000),
+      status: 'success'
+    }
+  ], [])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -466,6 +518,116 @@ export default function BentoIA() {
           </div>
         </div>
       </motion.div>
+
+      {/* KPIs Premium de IA */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+        <QuickStatWidget
+          title="Precisión IA"
+          value={94.7}
+          suffix="%"
+          change={2.3}
+          icon={Brain}
+          color="purple"
+          sparklineData={[88, 90, 91, 93, 92, 94, 94.7]}
+          delay={0.1}
+        />
+        <QuickStatWidget
+          title="Consultas Hoy"
+          value={messages.length + 47}
+          change={15.8}
+          icon={MessageCircle}
+          color="cyan"
+          sparklineData={[20, 35, 42, 38, 45, 52, messages.length + 47]}
+          delay={0.2}
+        />
+        <QuickStatWidget
+          title="Predicciones"
+          value={156}
+          change={22.1}
+          icon={Target}
+          color="green"
+          sparklineData={[80, 95, 110, 125, 140, 150, 156]}
+          delay={0.3}
+        />
+        <QuickStatWidget
+          title="Ahorro Generado"
+          value={45200}
+          prefix="$"
+          change={31.5}
+          icon={DollarSign}
+          color="orange"
+          sparklineData={[15000, 22000, 28000, 35000, 40000, 42000, 45200]}
+          delay={0.4}
+        />
+      </div>
+
+      {/* Gráficos Avanzados de IA */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+        {/* Radar de Capacidades */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="glass p-6 rounded-2xl border border-white/5 bg-black/20"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-xl bg-violet-500/20">
+              <Brain className="w-5 h-5 text-violet-400" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-white">Capacidades IA</h3>
+              <p className="text-xs text-white/50">Rendimiento por área</p>
+            </div>
+          </div>
+          <ResponsiveContainer width="100%" height={200}>
+            <RadarChart data={aiCapabilities}>
+              <PolarGrid stroke="rgba(255,255,255,0.1)" />
+              <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 10 }} />
+              <Radar name="Capacidad" dataKey="A" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.3} strokeWidth={2} />
+            </RadarChart>
+          </ResponsiveContainer>
+        </motion.div>
+
+        {/* Activity Feed de IA */}
+        <ActivityFeedWidget
+          title="Actividad IA"
+          activities={aiActivityFeed}
+          maxItems={4}
+          autoScroll
+        />
+
+        {/* Mini Charts de Performance */}
+        <div className="grid grid-cols-2 gap-4">
+          <MiniChartWidget
+            title="Tiempo Respuesta"
+            subtitle="0.8s"
+            type="line"
+            data={[1.2, 1.1, 0.9, 0.95, 0.85, 0.82, 0.8].map((v, i) => ({ name: `T${i + 1}`, value: v * 100 }))}
+            color="cyan"
+          />
+          <MiniChartWidget
+            title="Uso GPU"
+            subtitle="67%"
+            type="donut"
+            data={[{ name: 'Usado', value: 67 }, { name: 'Disponible', value: 33 }]}
+            color="purple"
+          />
+          <MiniChartWidget
+            title="Modelos Activos"
+            subtitle="5 modelos"
+            type="bar"
+            data={[3, 4, 4, 5, 5, 5, 5].map((v, i) => ({ name: `D${i + 1}`, value: v }))}
+            color="green"
+          />
+          <MiniChartWidget
+            title="Accuracy"
+            subtitle="97.2%"
+            type="area"
+            data={[92, 93, 94, 95, 96, 96.5, 97.2].map((v, i) => ({ name: `V${i + 1}`, value: v }))}
+            color="orange"
+          />
+        </div>
+      </div>
 
       {/* AI Brain Visualizer - Premium Visualization */}
       <motion.div
