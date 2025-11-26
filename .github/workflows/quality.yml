@@ -104,5 +104,6 @@ jobs:
         with:
           configPath: ./lighthouserc.json
           uploadArtifacts: true
-          temporaryPublicStorage: true
+          # Note: Set temporaryPublicStorage to false to avoid exposing performance data
+          temporaryPublicStorage: false
         continue-on-error: true

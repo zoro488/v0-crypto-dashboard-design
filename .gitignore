@@ -46,6 +46,9 @@ coverage/
 # Vercel
 .vercel/
 
+# Lighthouse CI
+.lighthouse/
+
 # Misc
 *.log
 *.pid

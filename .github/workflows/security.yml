@@ -59,4 +59,6 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Note: continue-on-error allows initial setup while addressing existing issues.
+        # Remove this for stricter enforcement once historical secrets are cleaned.
         continue-on-error: true

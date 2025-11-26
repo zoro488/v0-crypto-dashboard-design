@@ -111,6 +111,8 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run security audit
+        # Note: continue-on-error is intentional to allow builds to pass while
+        # security issues are being addressed. Remove this for stricter enforcement.
         run: pnpm audit --audit-level=high
         continue-on-error: true
 
