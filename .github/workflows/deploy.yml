@@ -3,12 +3,19 @@ name: Deploy to Vercel
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     environment: production
     steps:
       - uses: actions/checkout@v4

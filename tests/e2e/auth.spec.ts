@@ -17,11 +17,13 @@ test.describe('Autenticación', () => {
   test('debe navegar entre paneles', async ({ page }) => {
     // Navegar a Ventas
     await page.click('text=Ventas')
-    await expect(page.locator('h1:has-text("Ventas"), h2:has-text("Ventas")')).toBeVisible()
+    // Wait for the panel content to load and check for Ventas text in any heading
+    await expect(page.getByRole('heading', { name: /Ventas/i })).toBeVisible()
 
     // Navegar a Órdenes de Compra
     await page.click('text=Órdenes')
-    await expect(page.locator('h1:has-text("Órdenes"), h2:has-text("Órdenes")')).toBeVisible()
+    // Wait for the panel content to load and check for Órdenes text in any heading
+    await expect(page.getByRole('heading', { name: /Órdenes/i })).toBeVisible()
   })
 
   test('debe mostrar datos mock en dashboard', async ({ page }) => {
