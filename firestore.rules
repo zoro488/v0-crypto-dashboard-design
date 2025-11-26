@@ -2,60 +2,98 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // ⚠️ REGLAS TEMPORALES DE DESARROLLO
-    // TODO: Reemplazar con reglas seguras antes de producción
-    // Fecha de expiración: 2025-11-26
+    // 🔒 REGLAS DE PRODUCCIÓN - CHRONOS SYSTEM
+    // Última actualización: 2025-11-25
     
-    // Permitir lectura a todos los usuarios autenticados
-    match /{collection}/{document=**} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null;
+    function isAuthenticated() {
+      return request.auth != null;
     }
     
-    // PUERTA TRASERA TEMPORAL (SOLO DESARROLLO)
-    // Remover en producción
-    match /movimientos/{document=**} {
-      allow read, write: if true;
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
     }
     
-    match /dashboard_totales/{document=**} {
-      allow read: if true;
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
     }
     
-    match /dashboard_paneles/{document=**} {
-      allow read: if true;
+    function isValidMonto() {
+      return request.resource.data.monto >= 0;
     }
     
-    match /almacen_productos/{document=**} {
-      allow read, write: if true;
+    match /movimientos/{movimientoId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && hasRequiredFields(['bancoId', 'tipoMovimiento', 'monto', 'fecha']) && isValidMonto();
+      allow update: if isAuthenticated() && isValidMonto();
+      allow delete: if isAuthenticated();
     }
     
-    match /almacen_entradas/{document=**} {
-      allow read, write: if true;
+    match /ventas/{ventaId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && hasRequiredFields(['cliente', 'total', 'fecha']);
+      allow update, delete: if isAuthenticated();
     }
     
-    match /almacen_salidas/{document=**} {
-      allow read, write: if true;
+    match /clientes/{clienteId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && hasRequiredFields(['nombre']);
+      allow update, delete: if isAuthenticated();
     }
     
-    match /ventas/{document=**} {
-      allow read, write: if true;
+    match /distribuidores/{distribuidorId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && hasRequiredFields(['nombre']);
+      allow update, delete: if isAuthenticated();
     }
     
-    match /clientes/{document=**} {
-      allow read, write: if true;
+    match /ordenes_compra/{ordenId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && hasRequiredFields(['distribuidor', 'fecha', 'costoTotal']);
+      allow update, delete: if isAuthenticated();
     }
     
-    match /distribuidores/{document=**} {
-      allow read, write: if true;
+    match /almacen_productos/{productoId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && hasRequiredFields(['nombre', 'stock']);
+      allow update, delete: if isAuthenticated();
     }
     
-    match /ordenes_compra/{document=**} {
-      allow read, write: if true;
+    match /almacen_entradas/{entradaId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && hasRequiredFields(['fecha', 'cantidad']);
+      allow update, delete: if isAuthenticated();
     }
     
-    match /cortes_bancarios/{document=**} {
-      allow read, write: if true;
+    match /almacen_salidas/{salidaId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && hasRequiredFields(['fecha', 'cantidad']);
+      allow update, delete: if isAuthenticated();
+    }
+    
+    match /cortes_bancarios/{corteId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && hasRequiredFields(['bancoId', 'fechaInicio']);
+      allow update, delete: if isAuthenticated();
+    }
+    
+    match /dashboard_totales/{docId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    match /dashboard_paneles/{docId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    match /usuarios/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+    
+    match /configuracion/{docId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

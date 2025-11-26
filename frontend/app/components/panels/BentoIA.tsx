@@ -8,7 +8,7 @@ import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
 import { SplineBot3D, useSplineBot } from "@/frontend/app/components/3d/SplineBot3D"
 import { SplitScreenIA } from "@/frontend/app/components/3d/SplitScreenIA"
 import { AIAnalyticsOverlay } from "@/frontend/app/components/3d/AIAnalyticsOverlay"
-import { SplineWidget3D } from "@/frontend/app/components/3d/SplineWidget3D"
+// SplineWidget3D ya no se usa aquí - está en FloatingAIWidget
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
 import { AIBrainVisualizer } from "@/frontend/app/components/visualizations/AIBrainVisualizer"
 
@@ -166,19 +166,54 @@ export default function BentoIA() {
       >
         {use3DMode ? (
           <SplitScreenIA
-            defaultRatio={35}
+            defaultRatio={40}
             leftContent={
-              <div className="relative w-full h-full flex items-center justify-center p-8">
+              // Robot 3D como fondo interactivo completo - sin widgets encima
+              <div className="relative w-full h-full">
+                {/* Fondo con gradiente sutil */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-950/30 via-purple-950/20 to-slate-950/40" />
+                
+                {/* SplineBot3D ocupando todo el espacio */}
                 <SplineBot3D
                   isListening={isListening}
                   isSpeaking={isTyping}
                   className="w-full h-full"
+                  onInteraction={(objectName) => {
+                    // Reaccionar a interacciones con el bot
+                    if (objectName) {
+                      setInputText(`Hola, necesito ayuda con ${objectName}`)
+                    }
+                  }}
                 />
                 
-                {/* Widget 3D flotante pequeño */}
-                <div className="absolute bottom-8 right-8">
-                  <SplineWidget3D size="sm" />
-                </div>
+                {/* Overlay con información de estado - no bloquea el bot */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="absolute bottom-6 left-6 right-6 pointer-events-none"
+                >
+                  <div className="bg-black/40 backdrop-blur-xl rounded-2xl px-4 py-3 border border-white/10">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <motion.div 
+                          className={`w-3 h-3 rounded-full ${
+                            isListening ? "bg-green-500" : 
+                            isTyping ? "bg-blue-500" : 
+                            "bg-gray-500"
+                          }`}
+                          animate={isListening || isTyping ? { scale: [1, 1.3, 1] } : {}}
+                          transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY }}
+                        />
+                        <span className="text-white/80 text-sm font-medium">
+                          {isListening ? "🎤 Escuchando..." : 
+                           isTyping ? "🧠 Procesando..." : 
+                           "💤 En espera"}
+                        </span>
+                      </div>
+                      <span className="text-white/50 text-xs">Interactúa con el bot</span>
+                    </div>
+                  </div>
+                </motion.div>
               </div>
             }
             rightContent={

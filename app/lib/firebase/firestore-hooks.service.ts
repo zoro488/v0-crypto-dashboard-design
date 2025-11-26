@@ -22,8 +22,9 @@ import { logger } from "../utils/logger"
 // ===================================================================
 // CONFIGURACIÓN
 // ===================================================================
-const DEFAULT_PAGE_SIZE = 50
-const SMALL_PAGE_SIZE = 20
+const DEFAULT_PAGE_SIZE = 500  // Aumentado para mostrar todos los registros
+const SMALL_PAGE_SIZE = 100    // Para colecciones pequeñas
+const LARGE_PAGE_SIZE = 1000   // Para consultas completas
 
 // Flag global para modo mock
 let USE_MOCK_DATA = false
@@ -94,11 +95,22 @@ function useFirestoreQuery<T extends DocumentData>(
   // 🛡️ Flag isMounted - CRÍTICO para evitar memory leaks
   const isMountedRef = useRef(true)
   const fetchingRef = useRef(false)
+  // Ref para rastrear las opciones anteriores
+  const prevOptionsRef = useRef<string>('')
 
   const fetchData = useCallback(async () => {
-    // Evitar fetch duplicados
-    if (fetchingRef.current) return
+    // Crear key única para las opciones
+    const optionsKey = JSON.stringify({
+      collectionName,
+      whereField: options.whereField,
+      whereValue: options.whereValue,
+      orderByField: options.orderByField
+    })
+    
+    // Evitar fetch duplicados con mismas opciones
+    if (fetchingRef.current && prevOptionsRef.current === optionsKey) return
     fetchingRef.current = true
+    prevOptionsRef.current = optionsKey
 
     // Modo mock activo
     if (USE_MOCK_DATA) {
@@ -112,18 +124,25 @@ function useFirestoreQuery<T extends DocumentData>(
     }
 
     try {
-      let q = query(
-        collection(db, collectionName),
-        limit(options.pageSize || DEFAULT_PAGE_SIZE)
-      )
-
-      if (options.orderByField) {
-        q = query(q, orderBy(options.orderByField, options.orderDirection || 'desc'))
-      }
-
+      // Construir query de forma correcta
+      const collRef = collection(db, collectionName)
+      const constraints: Parameters<typeof query>[1][] = []
+      
+      // Agregar where si existe
       if (options.whereField && options.whereValue) {
-        q = query(q, where(options.whereField, '==', options.whereValue))
+        constraints.push(where(options.whereField, '==', options.whereValue))
       }
+      
+      // Agregar orderBy si existe
+      if (options.orderByField) {
+        constraints.push(orderBy(options.orderByField, options.orderDirection || 'desc'))
+      }
+      
+      // Agregar limit
+      constraints.push(limit(options.pageSize || DEFAULT_PAGE_SIZE))
+      
+      // Crear query con todos los constraints
+      const q = query(collRef, ...constraints)
 
       const snapshot = await getDocs(q)
       
@@ -137,9 +156,10 @@ function useFirestoreQuery<T extends DocumentData>(
         if (options.transform) {
           return options.transform(doc)
         }
-        return { id: doc.id, ...doc.data() } as T
+        return { id: doc.id, ...doc.data() } as unknown as T
       })
 
+      logger.info(`[Firestore] ${collectionName}: ${items.length} registros cargados`)
       setData(items)
       setLoading(false)
       setError(null)
@@ -167,7 +187,7 @@ function useFirestoreQuery<T extends DocumentData>(
     }
     
     fetchingRef.current = false
-  }, [collectionName, options])
+  }, [collectionName, options.whereField, options.whereValue, options.orderByField, options.orderDirection, options.pageSize, options.mockData, options.transform])
 
   useEffect(() => {
     isMountedRef.current = true
@@ -192,12 +212,13 @@ export function useBancoData(bancoId: string): HookResult<DocumentData> & { stat
     whereValue: bancoId,
     orderByField: 'fecha',
     orderDirection: 'desc',
+    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_MOVIMIENTOS.filter(m => m.bancoId === bancoId || !m.bancoId)
   })
 
   const stats: BancoStats = {
-    totalIngresos: result.data.filter(m => m.tipoMovimiento === 'ingreso').reduce((s, m) => s + (m.monto || 0), 0),
-    totalGastos: result.data.filter(m => m.tipoMovimiento === 'gasto').reduce((s, m) => s + (m.monto || 0), 0),
+    totalIngresos: result.data.filter(m => m.tipoMovimiento === 'ingreso' || m.tipoMovimiento === 'transferencia_entrada').reduce((s, m) => s + (m.monto || 0), 0),
+    totalGastos: result.data.filter(m => m.tipoMovimiento === 'gasto' || m.tipoMovimiento === 'transferencia_salida').reduce((s, m) => s + (m.monto || 0), 0),
     saldoNeto: 0,
     transacciones: result.data.length
   }
@@ -210,6 +231,7 @@ export function useAlmacenData(): HookResult<DocumentData> {
   return useFirestoreQuery('almacen_productos', {
     orderByField: 'nombre',
     orderDirection: 'asc',
+    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_PRODUCTOS
   })
 }
@@ -218,6 +240,7 @@ export function useVentasData(): HookResult<DocumentData> {
   return useFirestoreQuery('ventas', {
     orderByField: 'fecha',
     orderDirection: 'desc',
+    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_VENTAS
   })
 }
@@ -226,6 +249,7 @@ export function useClientesData(): HookResult<DocumentData> {
   return useFirestoreQuery('clientes', {
     orderByField: 'nombre',
     orderDirection: 'asc',
+    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_CLIENTES
   })
 }
@@ -234,6 +258,7 @@ export function useDistribuidoresData(): HookResult<DocumentData> {
   return useFirestoreQuery('distribuidores', {
     orderByField: 'nombre',
     orderDirection: 'asc',
+    pageSize: DEFAULT_PAGE_SIZE,
     mockData: MOCK_DISTRIBUIDORES
   })
 }
@@ -242,6 +267,7 @@ export function useOrdenesCompraData(): HookResult<DocumentData> {
   return useFirestoreQuery('ordenes_compra', {
     orderByField: 'fecha',
     orderDirection: 'desc',
+    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_ORDENES_COMPRA
   })
 }
@@ -259,6 +285,7 @@ export function useGYAData(): HookResult<DocumentData> {
   return useFirestoreQuery('movimientos', {
     orderByField: 'fecha',
     orderDirection: 'desc',
+    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_MOVIMIENTOS
   })
 }
@@ -269,6 +296,7 @@ export function useIngresosBanco(bancoId: string): HookResult<DocumentData> {
     whereValue: bancoId,
     orderByField: 'fecha',
     orderDirection: 'desc',
+    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_MOVIMIENTOS.filter(m => m.tipo === 'ingreso')
   })
   
@@ -284,6 +312,7 @@ export function useGastos(bancoId: string): HookResult<DocumentData> {
     whereValue: bancoId,
     orderByField: 'fecha',
     orderDirection: 'desc',
+    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_MOVIMIENTOS.filter(m => m.tipo === 'gasto')
   })
   
@@ -299,12 +328,15 @@ export function useTransferencias(bancoId: string): HookResult<DocumentData> {
     whereValue: bancoId,
     orderByField: 'fecha',
     orderDirection: 'desc',
+    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_TRANSFERENCIAS
   })
   
   return {
     ...result,
-    data: result.data.filter(m => m.tipoMovimiento?.includes('transferencia'))
+    data: result.data.filter((m: DocumentData) => 
+      typeof m.tipoMovimiento === 'string' && m.tipoMovimiento.includes('transferencia')
+    )
   }
 }
 
@@ -323,6 +355,7 @@ export function useEntradasAlmacen(): HookResult<DocumentData> {
   return useFirestoreQuery('almacen_entradas', {
     orderByField: 'fecha',
     orderDirection: 'desc',
+    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_ENTRADAS
   })
 }
@@ -331,6 +364,7 @@ export function useSalidasAlmacen(): HookResult<DocumentData> {
   return useFirestoreQuery('almacen_salidas', {
     orderByField: 'fecha',
     orderDirection: 'desc',
+    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_SALIDAS
   })
 }
@@ -358,7 +392,7 @@ const MOCK_MOVIMIENTOS = [
 ]
 
 const MOCK_TRANSFERENCIAS = [
-  { id: "T-001", fecha: new Date().toISOString(), monto: 1000, origen: "Banco A", destino: "Banco B" },
+  { id: "T-001", fecha: new Date().toISOString(), monto: 1000, origen: "Banco A", destino: "Banco B", tipoMovimiento: "transferencia_salida" },
 ]
 
 const MOCK_CORTES = [
