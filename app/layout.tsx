@@ -8,6 +8,7 @@ import "./globals.css"
 import { AppProvider } from "@/frontend/app/lib/context/AppContext"
 import { Toaster } from "@/frontend/app/components/ui/toaster"
 import { ErrorBoundary } from "@/frontend/app/components/ErrorBoundary"
+import { ImmersiveLayout } from "@/app/components/layout/ImmersiveLayout"
 // import { PerformanceMonitor } from "@/frontend/app/components/PerformanceMonitor"
 
 const geist = Geist({ 
@@ -101,7 +102,12 @@ export default function RootLayout({
         <ErrorBoundary>
           <AppProvider>
             {/* <PerformanceMonitor /> */}
-            {children}
+            <ImmersiveLayout 
+              showBackground={true} 
+              enablePostProcessing={true}
+            >
+              {children}
+            </ImmersiveLayout>
             <Toaster />
           </AppProvider>
         </ErrorBoundary>
