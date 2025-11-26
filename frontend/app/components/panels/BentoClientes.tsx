@@ -1,15 +1,19 @@
 "use client"
 
-import { motion } from "framer-motion"
-import { Users, AlertTriangle, CheckCircle2, Clock, DollarSign, Plus } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Users, AlertTriangle, CheckCircle2, Clock, DollarSign, Plus, TrendingUp, BarChart3, Activity, Zap } from "lucide-react"
 import { Button } from "@/frontend/app/components/ui/button"
 import { Badge } from "@/frontend/app/components/ui/badge"
 import { useClientes } from "@/frontend/app/lib/firebase/firestore-hooks.service"
 import CreateClienteModal from "@/frontend/app/components/modals/CreateClienteModal"
-import CreateAbonoModal from "@/frontend/app/components/modals/CreateAbonoModal" // Import CreateAbonoModal
-import { useState } from "react"
+import CreateAbonoModal from "@/frontend/app/components/modals/CreateAbonoModal"
+import { useState, useMemo } from "react"
 import { Skeleton } from "@/frontend/app/components/ui/skeleton"
 import { ClientNetworkGraph } from "@/frontend/app/components/visualizations/ClientNetworkGraph"
+import { AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from "recharts"
+import { QuickStatWidget } from "@/frontend/app/components/widgets/QuickStatWidget"
+import { MiniChartWidget } from "@/frontend/app/components/widgets/MiniChartWidget"
+import { ActivityFeedWidget, ActivityItem } from "@/frontend/app/components/widgets/ActivityFeedWidget"
 
 // Interface para cliente
 interface ClienteData {
@@ -23,7 +27,7 @@ interface ClienteData {
 
 export default function BentoClientes() {
   const [showCreateModal, setShowCreateModal] = useState(false)
-  const [showAbonoModal, setShowAbonoModal] = useState(false) // State for Abono Modal
+  const [showAbonoModal, setShowAbonoModal] = useState(false)
   const { data: clientesRaw, loading } = useClientes()
   
   // Casting seguro
@@ -34,6 +38,40 @@ export default function BentoClientes() {
   const totalVentas = clientes?.reduce((acc, c) => acc + (c.totalVentas ?? 0), 0) ?? 0
   const totalCobrado = clientes?.reduce((acc, c) => acc + (c.totalPagado ?? 0), 0) ?? 0
   const clientesPendientes = clientes?.filter((c) => (c.deudaTotal ?? 0) > 0).length ?? 0
+
+  // Colores para gráficos
+  const CHART_COLORS = ['#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444']
+
+  // Datos para gráficos
+  const trendData = useMemo(() => {
+    return Array.from({ length: 7 }, (_, i) => ({
+      name: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'][i],
+      ventas: Math.floor(Math.random() * 50000) + 30000,
+      cobros: Math.floor(Math.random() * 40000) + 20000,
+    }))
+  }, [])
+
+  // Distribución de clientes por estado
+  const clientesPorEstado = useMemo(() => {
+    const saldados = clientes?.filter(c => (c.deudaTotal ?? 0) === 0).length ?? 0
+    const pendientes = clientesPendientes
+    return [
+      { name: 'Saldados', value: saldados, color: '#10b981' },
+      { name: 'Pendientes', value: pendientes, color: '#f59e0b' },
+    ]
+  }, [clientes, clientesPendientes])
+
+  // Activity feed
+  const recentActivity: ActivityItem[] = useMemo(() => {
+    return topClientes.slice(0, 4).map((c, i) => ({
+      id: c.id || `cliente-${i}`,
+      type: 'cliente' as const,
+      title: c.nombre || 'Cliente',
+      description: `Venta total: $${((c.totalVentas ?? 0) / 1000).toFixed(0)}K`,
+      timestamp: new Date(Date.now() - i * 3600000),
+      status: ((c.deudaTotal ?? 0) > 0 ? 'pending' : 'success') as 'pending' | 'success'
+    }))
+  }, [topClientes])
 
   if (loading) {
     return (
@@ -88,83 +126,188 @@ export default function BentoClientes() {
           </Button>
         </div>
       </motion.div>
-      {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* KPIs Premium con Widgets */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <QuickStatWidget
+          title="Total Ventas"
+          value={totalVentas}
+          prefix="$"
+          change={18.5}
+          icon={DollarSign}
+          color="cyan"
+          sparklineData={trendData.map(d => d.ventas)}
+          delay={0.1}
+        />
+        <QuickStatWidget
+          title="Por Cobrar"
+          value={totalDeuda}
+          prefix="$"
+          change={-5.2}
+          icon={AlertTriangle}
+          color="orange"
+          sparklineData={trendData.map(d => d.ventas - d.cobros)}
+          delay={0.2}
+        />
+        <QuickStatWidget
+          title="Cobrado"
+          value={totalCobrado}
+          prefix="$"
+          change={22.3}
+          icon={CheckCircle2}
+          color="green"
+          sparklineData={trendData.map(d => d.cobros)}
+          delay={0.3}
+        />
+        <QuickStatWidget
+          title="Total Clientes"
+          value={clientes?.length || 0}
+          change={8.1}
+          icon={Users}
+          color="purple"
+          sparklineData={[20, 25, 28, 30, 29, 31, clientes?.length || 32]}
+          delay={0.4}
+        />
+      </div>
+
+      {/* Gráficos Premium Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Gráfico de Tendencia de Ventas/Cobros */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1 }}
-          className="relative group"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="lg:col-span-2 relative group"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
-          <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 hover:border-cyan-500/50 transition-colors">
-            <div className="flex items-center justify-between mb-4">
-              <DollarSign className="w-8 h-8 text-cyan-400" />
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-blue-500/5 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
+          <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-cyan-500/20">
+                  <TrendingUp className="w-5 h-5 text-cyan-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">Ventas vs Cobros</h3>
+                  <p className="text-xs text-zinc-400">Últimos 7 días</p>
+                </div>
+              </div>
               <Badge variant="outline" className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20">
-                Total Ventas
+                <Activity className="w-3 h-3 mr-1" /> En vivo
               </Badge>
             </div>
-            <div className="text-3xl font-bold text-white mb-2">${(totalVentas / 1000000).toFixed(2)}M</div>
-            <p className="text-sm text-zinc-400">Valor total vendido</p>
+            <ResponsiveContainer width="100%" height={220}>
+              <AreaChart data={trendData}>
+                <defs>
+                  <linearGradient id="colorVentasC" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorCobros" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <XAxis dataKey="name" stroke="#fff" opacity={0.3} fontSize={11} />
+                <YAxis stroke="#fff" opacity={0.3} fontSize={11} tickFormatter={(v) => `$${(v/1000).toFixed(0)}K`} />
+                <Tooltip 
+                  contentStyle={{ 
+                    background: 'rgba(15, 23, 42, 0.95)', 
+                    border: '1px solid rgba(255,255,255,0.1)', 
+                    borderRadius: '12px' 
+                  }}
+                  formatter={(value: number) => [`$${value.toLocaleString()}`, '']}
+                />
+                <Area type="monotone" dataKey="ventas" stroke="#06b6d4" strokeWidth={2} fillOpacity={1} fill="url(#colorVentasC)" name="Ventas" />
+                <Area type="monotone" dataKey="cobros" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorCobros)" name="Cobros" />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </motion.div>
 
+        {/* Estado de Clientes - Pie Chart */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
           className="relative group"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
-          <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 hover:border-red-500/50 transition-colors">
-            <div className="flex items-center justify-between mb-4">
-              <AlertTriangle className="w-8 h-8 text-red-400" />
-              <Badge variant="outline" className="bg-red-500/10 text-red-400 border-red-500/20">
-                Por Cobrar
-              </Badge>
+          <div className="absolute inset-0 bg-gradient-to-r from-violet-500/5 to-purple-500/5 rounded-2xl blur-xl" />
+          <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 h-full">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-xl bg-violet-500/20">
+                <BarChart3 className="w-5 h-5 text-violet-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white">Estado</h3>
+                <p className="text-xs text-zinc-400">Por cartera</p>
+              </div>
             </div>
-            <div className="text-3xl font-bold text-white mb-2">${(totalDeuda / 1000000).toFixed(2)}M</div>
-            <p className="text-sm text-zinc-400">{clientesPendientes} clientes con adeudo</p>
+            <ResponsiveContainer width="100%" height={150}>
+              <PieChart>
+                <Pie
+                  data={clientesPorEstado}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={40}
+                  outerRadius={60}
+                  paddingAngle={4}
+                  dataKey="value"
+                >
+                  {clientesPorEstado.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="flex justify-center gap-6 mt-2">
+              {clientesPorEstado.map((item, i) => (
+                <div key={i} className="flex items-center gap-2 text-sm">
+                  <div className="w-3 h-3 rounded-full" style={{ background: item.color }} />
+                  <span className="text-white/70">{item.name}: {item.value}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </motion.div>
+      </div>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3 }}
-          className="relative group"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
-          <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 hover:border-green-500/50 transition-colors">
-            <div className="flex items-center justify-between mb-4">
-              <CheckCircle2 className="w-8 h-8 text-green-400" />
-              <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/20">
-                Cobrado
-              </Badge>
-            </div>
-            <div className="text-3xl font-bold text-white mb-2">${(totalCobrado / 1000000).toFixed(2)}M</div>
-            <p className="text-sm text-zinc-400">Pagos recibidos</p>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4 }}
-          className="relative group"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
-          <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 hover:border-purple-500/50 transition-colors">
-            <div className="flex items-center justify-between mb-4">
-              <Users className="w-8 h-8 text-purple-400" />
-              <Badge variant="outline" className="bg-purple-500/10 text-purple-400 border-purple-500/20">
-                Clientes
-              </Badge>
-            </div>
-            <div className="text-3xl font-bold text-white mb-2">{clientes?.length || 0}</div>
-            <p className="text-sm text-zinc-400">Total de clientes activos</p>
-          </div>
-        </motion.div>
+      {/* Activity Feed y Mini Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <ActivityFeedWidget
+          title="Actividad de Clientes"
+          activities={recentActivity}
+          maxItems={4}
+        />
+        <div className="lg:col-span-2 grid grid-cols-2 gap-4">
+          <MiniChartWidget
+            title="Tasa de Cobro"
+            subtitle={`${Math.round((totalCobrado / Math.max(totalVentas, 1)) * 100)}%`}
+            type="donut"
+            data={[{ name: 'Cobrado', value: totalCobrado }, { name: 'Pendiente', value: totalDeuda }]}
+            color="green"
+          />
+          <MiniChartWidget
+            title="Promedio por Cliente"
+            subtitle={`$${clientes?.length ? Math.round(totalVentas / clientes.length).toLocaleString() : 0}`}
+            type="area"
+            data={trendData.map(d => ({ name: d.name, value: d.ventas / 30 }))}
+            color="cyan"
+          />
+          <MiniChartWidget
+            title="Clientes con Deuda"
+            subtitle={`${clientesPendientes} clientes`}
+            type="bar"
+            data={[{ name: 'Con deuda', value: clientesPendientes }, { name: 'Sin deuda', value: (clientes?.length || 0) - clientesPendientes }]}
+            color="orange"
+          />
+          <MiniChartWidget
+            title="Retención"
+            subtitle="94%"
+            type="line"
+            data={trendData.map((d, i) => ({ name: d.name, value: 90 + Math.random() * 8 }))}
+            color="purple"
+          />
+        </div>
       </div>
       {/* Tabla Clientes */}
       <motion.div

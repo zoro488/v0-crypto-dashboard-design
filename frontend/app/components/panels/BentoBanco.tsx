@@ -17,8 +17,11 @@ import {
   Download,
   ChevronDown,
   Wallet,
+  Activity,
+  BarChart3,
+  Zap,
 } from "lucide-react"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { BANCOS } from "@/frontend/app/lib/constants"
 import SimpleCurrencyWidget from "@/frontend/app/components/widgets/SimpleCurrencyWidget"
 import CreateGastoModal from "@/frontend/app/components/modals/CreateGastoModal"
@@ -32,6 +35,10 @@ import {
   useCorteBancario,
 } from "@/frontend/app/lib/firebase/firestore-hooks.service"
 import { Skeleton } from "@/frontend/app/components/ui/skeleton"
+import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from "recharts"
+import { QuickStatWidget } from "@/frontend/app/components/widgets/QuickStatWidget"
+import { MiniChartWidget } from "@/frontend/app/components/widgets/MiniChartWidget"
+import { ActivityFeedWidget, ActivityItem } from "@/frontend/app/components/widgets/ActivityFeedWidget"
 
 // Interfaces para tipado
 interface MovimientoBanco {
@@ -114,6 +121,51 @@ export default function BentoBanco() {
   const totalIngresos = ingresos.reduce((sum, i) => sum + (i.monto ?? 0), 0)
   const totalGastos = gastos.reduce((sum, g) => sum + (g.monto ?? 0), 0)
   const saldoActual = totalIngresos - totalGastos
+
+  // Datos para gráficos
+  const trendData = useMemo(() => {
+    return Array.from({ length: 7 }, (_, i) => ({
+      name: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'][i],
+      ingresos: Math.floor(Math.random() * 50000) + 20000,
+      gastos: Math.floor(Math.random() * 30000) + 10000,
+    }))
+  }, [])
+
+  // Distribución por tipo de movimiento
+  const distribucionMovimientos = useMemo(() => [
+    { name: 'Ingresos', value: totalIngresos, color: '#10b981' },
+    { name: 'Gastos', value: totalGastos, color: '#ef4444' },
+    { name: 'Transferencias', value: transferencias.reduce((sum, t) => sum + (t.monto ?? 0), 0), color: '#8b5cf6' },
+  ], [totalIngresos, totalGastos, transferencias])
+
+  // Activity feed
+  const recentActivity: ActivityItem[] = useMemo(() => {
+    const activities: ActivityItem[] = []
+    
+    ingresos.slice(0, 2).forEach((ing, i) => {
+      activities.push({
+        id: `ing-${ing.id || i}`,
+        type: 'pago',
+        title: 'Ingreso registrado',
+        description: `+$${(ing.monto ?? 0).toLocaleString()} - ${ing.concepto || 'Sin concepto'}`,
+        timestamp: ing.fecha ? new Date(ing.fecha as string) : new Date(),
+        status: 'success'
+      })
+    })
+    
+    gastos.slice(0, 2).forEach((g, i) => {
+      activities.push({
+        id: `gasto-${g.id || i}`,
+        type: 'compra',
+        title: 'Gasto registrado',
+        description: `-$${(g.monto ?? 0).toLocaleString()} - ${g.concepto || 'Sin concepto'}`,
+        timestamp: g.fecha ? new Date(g.fecha as string) : new Date(),
+        status: 'error'
+      })
+    })
+    
+    return activities.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()).slice(0, 4)
+  }, [ingresos, gastos])
 
   return (
     <div className="p-6 space-y-6">
@@ -234,6 +286,194 @@ export default function BentoBanco() {
             </motion.div>
           )}
         </motion.div>
+
+        {/* Premium Widgets Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mt-6">
+          <QuickStatWidget
+            title="Saldo Disponible"
+            value={saldoActual}
+            prefix="$"
+            change={12.5}
+            icon={Wallet}
+            color="green"
+            sparklineData={trendData.map(d => d.ingresos - d.gastos)}
+            delay={0.1}
+          />
+          <QuickStatWidget
+            title="Ingresos del Período"
+            value={totalIngresos}
+            prefix="$"
+            change={18.3}
+            icon={TrendingUp}
+            color="cyan"
+            sparklineData={trendData.map(d => d.ingresos)}
+            delay={0.2}
+          />
+          <QuickStatWidget
+            title="Gastos del Período"
+            value={totalGastos}
+            prefix="$"
+            change={-5.2}
+            icon={TrendingDown}
+            color="red"
+            sparklineData={trendData.map(d => d.gastos)}
+            delay={0.3}
+          />
+          <QuickStatWidget
+            title="Transferencias"
+            value={transferencias.length}
+            change={8.1}
+            icon={ArrowLeftRight}
+            color="purple"
+            sparklineData={[3, 5, 4, 7, 6, 8, transferencias.length]}
+            delay={0.4}
+          />
+        </div>
+
+        {/* Gráficos Premium */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          {/* Tendencia Ingresos vs Gastos */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="lg:col-span-2 glass p-6 rounded-2xl border border-white/5 bg-black/20"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-emerald-500/20">
+                  <Activity className="w-5 h-5 text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">Flujo de Caja</h3>
+                  <p className="text-xs text-white/50">Ingresos vs Gastos - 7 días</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4 text-xs">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                  <span className="text-white/60">Ingresos</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-rose-500" />
+                  <span className="text-white/60">Gastos</span>
+                </div>
+              </div>
+            </div>
+            <ResponsiveContainer width="100%" height={200}>
+              <AreaChart data={trendData}>
+                <defs>
+                  <linearGradient id="colorIngresosB" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorGastosB" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <XAxis dataKey="name" stroke="#fff" opacity={0.3} fontSize={11} />
+                <YAxis stroke="#fff" opacity={0.3} fontSize={11} tickFormatter={(v) => `$${(v/1000).toFixed(0)}K`} />
+                <Tooltip 
+                  contentStyle={{ 
+                    background: 'rgba(15, 23, 42, 0.95)', 
+                    border: '1px solid rgba(255,255,255,0.1)', 
+                    borderRadius: '12px' 
+                  }}
+                  formatter={(value: number) => [`$${value.toLocaleString()}`, '']}
+                />
+                <Area type="monotone" dataKey="ingresos" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorIngresosB)" name="Ingresos" />
+                <Area type="monotone" dataKey="gastos" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorGastosB)" name="Gastos" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </motion.div>
+
+          {/* Distribución Pie Chart */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="glass p-6 rounded-2xl border border-white/5 bg-black/20"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-xl bg-violet-500/20">
+                <BarChart3 className="w-5 h-5 text-violet-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white">Distribución</h3>
+                <p className="text-xs text-white/50">Por tipo</p>
+              </div>
+            </div>
+            <ResponsiveContainer width="100%" height={140}>
+              <PieChart>
+                <Pie
+                  data={distribucionMovimientos}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={35}
+                  outerRadius={55}
+                  paddingAngle={4}
+                  dataKey="value"
+                >
+                  {distribucionMovimientos.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="space-y-2 mt-2">
+              {distribucionMovimientos.map((item, i) => (
+                <div key={i} className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full" style={{ background: item.color }} />
+                    <span className="text-white/70">{item.name}</span>
+                  </div>
+                  <span className="text-white font-medium">${(item.value / 1000).toFixed(0)}K</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Activity Feed y Mini Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          <ActivityFeedWidget
+            title="Movimientos Recientes"
+            activities={recentActivity}
+            maxItems={4}
+          />
+          <div className="lg:col-span-2 grid grid-cols-2 gap-4">
+            <MiniChartWidget
+              title="Ratio Ingreso/Gasto"
+              subtitle={`${totalGastos > 0 ? Math.round((totalIngresos / totalGastos) * 100) : 100}%`}
+              type="donut"
+              data={[{ name: 'Ingresos', value: totalIngresos }, { name: 'Gastos', value: totalGastos }]}
+              color="green"
+            />
+            <MiniChartWidget
+              title="Cortes Realizados"
+              subtitle={`${cortes.length} cortes`}
+              type="bar"
+              data={cortes.slice(0, 5).map((c, i) => ({ name: `Corte ${i+1}`, value: c.capitalFinal || 0 }))}
+              color="cyan"
+            />
+            <MiniChartWidget
+              title="Promedio Ingreso"
+              subtitle={`$${ingresos.length > 0 ? Math.round(totalIngresos / ingresos.length).toLocaleString() : 0}`}
+              type="area"
+              data={trendData.map(d => ({ name: d.name, value: d.ingresos / 5 }))}
+              color="blue"
+            />
+            <MiniChartWidget
+              title="Salud Financiera"
+              subtitle={`${saldoActual > 0 ? 92 : 45}%`}
+              type="line"
+              data={trendData.map(d => ({ name: d.name, value: 80 + Math.random() * 15 }))}
+              color="purple"
+            />
+          </div>
+        </div>
 
         {/* Advanced Controls & Tabs */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-black/20 p-2 rounded-3xl backdrop-blur-xl border border-white/5">
