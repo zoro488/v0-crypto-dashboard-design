@@ -16,18 +16,23 @@ import type { Banco, OrdenCompra, Venta, Distribuidor, Cliente, Producto } from 
 import { logger } from "../utils/logger"
 
 // ============================================================
-// COLECCIONES
+// COLECCIONES - Nombres estandarizados (snake_case)
 // ============================================================
 const COLLECTIONS = {
   BANCOS: "bancos",
-  ORDENES_COMPRA: "ordenesCompra",
+  ORDENES_COMPRA: "ordenes_compra",  // CORREGIDO: snake_case (300 docs)
   VENTAS: "ventas",
   DISTRIBUIDORES: "distribuidores",
   CLIENTES: "clientes",
-  PRODUCTOS: "productos",
+  PRODUCTOS: "almacen_productos",  // CORREGIDO: apunta a productos del almacén
   ALMACEN: "almacen",
+  ALMACEN_PRODUCTOS: "almacen_productos",
+  ALMACEN_ENTRADAS: "almacen_entradas",
+  ALMACEN_SALIDAS: "almacen_salidas",
+  MOVIMIENTOS: "movimientos",  // NUEVO: colección unificada de movimientos financieros
   TRANSFERENCIAS: "transferencias",
   ABONOS: "abonos",
+  CORTES_BANCARIOS: "cortes_bancarios",
 }
 
 // ============================================================

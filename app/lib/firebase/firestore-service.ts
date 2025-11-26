@@ -12,23 +12,14 @@ import {
   increment,
 } from "firebase/firestore"
 import { db } from "./config"
-import type { Banco, OrdenCompra, Venta, Distribuidor, Cliente, Producto } from "@/frontend/app/types"
+import type { Banco, OrdenCompra, Venta, Distribuidor, Cliente, Producto, BancoId, Movimiento } from "@/app/types"
 import { logger } from "../utils/logger"
-
-// ============================================================
-// COLECCIONES
-// ============================================================
-const COLLECTIONS = {
-  BANCOS: "bancos",
-  ORDENES_COMPRA: "ordenesCompra",
-  VENTAS: "ventas",
-  DISTRIBUIDORES: "distribuidores",
-  CLIENTES: "clientes",
-  PRODUCTOS: "productos",
-  ALMACEN: "almacen",
-  TRANSFERENCIAS: "transferencias",
-  ABONOS: "abonos",
-}
+import { 
+  COLLECTIONS, 
+  BANCO_IDS, 
+  DISTRIBUCION_VENTA,
+  normalizeBancoId 
+} from "@/app/lib/config/collections.config"
 
 // ============================================================
 // BANCOS
@@ -246,17 +237,17 @@ export const crearVenta = async (data: Omit<Venta, "id">) => {
   try {
     const batch = writeBatch(db)
 
-    // Validar stock disponible
-    const prodQuery = query(collection(db, COLLECTIONS.ALMACEN), where("nombre", "==", data.producto))
-    const prodSnapshot = await getDocs(prodQuery)
-
-    if (prodSnapshot.empty) {
-      throw new Error("Producto no encontrado en almacén")
+    // Obtener la OC relacionada para validar stock
+    const ocRef = doc(db, COLLECTIONS.ORDENES_COMPRA, data.ocRelacionada)
+    const ocSnap = await getDoc(ocRef)
+    
+    if (!ocSnap.exists()) {
+      throw new Error(`Orden de compra ${data.ocRelacionada} no encontrada`)
     }
-
-    const prodData = prodSnapshot.docs[0].data()
-    if (prodData.stockActual < data.cantidad) {
-      throw new Error(`Stock insuficiente. Disponible: ${prodData.stockActual}, Solicitado: ${data.cantidad}`)
+    
+    const ocData = ocSnap.data() as OrdenCompra
+    if (ocData.stockActual < data.cantidad) {
+      throw new Error(`Stock insuficiente en OC. Disponible: ${ocData.stockActual}, Solicitado: ${data.cantidad}`)
     }
 
     // Crear venta
@@ -264,6 +255,12 @@ export const crearVenta = async (data: Omit<Venta, "id">) => {
     batch.set(ventaRef, {
       ...data,
       createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    })
+
+    // Actualizar stock de la OC
+    batch.update(ocRef, {
+      stockActual: increment(-data.cantidad),
       updatedAt: Timestamp.now(),
     })
 
@@ -300,37 +297,31 @@ export const crearVenta = async (data: Omit<Venta, "id">) => {
       })
     }
 
-    // Actualizar almacén (crear salida)
-    const prodRef = doc(db, COLLECTIONS.ALMACEN, prodSnapshot.docs[0].id)
-    batch.update(prodRef, {
-      stockActual: increment(-data.cantidad),
-      totalSalidas: increment(data.cantidad),
-      salidas: [
-        ...(prodData.salidas || []),
-        {
-          id: ventaRef.id,
-          fecha: data.fecha,
-          cantidad: data.cantidad,
-          destino: data.cliente,
-          tipo: "salida",
-        },
-      ],
-      updatedAt: Timestamp.now(),
+    // Registrar salida de almacén (opcional, si se usa la colección de salidas)
+    const salidaRef = doc(collection(db, COLLECTIONS.ALMACEN_SALIDAS))
+    batch.set(salidaRef, {
+      fecha: data.fecha,
+      ocRelacionada: data.ocRelacionada,
+      cantidad: data.cantidad,
+      destino: data.cliente,
+      ventaId: ventaRef.id,
+      tipo: "salida",
+      createdAt: Timestamp.now(),
     })
 
     // Actualizar bancos (distribución proporcional)
     const proporcion = data.montoPagado / data.precioTotalVenta
 
-    // Bóveda Monte
-    const bovedaMonteRef = doc(db, COLLECTIONS.BANCOS, "bovedaMonte")
+    // Bóveda Monte (boveda_monte)
+    const bovedaMonteRef = doc(db, COLLECTIONS.BANCOS, BANCO_IDS.BOVEDA_MONTE)
     batch.update(bovedaMonteRef, {
       capitalActual: increment(data.distribucionBancos.bovedaMonte * proporcion),
       historicoIngresos: increment(data.distribucionBancos.bovedaMonte),
       updatedAt: Timestamp.now(),
     })
 
-    // Fletes
-    const fletesRef = doc(db, COLLECTIONS.BANCOS, "fletes")
+    // Fletes (flete_sur)
+    const fletesRef = doc(db, COLLECTIONS.BANCOS, BANCO_IDS.FLETE_SUR)
     batch.update(fletesRef, {
       capitalActual: increment(data.distribucionBancos.fletes * proporcion),
       historicoIngresos: increment(data.distribucionBancos.fletes),
@@ -338,7 +329,7 @@ export const crearVenta = async (data: Omit<Venta, "id">) => {
     })
 
     // Utilidades
-    const utilidadesRef = doc(db, COLLECTIONS.BANCOS, "utilidades")
+    const utilidadesRef = doc(db, COLLECTIONS.BANCOS, BANCO_IDS.UTILIDADES)
     batch.update(utilidadesRef, {
       capitalActual: increment(data.distribucionBancos.utilidades * proporcion),
       historicoIngresos: increment(data.distribucionBancos.utilidades),
@@ -628,19 +619,19 @@ export const cobrarCliente = async (clienteId: string, ventaId: string, monto: n
     // Actualizar bancos (distribución proporcional)
     const proporcion = monto / ventaData.precioTotalVenta
 
-    const bovedaMonteRef = doc(db, COLLECTIONS.BANCOS, "bovedaMonte")
+    const bovedaMonteRef = doc(db, COLLECTIONS.BANCOS, BANCO_IDS.BOVEDA_MONTE)
     batch.update(bovedaMonteRef, {
       capitalActual: increment(ventaData.distribucionBancos.bovedaMonte * proporcion),
       updatedAt: Timestamp.now(),
     })
 
-    const fletesRef = doc(db, COLLECTIONS.BANCOS, "fletes")
+    const fletesRef = doc(db, COLLECTIONS.BANCOS, BANCO_IDS.FLETE_SUR)
     batch.update(fletesRef, {
       capitalActual: increment(ventaData.distribucionBancos.fletes * proporcion),
       updatedAt: Timestamp.now(),
     })
 
-    const utilidadesRef = doc(db, COLLECTIONS.BANCOS, "utilidades")
+    const utilidadesRef = doc(db, COLLECTIONS.BANCOS, BANCO_IDS.UTILIDADES)
     batch.update(utilidadesRef, {
       capitalActual: increment(ventaData.distribucionBancos.utilidades * proporcion),
       updatedAt: Timestamp.now(),
