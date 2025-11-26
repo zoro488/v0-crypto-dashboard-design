@@ -24,10 +24,11 @@ export interface ComboboxOption {
   disabled?: boolean
 }
 
-export interface HybridComboboxProps {
-  options: ComboboxOption[]
+export interface HybridComboboxProps<T = unknown> {
+  options?: ComboboxOption[]
   value?: string
   onValueChange?: (value: string) => void
+  onSelect?: (item: T) => void
   placeholder?: string
   searchPlaceholder?: string
   emptyMessage?: string
@@ -35,12 +36,15 @@ export interface HybridComboboxProps {
   onCreateOption?: (value: string) => void
   disabled?: boolean
   className?: string
+  label?: string
+  collectionName?: string
 }
 
-export function HybridCombobox({
-  options,
+export function HybridCombobox<T = unknown>({
+  options = [],
   value,
   onValueChange,
+  onSelect,
   placeholder = "Seleccionar...",
   searchPlaceholder = "Buscar...",
   emptyMessage = "No se encontraron resultados.",
@@ -48,7 +52,9 @@ export function HybridCombobox({
   onCreateOption,
   disabled = false,
   className,
-}: HybridComboboxProps) {
+  label,
+  collectionName,
+}: HybridComboboxProps<T>) {
   const [open, setOpen] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState("")
 

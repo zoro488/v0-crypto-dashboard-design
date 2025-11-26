@@ -49,7 +49,7 @@ import {
   Zap,
 } from "lucide-react"
 import { cn } from "@/app/lib/utils"
-import { HybridCombobox } from "@/app/components/ui/HybridCombobox"
+import { HybridCombobox } from "@/app/components/ui/hybrid-combobox"
 import { useToast } from "@/app/hooks/use-toast"
 import { logger } from "@/app/lib/utils/logger"
 import { 
@@ -344,9 +344,10 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
     setIsListening(true)
     setVoiceTranscript("")
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      const transcript = Array.from(event.results)
-        .map(result => result[0].transcript)
+    recognition.onresult = (event: Event) => {
+      const speechEvent = event as unknown as { results: SpeechRecognitionResultList }
+      const transcript = Array.from(speechEvent.results)
+        .map((result: SpeechRecognitionResult) => result[0].transcript)
         .join("")
       setVoiceTranscript(transcript)
     }
@@ -379,7 +380,7 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
 
     // TODO: Integrar con Vercel AI SDK para parsing inteligente
     // Por ahora, solo mostramos el texto
-    logger.info("Voice command received", { text })
+    logger.info("Voice command received", { data: { text } })
   }
 
   // Procesar venta

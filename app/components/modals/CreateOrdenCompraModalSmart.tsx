@@ -44,7 +44,7 @@ import {
   AlertTriangle,
 } from "lucide-react"
 import { cn } from "@/app/lib/utils"
-import { HybridCombobox } from "@/app/components/ui/HybridCombobox"
+import { HybridCombobox } from "@/app/components/ui/hybrid-combobox"
 import { useToast } from "@/app/hooks/use-toast"
 import { logger } from "@/app/lib/utils/logger"
 import { formatearMonto, generarKeywords } from "@/app/lib/validations/smart-forms-schemas"
