@@ -2,7 +2,7 @@
 
 import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
 import BentoNav from "@/frontend/app/components/layout/BentoNav"
-import { FloatingAIWidget } from "@/frontend/app/components/FloatingAIWidget"
+import { FloatingSplineAIWidget } from "@/frontend/app/components/FloatingSplineAIWidget"
 import { FirestoreSetupAlert } from "@/frontend/app/components/ui/FirestoreSetupAlert"
 import { motion, AnimatePresence } from "framer-motion"
 import { useEffect, lazy, Suspense } from "react"
@@ -176,7 +176,7 @@ export default function Chronos() {
         </main>
       </div>
 
-      <FloatingAIWidget />
+      <FloatingSplineAIWidget />
     </div>
   )
 }

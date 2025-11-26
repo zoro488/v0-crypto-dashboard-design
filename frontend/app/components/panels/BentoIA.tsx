@@ -1,31 +1,55 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Sparkles, Mic, MicOff, Send, Activity, Brain, TrendingUp, BarChart3, Package, Users, DollarSign } from "lucide-react"
-import { useState, useEffect, useRef } from "react"
+import { Sparkles, Mic, MicOff, Send, Activity, Brain, TrendingUp, BarChart3, Package, Users, DollarSign, Zap, RefreshCw, AlertTriangle } from "lucide-react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import { useVoiceAgent } from "@/frontend/app/hooks/useVoiceAgent"
 import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
 import { SplineBot3D, useSplineBot } from "@/frontend/app/components/3d/SplineBot3D"
 import { SplitScreenIA } from "@/frontend/app/components/3d/SplitScreenIA"
 import { AIAnalyticsOverlay } from "@/frontend/app/components/3d/AIAnalyticsOverlay"
-// SplineWidget3D ya no se usa aquí - está en FloatingAIWidget
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
 import { AIBrainVisualizer } from "@/frontend/app/components/visualizations/AIBrainVisualizer"
 
-const analysisData = [
-  { month: "Ene", ventas: 45000, compras: 32000, prediccion: 48000 },
-  { month: "Feb", ventas: 52000, compras: 38000, prediccion: 54000 },
-  { month: "Mar", ventas: 61000, compras: 42000, prediccion: 63000 },
-  { month: "Abr", ventas: 58000, compras: 40000, prediccion: 60000 },
-  { month: "May", ventas: 67000, compras: 45000, prediccion: 70000 },
-  { month: "Jun", ventas: 72000, compras: 48000, prediccion: 76000 },
-]
+// Servicios de IA integrados
+import { useAI } from "@/frontend/app/lib/hooks/useAI"
+import { MegaAIAgentService } from "@/frontend/app/lib/services/ai/MegaAIAgent.service"
+import { AIPowerBIService } from "@/frontend/app/lib/services/ai/AIPowerBI.service"
+import { UserLearningService } from "@/frontend/app/lib/services/ai/UserLearning.service"
+
+// Tipos para analytics
+interface AnalyticsData {
+  month: string
+  ventas: number
+  compras: number
+  prediccion: number
+}
+
+interface KPIData {
+  id: string
+  label: string
+  value: number
+  change: number
+  trend: 'up' | 'down' | 'stable'
+  icon: React.ComponentType<{ className?: string }>
+}
+
+interface AIInsight {
+  type: 'success' | 'warning' | 'info'
+  title: string
+  description: string
+}
 
 interface Message {
   id: string
   text: string
   sender: "user" | "ai"
   timestamp: Date
+  metadata?: {
+    type?: string
+    confidence?: number
+    sources?: string[]
+  }
 }
 
 export default function BentoIA() {
@@ -36,12 +60,52 @@ export default function BentoIA() {
   const [showAnalytics, setShowAnalytics] = useState(false)
   const [analyticsType, setAnalyticsType] = useState<"sales" | "inventory" | "clients" | "predictions">("sales")
   const [use3DMode, setUse3DMode] = useState(true)
+  const [kpis, setKpis] = useState<KPIData[]>([])
+  const [insights, setInsights] = useState<AIInsight[]>([])
+  const [analysisData, setAnalysisData] = useState<AnalyticsData[]>([
+    { month: "Ene", ventas: 45000, compras: 32000, prediccion: 48000 },
+    { month: "Feb", ventas: 52000, compras: 38000, prediccion: 54000 },
+    { month: "Mar", ventas: 61000, compras: 42000, prediccion: 63000 },
+    { month: "Abr", ventas: 58000, compras: 40000, prediccion: 60000 },
+    { month: "May", ventas: 67000, compras: 45000, prediccion: 70000 },
+    { month: "Jun", ventas: 72000, compras: 48000, prediccion: 76000 },
+  ])
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { connect, disconnect, isConnected } = useVoiceAgent()
   const { voiceAgentStatus, audioFrequencies } = useAppStore()
   
   // Hook del bot 3D de Spline
   const botControl = useSplineBot()
+  
+  // Hook de servicios IA integrados
+  const { 
+    sendMessage: sendAIMessage, 
+    isLoading: aiLoading,
+    services
+  } = useAI()
+  
+  // Instancias de servicios de IA (memoizadas)
+  const aiAgent = useMemo(() => new MegaAIAgentService('default-user'), [])
+  const powerBI = useMemo(() => new AIPowerBIService(), [])
+  const userLearning = useMemo(() => new UserLearningService(), [])
+
+  // Inicializar servicios de IA con datos por defecto
+  useEffect(() => {
+    // Datos de KPIs por defecto
+    setKpis([
+      { id: 'ventas', label: 'Ventas', value: 3378700, change: 12.5, trend: 'up', icon: TrendingUp },
+      { id: 'compras', label: 'Compras', value: 14678900, change: 8.3, trend: 'up', icon: Package },
+      { id: 'clientes', label: 'Clientes', value: 31, change: 5.2, trend: 'up', icon: Users },
+      { id: 'utilidades', label: 'Utilidades', value: 337870, change: 15.7, trend: 'up', icon: DollarSign },
+    ])
+
+    // Insights por defecto
+    setInsights([
+      { type: 'success', title: 'Tendencia Positiva', description: 'Incremento del 18% en ventas este mes' },
+      { type: 'info', title: 'Predicción', description: 'Se espera alcanzar 76K en ventas próximo mes' },
+      { type: 'warning', title: 'Stock Bajo', description: 'Considera reponer inventario en 3 productos' },
+    ])
+  }, [])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -83,23 +147,60 @@ export default function BentoIA() {
     }
 
     setMessages((prev) => [...prev, userMessage])
+    const currentInput = inputText
     setInputText("")
     setIsTyping(true)
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      // Usar MegaAIAgent para respuesta inteligente
+      const response = await aiAgent.sendMessage({
+        message: currentInput,
+        userId: 'default-user',
+        context: { conversationHistory: messages.slice(-5) }
+      })
+
+      // Detectar tipo de analytics a mostrar
+      const input = currentInput.toLowerCase()
+      if (input.includes("ventas") || input.includes("vender")) {
+        setShowAnalytics(true)
+        setAnalyticsType("sales")
+      } else if (input.includes("compras") || input.includes("órdenes") || input.includes("inventario")) {
+        setShowAnalytics(true)
+        setAnalyticsType("inventory")
+      } else if (input.includes("clientes") || input.includes("cliente")) {
+        setShowAnalytics(true)
+        setAnalyticsType("clients")
+      } else if (input.includes("predicción") || input.includes("prediccion") || input.includes("futuro")) {
+        setShowAnalytics(true)
+        setAnalyticsType("predictions")
+      }
+
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: generateAIResponse(inputText),
+        text: response.message || "He procesado tu consulta. ¿Necesitas algo más?",
+        sender: "ai",
+        timestamp: new Date(),
+        metadata: {
+          type: response.type,
+        }
+      }
+      setMessages((prev) => [...prev, aiResponse])
+    } catch (error) {
+      // Fallback a respuesta local si el servicio falla
+      const aiResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        text: generateLocalResponse(currentInput),
         sender: "ai",
         timestamp: new Date(),
       }
       setMessages((prev) => [...prev, aiResponse])
+    } finally {
       setIsTyping(false)
-    }, 1500)
+    }
   }
 
-  const generateAIResponse = (userInput: string): string => {
+  // Respuesta local de fallback cuando el servicio IA no está disponible
+  const generateLocalResponse = (userInput: string): string => {
     const input = userInput.toLowerCase()
 
     if (input.includes("ventas") || input.includes("vender")) {
@@ -473,31 +574,77 @@ export default function BentoIA() {
 
           {/* Insights */}
           <div className="space-y-3">
-            <h4 className="text-white font-medium mb-4">Insights Clave</h4>
-
-            <div className="p-4 rounded-xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="w-4 h-4 text-green-400" />
-                <span className="text-green-400 font-medium text-sm">Tendencia Positiva</span>
-              </div>
-              <p className="text-white/80 text-xs">Incremento del 18% en ventas</p>
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-white font-medium">Insights Clave</h4>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  // Rotar insights para simular actualización
+                  setInsights(prev => [...prev.slice(1), prev[0]])
+                }}
+                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+              >
+                <RefreshCw className="w-4 h-4 text-white/60" />
+              </motion.button>
             </div>
 
-            <div className="p-4 rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20">
-              <div className="flex items-center gap-2 mb-2">
-                <Activity className="w-4 h-4 text-blue-400" />
-                <span className="text-blue-400 font-medium text-sm">Predicción</span>
-              </div>
-              <p className="text-white/80 text-xs">Alcanzar 76K en ventas próximo mes</p>
-            </div>
+            {insights.length > 0 ? (
+              insights.slice(0, 3).map((insight, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  className={`p-4 rounded-xl border ${
+                    insight.type === 'success' 
+                      ? 'bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20'
+                      : insight.type === 'warning'
+                      ? 'bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-yellow-500/20'
+                      : 'bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    {insight.type === 'success' && <TrendingUp className="w-4 h-4 text-green-400" />}
+                    {insight.type === 'warning' && <AlertTriangle className="w-4 h-4 text-yellow-400" />}
+                    {insight.type === 'info' && <Activity className="w-4 h-4 text-blue-400" />}
+                    <span className={`font-medium text-sm ${
+                      insight.type === 'success' ? 'text-green-400' :
+                      insight.type === 'warning' ? 'text-yellow-400' : 'text-blue-400'
+                    }`}>
+                      {insight.title}
+                    </span>
+                  </div>
+                  <p className="text-white/80 text-xs">{insight.description}</p>
+                </motion.div>
+              ))
+            ) : (
+              <>
+                <div className="p-4 rounded-xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingUp className="w-4 h-4 text-green-400" />
+                    <span className="text-green-400 font-medium text-sm">Tendencia Positiva</span>
+                  </div>
+                  <p className="text-white/80 text-xs">Incremento del 18% en ventas</p>
+                </div>
 
-            <div className="p-4 rounded-xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20">
-              <div className="flex items-center gap-2 mb-2">
-                <Brain className="w-4 h-4 text-purple-400" />
-                <span className="text-purple-400 font-medium text-sm">Recomendación</span>
-              </div>
-              <p className="text-white/80 text-xs">Aumentar inventario en 15%</p>
-            </div>
+                <div className="p-4 rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Activity className="w-4 h-4 text-blue-400" />
+                    <span className="text-blue-400 font-medium text-sm">Predicción</span>
+                  </div>
+                  <p className="text-white/80 text-xs">Alcanzar 76K en ventas próximo mes</p>
+                </div>
+
+                <div className="p-4 rounded-xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Brain className="w-4 h-4 text-purple-400" />
+                    <span className="text-purple-400 font-medium text-sm">Recomendación</span>
+                  </div>
+                  <p className="text-white/80 text-xs">Aumentar inventario en 15%</p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </motion.div>
