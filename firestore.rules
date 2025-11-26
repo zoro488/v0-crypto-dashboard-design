@@ -3,46 +3,91 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // REGLAS PARA BANCOS
+    // ============================================================
+    // FUNCIONES HELPER
+    // ============================================================
+    
+    // Verifica si el usuario está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Verifica si el documento contiene los campos requeridos
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+    
+    // ============================================================
+    // REGLAS POR COLECCIÓN
+    // ============================================================
+    
+    // BANCOS - Control financiero
+    // Solo lectura para usuarios autenticados, escritura restringida
     match /bancos/{bancoId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() 
+        && hasRequiredFields(['nombre', 'capitalActual', 'createdAt']);
+      allow update: if isAuthenticated();
+      allow delete: if false; // No permitir eliminar bancos
     }
     
-    // REGLAS PARA ÓRDENES DE COMPRA
+    // ÓRDENES DE COMPRA
     match /ordenesCompra/{ordenId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated()
+        && hasRequiredFields(['distribuidor', 'producto', 'cantidad', 'fecha']);
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
     }
     
-    // REGLAS PARA VENTAS
+    // VENTAS
     match /ventas/{ventaId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated()
+        && hasRequiredFields(['cliente', 'producto', 'cantidad', 'fecha']);
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
     }
     
-    // REGLAS PARA DISTRIBUIDORES
+    // DISTRIBUIDORES
     match /distribuidores/{distribuidorId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
     }
     
-    // REGLAS PARA CLIENTES
+    // CLIENTES
     match /clientes/{clienteId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
     }
     
-    // REGLAS PARA ALMACÉN
-    match /almacen/{productoId} {
-      allow read: if true;
-      allow write: if true;
-    }
-    
-    // REGLAS PARA PRODUCTOS
+    // PRODUCTOS
     match /productos/{productoId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
     }
+    
+    // ALMACÉN
+    match /almacen/{productoId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+    
+    // ============================================================
+    // REGLA CATCH-ALL - Denegar acceso a colecciones no definidas
+    // ============================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    
+    // ============================================================
+    // ⚠️ MODO DESARROLLO - Descomentar para testing local
+    // ============================================================
+    // ADVERTENCIA: Las siguientes reglas permiten acceso completo
+    // sin autenticación. Solo usar en desarrollo local.
+    // 
+    // match /{document=**} {
+    //   allow read, write: if true;
+    // }
   }
 }
