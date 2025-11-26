@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, lazy, Suspense } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { TrendingUp, PieChart, BarChart3, Download, ArrowUpRight, Target, Zap, DollarSign } from "lucide-react"
+import { TrendingUp, PieChart, BarChart3, Download, ArrowUpRight, Target, Zap, DollarSign, Activity, Gauge } from "lucide-react"
 import { ProfitWaterfallChart } from "@/frontend/app/components/visualizations/ProfitWaterfallChart"
 import {
   AreaChart,
@@ -19,6 +19,11 @@ import {
 import { useVentasData, useBancoData } from "@/frontend/app/lib/firebase/firestore-hooks.service"
 import { Skeleton } from "@/frontend/app/components/ui/skeleton"
 import CasaCambioWidget from "@/frontend/app/components/widgets/CasaCambioWidget"
+
+// Importar el nuevo sistema de arbitraje Panel Profit
+const ProfitCommandCenter = lazy(() => 
+  import("@/app/components/profit/ProfitCommandCenter").then(mod => ({ default: mod.ProfitCommandCenter }))
+)
 
 const monthlyProfitData = [
   { mes: "Ene", utilidadBruta: 450000, utilidadNeta: 320000, gastos: 130000 },
@@ -88,6 +93,7 @@ export default function BentoProfit() {
 
   const tabs = [
     { id: "overview", label: "Resumen", icon: PieChart },
+    { id: "arbitrage", label: "Panel Profit", icon: Activity },
     { id: "analysis", label: "Análisis Detallado", icon: BarChart3 },
     { id: "casa-cambio", label: "Casa de Cambio", icon: DollarSign },
     { id: "roi", label: "ROI por Producto", icon: Target },
@@ -314,6 +320,22 @@ export default function BentoProfit() {
                 </ResponsiveContainer>
               </div>
             </div>
+          )}
+
+          {activeTab === "arbitrage" && (
+            <Suspense fallback={
+              <div className="space-y-6">
+                <Skeleton className="h-12 w-64" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Skeleton className="h-32" />
+                  <Skeleton className="h-32" />
+                  <Skeleton className="h-32" />
+                </div>
+                <Skeleton className="h-64" />
+              </div>
+            }>
+              <ProfitCommandCenter />
+            </Suspense>
           )}
 
           {activeTab === "casa-cambio" && (

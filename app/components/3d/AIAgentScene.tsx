@@ -9,11 +9,12 @@ import {
   ChromaticAberration,
 } from "@react-three/postprocessing"
 import { GlitchMode, BlendFunction } from "postprocessing"
+import useSpline from "@splinetool/r3f-spline"
 import * as THREE from "three"
 import { motion, AnimatePresence } from "framer-motion"
 import { MessageCircle, X, Minimize2, Maximize2 } from "lucide-react"
 
-// URL del bot IA en Spline (para referencia futura)
+// URL del bot IA en Spline - USAR LA ESCENA REAL
 const SPLINE_BOT_URL = "https://prod.spline.design/X2wQi1Id1gUKP4Od/scene.splinecode"
 
 // Interface para las props del componente
@@ -25,10 +26,104 @@ interface AIAgentSceneProps {
   isProcessing?: boolean
   enableGlitch?: boolean
   enableFloating?: boolean
+  useSplineModel?: boolean
 }
 
-// Componente del Bot 3D procedural con shaders personalizados
-function AIBot({
+// Componente del Bot 3D usando Spline
+function SplineBot({
+  isThinking,
+  enableFloating,
+}: {
+  isThinking: boolean
+  enableFloating: boolean
+}) {
+  const groupRef = useRef<THREE.Group>(null)
+  const { pointer } = useThree()
+  
+  // Cargar la escena de Spline - devuelve nodes
+  const splineResult = useSpline(SPLINE_BOT_URL)
+  const nodes = splineResult.nodes
+  
+  // Buscar el nodo principal del bot
+  const botNode = useMemo(() => {
+    if (!nodes) return null
+    
+    // Buscar posibles nombres del nodo del bot en la escena
+    const possibleNames = [
+      "Bot", "Robot", "AI", "Agent", "Character", 
+      "Scene", "Group", "bot", "robot", "ai"
+    ]
+    
+    for (const name of possibleNames) {
+      if (nodes[name]) {
+        return nodes[name] as THREE.Object3D
+      }
+    }
+    
+    // Si no encontramos un nombre específico, tomar el primer nodo
+    const nodeKeys = Object.keys(nodes)
+    if (nodeKeys.length > 0) {
+      return nodes[nodeKeys[0]] as THREE.Object3D
+    }
+    
+    return null
+  }, [nodes])
+  
+  // Animación del bot Spline
+  useFrame((state) => {
+    if (!groupRef.current) return
+    
+    const time = state.clock.elapsedTime
+    
+    // Seguir el mouse suavemente (lookAt)
+    const targetRotationY = pointer.x * 0.5
+    const targetRotationX = -pointer.y * 0.3
+    
+    groupRef.current.rotation.y = THREE.MathUtils.lerp(
+      groupRef.current.rotation.y,
+      targetRotationY,
+      0.05
+    )
+    groupRef.current.rotation.x = THREE.MathUtils.lerp(
+      groupRef.current.rotation.x,
+      targetRotationX,
+      0.05
+    )
+    
+    // Flotación suave
+    if (enableFloating) {
+      groupRef.current.position.y = Math.sin(time * 1.5) * 0.15
+    }
+    
+    // Escala pulsante cuando piensa
+    if (isThinking) {
+      const pulse = 1 + Math.sin(time * 4) * 0.05
+      groupRef.current.scale.setScalar(pulse)
+    } else {
+      groupRef.current.scale.setScalar(
+        THREE.MathUtils.lerp(groupRef.current.scale.x, 1, 0.1)
+      )
+    }
+  })
+  
+  if (!botNode) return null
+  
+  return (
+    <group ref={groupRef} scale={0.8}>
+      <primitive object={botNode.clone()} />
+      {/* Luz adicional para el modelo */}
+      <pointLight
+        color="#4a90d9"
+        intensity={isThinking ? 3 : 1}
+        distance={5}
+        decay={2}
+      />
+    </group>
+  )
+}
+
+// Componente del Bot 3D procedural (fallback) con shaders personalizados
+function ProceduralBot({
   isThinking,
   isGlitching,
   enableFloating,
@@ -191,6 +286,61 @@ function AIBot({
   )
 }
 
+// Componente del Bot 3D que elige entre Spline y procedural
+function AIBot({
+  isThinking,
+  isGlitching,
+  enableFloating,
+  useSplineModel = true,
+}: {
+  isThinking: boolean
+  isGlitching: boolean
+  enableFloating: boolean
+  useSplineModel?: boolean
+}) {
+  const [splineError, setSplineError] = useState(false)
+  
+  // Si hay error cargando Spline o no se quiere usar, usar procedural
+  if (!useSplineModel || splineError) {
+    return (
+      <ProceduralBot
+        isThinking={isThinking}
+        isGlitching={isGlitching}
+        enableFloating={enableFloating}
+      />
+    )
+  }
+  
+  return (
+    <ErrorBoundary onError={() => setSplineError(true)}>
+      <SplineBot isThinking={isThinking} enableFloating={enableFloating} />
+    </ErrorBoundary>
+  )
+}
+
+// Error boundary simple para capturar errores de Spline
+function ErrorBoundary({ 
+  children, 
+  onError 
+}: { 
+  children: React.ReactNode
+  onError: () => void 
+}) {
+  const [hasError, setHasError] = useState(false)
+  
+  useEffect(() => {
+    if (hasError) {
+      onError()
+    }
+  }, [hasError, onError])
+  
+  if (hasError) {
+    return null
+  }
+  
+  return <>{children}</>
+}
+
 // Partículas orbitando el núcleo
 function OrbitalParticles({ isThinking }: { isThinking: boolean }) {
   const pointsRef = useRef<THREE.Points>(null)
@@ -333,11 +483,13 @@ function AIBotScene({
   isGlitching,
   enableGlitch,
   enableFloating,
+  useSplineModel = true,
 }: {
   isThinking: boolean
   isGlitching: boolean
   enableGlitch: boolean
   enableFloating: boolean
+  useSplineModel?: boolean
 }) {
   return (
     <>
@@ -353,12 +505,13 @@ function AIBotScene({
         color="#9333ea"
       />
       
-      {/* Bot IA */}
+      {/* Bot IA - Usa Spline si está disponible, fallback a procedural */}
       <Suspense fallback={<LoadingFallback />}>
         <AIBot
           isThinking={isThinking}
           isGlitching={isGlitching}
           enableFloating={enableFloating}
+          useSplineModel={useSplineModel}
         />
       </Suspense>
       
@@ -498,6 +651,7 @@ export function AIAgentScene({
   isProcessing = false,
   enableGlitch = true,
   enableFloating = true,
+  useSplineModel = true,
 }: AIAgentSceneProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isChatOpen, setIsChatOpen] = useState(showChat)
@@ -595,6 +749,7 @@ export function AIAgentScene({
               isGlitching={isGlitching}
               enableGlitch={enableGlitch}
               enableFloating={enableFloating}
+              useSplineModel={useSplineModel}
             />
           </Canvas>
         </div>

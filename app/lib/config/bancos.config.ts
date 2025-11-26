@@ -14,7 +14,7 @@
 
 import type { BancoId, Moneda } from "@/app/types"
 
-// Tipo simplificado para configuración de banco (no necesita todos los campos de Banco) 
+// Tipo simplificado para configuración de banco (no necesita todos los campos de Banco)  .       
 export interface BancoConfig {
   nombre: string
   icon: string

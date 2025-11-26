@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion"
 import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
-import { TrendingUp, DollarSign, Package, ShoppingCart, Zap, PieChart, Filter } from "lucide-react"
+import { TrendingUp, DollarSign, Package, ShoppingCart, Zap, PieChart, Filter, Users, Activity, ArrowUpRight, ArrowDownRight, Sparkles, Clock, Bell } from "lucide-react"
 import { InteractiveMetricsOrb } from "@/frontend/app/components/visualizations/InteractiveMetricsOrb"
 import {
   AreaChart,
@@ -19,13 +19,20 @@ import {
   PolarRadiusAxis,
   Radar,
   CartesianGrid,
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell,
 } from "recharts"
-import { useState, useEffect } from "react"
-import { useVentas, useOrdenesCompra, useProductos } from "@/frontend/app/lib/firebase/firestore-hooks.service"
+import { useState, useEffect, useMemo, useCallback } from "react"
+import { useVentas, useOrdenesCompra, useProductos, useClientes } from "@/frontend/app/lib/firebase/firestore-hooks.service"
 import { Skeleton } from "@/frontend/app/components/ui/skeleton"
 import CreateOrdenCompraModal from "@/frontend/app/components/modals/CreateOrdenCompraModal"
 import CreateVentaModal from "@/frontend/app/components/modals/CreateVentaModal"
 import CreateTransferenciaModal from "@/frontend/app/components/modals/CreateTransferenciaModal"
+import { QuickStatWidget, QuickStatsGrid } from "@/app/components/widgets/QuickStatWidget"
+import { ActivityFeedWidget, ActivityItem } from "@/app/components/widgets/ActivityFeedWidget"
+import { MiniChartWidget } from "@/app/components/widgets/MiniChartWidget"
+import { PremiumSplineOrb } from "@/app/components/3d/PremiumSplineOrb"
 
 // Interfaces para tipado
 interface VentaData {
@@ -586,11 +593,180 @@ export default function BentoDashboard() {
         </div>
       </motion.div>
 
+      {/* ============================================================ */}
+      {/* SECCIÓN PREMIUM: WIDGETS ADICIONALES */}
+      {/* ============================================================ */}
+      
+      {/* Fila de Mini Charts - 3 columnas */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="col-span-12 lg:col-span-4"
+      >
+        <MiniChartWidget
+          title="Tendencia Semanal"
+          subtitle="Últimos 7 días"
+          type="area"
+          color="blue"
+          data={[
+            { name: "L", value: 45000 },
+            { name: "M", value: 52000 },
+            { name: "X", value: 48000 },
+            { name: "J", value: 61000 },
+            { name: "V", value: 58000 },
+            { name: "S", value: 72000 },
+            { name: "D", value: 65000 },
+          ]}
+          height={140}
+          delay={0.5}
+        />
+      </motion.div>
+      
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6 }}
+        className="col-span-12 lg:col-span-4"
+      >
+        <MiniChartWidget
+          title="Distribución de Capital"
+          subtitle="Por cuenta"
+          type="donut"
+          color="purple"
+          showLegend
+          data={bancos?.slice(0, 4).map((b, i) => ({
+            name: b.nombre,
+            value: b.saldo,
+            color: ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b'][i]
+          })) || []}
+          height={140}
+          delay={0.6}
+        />
+      </motion.div>
+      
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7 }}
+        className="col-span-12 lg:col-span-4"
+      >
+        <MiniChartWidget
+          title="Comparativa Mensual"
+          subtitle="Ventas vs Compras"
+          type="bar"
+          color="green"
+          data={[
+            { name: "Ene", value: 180000, value2: 120000 },
+            { name: "Feb", value: 220000, value2: 150000 },
+            { name: "Mar", value: 195000, value2: 140000 },
+            { name: "Abr", value: 280000, value2: 180000 },
+          ]}
+          height={140}
+          delay={0.7}
+        />
+      </motion.div>
+
+      {/* Fila: Premium 3D Orb + Activity Feed */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.8, duration: 0.6 }}
+        className="col-span-12 lg:col-span-4 apple-card p-6 rounded-[32px] border border-white/5 flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden group"
+      >
+        {/* Fondo animado */}
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5"
+          animate={{
+            background: [
+              'radial-gradient(circle at 30% 30%, rgba(59,130,246,0.1) 0%, transparent 50%)',
+              'radial-gradient(circle at 70% 70%, rgba(139,92,246,0.1) 0%, transparent 50%)',
+              'radial-gradient(circle at 30% 70%, rgba(236,72,153,0.1) 0%, transparent 50%)',
+              'radial-gradient(circle at 30% 30%, rgba(59,130,246,0.1) 0%, transparent 50%)',
+            ]
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+        />
+        
+        <div className="relative z-10">
+          <PremiumSplineOrb
+            state="idle"
+            size={120}
+            glowIntensity={1.2}
+            showParticles
+            showRings
+            interactive
+            label="AI Status"
+            value="Online"
+          />
+        </div>
+        
+        {/* Indicadores de estado */}
+        <div className="relative z-10 mt-6 flex flex-wrap justify-center gap-4">
+          {[
+            { label: 'Precisión', value: '98.5%', color: 'text-emerald-400' },
+            { label: 'Consultas', value: '247', color: 'text-cyan-400' },
+            { label: 'Latencia', value: '42ms', color: 'text-purple-400' },
+          ].map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1 + i * 0.1 }}
+              className="text-center"
+            >
+              <p className={`text-lg font-bold ${stat.color}`}>{stat.value}</p>
+              <p className="text-xs text-white/40">{stat.label}</p>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Activity Feed */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.9 }}
+        className="col-span-12 lg:col-span-8"
+      >
+        <ActivityFeedWidget
+          title="Actividad en Tiempo Real"
+          maxItems={6}
+          activities={[
+            { id: '1', type: 'venta', title: 'Venta #1234', description: 'Cliente: Bódega Valle', amount: 45000, timestamp: new Date(Date.now() - 5 * 60000), status: 'success' },
+            { id: '2', type: 'compra', title: 'OC-456 recibida', description: 'Proveedor: DistMex', amount: -23000, timestamp: new Date(Date.now() - 15 * 60000), status: 'success' },
+            { id: '3', type: 'transferencia', title: 'Transferencia Interna', description: 'Monte → Azteca', amount: 50000, timestamp: new Date(Date.now() - 60 * 60000), status: 'success' },
+            { id: '4', type: 'stock', title: 'Stock Actualizado', description: 'Producto Premium Box (+50 unidades)', timestamp: new Date(Date.now() - 2 * 60 * 60000), status: 'success' },
+            { id: '5', type: 'cliente', title: 'Nuevo Cliente', description: 'Super Express registrado', timestamp: new Date(Date.now() - 3 * 60 * 60000), status: 'success' },
+            { id: '6', type: 'alerta', title: 'Stock Bajo', description: 'Producto A por debajo del mínimo', timestamp: new Date(Date.now() - 4 * 60 * 60000), status: 'pending' },
+          ]}
+        />
+      </motion.div>
+
+      {/* Fila de Quick Stats Adicionales */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1 }}
+        className="col-span-12"
+      >
+        <QuickStatsGrid
+          columns={5}
+          stats={[
+            { title: 'Clientes Activos', value: 156, icon: Users, color: 'cyan', change: 12, changeLabel: 'vs mes anterior', sparklineData: [120, 135, 142, 138, 150, 156] },
+            { title: 'Ticket Promedio', value: 45200, prefix: '$', icon: DollarSign, color: 'green', change: 8.3, changeLabel: 'vs mes anterior', sparklineData: [38000, 40000, 42000, 44000, 45200] },
+            { title: 'Productos Activos', value: 847, icon: Package, color: 'purple', change: -2.1, changeLabel: '5 descontinuados', sparklineData: [860, 855, 850, 848, 847] },
+            { title: 'Días Sin Incidentes', value: 23, suffix: ' días', icon: Activity, color: 'orange', change: 15, sparklineData: [15, 17, 19, 21, 23] },
+            { title: 'Eficiencia', value: '94.5%', icon: Zap, color: 'pink', change: 3.2, changeLabel: 'mejora continua', sparklineData: [88, 90, 91, 93, 94.5] },
+          ]}
+        />
+      </motion.div>
+
       {/* Interactive Metrics Orb - Premium Visualization */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
+        transition={{ delay: 1.1 }}
         className="col-span-12 mt-6 flex justify-center"
       >
         <InteractiveMetricsOrb
