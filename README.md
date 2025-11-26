@@ -1,5 +1,9 @@
 # Chronos - Sistema de Gestión Empresarial
 
+![CI](https://github.com/zoro488/v0-crypto-dashboard-design/workflows/CI/badge.svg)
+![Security](https://github.com/zoro488/v0-crypto-dashboard-design/workflows/Security/badge.svg)
+![Quality](https://github.com/zoro488/v0-crypto-dashboard-design/workflows/Quality/badge.svg)
+
 Sistema empresarial completo desarrollado con Next.js 16, React 19, TypeScript y Firestore.
 
 ## Características
@@ -13,10 +17,21 @@ Sistema empresarial completo desarrollado con Next.js 16, React 19, TypeScript y
 
 ## Instalación
 
-\`\`\`bash
-npm install
-npm run dev
-\`\`\`
+```bash
+# Clone the repo
+git clone https://github.com/zoro488/v0-crypto-dashboard-design.git
+cd v0-crypto-dashboard-design
+
+# Install dependencies
+pnpm install
+
+# Copy environment variables template
+cp .env.example .env.local
+# Edit .env.local with your Firebase credentials
+
+# Run development server
+pnpm dev
+```
 
 ## Configuración de Firestore
 
@@ -89,12 +104,38 @@ chronos/
 
 ## Scripts
 
-\`\`\`bash
-npm run dev      # Desarrollo
-npm run build    # Build de producción
-npm run start    # Servidor de producción
-npm run lint     # Linting
-\`\`\`
+```bash
+pnpm dev           # Desarrollo
+pnpm build         # Build de producción
+pnpm start         # Servidor de producción
+pnpm lint          # Linting
+pnpm lint:fix      # Linting con auto-fix
+pnpm typecheck     # Verificación de tipos TypeScript
+pnpm test          # Ejecutar tests
+```
+
+## 🚀 CI/CD
+
+Este proyecto utiliza GitHub Actions para CI/CD automático:
+
+### Pipelines
+
+- **CI**: Lint, TypeCheck, Build en cada push/PR
+- **Security**: CodeQL analysis, dependency review, secret scanning
+- **Quality**: Bundle size analysis, Lighthouse CI
+
+### Deploy Automático
+
+- **Preview**: Cada PR obtiene un deploy de preview en Vercel
+- **Production**: Push a `main` despliega automáticamente a producción
+
+### Variables de Entorno para Vercel
+
+Para configurar el deploy automático, agrega estos secrets en GitHub:
+
+- `VERCEL_TOKEN` - Token de Vercel
+- `VERCEL_ORG_ID` - ID de la organización en Vercel
+- `VERCEL_PROJECT_ID` - ID del proyecto en Vercel
 
 ## Documentación Completa
 

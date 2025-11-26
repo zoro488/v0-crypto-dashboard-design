@@ -1,0 +1,117 @@
+name: 🐛 Bug Report
+description: Reportar un bug o problema
+title: "[BUG]: "
+labels: ["bug", "needs-triage"]
+assignees:
+  - zoro488
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por tomarte el tiempo de reportar este bug! 🙏
+        Por favor llena la información a continuación para ayudarnos a resolver el problema.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Descripción del Bug
+      description: Una descripción clara y concisa del bug.
+      placeholder: Describe qué está pasando...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Pasos para Reproducir
+      description: Pasos para reproducir el comportamiento.
+      placeholder: |
+        1. Ir a '...'
+        2. Hacer clic en '...'
+        3. Scroll hacia abajo hasta '...'
+        4. Ver el error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamiento Esperado
+      description: Una descripción clara de lo que esperabas que pasara.
+      placeholder: Debería mostrar...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Comportamiento Actual
+      description: Una descripción de lo que realmente está pasando.
+      placeholder: En cambio muestra...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Navegador
+      description: ¿En qué navegador(es) ocurre el problema?
+      multiple: true
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+        - Opera
+        - Otro
+    validations:
+      required: true
+
+  - type: dropdown
+    id: device
+    attributes:
+      label: Dispositivo
+      description: ¿En qué tipo de dispositivo ocurre?
+      options:
+        - Desktop
+        - Tablet
+        - Mobile
+        - Todos
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Sistema Operativo
+      description: ¿Qué sistema operativo estás usando?
+      placeholder: "ej: Windows 11, macOS Sonoma, Ubuntu 22.04"
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: Si aplica, agrega screenshots para ayudar a explicar el problema.
+      placeholder: Arrastra y suelta imágenes aquí...
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs de Consola
+      description: Si hay errores en la consola del navegador, pégalos aquí.
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Contexto Adicional
+      description: Cualquier otra información que pueda ser útil.
+    validations:
+      required: false
