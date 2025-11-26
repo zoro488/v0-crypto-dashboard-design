@@ -8,7 +8,8 @@ import "./globals.css"
 import { AppProvider } from "@/frontend/app/lib/context/AppContext"
 import { Toaster } from "@/frontend/app/components/ui/toaster"
 import { ErrorBoundary } from "@/frontend/app/components/ErrorBoundary"
-import { ImmersiveLayout } from "@/app/components/layout/ImmersiveLayout"
+import ImmersiveWrapper from "@/app/components/layout/ImmersiveWrapper"
+import { FloatingAIWidget } from "@/app/components/FloatingAIWidget"
 // import { PerformanceMonitor } from "@/frontend/app/components/PerformanceMonitor"
 
 const geist = Geist({ 
@@ -102,12 +103,18 @@ export default function RootLayout({
         <ErrorBoundary>
           <AppProvider>
             {/* <PerformanceMonitor /> */}
-            <ImmersiveLayout 
-              showBackground={true} 
-              enablePostProcessing={true}
-            >
+            
+            {/* 🌌 FONDO 3D GLOBAL - Siempre visible */}
+            <ImmersiveWrapper />
+            
+            {/* 📦 CONTENIDO PRINCIPAL - Con z-index superior */}
+            <div className="relative z-10 min-h-screen w-full overflow-auto">
               {children}
-            </ImmersiveLayout>
+            </div>
+            
+            {/* 🤖 AGENTE IA FLOTANTE - Siempre presente */}
+            <FloatingAIWidget />
+            
             <Toaster />
           </AppProvider>
         </ErrorBoundary>
