@@ -73,6 +73,9 @@ export default function CreateGastoModal({ isOpen, onClose }: CreateGastoModalPr
       })
       onClose()
       setFormData({ bancoId: "", concepto: "", monto: "", descripcion: "" })
+      
+      // Refrescar datos en la UI
+      useAppStore.getState().triggerDataRefresh()
     } catch (error) {
       logger.error("Error creating gasto:", error)
       toast({

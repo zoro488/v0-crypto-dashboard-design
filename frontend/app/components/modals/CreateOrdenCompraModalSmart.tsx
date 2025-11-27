@@ -46,6 +46,7 @@ import {
 import { cn } from "@/frontend/app/lib/utils"
 import { HybridCombobox } from "@/frontend/app/components/ui/hybrid-combobox"
 import { useToast } from "@/frontend/app/hooks/use-toast"
+import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
 import { logger } from "@/frontend/app/lib/utils/logger"
 import { formatearMonto, generarKeywords } from "@/frontend/app/lib/validations/smart-forms-schemas"
 import {
@@ -386,6 +387,9 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
       resetForm()
       onClose()
       onSuccess?.()
+      
+      // Refrescar datos en la UI
+      useAppStore.getState().triggerDataRefresh()
 
     } catch (error) {
       logger.error("Error creando orden de compra", error)

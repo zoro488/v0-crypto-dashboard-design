@@ -51,6 +51,7 @@ import {
 import { cn } from "@/frontend/app/lib/utils"
 import { HybridCombobox } from "@/frontend/app/components/ui/hybrid-combobox"
 import { useToast } from "@/frontend/app/hooks/use-toast"
+import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
 import { logger } from "@/frontend/app/lib/utils/logger"
 import { 
   ventaSchema, 
@@ -500,6 +501,9 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
       resetForm()
       onClose()
       onSuccess?.()
+      
+      // Refrescar datos en la UI
+      useAppStore.getState().triggerDataRefresh()
 
     } catch (error) {
       logger.error("Error procesando venta", error)

@@ -55,6 +55,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/frontend/app/lib/utils"
 import { useToast } from "@/frontend/app/hooks/use-toast"
+import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
 import { logger } from "@/frontend/app/lib/utils/logger"
 import { 
   productoSchema, 
@@ -285,6 +286,9 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
       resetForm()
       onClose()
       onSuccess?.()
+      
+      // Refrescar datos en la UI
+      useAppStore.getState().triggerDataRefresh()
 
     } catch (error) {
       logger.error("Error creando producto", error)
