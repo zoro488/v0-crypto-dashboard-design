@@ -10,6 +10,7 @@ import { Toaster } from "@/frontend/app/components/ui/toaster"
 import { ErrorBoundary } from "@/frontend/app/components/ErrorBoundary"
 import ImmersiveWrapper from "@/frontend/app/components/layout/ImmersiveWrapper"
 import { FloatingAIWidget } from "@/frontend/app/components/FloatingAIWidget"
+import { SplashScreen } from "@/frontend/app/components/splash"
 // import { PerformanceMonitor } from "@/frontend/app/components/PerformanceMonitor"
 
 const geist = Geist({ 
@@ -102,20 +103,23 @@ export default function RootLayout({
         />
         <ErrorBoundary>
           <AppProvider>
-            {/* <PerformanceMonitor /> */}
-            
-            {/* 🌌 FONDO 3D GLOBAL - Siempre visible */}
-            <ImmersiveWrapper />
-            
-            {/* 📦 CONTENIDO PRINCIPAL - Con z-index superior */}
-            <div className="relative z-10 min-h-screen w-full overflow-auto">
-              {children}
-            </div>
-            
-            {/* 🤖 AGENTE IA FLOTANTE - Siempre presente */}
-            <FloatingAIWidget />
-            
-            <Toaster />
+            {/* 🎬 SPLASH SCREEN - Partículas CHRONOS */}
+            <SplashScreen duration={5500} enabled={true}>
+              {/* <PerformanceMonitor /> */}
+              
+              {/* 🌌 FONDO 3D GLOBAL - Siempre visible */}
+              <ImmersiveWrapper />
+              
+              {/* 📦 CONTENIDO PRINCIPAL - Con z-index superior */}
+              <div className="relative z-10 min-h-screen w-full overflow-auto">
+                {children}
+              </div>
+              
+              {/* 🤖 AGENTE IA FLOTANTE - Siempre presente */}
+              <FloatingAIWidget />
+              
+              <Toaster />
+            </SplashScreen>
           </AppProvider>
         </ErrorBoundary>
         <Analytics />
