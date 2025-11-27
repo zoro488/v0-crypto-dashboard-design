@@ -18,7 +18,6 @@ const BANCOS = ["Bóveda Monte", "Bóveda USA", "Utilidades", "Fletes", "Azteca"
 
 export default function CreateGastoModal({ isOpen, onClose }: CreateGastoModalProps) {
   const bancos = useAppStore((state) => state.bancos)
-  // const addGasto = useAppStore((state) => state.addGasto) // TODO: Implement in store
   const { toast } = useToast()
 
   const [formData, setFormData] = useState({
@@ -28,6 +27,7 @@ export default function CreateGastoModal({ isOpen, onClose }: CreateGastoModalPr
     descripcion: "",
   })
 
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const validateForm = () => {
@@ -52,24 +52,20 @@ export default function CreateGastoModal({ isOpen, onClose }: CreateGastoModalPr
     e.preventDefault()
 
     if (!validateForm()) return
-
-    const gasto = {
-      id: `GASTO_${Date.now()}`,
-      bancoId: formData.bancoId,
-      concepto: formData.concepto,
-      monto: Number.parseFloat(formData.monto),
-      descripcion: formData.descripcion,
-      fecha: new Date(),
-      createdAt: new Date(),
-    }
+    
+    setIsSubmitting(true)
 
     try {
-      // TODO: Implement addGasto method in firestoreService
-      // await firestoreService.addGasto(gasto)
-      // addGasto(gasto) // TODO: Implement addGasto in store
+      await firestoreService.crearGasto({
+        monto: Number.parseFloat(formData.monto),
+        concepto: formData.concepto,
+        bancoOrigen: formData.bancoId,
+        notas: formData.descripcion,
+      })
+      
       toast({
         title: "Gasto Registrado",
-        description: `Se ha registrado el gasto de $${gasto.monto.toLocaleString()} correctamente.`,
+        description: `Se ha registrado el gasto de $${Number.parseFloat(formData.monto).toLocaleString()} correctamente.`,
       })
       onClose()
       setFormData({ bancoId: "", concepto: "", monto: "", descripcion: "" })
@@ -83,6 +79,8 @@ export default function CreateGastoModal({ isOpen, onClose }: CreateGastoModalPr
         description: "Error al registrar el gasto. Por favor intenta de nuevo.",
         variant: "destructive",
       })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -200,19 +198,21 @@ export default function CreateGastoModal({ isOpen, onClose }: CreateGastoModalPr
               <motion.button
                 type="button"
                 onClick={onClose}
+                disabled={isSubmitting}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="flex-1 px-6 py-3 rounded-xl border border-white/10 text-white/80 hover:bg-white/5 transition-colors"
+                className="flex-1 px-6 py-3 rounded-xl border border-white/10 text-white/80 hover:bg-white/5 transition-colors disabled:opacity-50"
               >
                 Cancelar
               </motion.button>
               <motion.button
                 type="submit"
+                disabled={isSubmitting}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-red-500 to-orange-500 text-white font-medium shadow-lg shadow-red-500/25 hover:shadow-red-500/40 transition-all"
+                className="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-red-500 to-orange-500 text-white font-medium shadow-lg shadow-red-500/25 hover:shadow-red-500/40 transition-all disabled:opacity-50"
               >
-                Registrar Gasto
+                {isSubmitting ? "Registrando..." : "Registrar Gasto"}
               </motion.button>
             </div>
           </form>
