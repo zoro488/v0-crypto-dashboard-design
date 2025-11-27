@@ -30,25 +30,25 @@ import { motion, AnimatePresence } from "framer-motion"
 
 const CONFIG = {
   // Partículas
-  particleCount: 15000,
-  particleSize: 0.015,
+  particleCount: 25000,
+  particleSize: 0.012,
   
-  // Colores (gradiente cyan-purple estilo Chronos)
+  // Colores (gradiente cyan-gold premium estilo Chronos)
   colors: {
     primary: new THREE.Color("#00f5ff"),    // Cyan brillante
-    secondary: new THREE.Color("#8b5cf6"),   // Violeta
-    accent: new THREE.Color("#f472b6"),      // Rosa
+    secondary: new THREE.Color("#fbbf24"),   // Oro/Amber
+    accent: new THREE.Color("#8b5cf6"),      // Violeta
     background: "#000000",
   },
   
   // Física
   morphSpeed: 0.8,
-  noiseScale: 0.3,
-  noiseSpeed: 0.5,
+  noiseScale: 0.25,
+  noiseSpeed: 0.4,
   
   // Texto
   text: "CHRONOS",
-  fontSize: 1.2,
+  fontSize: 1.4,
 }
 
 // ============================================
@@ -169,12 +169,12 @@ const vertexShader = `
     float colorMix = sin(position.x * 2.0 + uTime) * 0.5 + 0.5;
     float colorMix2 = cos(position.y * 2.0 + uTime * 0.7) * 0.5 + 0.5;
     
-    // Gradiente de colores
+    // Gradiente de colores - Cyan a Oro con toques violeta
     vec3 color1 = vec3(0.0, 0.96, 1.0);   // Cyan
-    vec3 color2 = vec3(0.55, 0.36, 0.96); // Violeta
-    vec3 color3 = vec3(0.96, 0.45, 0.71); // Rosa
+    vec3 color2 = vec3(0.98, 0.75, 0.14); // Oro
+    vec3 color3 = vec3(0.55, 0.36, 0.96); // Violeta
     
-    vColor = mix(mix(color1, color2, colorMix), color3, colorMix2 * 0.3);
+    vColor = mix(mix(color1, color2, colorMix), color3, colorMix2 * 0.2);
     
     // Alpha basado en distancia al centro y morph progress
     vDistance = length(morphedPosition);
@@ -234,50 +234,55 @@ function generateTextPositions(text: string, particleCount: number): Float32Arra
   const canvas = document.createElement("canvas")
   const ctx = canvas.getContext("2d")!
   
-  canvas.width = 1024
-  canvas.height = 256
+  canvas.width = 2048
+  canvas.height = 512
   
   // Configurar texto
   ctx.fillStyle = "#000000"
   ctx.fillRect(0, 0, canvas.width, canvas.height)
   
-  ctx.font = "bold 180px Arial, sans-serif"
+  // Usar fuente más bold y grande para mejor definición
+  ctx.font = "bold 320px 'Arial Black', Arial, sans-serif"
   ctx.fillStyle = "#ffffff"
   ctx.textAlign = "center"
   ctx.textBaseline = "middle"
+  ctx.letterSpacing = "0.1em"
   ctx.fillText(text, canvas.width / 2, canvas.height / 2)
   
   // Obtener datos de imagen
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
   const pixels = imageData.data
   
-  // Encontrar píxeles blancos (texto)
-  const textPixels: { x: number; y: number }[] = []
+  // Encontrar píxeles blancos (texto) con sampling más denso
+  const textPixels: { x: number; y: number; brightness: number }[] = []
   
-  for (let y = 0; y < canvas.height; y += 2) {
-    for (let x = 0; x < canvas.width; x += 2) {
+  for (let y = 0; y < canvas.height; y += 1) {
+    for (let x = 0; x < canvas.width; x += 1) {
       const i = (y * canvas.width + x) * 4
-      if (pixels[i] > 128) {
-        textPixels.push({ x, y })
+      const brightness = pixels[i]
+      if (brightness > 100) {
+        textPixels.push({ x, y, brightness: brightness / 255 })
       }
     }
   }
   
   // Distribuir partículas en los píxeles del texto
-  const scale = 4.0 / canvas.width
-  const offsetX = -2.0
-  const offsetY = 0.5
+  const scale = 5.0 / canvas.width
+  const offsetX = -2.5
+  const offsetY = 0.6
   
   for (let i = 0; i < particleCount; i++) {
     const idx = i * 3
     
     if (textPixels.length > 0) {
+      // Seleccionar pixel con bias hacia áreas más brillantes
       const pixel = textPixels[Math.floor(Math.random() * textPixels.length)]
       
-      // Agregar algo de variación
-      positions[idx] = (pixel.x * scale + offsetX) + (Math.random() - 0.5) * 0.02
-      positions[idx + 1] = (-pixel.y * scale + offsetY) + (Math.random() - 0.5) * 0.02
-      positions[idx + 2] = (Math.random() - 0.5) * 0.1
+      // Posición base con variación mínima para texto nítido
+      const variation = 0.008
+      positions[idx] = (pixel.x * scale + offsetX) + (Math.random() - 0.5) * variation
+      positions[idx + 1] = (-pixel.y * scale + offsetY) + (Math.random() - 0.5) * variation
+      positions[idx + 2] = (Math.random() - 0.5) * 0.05 // Muy poco profundidad para texto plano
     } else {
       // Fallback: posición aleatoria
       positions[idx] = (Math.random() - 0.5) * 4
@@ -463,33 +468,48 @@ export default function ChronosParticles({
             {/* Post-processing effects */}
             <EffectComposer>
               <Bloom
-                intensity={1.5}
-                luminanceThreshold={0.1}
-                luminanceSmoothing={0.9}
+                intensity={2.0}
+                luminanceThreshold={0.05}
+                luminanceSmoothing={0.95}
                 mipmapBlur
               />
               <ChromaticAberration
                 blendFunction={BlendFunction.NORMAL}
-                offset={new THREE.Vector2(0.002, 0.002)}
+                offset={new THREE.Vector2(0.001, 0.001)}
               />
               <Vignette
-                darkness={0.5}
-                offset={0.3}
+                darkness={0.6}
+                offset={0.2}
               />
             </EffectComposer>
           </Canvas>
           
-          {/* Texto de loading sutil */}
+          {/* Subtítulo elegante */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2.5, duration: 0.8 }}
+            className="absolute bottom-20 left-1/2 -translate-x-1/2 text-center"
+          >
+            <p className="text-white/30 text-xs tracking-[0.4em] uppercase font-light">
+              Enterprise Capital Flow System
+            </p>
+          </motion.div>
+          
+          {/* Loading indicator */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.5 }}
             className="absolute bottom-8 left-1/2 -translate-x-1/2"
           >
-            <div className="flex items-center gap-2 text-white/40 text-sm">
-              <div className="w-1 h-1 rounded-full bg-cyan-400 animate-pulse" />
-              <span className="font-light tracking-widest">INITIALIZING</span>
-              <div className="w-1 h-1 rounded-full bg-purple-400 animate-pulse" style={{ animationDelay: "0.2s" }} />
+            <div className="flex items-center gap-3 text-white/30 text-xs">
+              <div className="flex gap-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-cyan-400/80 animate-pulse" />
+                <div className="w-1.5 h-1.5 rounded-full bg-amber-400/80 animate-pulse" style={{ animationDelay: "0.15s" }} />
+                <div className="w-1.5 h-1.5 rounded-full bg-violet-400/80 animate-pulse" style={{ animationDelay: "0.3s" }} />
+              </div>
+              <span className="tracking-[0.3em] uppercase">Loading</span>
             </div>
           </motion.div>
           
