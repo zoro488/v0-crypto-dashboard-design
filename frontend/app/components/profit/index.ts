@@ -18,4 +18,4 @@ export type {
   StrategyMode,
   TreasuryAlert,
   TreasuryHealthMetrics,
-} from '@/app/lib/profit-engine/types/profit-engine.types';
+} from '@/frontend/app/lib/profit-engine/types/profit-engine.types';

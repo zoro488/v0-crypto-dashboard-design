@@ -15,7 +15,7 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion'
-import AIAgent3DWidget from '@/app/components/3d/AIAgent3DWidget'
+import AIAgent3DWidget from '@/frontend/app/components/3d/AIAgent3DWidget'
 import { Button } from '@/frontend/app/components/ui/button'
 import { Input } from '@/frontend/app/components/ui/input'
 import { ScrollArea } from '@/frontend/app/components/ui/scroll-area'

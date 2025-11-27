@@ -38,7 +38,7 @@ const config = {
     }],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
-  testPathIgnorePatterns: ['/node_modules/', '/.next/', '/dist/', '/backend/'],
+  testPathIgnorePatterns: ['/node_modules/', '/.next/', '/dist/', '/backend/', '/e2e/'],
 }
 
 module.exports = config

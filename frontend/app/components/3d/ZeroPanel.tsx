@@ -34,7 +34,7 @@ import {
 import dynamic from 'next/dynamic'
 import { ZeroState } from './ZeroAvatar'
 import { ZeroChatWidget, ChatMessage } from './ZeroChatWidget'
-import { useVoiceInput, VoiceCommand } from '@/app/hooks/useVoiceInput'
+import { useVoiceInput, VoiceCommand } from '@/frontend/app/hooks/useVoiceInput'
 
 // Cargar componentes 3D de forma dinámica (solo cliente)
 const ZeroCombatScene = dynamic(

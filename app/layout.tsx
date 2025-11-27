@@ -8,8 +8,8 @@ import "./globals.css"
 import { AppProvider } from "@/frontend/app/lib/context/AppContext"
 import { Toaster } from "@/frontend/app/components/ui/toaster"
 import { ErrorBoundary } from "@/frontend/app/components/ErrorBoundary"
-import ImmersiveWrapper from "@/app/components/layout/ImmersiveWrapper"
-import { FloatingAIWidget } from "@/app/components/FloatingAIWidget"
+import ImmersiveWrapper from "@/frontend/app/components/layout/ImmersiveWrapper"
+import { FloatingAIWidget } from "@/frontend/app/components/FloatingAIWidget"
 // import { PerformanceMonitor } from "@/frontend/app/components/PerformanceMonitor"
 
 const geist = Geist({ 
