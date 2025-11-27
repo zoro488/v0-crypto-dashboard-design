@@ -10,7 +10,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server"
-import { logger } from "@/app/lib/utils/logger"
+import { logger } from "@/frontend/app/lib/utils/logger"
 
 // Tipos para la respuesta de OpenAI
 interface OpenAISessionResponse {

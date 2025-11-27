@@ -22,7 +22,7 @@ import CasaCambioWidget from "@/frontend/app/components/widgets/CasaCambioWidget
 
 // Importar el nuevo sistema de arbitraje Panel Profit
 const ProfitCommandCenter = lazy(() => 
-  import("@/app/components/profit/ProfitCommandCenter").then(mod => ({ default: mod.ProfitCommandCenter }))
+  import("@/frontend/app/components/profit/ProfitCommandCenter").then(mod => ({ default: mod.ProfitCommandCenter }))
 )
 
 const monthlyProfitData = [
