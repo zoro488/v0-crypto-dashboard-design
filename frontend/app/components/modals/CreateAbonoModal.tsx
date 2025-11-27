@@ -16,6 +16,7 @@ export default function CreateAbonoModal({ isOpen, onClose }: { isOpen: boolean;
   const clientes = useAppStore((state) => state.clientes)
   const abonarDistribuidor = useAppStore((state) => state.abonarDistribuidor)
   const abonarCliente = useAppStore((state) => state.abonarCliente)
+  const triggerDataRefresh = useAppStore((state) => state.triggerDataRefresh)
 
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
@@ -75,6 +76,9 @@ export default function CreateAbonoModal({ isOpen, onClose }: { isOpen: boolean;
       } else {
         abonarCliente(formData.entidadId, monto)
       }
+
+      // 🔄 Trigger para actualizar hooks de datos
+      triggerDataRefresh()
 
       toast({
         title: "Abono Registrado",

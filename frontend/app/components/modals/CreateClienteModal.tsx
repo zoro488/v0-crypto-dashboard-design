@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { X, User, Phone, Mail, MapPin, Building2 } from "lucide-react"
 import { firestoreService } from "@/frontend/app/lib/firebase/firestore-service"
 import { useToast } from "@/frontend/app/hooks/use-toast"
+import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
 
 interface ClienteFormData {
   nombre: string
@@ -23,6 +24,7 @@ interface CreateClienteModalProps {
 
 export default function CreateClienteModal({ isOpen, onClose, onSubmit }: CreateClienteModalProps) {
   const { toast } = useToast()
+  const { triggerDataRefresh } = useAppStore()
 
   const [formData, setFormData] = useState({
     nombre: "",
@@ -46,6 +48,9 @@ export default function CreateClienteModal({ isOpen, onClose, onSubmit }: Create
 
       // Crear cliente en Firestore
       await firestoreService.crearCliente(clienteData)
+
+      // 🔄 Trigger para actualizar hooks de datos
+      triggerDataRefresh()
 
       onSubmit(formData)
 

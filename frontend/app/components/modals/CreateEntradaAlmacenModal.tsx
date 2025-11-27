@@ -16,6 +16,7 @@ interface CreateEntradaAlmacenModalProps {
 export default function CreateEntradaAlmacenModal({ isOpen, onClose }: CreateEntradaAlmacenModalProps) {
   const { toast } = useToast()
   const addEntradaAlmacen = useAppStore((state) => state.addEntradaAlmacen)
+  const triggerDataRefresh = useAppStore((state) => state.triggerDataRefresh)
   const { data: productos = [] } = useAlmacenData()
 
   const [formData, setFormData] = useState({
@@ -54,6 +55,9 @@ export default function CreateEntradaAlmacenModal({ isOpen, onClose }: CreateEnt
         valorTotal: formData.cantidad * formData.costoUnitario,
         ordenCompraRef: formData.ordenCompraRef,
       })
+
+      // 🔄 Trigger para actualizar hooks de datos
+      triggerDataRefresh()
 
       toast({
         title: "✅ Entrada Registrada",

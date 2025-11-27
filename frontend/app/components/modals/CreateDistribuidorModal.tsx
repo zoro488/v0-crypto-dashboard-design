@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { X, User, Building2, Phone, Mail, MapPin } from "lucide-react"
 import { firestoreService } from "@/frontend/app/lib/firebase/firestore-service"
 import { useToast } from "@/frontend/app/hooks/use-toast"
+import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
 
 interface DistribuidorFormData {
   nombre: string
@@ -23,6 +24,7 @@ interface CreateDistribuidorModalProps {
 
 export default function CreateDistribuidorModal({ isOpen, onClose, onSubmit }: CreateDistribuidorModalProps) {
   const { toast } = useToast()
+  const { triggerDataRefresh } = useAppStore()
 
   const [formData, setFormData] = useState({
     nombre: "",
@@ -46,6 +48,9 @@ export default function CreateDistribuidorModal({ isOpen, onClose, onSubmit }: C
 
       // Crear distribuidor en Firestore
       await firestoreService.crearDistribuidor(distribuidorData)
+
+      // 🔄 Trigger para actualizar hooks de datos
+      triggerDataRefresh()
 
       onSubmit(formData)
 

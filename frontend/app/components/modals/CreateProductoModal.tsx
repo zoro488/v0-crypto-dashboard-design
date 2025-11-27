@@ -16,6 +16,7 @@ interface CreateProductoModalProps {
 
 export default function CreateProductoModal({ isOpen, onClose }: CreateProductoModalProps) {
   const { toast } = useToast()
+  const triggerDataRefresh = useAppStore((state) => state.triggerDataRefresh)
   // const addProducto = useAppStore((state) => state.addProducto) // TODO: Implement in store
 
   const [formData, setFormData] = useState({
@@ -60,6 +61,9 @@ export default function CreateProductoModal({ isOpen, onClose }: CreateProductoM
         stockInicial: 0,
         categoria: "General",
       })
+
+      // 🔄 Trigger para actualizar hooks de datos
+      triggerDataRefresh()
 
       toast({
         title: "Producto Creado",

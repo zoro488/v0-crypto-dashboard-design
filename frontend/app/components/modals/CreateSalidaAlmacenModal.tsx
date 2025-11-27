@@ -16,6 +16,7 @@ interface CreateSalidaAlmacenModalProps {
 export default function CreateSalidaAlmacenModal({ isOpen, onClose }: CreateSalidaAlmacenModalProps) {
   const { toast } = useToast()
   const addSalidaAlmacen = useAppStore((state) => state.addSalidaAlmacen)
+  const triggerDataRefresh = useAppStore((state) => state.triggerDataRefresh)
   const { data: productosFirestore = [] } = useAlmacenData()
   const productosStore = useAppStore((state) => state.productos)
   
@@ -68,6 +69,9 @@ export default function CreateSalidaAlmacenModal({ isOpen, onClose }: CreateSali
         productoNombre: (productoSeleccionado?.nombre as string) || "",
         ventaRef: formData.ventaRef,
       })
+
+      // 🔄 Trigger para actualizar hooks de datos
+      triggerDataRefresh()
 
       toast({
         title: "✅ Salida Registrada",

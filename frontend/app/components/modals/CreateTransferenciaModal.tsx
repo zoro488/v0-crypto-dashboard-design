@@ -14,6 +14,7 @@ export default function CreateTransferenciaModal({ isOpen, onClose }: { isOpen: 
   const { toast } = useToast()
   const crearTransferencia = useAppStore((state) => state.crearTransferencia)
   const bancos = useAppStore((state) => state.bancos)
+  const triggerDataRefresh = useAppStore((state) => state.triggerDataRefresh)
 
   const [formData, setFormData] = useState({
     bancoOrigen: "",
@@ -85,6 +86,9 @@ export default function CreateTransferenciaModal({ isOpen, onClose }: { isOpen: 
 
       // Actualizar estado local
       crearTransferencia(formData.bancoOrigen, formData.bancoDestino, monto)
+
+      // 🔄 Trigger para actualizar hooks de datos
+      triggerDataRefresh()
 
       toast({
         title: "Transferencia Exitosa",

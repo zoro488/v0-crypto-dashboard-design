@@ -21,6 +21,7 @@ const BANCOS = ["Bóveda Monte", "Bóveda USA", "Utilidades", "Fletes", "Azteca"
 export default function CreateIngresoModal({ isOpen, onClose }: CreateIngresoModalProps) {
   const { toast } = useToast()
   const bancos = useAppStore((state) => state.bancos)
+  const triggerDataRefresh = useAppStore((state) => state.triggerDataRefresh)
 
   const [formData, setFormData] = useState({
     bancoId: "",
@@ -59,6 +60,9 @@ export default function CreateIngresoModal({ isOpen, onClose }: CreateIngresoMod
         referencia: formData.referencia,
         notas: formData.descripcion,
       })
+
+      // 🔄 Trigger para actualizar hooks de datos
+      triggerDataRefresh()
 
       toast({
         title: "Ingreso Registrado",
