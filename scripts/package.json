@@ -1,0 +1,24 @@
+{
+  "name": "chronos-migration-scripts",
+  "version": "1.0.0",
+  "description": "Scripts de limpieza y migración de datos para Chronos",
+  "main": "index.js",
+  "scripts": {
+    "clean": "ts-node data-cleaner.ts",
+    "migrate": "ts-node firestore-migrator.ts",
+    "migrate:web": "ts-node firestore-migrator-web.ts",
+    "clean-and-migrate": "npm run clean && npm run migrate",
+    "clean-and-migrate:web": "npm run clean && npm run migrate:web",
+    "verify": "ts-node verify-migration.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "firebase": "^12.6.0",
+    "firebase-admin": "^12.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

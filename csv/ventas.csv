@@ -1,0 +1,97 @@
+fecha,ocRelacionada,cantidad,cliente,bovedaMonte,precioVenta,ingreso,flete,fleteUtilidad,utilidad,estatus,concepto
+2025-08-23,OC0001,150,Bódega M-P,945000,6300,945000,Aplica,75000,0,Pendiente,
+2025-08-23,OC0001,60,Valle,378000,6800,408000,Aplica,30000,0,Pendiente,
+2025-08-23,OC0001,50,Ax,315000,7000,350000,Aplica,25000,10000,Pagado,
+2025-08-23,OC0001,25,Negrito,157500,7000,175000,Aplica,12500,5000,Pagado,
+2025-08-23,OC0001,20,Wero Benavides,126000,7100,142000,Aplica,10000,6000,Pendiente,
+2025-08-23,OC0001,30,Lamas,189000,7100,213000,Aplica,15000,9000,Pendiente,
+2025-08-25,OC0001,48,Trámite Chucho,302400,6300,302400,No Aplica,0,0,Pendiente,
+2025-08-25,OC0001,3,Galvan,18900,7400,22200,Aplica,1500,1800,Pagado,
+2025-08-25,OC0001,2,Valle Local,12600,7000,14000,Aplica,1000,400,Pagado,
+2025-08-25,OC0001,20,Tocayo,126000,7000,140000,Aplica,10000,4000,Pagado,
+2025-08-25,OC0001,15,Sierra47,94500,7000,105000,Aplica,7500,3000,Pagado,
+2025-08-26,OC0003,33,Lamas,207900,7000,231000,Aplica,16500,6600,Pendiente,
+2025-08-30,OC0004,33,Ax,207900,6300,207900,Aplica,16500,0,Pendiente,debiamos prestadas a/x
+2025-08-30,OC0004,75,Valle,472500,6300,472500,Aplica,37500,0,Pendiente,"gaviota,panaderia"
+2025-08-30,OC0004,25,Ax,157500,6300,157500,Aplica,12500,0,Pendiente,panaderia
+2025-08-30,OC0004,44,Tocayo,277200,6300,277200,Aplica,22000,0,Pendiente,panaderia
+2025-08-30,OC0004,50,Tio Tocayo,315000,6300,315000,Aplica,25000,0,Pendiente,panaderia
+2025-08-30,OC0004,15,Chucho,94500,7000,105000,Aplica,7500,3000,Pagado,venta local monte#15
+2025-08-31,OC0004,22,Lamas,138600,7100,156200,Aplica,11000,6600,Pendiente,playa azul#22
+2025-08-31,OC0004,22,Lamas,138600,7000,154000,Aplica,11000,4400,Pendiente,venta local monte#22
+2025-09-01,OC0004,14,Ax,88200,7000,98000,Aplica,7000,2800,Pagado,venta local monte #14
+2025-09-02,OC0004,24,Trámite Güerito,151200,0,0,No Aplica,0,-151200,Pendiente,silla-planta 🚚#24
+2025-09-02,OC0004,1,Galvan,6300,7400,7400,Aplica,500,600,Pagado,venta local monte rafa#1
+2025-09-02,OC0004,1,Galvan,6300,7000,7000,Aplica,500,200,Pagado,venta local galvan #1
+2025-09-02,OC0004,8,Sierra47,50400,7000,56000,Aplica,4000,1600,Pagado,venta local monte #8
+2025-09-03,OC0003,1,470,6300,7000,7000,Aplica,500,200,Pagado,venta local monte #1
+2025-09-03,OC0001,1,Trámite Playa Azul,6300,0,0,No Aplica,0,-6300,Pendiente,entregamos tocallo mc#1
+2025-09-03,OC0004,5,Valle Local,31500,7000,35000,Aplica,2500,1000,Pagado,venta local monte#5
+2025-09-04,OC0004,22,Chucho,138600,7000,154000,Aplica,11000,4400,Pagado,venta local monte#22
+2025-09-04,OC0004,16,Trámite Chucho,100800,0,0,No Aplica,0,-100800,Pendiente,silla-mc🙏🏻#16
+2025-09-05,OC0004,1,Galvan,6300,7000,7000,Aplica,500,200,Pagado,venta local monte#1
+2025-09-05,OC0004,10,Negrito,63000,7000,70000,Aplica,5000,2000,Pagado,venta local monte#10
+2025-09-06,OC0005,60,Robalo,378000,6600,396000,No Aplica,0,18000,Pendiente,venta local monte#60
+2025-09-06,OC0005,230,Bódega M-P,1449000,0,0,No Aplica,0,-1449000,Pendiente,
+2025-09-08,OC0004,16,Trámite Chucho,100800,0,0,No Aplica,0,-100800,Pendiente,silla-mc#16🙏🏻
+2025-09-08,OC0005,100,Tavo,630000,0,0,No Aplica,0,-630000,Pendiente,playa azul#200 (tavo)
+2025-09-08,OC0005,12,mg,75600,0,0,No Aplica,0,-75600,Pendiente,playa azul#12 mg
+2025-09-09,OC0005,16,Trámite Chucho,100800,0,0,No Aplica,0,-100800,Pendiente,silla-mc#16🙏🏻
+2025-09-09,OC0005,5,Sierra47,31500,7000,35000,Aplica,2500,1000,Pagado,venta local monte #5
+2025-09-10,OC0005,9,Chucho,56700,7000,63000,Aplica,4500,1800,Pagado,venta local monte #9
+2025-09-10,OC0004,1,Galvan,6300,7000,7000,Aplica,500,200,Pagado,venta local monte#1
+2025-09-11,OC0005,16,Chucho,100800,7000,112000,Aplica,8000,3200,Pagado,venta local monte#16
+2025-09-11,OC0005,10,Negrito,63000,7000,70000,Aplica,5000,2000,Pagado,venta local monte#10
+2025-09-12,OC0004,1,Galvan,6300,7400,7400,Aplica,500,600,Pagado,venta local monte#1 rafa
+2025-09-13,OC0005,5,tx8,31500,7000,35000,Aplica,2500,1000,Pagado,venta local monte#5
+2025-09-13,OC0005,50,amigo playa azul,315000,7100,355000,Aplica,25000,15000,Pendiente,venta local playa azul#50
+2025-09-13,OC0005,50,flama,315000,6700,335000,Aplica,25000,-5000,Pendiente,venta local monte#50
+2025-09-15,OC0005,16,Trámite Chucho,100800,0,0,No Aplica,0,-100800,Pendiente,tramite silla-mc🙏🏻
+2025-09-16,OC0005,23,Lamas,144900,7000,161000,Aplica,11500,4600,Pendiente,venta local monte#23
+2025-09-16,OC0004,1,Galvan,6300,7000,7000,Aplica,500,200,Pagado,venta local monte#1
+2025-09-16,OC0004,3,Tocayo,18900,7100,21300,Aplica,1500,900,Pagado,venta local monte#3
+2025-09-17,OC0006,20,Wero Benavides,126000,7100,0,Aplica,10000,6000,Pendiente,venta playa azul #20
+2025-09-17,OC0006,1,Galvan,6300,7000,7000,Aplica,500,200,Pagado,venta local monte#1
+2025-09-18,OC0006,16,Trámite Chucho,100800,0,0,No Aplica,0,-100800,Pendiente,tramite silla-mc🙏🏻
+2025-09-18,OC0006,20,Tocayo,126000,7000,140000,Aplica,10000,4000,Pagado,venta local monte#20
+2025-09-18,OC0001,1,Ax,6300,6500,6500,No Aplica,0,200,Pagado,venta local monte#1 (psico bunny)
+2025-09-19,OC0006,5,Negrito,31500,7000,35000,Aplica,2500,1000,Pagado,venta local monte#5
+2025-09-19,OC0006,1,Don Rafa,6300,7400,7400,Aplica,500,600,Pagado,venta local monte#1
+2025-09-20,OC0006,14,mg,88200,7100,99400,Aplica,7000,4200,Pendiente,venta playa azul #14
+2025-09-20,OC0006,12,Sierra47,75600,7000,84000,Aplica,6000,2400,Pagado,venta local monte#12
+2025-09-20,OC0006,2,Rojo,12600,7000,14000,Aplica,1000,400,Pagado,venta local monte#2
+2025-09-20,OC0006,3,Ax,18900,7000,21000,Aplica,1500,600,Pagado,venta local monte#3
+2025-09-20,OC0006,1,Galvan,6300,7000,7000,Aplica,500,200,Pagado,venta local monte#1
+2025-09-23,OC0006,1,Trámite Chucho,6300,0,0,No Aplica,0,-6300,Pendiente,tramite silla-mc🚚
+2025-09-25,OC0001,1,Ax,6300,6500,6500,No Aplica,0,200,Pagado,psico bunny (wero a/x)
+2025-09-29,OC0007,20,Sierra47,140000,7000,140000,No Aplica,0,0,Pagado,venta local monte#20
+2025-10-03,OC0001,2,Galvan,12600,7000,14000,Aplica,1000,400,Pendiente,gastos galvan octubre
+2025-10-05,OC0008,60,Valle,378000,0,0,No Aplica,0,-378000,Pendiente,valle gaviota#60
+2025-10-05,OC0008,20,Valle,126000,0,0,No Aplica,0,-126000,Pendiente,valle gaviota#20 (vendimos sierra47)
+2025-10-05,OC0008,30,Valle,189000,0,0,No Aplica,0,-189000,Pendiente,valle pacman#30
+2025-10-05,OC0008,100,Bódega M-P,630000,0,0,No Aplica,0,-630000,Pendiente,bodega mp #100 gaviota
+2025-10-06,OC0008,25,Ax,157500,0,0,No Aplica,0,-157500,Pendiente,a/x pacman#25
+2025-10-06,OC0008,24,Ax,151200,0,0,No Aplica,0,-151200,Pendiente,a/x debiamos flete werito silla-planta
+2025-10-06,OC0008,40,Robalo,252000,6600,264000,No Aplica,0,12000,Pendiente,robalo#40 gaviota
+2025-10-06,OC0008,2,Valle Local,12600,7000,14000,Aplica,1000,400,Pagado,venta local monte valle#2
+2025-10-06,OC0008,20,Trámite Playa Azul,126000,0,0,No Aplica,0,-126000,Pendiente,tramite playa azul silla-mc
+2025-10-06,OC0008,48,Trámite Chucho,302400,0,0,No Aplica,0,-302400,Pendiente,tramite chucho silla-mc
+2025-10-06,OC0008,48,Trámite Chucho,302400,0,0,No Aplica,0,-302400,Pendiente,tramite chucho silla-mc
+2025-10-06,OC0008,50,Tocayo,315000,0,0,No Aplica,0,-315000,Pendiente,tocallo#50 pacman
+2025-10-06,OC0008,74,Tio Tocayo,466200,0,0,No Aplica,0,-466200,Pendiente,tio tocallo#74 pacman
+2025-10-07,OC0008,10,tx8,63000,7000,70000,Aplica,5000,2000,Pagado,venta local monte#10
+2025-10-07,OC0008,30,Valle Local,189000,7000,210000,Aplica,15000,6000,Pagado,venta local monte#30
+2025-10-07,OC0008,3,Sierra47,18900,7000,21000,Aplica,1500,600,Pagado,venta local monte#3
+2025-10-07,OC0008,3,Tocayo,18900,7000,21000,Aplica,1500,600,Pagado,venta local monte#3
+2025-10-09,OC0009,15,mg,94500,7100,106500,Aplica,7500,4500,Pendiente,venta playa azul#15
+2025-10-09,OC0009,1,cabo,6300,7000,7000,Aplica,500,200,Pagado,venta local monte#1
+2025-10-09,OC0001,1,Ax,6300,6500,6500,No Aplica,0,200,Pagado,venta local monte psico bunny #1
+2025-10-09,OC0008,1,Galvan,6300,7400,7400,Aplica,500,600,Pagado,venta local monte#1 (tito)
+2025-10-11,OC0001,1,Galvan,6300,7400,7400,Aplica,500,600,Pagado,venta local monte #1 (rafa)
+2025-10-14,OC0008,1,tx8,6300,7000,7000,Aplica,500,200,Pagado,venta local monte#1
+2025-10-15,OC0008,1,Rojo,6300,7000,7000,Aplica,500,200,Pagado,venta local monte#1
+2025-10-16,OC0001,2,compa,12600,6500,13000,No Aplica,0,400,Pagado,venta local monte#2 psico bunny
+2025-10-17,OC0009,10,Sierra47,63000,7000,70000,Aplica,5000,2000,Pagado,venta local monte#10
+2025-10-17,OC0008,1,Galvan,6300,7000,7000,Aplica,500,200,Pagado,venta local monte#1👁️
+2025-10-18,OC0009,20,Lamas,126000,7100,142000,Aplica,10000,6000,Pendiente,venta playa azul#20👁️
+2025-10-20,OC0009,48,Trámite Chucho,302400,0,0,No Aplica,0,-302400,Pendiente,tramite chucho silla-mc 🚚

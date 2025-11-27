@@ -1,0 +1,99 @@
+{
+  "common": {
+    "app_name": "CHRONOS Dashboard",
+    "welcome": "Welcome",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "buy": "Purchases",
+    "sell": "Sales",
+    "bank": "Bank",
+    "warehouse": "Warehouse",
+    "exchange": "Exchange",
+    "clients": "Clients",
+    "distributors": "Distributors"
+  },
+  "dashboard": {
+    "title": "Main Dashboard",
+    "total_capital": "Total Capital",
+    "today_profit": "Today's Profit",
+    "monthly_profit": "Monthly Profit",
+    "active_operations": "Active Operations",
+    "recent_transactions": "Recent Transactions",
+    "quick_stats": "Quick Stats"
+  },
+  "exchange": {
+    "title": "Exchange House",
+    "buy_rate": "Buy Rate",
+    "sell_rate": "Sell Rate",
+    "available_balance": "Available Balance",
+    "exchange_transaction": "Make Exchange",
+    "transaction_history": "Transaction History"
+  },
+  "bank": {
+    "title": "Bank Management",
+    "account_balance": "Account Balance",
+    "pending_transfers": "Pending Transfers",
+    "recent_movements": "Recent Movements"
+  },
+  "warehouse": {
+    "title": "Inventory",
+    "total_stock": "Total Stock",
+    "low_stock_alert": "Low Stock Alert",
+    "products": "Products",
+    "categories": "Categories"
+  },
+  "clients": {
+    "title": "Clients",
+    "total_clients": "Total Clients",
+    "active_clients": "Active Clients",
+    "pending_payments": "Pending Payments",
+    "client_details": "Client Details"
+  },
+  "distributors": {
+    "title": "Distributors",
+    "total_distributors": "Total Distributors",
+    "active_orders": "Active Orders",
+    "pending_deliveries": "Pending Deliveries"
+  },
+  "transactions": {
+    "date": "Date",
+    "type": "Type",
+    "amount": "Amount",
+    "status": "Status",
+    "description": "Description",
+    "details": "Details"
+  },
+  "modals": {
+    "confirm": "Confirm",
+    "confirm_action": "Are you sure you want to perform this action?",
+    "success_title": "Operation Successful",
+    "error_title": "Operation Error",
+    "close_modal": "Close Modal"
+  },
+  "voice": {
+    "listening": "Listening...",
+    "not_available": "Voice assistant not available",
+    "activate": "Activate Assistant",
+    "deactivate": "Deactivate Assistant"
+  },
+  "errors": {
+    "network_error": "Connection error. Please check your internet.",
+    "unauthorized": "You don't have permissions for this action.",
+    "not_found": "Resource not found.",
+    "server_error": "Server error. Please try again later.",
+    "validation_error": "Please check the entered data."
+  }
+}
