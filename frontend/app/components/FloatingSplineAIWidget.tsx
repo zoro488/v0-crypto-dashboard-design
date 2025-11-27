@@ -1,11 +1,17 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { Mic, MicOff, Send, Maximize2, Minimize2, Volume2, VolumeX, Sparkles, X } from "lucide-react"
-import { useState, useRef, useEffect, Suspense, useCallback } from "react"
-import Spline from "@splinetool/react-spline"
+import { Mic, MicOff, Send, Maximize2, Sparkles, X, Bot } from "lucide-react"
+import { useState, useRef, useEffect, Suspense, useCallback, Component, type ReactNode } from "react"
+import dynamic from "next/dynamic"
 import type { Application } from "@splinetool/runtime"
 import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
+
+// Carga dinámica de Spline con SSR desactivado para evitar errores de hidratación
+const Spline = dynamic(() => import("@splinetool/react-spline"), {
+  ssr: false,
+  loading: () => <SplineFallback />
+})
 
 // Tipos
 interface DisplayMessage {
@@ -16,8 +22,94 @@ interface DisplayMessage {
   suggestions?: string[]
 }
 
+// Error Boundary para capturar errores del runtime de Spline
+interface SplineErrorBoundaryState {
+  hasError: boolean
+  errorMessage: string
+}
+
+interface SplineErrorBoundaryProps {
+  children: ReactNode
+  fallback?: ReactNode
+}
+
+class SplineErrorBoundary extends Component<SplineErrorBoundaryProps, SplineErrorBoundaryState> {
+  constructor(props: SplineErrorBoundaryProps) {
+    super(props)
+    this.state = { hasError: false, errorMessage: "" }
+  }
+
+  static getDerivedStateFromError(error: Error): SplineErrorBoundaryState {
+    return { hasError: true, errorMessage: error.message }
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+    // Silenciamos errores de Spline en producción
+    if (process.env.NODE_ENV === "development") {
+      console.debug("[SplineErrorBoundary] Error capturado:", error.message)
+    }
+  }
+
+  render(): ReactNode {
+    if (this.state.hasError) {
+      return this.props.fallback || <SplineFallback />
+    }
+    return this.props.children
+  }
+}
+
+// Fallback elegante cuando Spline no carga o tiene errores
+function SplineFallback({ size = "default" }: { size?: "small" | "default" | "large" }) {
+  const sizeClasses = {
+    small: "w-8 h-8",
+    default: "w-12 h-12",
+    large: "w-20 h-20"
+  }
+  
+  return (
+    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-full">
+      <motion.div
+        className={`${sizeClasses[size]} rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center`}
+        animate={{
+          scale: [1, 1.1, 1],
+          rotate: [0, 5, -5, 0],
+        }}
+        transition={{
+          duration: 3,
+          repeat: Number.POSITIVE_INFINITY,
+          ease: "easeInOut",
+        }}
+      >
+        <Bot className="w-1/2 h-1/2 text-white" />
+      </motion.div>
+    </div>
+  )
+}
+
 // URL del Spline Widget (orb con ojos)
+// NOTA: Esta URL puede causar errores de runtime si la escena tiene animaciones rotas
 const SPLINE_WIDGET_URL = "https://prod.spline.design/EMUFQmxEYeuyK46H/scene.splinecode"
+
+// Flag para deshabilitar Spline si causa muchos errores
+// Deshabilitado temporalmente - la escena externa causa errores de "position undefined"
+const SPLINE_ENABLED = false
+
+// Componente condicional que renderiza Spline solo si está habilitado
+function ConditionalSpline({ onLoad, style }: { onLoad?: (app: Application) => void; style?: React.CSSProperties }) {
+  if (!SPLINE_ENABLED) {
+    return <SplineFallback />
+  }
+  
+  return (
+    <SplineErrorBoundary fallback={<SplineFallback />}>
+      <Spline
+        scene={SPLINE_WIDGET_URL}
+        onLoad={onLoad}
+        style={style}
+      />
+    </SplineErrorBoundary>
+  )
+}
 
 // Respuestas inteligentes basadas en contexto
 const getAIResponse = (message: string, store: ReturnType<typeof useAppStore.getState>): { text: string; suggestions: string[] } => {
@@ -245,8 +337,7 @@ export function FloatingSplineAIWidget() {
                 />
               </div>
             }>
-              <Spline
-                scene={SPLINE_WIDGET_URL}
+              <ConditionalSpline
                 onLoad={handleSplineLoad}
                 style={{ width: '100%', height: '100%', transform: 'scale(1.2)' }}
               />
@@ -313,8 +404,7 @@ export function FloatingSplineAIWidget() {
                     <Sparkles className="w-5 h-5 text-blue-400 animate-pulse" />
                   </div>
                 }>
-                  <Spline
-                    scene={SPLINE_WIDGET_URL}
+                  <ConditionalSpline
                     style={{ width: '100%', height: '100%', transform: 'scale(1.5)' }}
                   />
                 </Suspense>
@@ -380,8 +470,7 @@ export function FloatingSplineAIWidget() {
                     />
                   </div>
                 }>
-                  <Spline
-                    scene={SPLINE_WIDGET_URL}
+                  <ConditionalSpline
                     style={{ width: '100%', height: '100%', transform: 'scale(1.3)' }}
                   />
                 </Suspense>

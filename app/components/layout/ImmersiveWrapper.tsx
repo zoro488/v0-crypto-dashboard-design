@@ -30,7 +30,6 @@ import {
 import { BlendFunction } from 'postprocessing'
 import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
-import Spline from '@splinetool/react-spline'
 
 // ============================================================================
 // NEBULOSA PROCEDURAL - Nubes volumétricas de color
@@ -322,33 +321,6 @@ export default function ImmersiveWrapper() {
           <Preload all />
         </Suspense>
       </Canvas>
-    </div>
-  )
-}
-
-// ============================================================================
-// COMPONENTE WRAPPER CON SPLINE (Alternativo)
-// ============================================================================
-export function ImmersiveWrapperWithSpline() {
-  const [splineLoaded, setSplineLoaded] = useState(false)
-  
-  return (
-    <div className="fixed inset-0 z-[-1] bg-black pointer-events-none">
-      {/* Capa de Spline */}
-      <div className="absolute inset-0 opacity-60">
-        <Spline 
-          scene="https://prod.spline.design/t22KlukwndaHbHKF/scene.splinecode"
-          onLoad={() => setSplineLoaded(true)}
-        />
-      </div>
-      
-      {/* Overlay de gradiente para fusionar */}
-      <div 
-        className="absolute inset-0"
-        style={{
-          background: 'radial-gradient(ellipse at center, transparent 0%, rgba(3,0,20,0.8) 100%)'
-        }}
-      />
     </div>
   )
 }
