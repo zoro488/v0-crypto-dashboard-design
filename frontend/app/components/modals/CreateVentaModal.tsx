@@ -8,6 +8,7 @@ import { useToast } from "@/frontend/app/hooks/use-toast"
 import { firestoreService } from "@/frontend/app/lib/firebase/firestore-service"
 import { useAlmacenData } from "@/frontend/app/lib/firebase/firestore-hooks.service"
 import { validarVenta, type CrearVentaInput } from "@/frontend/app/lib/schemas/ventas.schema"
+import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
 import type { Producto } from "@/frontend/app/types"
 
 interface AlmacenProducto {
@@ -33,6 +34,7 @@ const steps = [
 
 export function CreateVentaModal({ open, onClose }: CreateVentaModalProps) {
   const { toast } = useToast()
+  const { triggerDataRefresh } = useAppStore()
   const { data: almacenRaw = [] } = useAlmacenData()
   const almacen = almacenRaw as AlmacenProducto[]
   const [step, setStep] = useState(1)
@@ -131,6 +133,9 @@ export function CreateVentaModal({ open, onClose }: CreateVentaModalProps) {
       }
 
       await firestoreService.crearVenta(venta)
+
+      // 🔄 Trigger para actualizar todos los hooks de datos
+      triggerDataRefresh()
 
       toast({
         title: "Venta Exitosa",

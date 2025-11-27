@@ -9,6 +9,7 @@
  * - Cleanup function que cancela listeners
  * - Modo mock automático cuando Firestore falla
  * - Patrón getDocs (lectura única) para evitar ASSERTION FAILED
+ * - 🔄 Auto-refresh cuando el store dispara triggerDataRefresh
  */
 
 import { useEffect, useState, useRef, useCallback } from "react"
@@ -18,6 +19,7 @@ import {
 } from "firebase/firestore"
 import { db } from "./config"
 import { logger } from "../utils/logger"
+import { useAppStore } from "../store/useAppStore"
 
 // ===================================================================
 // CONFIGURACIÓN
@@ -91,6 +93,9 @@ function useFirestoreQuery<T extends DocumentData>(
   const [data, setData] = useState<T[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  
+  // 🔄 Obtener el trigger de refresh del store
+  const dataRefreshTrigger = useAppStore((state) => state.dataRefreshTrigger)
   
   // 🛡️ Flag isMounted - CRÍTICO para evitar memory leaks
   const isMountedRef = useRef(true)
@@ -197,7 +202,7 @@ function useFirestoreQuery<T extends DocumentData>(
     return () => {
       isMountedRef.current = false
     }
-  }, [fetchData])
+  }, [fetchData, dataRefreshTrigger]) // 🔄 Re-fetch cuando cambia el trigger
 
   return { data, loading, error, refresh: fetchData }
 }

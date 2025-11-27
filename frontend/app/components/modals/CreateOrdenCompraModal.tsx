@@ -6,6 +6,7 @@ import { X, Package, DollarSign, Truck, Check, ChevronRight, Building } from "lu
 import { Dialog, DialogContent, DialogDescription } from "@/frontend/app/components/ui/dialog"
 import { useToast } from "@/frontend/app/hooks/use-toast"
 import { firestoreService } from "@/frontend/app/lib/firebase/firestore-service"
+import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
 import type { BancoId } from "@/frontend/app/types"
 
 interface CreateOrdenCompraModalProps {
@@ -15,6 +16,7 @@ interface CreateOrdenCompraModalProps {
 
 export function CreateOrdenCompraModal({ open, onClose }: CreateOrdenCompraModalProps) {
   const { toast } = useToast()
+  const { triggerDataRefresh } = useAppStore()
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
 
@@ -89,6 +91,9 @@ export function CreateOrdenCompraModal({ open, onClose }: CreateOrdenCompraModal
       }
 
       await firestoreService.crearOrdenCompra(ordenCompra)
+
+      // 🔄 Trigger para actualizar todos los hooks de datos
+      triggerDataRefresh()
 
       toast({
         title: "Orden Creada",

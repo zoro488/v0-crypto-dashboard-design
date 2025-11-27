@@ -102,6 +102,10 @@ interface AppState {
   ventas: Venta[]
   productos: Producto[]
 
+  // 🔄 Flag para refrescar datos en los hooks
+  dataRefreshTrigger: number
+  triggerDataRefresh: () => void
+
   // Actions
   setCurrentPanel: (panel: string) => void
   toggleSidebar: () => void
@@ -150,6 +154,10 @@ export const useAppStore = create<AppState>()(
         ordenesCompra: [],
         ventas: [],
         productos: [],
+
+        // 🔄 Flag para refrescar datos
+        dataRefreshTrigger: 0,
+        triggerDataRefresh: () => set((state) => ({ dataRefreshTrigger: state.dataRefreshTrigger + 1 })),
 
         // Actions
         setCurrentPanel: (panel) => set({ currentPanel: panel }),

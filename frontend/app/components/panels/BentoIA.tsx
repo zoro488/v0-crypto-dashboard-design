@@ -1,19 +1,37 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { Sparkles, Mic, MicOff, Send, Activity, Brain, TrendingUp, BarChart3, Package, Users, DollarSign, Zap, Target, MessageCircle } from "lucide-react"
-import { useState, useEffect, useRef, useMemo } from "react"
+import { Sparkles, Mic, MicOff, Send, Activity, Brain, TrendingUp, BarChart3, Package, Users, DollarSign, Zap, Target, MessageCircle, Bot } from "lucide-react"
+import { useState, useEffect, useRef, useMemo, lazy, Suspense } from "react"
 import { useVoiceAgent } from "@/frontend/app/hooks/useVoiceAgent"
 import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
-import { SplineBot3D, useSplineBot } from "@/frontend/app/components/3d/SplineBot3D"
-import { SplitScreenIA } from "@/frontend/app/components/3d/SplitScreenIA"
 import { AIAnalyticsOverlay } from "@/frontend/app/components/3d/AIAnalyticsOverlay"
-import { SplineWidget3D } from "@/frontend/app/components/3d/SplineWidget3D"
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, RadarChart, PolarGrid, PolarAngleAxis, Radar, PieChart, Pie, Cell } from "recharts"
 import { AIBrainVisualizer } from "@/frontend/app/components/visualizations/AIBrainVisualizer"
 import { QuickStatWidget } from "@/frontend/app/components/widgets/QuickStatWidget"
 import { MiniChartWidget } from "@/frontend/app/components/widgets/MiniChartWidget"
 import { ActivityFeedWidget, ActivityItem } from "@/frontend/app/components/widgets/ActivityFeedWidget"
+
+// Flag para habilitar/deshabilitar Spline (causa errores de runtime)
+const SPLINE_ENABLED = false
+
+// Lazy load de componentes Spline
+const SplineBot3D = lazy(() => import("@/frontend/app/components/3d/SplineBot3D").then(m => ({ default: m.SplineBot3D })))
+const SplitScreenIA = lazy(() => import("@/frontend/app/components/3d/SplitScreenIA").then(m => ({ default: m.SplitScreenIA })))
+const SplineWidget3D = lazy(() => import("@/frontend/app/components/3d/SplineWidget3D").then(m => ({ default: m.SplineWidget3D })))
+
+// Hook simplificado para control del bot cuando Spline está deshabilitado
+function useSplineBot() {
+  const [state, setState] = useState<'idle' | 'listening' | 'speaking' | 'thinking'>('idle')
+  const [isInteracting, setIsInteracting] = useState(false)
+
+  const setIdle = () => { setState('idle'); setIsInteracting(false) }
+  const setListening = () => { setState('listening'); setIsInteracting(true) }
+  const setSpeaking = () => { setState('speaking'); setIsInteracting(true) }
+  const setThinking = () => { setState('thinking'); setIsInteracting(true) }
+
+  return { state, isInteracting, setIdle, setListening, setSpeaking, setThinking }
+}
 
 const analysisData = [
   { month: "Ene", ventas: 45000, compras: 32000, prediccion: 48000 },
@@ -208,6 +226,63 @@ export default function BentoIA() {
     setAnalyticsType(action.type)
   }
 
+  // Componente Fallback cuando Spline está deshabilitado
+  const BotFallback = () => (
+    <div className="relative w-full h-full flex items-center justify-center p-8 bg-gradient-to-br from-blue-950/40 via-purple-950/40 to-black/40 rounded-2xl">
+      <div className="relative">
+        {/* Avatar del Bot animado */}
+        <motion.div
+          animate={{
+            scale: isListening ? [1, 1.05, 1] : [1, 1.02, 1],
+            rotate: isTyping ? [0, 2, -2, 0] : 0,
+          }}
+          transition={{ repeat: Infinity, duration: isListening ? 1 : 3 }}
+          className="w-40 h-40 rounded-3xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-2xl shadow-purple-500/30"
+        >
+          <div className="w-36 h-36 rounded-2xl bg-black/80 flex items-center justify-center">
+            <Bot className="w-20 h-20 text-white" />
+          </div>
+        </motion.div>
+        
+        {/* Indicador de estado */}
+        <motion.div
+          className={`absolute -bottom-2 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full backdrop-blur-xl border shadow-lg ${
+            isListening ? 'bg-green-500/20 border-green-500/30' :
+            isTyping ? 'bg-purple-500/20 border-purple-500/30' :
+            'bg-blue-500/20 border-blue-500/30'
+          }`}
+          animate={{ scale: [1, 1.02, 1] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+        >
+          <span className="text-white text-sm font-medium">
+            {isListening ? '🎤 Escuchando...' : isTyping ? '🧠 Pensando...' : '✨ Chronos IA'}
+          </span>
+        </motion.div>
+
+        {/* Partículas decorativas */}
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 rounded-full bg-blue-400/60"
+            style={{
+              top: `${20 + Math.random() * 60}%`,
+              left: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -20, 0],
+              opacity: [0.3, 0.8, 0.3],
+            }}
+            transition={{
+              repeat: Infinity,
+              duration: 2 + Math.random() * 2,
+              delay: i * 0.2,
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  )
+
   return (
     <div className="bento-container relative">
       {/* Main interface with split screen */}
@@ -217,25 +292,36 @@ export default function BentoIA() {
         className="bento-full h-[calc(100vh-12rem)] relative"
       >
         {use3DMode ? (
-          <SplitScreenIA
-            defaultRatio={35}
-            leftContent={
-              <div className="relative w-full h-full flex items-center justify-center p-8">
-                <SplineBot3D
-                  isListening={isListening}
-                  isSpeaking={isTyping}
-                  className="w-full h-full"
-                />
-                
-                {/* Widget 3D flotante pequeño */}
-                <div className="absolute bottom-8 right-8">
-                  <SplineWidget3D size="sm" />
-                </div>
+          // Usar Spline solo si está habilitado, sino usar fallback
+          SPLINE_ENABLED ? (
+            <Suspense fallback={<BotFallback />}>
+              <SplitScreenIA
+                defaultRatio={35}
+                leftContent={
+                  <div className="relative w-full h-full flex items-center justify-center p-8">
+                    <SplineBot3D
+                      isListening={isListening}
+                      isSpeaking={isTyping}
+                      className="w-full h-full"
+                    />
+                    <div className="absolute bottom-8 right-8">
+                      <SplineWidget3D size="sm" />
+                    </div>
+                  </div>
+                }
+                rightContent={<div className="relative w-full h-full">{/* Chat content */}</div>}
+              />
+            </Suspense>
+          ) : (
+            // Layout sin Spline - diseño elegante split
+            <div className="flex h-full gap-4">
+              {/* Panel izquierdo - Bot Fallback */}
+              <div className="w-[35%] min-w-[300px]">
+                <BotFallback />
               </div>
-            }
-            rightContent={
-              <div className="relative w-full h-full">
-                {/* Chat interface */}
+              
+              {/* Panel derecho - Chat */}
+              <div className="flex-1 relative">
                 <div className="crystal-card h-full flex flex-col">
                   {/* Header */}
                   <div className="p-6 border-b border-white/10">
@@ -424,8 +510,8 @@ export default function BentoIA() {
                   type={analyticsType}
                 />
               </div>
-            }
-          />
+            </div>
+          )
         ) : (
           // Simple mode - solo chat
           <div className="crystal-card h-full flex flex-col lg:flex-row gap-6">{/* Contenido simple mode aquí */}</div>
