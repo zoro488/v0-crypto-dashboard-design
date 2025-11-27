@@ -1,0 +1,776 @@
+"use client"
+
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion"
+import { TrendingUp, Plus, DollarSign, Users, Package, CheckCircle2, Clock, ArrowUpRight, ArrowDownRight, Sparkles, Target, Zap, BarChart3, PieChart as PieChartIcon } from "lucide-react"
+import { Button } from "@/frontend/app/components/ui/button"
+import { Badge } from "@/frontend/app/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/frontend/app/components/ui/tabs"
+import { useState, useEffect, useMemo, useRef } from "react"
+import { useVentasData } from "@/frontend/app/lib/firebase/firestore-hooks.service"
+import { CreateVentaModal } from "@/frontend/app/components/modals/CreateVentaModal"
+import { SalesFlowDiagram } from "@/frontend/app/components/visualizations/SalesFlowDiagram"
+import { 
+  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, 
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
+} from "recharts"
+
+interface VentaData {
+  id: string
+  precioTotalVenta?: number
+  montoPagado?: number
+  montoRestante?: number
+  estadoPago?: "completo" | "parcial" | "pendiente"
+  cliente?: string
+  fecha?: string
+  producto?: string
+  cantidad?: number
+  [key: string]: unknown
+}
+
+// ============================================================================
+// COMPONENTES DE ANIMACIÓN PREMIUM
+// ============================================================================
+
+function AnimatedCounter({ value, prefix = "", suffix = "", className = "" }: {
+  value: number
+  prefix?: string
+  suffix?: string
+  className?: string
+}) {
+  const [displayValue, setDisplayValue] = useState(0)
+  
+  useEffect(() => {
+    const duration = 1500
+    const startTime = Date.now()
+    const startValue = displayValue
+    
+    const animate = () => {
+      const elapsed = Date.now() - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 4)
+      
+      setDisplayValue(startValue + (value - startValue) * eased)
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      }
+    }
+    
+    requestAnimationFrame(animate)
+  }, [value])
+  
+  return (
+    <span className={className}>
+      {prefix}{displayValue.toFixed(value >= 1000 ? 2 : 0)}{suffix}
+    </span>
+  )
+}
+
+function PulsingOrb({ color = "green" }: { color?: string }) {
+  const colorMap: Record<string, string> = {
+    green: "from-green-500 to-emerald-500",
+    blue: "from-blue-500 to-cyan-500",
+    purple: "from-purple-500 to-violet-500",
+    yellow: "from-yellow-500 to-orange-500",
+    cyan: "from-cyan-500 to-teal-500"
+  }
+  
+  return (
+    <motion.div
+      className={`absolute -top-3 -right-3 w-6 h-6 rounded-full bg-gradient-to-r ${colorMap[color]} shadow-lg`}
+      animate={{
+        scale: [1, 1.3, 1],
+        opacity: [0.8, 0.4, 0.8]
+      }}
+      transition={{
+        duration: 2,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }}
+    >
+      <motion.div
+        className={`absolute inset-0 rounded-full bg-gradient-to-r ${colorMap[color]} blur-sm`}
+        animate={{ scale: [1, 1.5, 1] }}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
+    </motion.div>
+  )
+}
+
+// ============================================================================
+// CUSTOM TOOLTIP
+// ============================================================================
+
+function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number; name: string; color: string }[]; label?: string }) {
+  if (!active || !payload) return null
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 5 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-xl p-3 shadow-xl"
+    >
+      <p className="text-xs text-zinc-400 mb-2">{label}</p>
+      {payload.map((entry, index) => (
+        <div key={index} className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
+          <span className="text-sm text-white font-medium">${(entry.value / 1000).toFixed(1)}K</span>
+        </div>
+      ))}
+    </motion.div>
+  )
+}
+
+export default function BentoVentas() {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedTimeRange, setSelectedTimeRange] = useState<'day' | 'week' | 'month'>('week')
+
+  const { data: ventasDataRaw, loading, error } = useVentasData()
+  const ventasData = ventasDataRaw as VentaData[]
+
+  const totalVentas = ventasData.reduce((acc, v) => acc + (v.precioTotalVenta || 0), 0)
+  const totalCobrado = ventasData.reduce((acc, v) => acc + (v.montoPagado || 0), 0)
+  const totalPendiente = ventasData.reduce((acc, v) => acc + (v.montoRestante || 0), 0)
+  const ventasPendientes = ventasData.filter((v) => v.estadoPago === "pendiente").length
+  const ventasCompletas = ventasData.filter((v) => v.estadoPago === "completo").length
+  const ventasParciales = ventasData.filter((v) => v.estadoPago === "parcial").length
+  
+  // Calcular métricas adicionales
+  const promedioVenta = ventasData.length > 0 ? totalVentas / ventasData.length : 0
+  const tasaCobro = totalVentas > 0 ? (totalCobrado / totalVentas) * 100 : 0
+  
+  // Datos simulados para gráficos (reemplazar con datos reales agrupados)
+  const chartData = useMemo(() => [
+    { name: 'Lun', ventas: 125000, cobrado: 98000 },
+    { name: 'Mar', ventas: 230000, cobrado: 180000 },
+    { name: 'Mie', ventas: 185000, cobrado: 160000 },
+    { name: 'Jue', ventas: 320000, cobrado: 280000 },
+    { name: 'Vie', ventas: 280000, cobrado: 250000 },
+    { name: 'Sab', ventas: 150000, cobrado: 130000 },
+    { name: 'Dom', ventas: 90000, cobrado: 80000 },
+  ], [])
+  
+  const pieData = useMemo(() => [
+    { name: 'Completas', value: ventasCompletas, color: '#22c55e' },
+    { name: 'Parciales', value: ventasParciales, color: '#eab308' },
+    { name: 'Pendientes', value: ventasPendientes, color: '#ef4444' },
+  ], [ventasCompletas, ventasParciales, ventasPendientes])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+        <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full border-4 border-white/10 border-t-green-500 animate-spin" />
+          <div className="text-white text-lg">Cargando ventas...</div>
+        </motion.div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0f] p-6 space-y-6">
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4"
+        >
+          <p className="text-yellow-400 text-sm">{error}</p>
+        </motion.div>
+      )}
+
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center justify-between"
+      >
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-emerald-500/20 blur-xl" />
+            <TrendingUp className="w-12 h-12 text-green-400 relative" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+              Ventas
+            </h1>
+            <p className="text-zinc-400 text-sm">Registro de ventas y gestión de cobros</p>
+          </div>
+        </div>
+        <Button
+          className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
+          onClick={() => setIsModalOpen(true)}
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Nueva Venta
+        </Button>
+      </motion.div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.1 }}
+          className="relative group"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
+          <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 hover:border-green-500/50 transition-colors">
+            <Package className="w-8 h-8 text-green-400 mb-4" />
+            <div className="text-3xl font-bold text-white mb-2">{ventasData.length}</div>
+            <p className="text-sm text-zinc-400">Ventas Totales</p>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2 }}
+          className="relative group"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
+          <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 hover:border-emerald-500/50 transition-colors">
+            <DollarSign className="w-8 h-8 text-emerald-400 mb-4" />
+            <div className="text-3xl font-bold text-white mb-2">${(totalVentas / 1000000).toFixed(2)}M</div>
+            <p className="text-sm text-zinc-400">Valor Total</p>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3 }}
+          className="relative group"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-lime-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
+          <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 hover:border-green-500/50 transition-colors">
+            <CheckCircle2 className="w-8 h-8 text-lime-400 mb-4" />
+            <div className="text-3xl font-bold text-white mb-2">${(totalCobrado / 1000000).toFixed(2)}M</div>
+            <p className="text-sm text-zinc-400">Cobrado</p>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.4 }}
+          className="relative group"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
+          <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 hover:border-yellow-500/50 transition-colors">
+            <Clock className="w-8 h-8 text-yellow-400 mb-4" />
+            <div className="text-3xl font-bold text-white mb-2">${(totalPendiente / 1000000).toFixed(2)}M</div>
+            <p className="text-sm text-zinc-400">Por Cobrar</p>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.5 }}
+          className="relative group"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
+          <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 hover:border-cyan-500/50 transition-colors">
+            <Users className="w-8 h-8 text-cyan-400 mb-4" />
+            <div className="text-3xl font-bold text-white mb-2">{ventasCompletas}</div>
+            <p className="text-sm text-zinc-400">Completas</p>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* ════════════════════════════════════════════════════════════════════
+          SECCIÓN DE GRÁFICOS PREMIUM
+          ════════════════════════════════════════════════════════════════════ */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Gráfico de Ventas vs Cobrado */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="lg:col-span-2 relative group"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-emerald-500/5 rounded-2xl blur-2xl" />
+          <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 hover:border-green-500/30 transition-all duration-300">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-green-400" />
+                  <h3 className="text-lg font-bold text-white">Rendimiento Semanal</h3>
+                </div>
+                <p className="text-sm text-zinc-400 mt-1">Ventas vs Cobrado</p>
+              </div>
+              <div className="flex gap-2">
+                {(['day', 'week', 'month'] as const).map((range) => (
+                  <motion.button
+                    key={range}
+                    onClick={() => setSelectedTimeRange(range)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                      selectedTimeRange === range
+                        ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                        : 'bg-zinc-800/50 text-zinc-400 hover:text-white'
+                    }`}
+                  >
+                    {range === 'day' ? 'Día' : range === 'week' ? 'Semana' : 'Mes'}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+            
+            <div className="h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="colorVentas" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#22c55e" stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorCobrado" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
+                  <XAxis dataKey="name" stroke="#71717a" fontSize={12} />
+                  <YAxis stroke="#71717a" fontSize={12} tickFormatter={(v) => `$${(v/1000)}K`} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Area
+                    type="monotone"
+                    dataKey="ventas"
+                    stroke="#22c55e"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#colorVentas)"
+                    name="Ventas"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="cobrado"
+                    stroke="#3b82f6"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#colorCobrado)"
+                    name="Cobrado"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+            
+            {/* Leyenda personalizada */}
+            <div className="flex justify-center gap-6 mt-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-green-500" />
+                <span className="text-sm text-zinc-400">Ventas</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-blue-500" />
+                <span className="text-sm text-zinc-400">Cobrado</span>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+        
+        {/* Gráfico de Distribución de Estados */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.55 }}
+          className="relative group"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-violet-500/5 rounded-2xl blur-2xl" />
+          <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 hover:border-purple-500/30 transition-all duration-300 h-full">
+            <div className="flex items-center gap-2 mb-4">
+              <PieChartIcon className="w-5 h-5 text-purple-400" />
+              <h3 className="text-lg font-bold text-white">Estado de Pagos</h3>
+            </div>
+            
+            <div className="h-[200px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={50}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            
+            {/* Stats debajo del gráfico */}
+            <div className="space-y-3 mt-4">
+              {pieData.map((item) => (
+                <div key={item.name} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />
+                    <span className="text-sm text-zinc-400">{item.name}</span>
+                  </div>
+                  <span className="text-sm font-medium text-white">{item.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      </div>
+      
+      {/* Métricas adicionales */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.58 }}
+          className="relative group"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
+          <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-5 hover:border-cyan-500/50 transition-colors">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-zinc-400 mb-1">Promedio por Venta</p>
+                <div className="text-2xl font-bold text-white">
+                  $<AnimatedCounter value={promedioVenta / 1000} suffix="K" />
+                </div>
+              </div>
+              <div className="p-3 rounded-xl bg-cyan-500/10">
+                <Target className="w-6 h-6 text-cyan-400" />
+              </div>
+            </div>
+          </div>
+        </motion.div>
+        
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="relative group"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-green-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
+          <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-5 hover:border-emerald-500/50 transition-colors">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-zinc-400 mb-1">Tasa de Cobro</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-bold text-white">
+                    <AnimatedCounter value={tasaCobro} suffix="%" />
+                  </span>
+                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                    <ArrowUpRight className="w-3 h-3 mr-1" />
+                    +5%
+                  </Badge>
+                </div>
+              </div>
+              <div className="p-3 rounded-xl bg-emerald-500/10">
+                <Zap className="w-6 h-6 text-emerald-400" />
+              </div>
+            </div>
+            {/* Barra de progreso */}
+            <div className="mt-3 h-2 bg-zinc-800 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-gradient-to-r from-emerald-500 to-green-400"
+                initial={{ width: 0 }}
+                animate={{ width: `${tasaCobro}%` }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+              />
+            </div>
+          </div>
+        </motion.div>
+        
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.62 }}
+          className="relative group"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
+          <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-5 hover:border-purple-500/50 transition-colors">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-zinc-400 mb-1">Meta Mensual</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-bold text-white">78%</span>
+                  <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                    <Sparkles className="w-3 h-3 mr-1" />
+                    En progreso
+                  </Badge>
+                </div>
+              </div>
+              <motion.div 
+                className="p-3 rounded-xl bg-purple-500/10"
+                animate={{ rotate: [0, 5, -5, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <Target className="w-6 h-6 text-purple-400" />
+              </motion.div>
+            </div>
+            {/* Barra de progreso */}
+            <div className="mt-3 h-2 bg-zinc-800 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-gradient-to-r from-purple-500 to-pink-400"
+                initial={{ width: 0 }}
+                animate={{ width: "78%" }}
+                transition={{ duration: 1.5, ease: "easeOut", delay: 0.3 }}
+              />
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Tables Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.65 }}
+        className="relative group"
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-emerald-500/5 rounded-2xl blur-2xl" />
+        <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6">
+          <Tabs defaultValue="todas" className="w-full">
+            <TabsList className="bg-zinc-800/50 backdrop-blur-xl mb-6">
+              <TabsTrigger value="todas">Todas</TabsTrigger>
+              <TabsTrigger value="pendientes">Pendientes ({ventasPendientes})</TabsTrigger>
+              <TabsTrigger value="completas">Completas ({ventasCompletas})</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="todas">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-zinc-800">
+                      <th className="text-left py-4 px-4 text-sm font-medium text-zinc-400">ID</th>
+                      <th className="text-left py-4 px-4 text-sm font-medium text-zinc-400">Fecha</th>
+                      <th className="text-left py-4 px-4 text-sm font-medium text-zinc-400">Cliente</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-zinc-400">Cantidad</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-zinc-400">Total</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-zinc-400">Pendiente</th>
+                      <th className="text-center py-4 px-4 text-sm font-medium text-zinc-400">Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ventasData.map((venta, idx) => (
+                      <motion.tr
+                        key={venta.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.7 + idx * 0.03 }}
+                        whileHover={{ backgroundColor: 'rgba(39, 39, 42, 0.4)' }}
+                        className="border-b border-zinc-800/50 transition-colors group/row cursor-pointer"
+                      >
+                        <td className="py-4 px-4">
+                          <div className="font-mono text-sm text-green-400">{venta.id}</div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="text-sm text-zinc-400">{venta.fecha}</div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="font-medium text-white group-hover/row:text-green-400 transition-colors">
+                            {venta.cliente}
+                          </div>
+                        </td>
+                        <td className="py-4 px-4 text-right">
+                          <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                            {venta.cantidad} unidades
+                          </Badge>
+                        </td>
+                        <td className="py-4 px-4 text-right">
+                          <div className="font-mono text-white">
+                            ${((venta.precioTotalVenta || 0) / 1000).toFixed(0)}K
+                          </div>
+                        </td>
+                        <td className="py-4 px-4 text-right">
+                          <div className="font-mono text-yellow-400">
+                            ${((venta.montoRestante || 0) / 1000).toFixed(0)}K
+                          </div>
+                        </td>
+                        <td className="py-4 px-4 text-center">
+                          {venta.estadoPago === "completo" ? (
+                            <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/20">
+                              <CheckCircle2 className="w-3 h-3 mr-1" />
+                              Completo
+                            </Badge>
+                          ) : venta.estadoPago === "parcial" ? (
+                            <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/20">
+                              <Clock className="w-3 h-3 mr-1" />
+                              Parcial
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="bg-red-500/10 text-red-400 border-red-500/20">
+                              <Clock className="w-3 h-3 mr-1" />
+                              Pendiente
+                            </Badge>
+                          )}
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </TabsContent>
+
+            {/* Similar tables for pendientes and completas tabs */}
+            <TabsContent value="pendientes">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-zinc-800">
+                      <th className="text-left py-4 px-4 text-sm font-medium text-zinc-400">ID</th>
+                      <th className="text-left py-4 px-4 text-sm font-medium text-zinc-400">Fecha</th>
+                      <th className="text-left py-4 px-4 text-sm font-medium text-zinc-400">Cliente</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-zinc-400">Cantidad</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-zinc-400">Total</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-zinc-400">Pendiente</th>
+                      <th className="text-center py-4 px-4 text-sm font-medium text-zinc-400">Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ventasData
+                      .filter((venta: VentaData) => venta.estadoPago === "pendiente")
+                      .map((venta, idx) => (
+                        <motion.tr
+                          key={venta.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.7 + idx * 0.05 }}
+                          className="border-b border-zinc-800/50 hover:bg-zinc-800/20 transition-colors group/row"
+                        >
+                          <td className="py-4 px-4">
+                            <div className="font-mono text-sm text-green-400">{venta.id}</div>
+                          </td>
+                          <td className="py-4 px-4">
+                            <div className="text-sm text-zinc-400">{venta.fecha}</div>
+                          </td>
+                          <td className="py-4 px-4">
+                            <div className="font-medium text-white group-hover/row:text-green-400 transition-colors">
+                              {venta.cliente}
+                            </div>
+                          </td>
+                          <td className="py-4 px-4 text-right">
+                            <Badge
+                              variant="outline"
+                              className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                            >
+                              {venta.cantidad} unidades
+                            </Badge>
+                          </td>
+                          <td className="py-4 px-4 text-right">
+                            <div className="font-mono text-white">
+                              ${((venta.precioTotalVenta || 0) / 1000).toFixed(0)}K
+                            </div>
+                          </td>
+                          <td className="py-4 px-4 text-right">
+                            <div className="font-mono text-yellow-400">
+                              ${((venta.montoRestante || 0) / 1000).toFixed(0)}K
+                            </div>
+                          </td>
+                          <td className="py-4 px-4 text-center">
+                            <Badge variant="outline" className="bg-red-500/10 text-red-400 border-red-500/20">
+                              <Clock className="w-3 h-3 mr-1" />
+                              Pendiente
+                            </Badge>
+                          </td>
+                        </motion.tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="completas">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-zinc-800">
+                      <th className="text-left py-4 px-4 text-sm font-medium text-zinc-400">ID</th>
+                      <th className="text-left py-4 px-4 text-sm font-medium text-zinc-400">Fecha</th>
+                      <th className="text-left py-4 px-4 text-sm font-medium text-zinc-400">Cliente</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-zinc-400">Cantidad</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-zinc-400">Total</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-zinc-400">Pendiente</th>
+                      <th className="text-center py-4 px-4 text-sm font-medium text-zinc-400">Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ventasData
+                      .filter((venta: VentaData) => venta.estadoPago === "completo")
+                      .map((venta, idx) => (
+                        <motion.tr
+                          key={venta.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.7 + idx * 0.05 }}
+                          className="border-b border-zinc-800/50 hover:bg-zinc-800/20 transition-colors group/row"
+                        >
+                          <td className="py-4 px-4">
+                            <div className="font-mono text-sm text-green-400">{venta.id}</div>
+                          </td>
+                          <td className="py-4 px-4">
+                            <div className="text-sm text-zinc-400">{venta.fecha}</div>
+                          </td>
+                          <td className="py-4 px-4">
+                            <div className="font-medium text-white group-hover/row:text-green-400 transition-colors">
+                              {venta.cliente}
+                            </div>
+                          </td>
+                          <td className="py-4 px-4 text-right">
+                            <Badge
+                              variant="outline"
+                              className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                            >
+                              {venta.cantidad} unidades
+                            </Badge>
+                          </td>
+                          <td className="py-4 px-4 text-right">
+                            <div className="font-mono text-white">
+                              ${((venta.precioTotalVenta || 0) / 1000).toFixed(0)}K
+                            </div>
+                          </td>
+                          <td className="py-4 px-4 text-right">
+                            <div className="font-mono text-yellow-400">
+                              ${((venta.montoRestante || 0) / 1000).toFixed(0)}K
+                            </div>
+                          </td>
+                          <td className="py-4 px-4 text-center">
+                            <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/20">
+                              <CheckCircle2 className="w-3 h-3 mr-1" />
+                              Completo
+                            </Badge>
+                          </td>
+                        </motion.tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </motion.div>
+
+      {/* Sales Flow Diagram - Premium Visualization */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8 }}
+        className="relative group"
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-2xl blur-2xl" />
+        <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6">
+          <div className="mb-4">
+            <h3 className="text-xl font-bold text-white">Flujo de Ventas</h3>
+            <p className="text-sm text-zinc-400">Visualización de procesos de ventas en tiempo real</p>
+          </div>
+          <SalesFlowDiagram width={900} height={500} className="w-full" />
+        </div>
+      </motion.div>
+
+      <CreateVentaModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+    </div>
+  )
+}

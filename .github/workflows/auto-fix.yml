@@ -1,0 +1,63 @@
+name: Auto Fix Issues
+
+on:
+  issues:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'Issue number to fix'
+        required: true
+        type: number
+
+jobs:
+  auto-fix:
+    name: 🤖 Auto Fix with Copilot
+    runs-on: ubuntu-latest
+    if: contains(github.event.label.name, 'copilot-fix') || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get Issue Details
+        id: issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = context.payload.issue?.number || ${{ github.event.inputs.issue_number || 0 }};
+            const { data: issue } = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber
+            });
+            core.setOutput('title', issue.title);
+            core.setOutput('body', issue.body);
+            core.setOutput('number', issueNumber);
+
+      - name: Create Branch for Fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b fix/issue-${{ steps.issue.outputs.number }}
+
+      - name: Trigger Copilot Coding Agent
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ steps.issue.outputs.number }},
+              body: `🤖 **Copilot Coding Agent Triggered**
+
+              Starting automated fix for this issue...
+
+              **Branch:** \`fix/issue-${{ steps.issue.outputs.number }}\`
+              **Status:** In Progress ⏳
+              `
+            });

@@ -1,0 +1,99 @@
+{
+  "common": {
+    "app_name": "CHRONOS Dashboard",
+    "welcome": "Bienvenido",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "close": "Cerrar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "import": "Importar"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "buy": "Compras",
+    "sell": "Ventas",
+    "bank": "Banco",
+    "warehouse": "Almacén",
+    "exchange": "Casa de Cambio",
+    "clients": "Clientes",
+    "distributors": "Distribuidores"
+  },
+  "dashboard": {
+    "title": "Panel Principal",
+    "total_capital": "Capital Total",
+    "today_profit": "Ganancia de Hoy",
+    "monthly_profit": "Ganancia Mensual",
+    "active_operations": "Operaciones Activas",
+    "recent_transactions": "Transacciones Recientes",
+    "quick_stats": "Estadísticas Rápidas"
+  },
+  "exchange": {
+    "title": "Casa de Cambio",
+    "buy_rate": "Tasa de Compra",
+    "sell_rate": "Tasa de Venta",
+    "available_balance": "Saldo Disponible",
+    "exchange_transaction": "Realizar Cambio",
+    "transaction_history": "Historial de Transacciones"
+  },
+  "bank": {
+    "title": "Gestión Bancaria",
+    "account_balance": "Saldo en Cuenta",
+    "pending_transfers": "Transferencias Pendientes",
+    "recent_movements": "Movimientos Recientes"
+  },
+  "warehouse": {
+    "title": "Inventario",
+    "total_stock": "Stock Total",
+    "low_stock_alert": "Alerta de Stock Bajo",
+    "products": "Productos",
+    "categories": "Categorías"
+  },
+  "clients": {
+    "title": "Clientes",
+    "total_clients": "Total de Clientes",
+    "active_clients": "Clientes Activos",
+    "pending_payments": "Pagos Pendientes",
+    "client_details": "Detalles del Cliente"
+  },
+  "distributors": {
+    "title": "Distribuidores",
+    "total_distributors": "Total de Distribuidores",
+    "active_orders": "Pedidos Activos",
+    "pending_deliveries": "Entregas Pendientes"
+  },
+  "transactions": {
+    "date": "Fecha",
+    "type": "Tipo",
+    "amount": "Monto",
+    "status": "Estado",
+    "description": "Descripción",
+    "details": "Detalles"
+  },
+  "modals": {
+    "confirm": "Confirmar",
+    "confirm_action": "¿Estás seguro de que deseas realizar esta acción?",
+    "success_title": "Operación Exitosa",
+    "error_title": "Error en la Operación",
+    "close_modal": "Cerrar Modal"
+  },
+  "voice": {
+    "listening": "Escuchando...",
+    "not_available": "Asistente de voz no disponible",
+    "activate": "Activar Asistente",
+    "deactivate": "Desactivar Asistente"
+  },
+  "errors": {
+    "network_error": "Error de conexión. Por favor, verifica tu internet.",
+    "unauthorized": "No tienes permisos para realizar esta acción.",
+    "not_found": "Recurso no encontrado.",
+    "server_error": "Error del servidor. Intenta nuevamente más tarde.",
+    "validation_error": "Por favor, verifica los datos ingresados."
+  }
+}

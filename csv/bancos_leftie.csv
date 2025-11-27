@@ -1,0 +1,12 @@
+fecha,cliente,ingreso,tc,pesos,destino,concepto,observaciones
+25/08/2025,Lamas,213000,0,0,Leftie,,"playa azul#30 (7,100x30)"
+25/08/2025,Lamas,213000,0,0,Leftie,,lamas #30 playa azul
+26/08/2025,Lamas,280000,0,0,Leftie,,"monte (7,000x40)"
+26/08/2025,Lamas,280000,0,0,Leftie,,lamas #40 monte
+04/09/2025,Lamas,236000,0,0,Leftie,,"venta playa azul,monte #44 (lamas)"
+08/09/2025,Abono,74200,0,0,Leftie,,venta monte lamas resto #44
+16/09/2025,Lamas,70000,0,0,Leftie,,abono lamas playa azul (venta local monte#23)
+20/09/2025,Abono,99400,0,0,Leftie,,playa azul mg#14
+27/09/2025,Abono,31000,0,0,Leftie,,lamas playa azul
+09/10/2025,Abono,106500,0,0,Leftie,,venta playa azul mg #15
+20/10/2025,Lamas,142000,0,0,Leftie,,venta playa azul lamas#20

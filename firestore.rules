@@ -1,48 +1,178 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // REGLAS PARA BANCOS
+    // 🔒 REGLAS DE PRODUCCIÓN - CHRONOS SYSTEM
+    // Última actualización: 2025-11-26
+    // Sincronizado con CSVs de datos reales
+    
+    // ===================================================================
+    // FUNCIONES DE VALIDACIÓN
+    // ===================================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+    
+    function isValidMonto() {
+      return request.resource.data.monto is number;
+    }
+
+    // ===================================================================
+    // COLECCIÓN: BANCOS (Configuración de los 7 bancos/bóvedas)
+    // IDs: boveda_monte, boveda_usa, profit, leftie, azteca, flete_sur, utilidades
+    // ===================================================================
     match /bancos/{bancoId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && hasRequiredFields(['nombre', 'tipo']);
+      allow update, delete: if isAuthenticated();
     }
-    
-    // REGLAS PARA ÓRDENES DE COMPRA
-    match /ordenesCompra/{ordenId} {
-      allow read: if true;
-      allow write: if true;
+
+    // ===================================================================
+    // COLECCIÓN: MOVIMIENTOS (Unificado para todos los bancos)
+    // Reemplaza: boveda_monte, boveda_usa, profit, leftie, azteca, flete_sur, utilidades, gastos_abonos
+    // ===================================================================
+    match /movimientos/{movimientoId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() 
+        && hasRequiredFields(['bancoId', 'tipoMovimiento', 'monto', 'fecha']) 
+        && isValidMonto();
+      allow update: if isAuthenticated() && isValidMonto();
+      allow delete: if isAuthenticated();
     }
-    
-    // REGLAS PARA VENTAS
+
+    // ===================================================================
+    // COLECCIÓN: VENTAS (96 registros desde ventas.csv)
+    // ===================================================================
     match /ventas/{ventaId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() 
+        && hasRequiredFields(['cliente', 'fecha', 'totalVenta']);
+      allow update, delete: if isAuthenticated();
     }
-    
-    // REGLAS PARA DISTRIBUIDORES
-    match /distribuidores/{distribuidorId} {
-      allow read: if true;
-      allow write: if true;
-    }
-    
-    // REGLAS PARA CLIENTES
+
+    // ===================================================================
+    // COLECCIÓN: CLIENTES (31 registros desde clientes.csv)
+    // ===================================================================
     match /clientes/{clienteId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && hasRequiredFields(['nombre']);
+      allow update, delete: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // COLECCIÓN: DISTRIBUIDORES (6 registros)
+    // PACMAN, Q-MAYA, A/X, CH-MONTE, VALLE-MONTE, Q-MAYA-MP
+    // ===================================================================
+    match /distribuidores/{distribuidorId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && hasRequiredFields(['nombre']);
+      allow update, delete: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // COLECCIÓN: ORDENES_COMPRA (9 registros desde ordenes_compra.csv)
+    // ===================================================================
+    match /ordenes_compra/{ordenId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() 
+        && hasRequiredFields(['distribuidor', 'fecha', 'costoTotal', 'cantidad']);
+      allow update, delete: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // COLECCIÓN: GASTOS_ABONOS (302 registros - histórico de gastos/abonos)
+    // ===================================================================
+    match /gastos_abonos/{gastoId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() 
+        && hasRequiredFields(['fecha', 'valor', 'destino']);
+      allow update, delete: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // COLECCIÓN: ALMACEN (Inventario de productos - 9 registros)
+    // ===================================================================
+    match /almacen/{itemId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && hasRequiredFields(['cantidad']);
+      allow update, delete: if isAuthenticated();
+    }
+
+    match /almacen_productos/{productoId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && hasRequiredFields(['nombre', 'stock']);
+      allow update, delete: if isAuthenticated();
+    }
+
+    match /almacen_entradas/{entradaId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && hasRequiredFields(['fecha', 'cantidad']);
+      allow update, delete: if isAuthenticated();
+    }
+
+    match /almacen_salidas/{salidaId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && hasRequiredFields(['fecha', 'cantidad']);
+      allow update, delete: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // COLECCIÓN: CORTES BANCARIOS (Histórico de cortes)
+    // ===================================================================
+    match /cortes_bancarios/{corteId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && hasRequiredFields(['bancoId', 'fechaInicio']);
+      allow update, delete: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // COLECCIÓN: LOGS (Auditoría del sistema - inmutable)
+    // ===================================================================
+    match /logs/{logId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
+    }
+
+    // ===================================================================
+    // COLECCIONES DEL DASHBOARD
+    // ===================================================================
+    match /dashboard_totales/{docId} {
+      allow read, write: if isAuthenticated();
     }
     
-    // REGLAS PARA ALMACÉN
-    match /almacen/{productoId} {
-      allow read: if true;
-      allow write: if true;
+    match /dashboard_paneles/{docId} {
+      allow read, write: if isAuthenticated();
     }
-    
-    // REGLAS PARA PRODUCTOS
-    match /productos/{productoId} {
-      allow read: if true;
-      allow write: if true;
+
+    // ===================================================================
+    // COLECCIÓN: USUARIOS (Perfil de usuario)
+    // ===================================================================
+    match /usuarios/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // ===================================================================
+    // COLECCIÓN: CONFIGURACIÓN
+    // ===================================================================
+    match /configuracion/{docId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // REGLA POR DEFECTO - DENEGAR TODO LO DEMÁS
+    // ===================================================================
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
