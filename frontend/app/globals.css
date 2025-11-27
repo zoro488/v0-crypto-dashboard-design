@@ -449,6 +449,7 @@ html, body {
   padding: 24px;
   max-width: 1920px;
   margin: 0 auto;
+  overflow-x: hidden;
 }
 
 .bento-sm {

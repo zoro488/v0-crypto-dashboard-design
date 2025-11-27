@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion"
 import { Sparkles, Mic, MicOff, Send, Activity, Brain, TrendingUp, BarChart3, Package, Users, DollarSign, Zap, Target, MessageCircle, Bot } from "lucide-react"
-import { useState, useEffect, useRef, useMemo, lazy, Suspense } from "react"
+import { useState, useEffect, useRef, useMemo, useCallback, lazy, Suspense } from "react"
 import { useVoiceAgent } from "@/frontend/app/hooks/useVoiceAgent"
 import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
 import { AIAnalyticsOverlay } from "@/frontend/app/components/3d/AIAnalyticsOverlay"
@@ -25,10 +25,10 @@ function useSplineBot() {
   const [state, setState] = useState<'idle' | 'listening' | 'speaking' | 'thinking'>('idle')
   const [isInteracting, setIsInteracting] = useState(false)
 
-  const setIdle = () => { setState('idle'); setIsInteracting(false) }
-  const setListening = () => { setState('listening'); setIsInteracting(true) }
-  const setSpeaking = () => { setState('speaking'); setIsInteracting(true) }
-  const setThinking = () => { setState('thinking'); setIsInteracting(true) }
+  const setIdle = useCallback(() => { setState('idle'); setIsInteracting(false) }, [])
+  const setListening = useCallback(() => { setState('listening'); setIsInteracting(true) }, [])
+  const setSpeaking = useCallback(() => { setState('speaking'); setIsInteracting(true) }, [])
+  const setThinking = useCallback(() => { setState('thinking'); setIsInteracting(true) }, [])
 
   return { state, isInteracting, setIdle, setListening, setSpeaking, setThinking }
 }
@@ -126,11 +126,12 @@ export default function BentoIA() {
     } else if (messages.length > 0 && messages[messages.length - 1].sender === 'ai') {
       botControl.setSpeaking()
       // Volver a idle después de 2 segundos
-      setTimeout(() => botControl.setIdle(), 2000)
+      const timer = setTimeout(() => botControl.setIdle(), 2000)
+      return () => clearTimeout(timer)
     } else {
       botControl.setIdle()
     }
-  }, [isListening, isTyping, messages])
+  }, [isListening, isTyping, messages, botControl])
 
   const toggleVoiceAgent = async () => {
     if (isConnected) {
@@ -540,7 +541,8 @@ export default function BentoIA() {
           {/* Chart */}
           <div className="lg:col-span-2">
             <h4 className="text-white font-medium mb-4">Predicción de Ventas</h4>
-            <ResponsiveContainer width="100%" height={250}>
+            <div style={{ width: '100%', minWidth: 200, height: 250, minHeight: 250 }}>
+            <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={analysisData}>
                 <defs>
                   <linearGradient id="colorVentas" x1="0" y1="0" x2="0" y2="1">
@@ -572,6 +574,7 @@ export default function BentoIA() {
                 />
               </AreaChart>
             </ResponsiveContainer>
+            </div>
           </div>
 
           {/* Insights */}
@@ -665,13 +668,15 @@ export default function BentoIA() {
               <p className="text-xs text-white/50">Rendimiento por área</p>
             </div>
           </div>
-          <ResponsiveContainer width="100%" height={200}>
+          <div style={{ width: '100%', minWidth: 150, height: 200, minHeight: 200 }}>
+          <ResponsiveContainer width="100%" height="100%">
             <RadarChart data={aiCapabilities}>
               <PolarGrid stroke="rgba(255,255,255,0.1)" />
               <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 10 }} />
               <Radar name="Capacidad" dataKey="A" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.3} strokeWidth={2} />
             </RadarChart>
           </ResponsiveContainer>
+          </div>
         </motion.div>
 
         {/* Activity Feed de IA */}

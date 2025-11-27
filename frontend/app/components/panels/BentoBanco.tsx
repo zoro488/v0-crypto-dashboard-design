@@ -107,22 +107,12 @@ export default function BentoBanco() {
   const transferencias = transferenciasRaw as MovimientoBanco[]
   const cortes = cortesRaw as CorteBancarioDetalle[]
 
-  const loading = loadingIngresos || loadingGastos || loadingTransferencias || loadingCortes
-
-  if (loading) {
-    return (
-      <div className="bento-container space-y-6">
-        <Skeleton className="h-48 w-full" />
-        <Skeleton className="h-96 w-full" />
-      </div>
-    )
-  }
-
+  // Cálculos básicos
   const totalIngresos = ingresos.reduce((sum, i) => sum + (i.monto ?? 0), 0)
   const totalGastos = gastos.reduce((sum, g) => sum + (g.monto ?? 0), 0)
   const saldoActual = totalIngresos - totalGastos
 
-  // Datos para gráficos
+  // Datos para gráficos - DEBE estar antes de cualquier return condicional
   const trendData = useMemo(() => {
     return Array.from({ length: 7 }, (_, i) => ({
       name: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'][i],
@@ -133,9 +123,9 @@ export default function BentoBanco() {
 
   // Distribución por tipo de movimiento
   const distribucionMovimientos = useMemo(() => [
-    { name: 'Ingresos', value: totalIngresos, color: '#10b981' },
-    { name: 'Gastos', value: totalGastos, color: '#ef4444' },
-    { name: 'Transferencias', value: transferencias.reduce((sum, t) => sum + (t.monto ?? 0), 0), color: '#8b5cf6' },
+    { name: 'Ingresos', value: totalIngresos || 1, color: '#10b981' },
+    { name: 'Gastos', value: totalGastos || 1, color: '#ef4444' },
+    { name: 'Transferencias', value: transferencias.reduce((sum, t) => sum + (t.monto ?? 0), 0) || 1, color: '#8b5cf6' },
   ], [totalIngresos, totalGastos, transferencias])
 
   // Activity feed
@@ -166,6 +156,18 @@ export default function BentoBanco() {
     
     return activities.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()).slice(0, 4)
   }, [ingresos, gastos])
+
+  const loading = loadingIngresos || loadingGastos || loadingTransferencias || loadingCortes
+
+  // Loading state DESPUÉS de todos los hooks
+  if (loading) {
+    return (
+      <div className="p-6 space-y-6">
+        <Skeleton className="h-48 w-full rounded-2xl" />
+        <Skeleton className="h-96 w-full rounded-2xl" />
+      </div>
+    )
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -360,7 +362,8 @@ export default function BentoBanco() {
                 </div>
               </div>
             </div>
-            <ResponsiveContainer width="100%" height={200}>
+            <div style={{ width: '100%', minWidth: 200, height: 200, minHeight: 200 }}>
+            <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={trendData}>
                 <defs>
                   <linearGradient id="colorIngresosB" x1="0" y1="0" x2="0" y2="1">
@@ -386,6 +389,7 @@ export default function BentoBanco() {
                 <Area type="monotone" dataKey="gastos" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorGastosB)" name="Gastos" />
               </AreaChart>
             </ResponsiveContainer>
+            </div>
           </motion.div>
 
           {/* Distribución Pie Chart */}
@@ -404,7 +408,8 @@ export default function BentoBanco() {
                 <p className="text-xs text-white/50">Por tipo</p>
               </div>
             </div>
-            <ResponsiveContainer width="100%" height={140}>
+            <div style={{ width: '100%', minWidth: 120, height: 140, minHeight: 140 }}>
+            <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={distribucionMovimientos}
@@ -422,6 +427,7 @@ export default function BentoBanco() {
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
+            </div>
             <div className="space-y-2 mt-2">
               {distribucionMovimientos.map((item, i) => (
                 <div key={i} className="flex items-center justify-between text-sm">

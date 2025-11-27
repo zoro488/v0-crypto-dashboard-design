@@ -449,8 +449,15 @@ export function MiniChartWidget({
       </div>
       
       {/* Gráfico */}
-      <div className="px-2 pb-2" style={{ minHeight: height, height }}>
-        {ChartComponent}
+      <div 
+        className="px-2 pb-2 w-full" 
+        style={{ minHeight: height, height, minWidth: 100 }}
+      >
+        {data.length > 0 ? ChartComponent : (
+          <div className="w-full h-full flex items-center justify-center text-white/20 text-xs">
+            Sin datos
+          </div>
+        )}
       </div>
       
       {/* Leyenda opcional */}

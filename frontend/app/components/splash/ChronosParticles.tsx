@@ -458,7 +458,17 @@ export default function ChronosParticles({
             gl={{ 
               antialias: true,
               alpha: false,
-              powerPreference: "high-performance"
+              powerPreference: "high-performance",
+              failIfMajorPerformanceCaveat: false
+            }}
+            onCreated={({ gl }) => {
+              // Manejar pérdida de contexto WebGL
+              const canvas = gl.domElement
+              canvas.addEventListener('webglcontextlost', (e) => {
+                e.preventDefault()
+                console.warn('WebGL context lost - triggering completion')
+                handleComplete()
+              }, false)
             }}
           >
             <color attach="background" args={["#000000"]} />

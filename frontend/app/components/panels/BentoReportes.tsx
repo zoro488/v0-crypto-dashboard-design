@@ -235,7 +235,8 @@ export default function BentoReportes() {
             className="bento-lg crystal-card p-6 ambient-glow"
           >
             <h3 className="text-xl font-bold text-white mb-4">Tendencia de Ventas vs Compras</h3>
-            <ResponsiveContainer width="100%" height={300}>
+            <div style={{ width: '100%', minWidth: 200, height: 300, minHeight: 300 }}>
+            <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={ventas}>
                 <defs>
                   <linearGradient id="colorVentas" x1="0" y1="0" x2="0" y2="1">
@@ -267,6 +268,7 @@ export default function BentoReportes() {
                 <Area type="monotone" dataKey="costoTotal" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorCompras)" />
               </AreaChart>
             </ResponsiveContainer>
+            </div>
           </motion.div>
 
           {/* Product distribution */}
@@ -277,7 +279,8 @@ export default function BentoReportes() {
             className="bento-md crystal-card p-6 ambient-glow"
           >
             <h3 className="text-xl font-bold text-white mb-4">Distribución de Productos</h3>
-            <ResponsiveContainer width="100%" height={250}>
+            <div style={{ width: '100%', minWidth: 150, height: 250, minHeight: 250 }}>
+            <ResponsiveContainer width="100%" height="100%">
               <RechartsPieChart>
                 <Pie
                   data={productosData}
@@ -296,6 +299,7 @@ export default function BentoReportes() {
                 <Tooltip />
               </RechartsPieChart>
             </ResponsiveContainer>
+            </div>
           </motion.div>
 
           {/* Performance radar */}

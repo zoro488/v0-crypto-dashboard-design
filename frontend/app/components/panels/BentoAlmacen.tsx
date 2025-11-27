@@ -252,7 +252,8 @@ export default function BentoAlmacen() {
               <RefreshCw className="w-4 h-4" />
             </motion.button>
           </div>
-          <ResponsiveContainer width="100%" height={250}>
+          <div style={{ width: '100%', minWidth: 200, height: 250, minHeight: 250 }}>
+          <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={trendData}>
               <defs>
                 <linearGradient id="colorEntrada" x1="0" y1="0" x2="0" y2="1">
@@ -290,13 +291,12 @@ export default function BentoAlmacen() {
                 strokeWidth={2}
                 fillOpacity={1} 
                 fill="url(#colorSalida)" 
-                name="Salidas"
-              />
-            </AreaChart>
+              name="Salidas"
+            />
+          </AreaChart>
           </ResponsiveContainer>
-        </motion.div>
-
-        {/* Distribución de Stock - Pie Chart */}
+          </div>
+        </motion.div>        {/* Distribución de Stock - Pie Chart */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -312,7 +312,8 @@ export default function BentoAlmacen() {
               <p className="text-xs text-white/50">Por producto</p>
             </div>
           </div>
-          <ResponsiveContainer width="100%" height={180}>
+          <div style={{ width: '100%', minWidth: 150, height: 180, minHeight: 180 }}>
+          <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={stockDistribution}
@@ -336,6 +337,7 @@ export default function BentoAlmacen() {
               />
             </PieChart>
           </ResponsiveContainer>
+          </div>
           <div className="space-y-2 mt-4">
             {stockDistribution.slice(0, 3).map((item, i) => (
               <div key={i} className="flex items-center justify-between text-sm">
