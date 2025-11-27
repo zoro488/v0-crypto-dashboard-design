@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion"
 import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
 import { TrendingUp, DollarSign, Package, ShoppingCart, Zap, PieChart, Filter, Users, Activity, ArrowUpRight, ArrowDownRight, Sparkles, Clock, Bell } from "lucide-react"
-import { InteractiveMetricsOrb } from "@/frontend/app/components/visualizations/InteractiveMetricsOrb"
+// InteractiveMetricsOrb eliminado - causaba problemas de layout y scroll excesivo
 import {
   AreaChart,
   Area,
@@ -762,24 +762,7 @@ export default function BentoDashboard() {
         />
       </motion.div>
 
-      {/* Interactive Metrics Orb - Premium Visualization */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.1 }}
-        className="col-span-12 mt-6 flex justify-center"
-      >
-        <InteractiveMetricsOrb
-          metrics={[
-            { label: "Ventas", value: ventasMes, change: 12.5, icon: DollarSign, color: "#10b981" },
-            { label: "Capital", value: capitalTotal, change: 8.3, icon: TrendingUp, color: "#3b82f6" },
-            { label: "Stock", value: stockActual, change: -3.2, icon: Package, color: "#f59e0b" },
-            { label: "Órdenes", value: ordenesActivas, change: 4.2, icon: ShoppingCart, color: "#8b5cf6" }
-          ]}
-          size={500}
-          className="w-full max-w-2xl mx-auto"
-        />
-      </motion.div>
+      {/* Nota: InteractiveMetricsOrb eliminado para mejorar layout - el PremiumSplineOrb compacto cumple función similar */}
 
       <CreateOrdenCompraModal open={isOrdenModalOpen} onClose={() => setIsOrdenModalOpen(false)} />
       <CreateVentaModal open={isVentaModalOpen} onClose={() => setIsVentaModalOpen(false)} />

@@ -9,9 +9,9 @@ import CreateEntradaAlmacenModal from "@/frontend/app/components/modals/CreateEn
 import CreateSalidaAlmacenModal from "@/frontend/app/components/modals/CreateSalidaAlmacenModal"
 import { InventoryHeatGrid } from "@/frontend/app/components/visualizations/InventoryHeatGrid"
 import { AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from "recharts"
-import { QuickStatWidget, QuickStatsGrid } from "@/app/components/widgets/QuickStatWidget"
-import { MiniChartWidget } from "@/app/components/widgets/MiniChartWidget"
-import { ActivityFeedWidget, ActivityItem } from "@/app/components/widgets/ActivityFeedWidget"
+import { QuickStatWidget, QuickStatsGrid } from "@/frontend/app/components/widgets/QuickStatWidget"
+import { MiniChartWidget } from "@/frontend/app/components/widgets/MiniChartWidget"
+import { ActivityFeedWidget, ActivityItem } from "@/frontend/app/components/widgets/ActivityFeedWidget"
 
 // Interfaces para tipado
 interface MovimientoAlmacen {

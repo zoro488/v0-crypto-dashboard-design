@@ -108,20 +108,39 @@ export const actualizarCapitalBanco = async (
 // ÓRDENES DE COMPRA
 // ============================================================
 
-export const crearOrdenCompra = async (data: Omit<OrdenCompra, "id">) => {
+// Tipo flexible para crear órdenes - solo requiere campos esenciales
+type CrearOrdenCompraInput = Partial<Omit<OrdenCompra, "id">> & {
+  distribuidor: string
+  cantidad: number
+  costoTotal?: number
+}
+
+export const crearOrdenCompra = async (data: CrearOrdenCompraInput) => {
   try {
     const batch = writeBatch(db)
+
+    // Completar campos faltantes con valores por defecto
+    const ordenCompleta = {
+      ...data,
+      distribuidorId: data.distribuidorId || data.distribuidor?.toLowerCase().replace(/\s+/g, '_') || '',
+      keywords: data.keywords || [data.distribuidor?.toLowerCase(), data.producto?.toLowerCase(), data.origen?.toLowerCase()].filter(Boolean) as string[],
+      stockActual: data.stockActual ?? data.cantidad,
+      stockInicial: data.stockInicial ?? data.cantidad,
+      pagoInicial: data.pagoInicial ?? data.pagoDistribuidor ?? 0,
+      deuda: data.deuda ?? ((data.costoTotal || 0) - (data.pagoDistribuidor || 0)),
+      estado: data.estado || "pendiente",
+    }
 
     // Crear orden de compra
     const ocRef = doc(collection(db, COLLECTIONS.ORDENES_COMPRA))
     batch.set(ocRef, {
-      ...data,
+      ...ordenCompleta,
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
     })
 
     // Crear o actualizar distribuidor
-    const distQuery = query(collection(db, COLLECTIONS.DISTRIBUIDORES), where("nombre", "==", data.distribuidor))
+    const distQuery = query(collection(db, COLLECTIONS.DISTRIBUIDORES), where("nombre", "==", ordenCompleta.distribuidor))
     const distSnapshot = await getDocs(distQuery)
 
     let distribuidorId: string
@@ -131,10 +150,10 @@ export const crearOrdenCompra = async (data: Omit<OrdenCompra, "id">) => {
       const distRef = doc(collection(db, COLLECTIONS.DISTRIBUIDORES))
       distribuidorId = distRef.id
       batch.set(distRef, {
-        nombre: data.distribuidor,
-        deudaTotal: data.deuda,
-        totalOrdenesCompra: data.costoTotal,
-        totalPagado: data.pagoDistribuidor,
+        nombre: ordenCompleta.distribuidor,
+        deudaTotal: ordenCompleta.deuda || 0,
+        totalOrdenesCompra: ordenCompleta.costoTotal || 0,
+        totalPagado: ordenCompleta.pagoDistribuidor || 0,
         ordenesCompra: [ocRef.id],
         historialPagos: [],
         createdAt: Timestamp.now(),
@@ -145,34 +164,34 @@ export const crearOrdenCompra = async (data: Omit<OrdenCompra, "id">) => {
       distribuidorId = distSnapshot.docs[0].id
       const distRef = doc(db, COLLECTIONS.DISTRIBUIDORES, distribuidorId)
       batch.update(distRef, {
-        deudaTotal: increment(data.deuda),
-        totalOrdenesCompra: increment(data.costoTotal),
-        totalPagado: increment(data.pagoDistribuidor),
+        deudaTotal: increment(ordenCompleta.deuda || 0),
+        totalOrdenesCompra: increment(ordenCompleta.costoTotal || 0),
+        totalPagado: increment(ordenCompleta.pagoDistribuidor || 0),
         ordenesCompra: [...(distSnapshot.docs[0].data().ordenesCompra || []), ocRef.id],
         updatedAt: Timestamp.now(),
       })
     }
 
     // Actualizar almacén (crear entrada)
-    const prodQuery = query(collection(db, COLLECTIONS.ALMACEN), where("nombre", "==", data.producto))
+    const prodQuery = query(collection(db, COLLECTIONS.ALMACEN), where("nombre", "==", ordenCompleta.producto))
     const prodSnapshot = await getDocs(prodQuery)
 
     if (prodSnapshot.empty) {
       // Crear nuevo producto
       const prodRef = doc(collection(db, COLLECTIONS.ALMACEN))
       batch.set(prodRef, {
-        nombre: data.producto,
-        origen: data.origen,
-        stockActual: data.cantidad,
-        totalEntradas: data.cantidad,
+        nombre: ordenCompleta.producto,
+        origen: ordenCompleta.origen,
+        stockActual: ordenCompleta.cantidad,
+        totalEntradas: ordenCompleta.cantidad,
         totalSalidas: 0,
-        valorUnitario: data.costoPorUnidad,
+        valorUnitario: ordenCompleta.costoPorUnidad || 0,
         entradas: [
           {
             id: ocRef.id,
-            fecha: data.fecha,
-            cantidad: data.cantidad,
-            origen: data.distribuidor,
+            fecha: ordenCompleta.fecha,
+            cantidad: ordenCompleta.cantidad,
+            origen: ordenCompleta.distribuidor,
             tipo: "entrada",
           },
         ],
@@ -185,15 +204,15 @@ export const crearOrdenCompra = async (data: Omit<OrdenCompra, "id">) => {
       const prodRef = doc(db, COLLECTIONS.ALMACEN, prodSnapshot.docs[0].id)
       const prodData = prodSnapshot.docs[0].data()
       batch.update(prodRef, {
-        stockActual: increment(data.cantidad),
-        totalEntradas: increment(data.cantidad),
+        stockActual: increment(ordenCompleta.cantidad),
+        totalEntradas: increment(ordenCompleta.cantidad),
         entradas: [
           ...(prodData.entradas || []),
           {
             id: ocRef.id,
-            fecha: data.fecha,
-            cantidad: data.cantidad,
-            origen: data.distribuidor,
+            fecha: ordenCompleta.fecha,
+            cantidad: ordenCompleta.cantidad,
+            origen: ordenCompleta.distribuidor,
             tipo: "entrada",
           },
         ],
@@ -202,11 +221,11 @@ export const crearOrdenCompra = async (data: Omit<OrdenCompra, "id">) => {
     }
 
     // Si hay pago, actualizar banco
-    if (data.pagoDistribuidor > 0 && data.bancoOrigen) {
-      const bancoRef = doc(db, COLLECTIONS.BANCOS, data.bancoOrigen)
+    if ((ordenCompleta.pagoDistribuidor || 0) > 0 && ordenCompleta.bancoOrigen) {
+      const bancoRef = doc(db, COLLECTIONS.BANCOS, ordenCompleta.bancoOrigen)
       batch.update(bancoRef, {
-        capitalActual: increment(-data.pagoDistribuidor),
-        historicoGastos: increment(data.pagoDistribuidor),
+        capitalActual: increment(-(ordenCompleta.pagoDistribuidor || 0)),
+        historicoGastos: increment(ordenCompleta.pagoDistribuidor || 0),
         updatedAt: Timestamp.now(),
       })
     }
@@ -247,7 +266,15 @@ export const suscribirOrdenesCompra = (callback: (ordenes: OrdenCompra[]) => voi
 // VENTAS
 // ============================================================
 
-export const crearVenta = async (data: Omit<Venta, "id">) => {
+// Tipo flexible para crear ventas - solo requiere campos esenciales
+type CrearVentaInput = Partial<Omit<Venta, "id">> & {
+  cliente: string
+  cantidad: number
+  precioTotalVenta?: number
+  producto?: string
+}
+
+export const crearVenta = async (data: CrearVentaInput) => {
   try {
     const batch = writeBatch(db)
 
@@ -264,16 +291,37 @@ export const crearVenta = async (data: Omit<Venta, "id">) => {
       throw new Error(`Stock insuficiente. Disponible: ${prodData.stockActual}, Solicitado: ${data.cantidad}`)
     }
 
+    // Completar campos faltantes con valores por defecto
+    const ventaCompleta = {
+      ...data,
+      clienteId: data.clienteId || data.cliente?.toLowerCase().replace(/\s+/g, '_') || '',
+      keywords: data.keywords || [data.cliente?.toLowerCase(), data.producto?.toLowerCase()].filter(Boolean) as string[],
+      precioVenta: data.precioVenta || data.precioTotalVenta || 0,
+      ingreso: data.ingreso || data.precioTotalVenta || 0,
+      totalVenta: data.totalVenta || data.precioTotalVenta || 0,
+      flete: data.flete || "NoAplica",
+      fleteUtilidad: data.fleteUtilidad || data.precioFlete || 0,
+      precioFlete: data.precioFlete || 0,
+      utilidad: data.utilidad || 0,
+      bovedaMonte: data.bovedaMonte || data.distribucionBancos?.bovedaMonte || 0,
+      estatus: data.estatus || (data.estadoPago === "completo" ? "Pagado" : data.estadoPago === "parcial" ? "Parcial" : "Pendiente"),
+      estadoPago: data.estadoPago || "pendiente",
+      montoPagado: data.montoPagado || 0,
+      montoRestante: data.montoRestante || (data.precioTotalVenta || 0) - (data.montoPagado || 0),
+      adeudo: data.adeudo || (data.precioTotalVenta || 0) - (data.montoPagado || 0),
+      ocRelacionada: data.ocRelacionada || "",
+    }
+
     // Crear venta
     const ventaRef = doc(collection(db, COLLECTIONS.VENTAS))
     batch.set(ventaRef, {
-      ...data,
+      ...ventaCompleta,
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
     })
 
     // Crear o actualizar cliente
-    const clienteQuery = query(collection(db, COLLECTIONS.CLIENTES), where("nombre", "==", data.cliente))
+    const clienteQuery = query(collection(db, COLLECTIONS.CLIENTES), where("nombre", "==", ventaCompleta.cliente))
     const clienteSnapshot = await getDocs(clienteQuery)
 
     let clienteId: string
@@ -283,10 +331,10 @@ export const crearVenta = async (data: Omit<Venta, "id">) => {
       const clienteRef = doc(collection(db, COLLECTIONS.CLIENTES))
       clienteId = clienteRef.id
       batch.set(clienteRef, {
-        nombre: data.cliente,
-        deudaTotal: data.montoRestante,
-        totalVentas: data.precioTotalVenta,
-        totalPagado: data.montoPagado,
+        nombre: ventaCompleta.cliente,
+        deudaTotal: ventaCompleta.montoRestante || 0,
+        totalVentas: ventaCompleta.precioTotalVenta || 0,
+        totalPagado: ventaCompleta.montoPagado || 0,
         ventas: [ventaRef.id],
         historialPagos: [],
         createdAt: Timestamp.now(),
@@ -297,9 +345,9 @@ export const crearVenta = async (data: Omit<Venta, "id">) => {
       clienteId = clienteSnapshot.docs[0].id
       const clienteRef = doc(db, COLLECTIONS.CLIENTES, clienteId)
       batch.update(clienteRef, {
-        deudaTotal: increment(data.montoRestante),
-        totalVentas: increment(data.precioTotalVenta),
-        totalPagado: increment(data.montoPagado),
+        deudaTotal: increment(ventaCompleta.montoRestante || 0),
+        totalVentas: increment(ventaCompleta.precioTotalVenta || 0),
+        totalPagado: increment(ventaCompleta.montoPagado || 0),
         ventas: [...(clienteSnapshot.docs[0].data().ventas || []), ventaRef.id],
         updatedAt: Timestamp.now(),
       })
@@ -308,15 +356,15 @@ export const crearVenta = async (data: Omit<Venta, "id">) => {
     // Actualizar almacén (crear salida)
     const prodRef = doc(db, COLLECTIONS.ALMACEN, prodSnapshot.docs[0].id)
     batch.update(prodRef, {
-      stockActual: increment(-data.cantidad),
-      totalSalidas: increment(data.cantidad),
+      stockActual: increment(-ventaCompleta.cantidad),
+      totalSalidas: increment(ventaCompleta.cantidad),
       salidas: [
         ...(prodData.salidas || []),
         {
           id: ventaRef.id,
-          fecha: data.fecha,
-          cantidad: data.cantidad,
-          destino: data.cliente,
+          fecha: ventaCompleta.fecha,
+          cantidad: ventaCompleta.cantidad,
+          destino: ventaCompleta.cliente,
           tipo: "salida",
         },
       ],
@@ -324,29 +372,33 @@ export const crearVenta = async (data: Omit<Venta, "id">) => {
     })
 
     // Actualizar bancos (distribución proporcional)
-    const proporcion = data.montoPagado / data.precioTotalVenta
+    const precioTotal = ventaCompleta.precioTotalVenta || ventaCompleta.ingreso || 0
+    const montoPagado = ventaCompleta.montoPagado || 0
+    const proporcion = precioTotal > 0 ? montoPagado / precioTotal : 0
+
+    const distribucion = ventaCompleta.distribucionBancos || { bovedaMonte: 0, fletes: 0, utilidades: 0 }
 
     // Bóveda Monte
-    const bovedaMonteRef = doc(db, COLLECTIONS.BANCOS, "bovedaMonte")
+    const bovedaMonteRef = doc(db, COLLECTIONS.BANCOS, "boveda_monte")
     batch.update(bovedaMonteRef, {
-      capitalActual: increment(data.distribucionBancos.bovedaMonte * proporcion),
-      historicoIngresos: increment(data.distribucionBancos.bovedaMonte),
+      capitalActual: increment((distribucion.bovedaMonte || 0) * proporcion),
+      historicoIngresos: increment(distribucion.bovedaMonte || 0),
       updatedAt: Timestamp.now(),
     })
 
     // Fletes
-    const fletesRef = doc(db, COLLECTIONS.BANCOS, "fletes")
+    const fletesRef = doc(db, COLLECTIONS.BANCOS, "flete_sur")
     batch.update(fletesRef, {
-      capitalActual: increment(data.distribucionBancos.fletes * proporcion),
-      historicoIngresos: increment(data.distribucionBancos.fletes),
+      capitalActual: increment((distribucion.fletes || 0) * proporcion),
+      historicoIngresos: increment(distribucion.fletes || 0),
       updatedAt: Timestamp.now(),
     })
 
     // Utilidades
     const utilidadesRef = doc(db, COLLECTIONS.BANCOS, "utilidades")
     batch.update(utilidadesRef, {
-      capitalActual: increment(data.distribucionBancos.utilidades * proporcion),
-      historicoIngresos: increment(data.distribucionBancos.utilidades),
+      capitalActual: increment((distribucion.utilidades || 0) * proporcion),
+      historicoIngresos: increment(distribucion.utilidades || 0),
       updatedAt: Timestamp.now(),
     })
 

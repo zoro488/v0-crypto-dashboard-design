@@ -4,6 +4,7 @@ import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
 import BentoNav from "@/frontend/app/components/layout/BentoNav"
 import { FloatingSplineAIWidget } from "@/frontend/app/components/FloatingSplineAIWidget"
 import { FirestoreSetupAlert } from "@/frontend/app/components/ui/FirestoreSetupAlert"
+import { CommandMenu } from "@/frontend/app/components/CommandMenu"
 import { motion, AnimatePresence } from "framer-motion"
 import { useEffect, lazy, Suspense } from "react"
 import { useOptimizedPerformance } from "@/frontend/app/lib/hooks/useOptimizedPerformance"
@@ -176,7 +177,11 @@ export default function Chronos() {
         </main>
       </div>
 
-      <FloatingSplineAIWidget />
+      {/* FloatingSplineAIWidget temporalmente deshabilitado - causa errores de position */}
+      {/* <FloatingSplineAIWidget /> */}
+
+      {/* Command Menu - Cmd+K para búsqueda rápida */}
+      <CommandMenu />
     </div>
   )
 }

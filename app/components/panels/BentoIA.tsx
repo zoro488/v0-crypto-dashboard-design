@@ -11,9 +11,9 @@ import { AIAnalyticsOverlay } from "@/frontend/app/components/3d/AIAnalyticsOver
 import { SplineWidget3D } from "@/frontend/app/components/3d/SplineWidget3D"
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, RadarChart, PolarGrid, PolarAngleAxis, Radar, PieChart, Pie, Cell } from "recharts"
 import { AIBrainVisualizer } from "@/frontend/app/components/visualizations/AIBrainVisualizer"
-import { QuickStatWidget } from "@/app/components/widgets/QuickStatWidget"
-import { MiniChartWidget } from "@/app/components/widgets/MiniChartWidget"
-import { ActivityFeedWidget, ActivityItem } from "@/app/components/widgets/ActivityFeedWidget"
+import { QuickStatWidget } from "@/frontend/app/components/widgets/QuickStatWidget"
+import { MiniChartWidget } from "@/frontend/app/components/widgets/MiniChartWidget"
+import { ActivityFeedWidget, ActivityItem } from "@/frontend/app/components/widgets/ActivityFeedWidget"
 
 const analysisData = [
   { month: "Ene", ventas: 45000, compras: 32000, prediccion: 48000 },

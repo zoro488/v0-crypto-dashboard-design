@@ -5,10 +5,44 @@ import { ShoppingCart, Plus, TrendingUp, AlertCircle, CheckCircle2, Clock, Packa
 import { Button } from "@/frontend/app/components/ui/button"
 import { Badge } from "@/frontend/app/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/frontend/app/components/ui/tabs"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { suscribirOrdenesCompra } from "@/frontend/app/lib/firebase/firestore-service"
-import type { OrdenCompra } from "@/frontend/app/types"
+import type { OrdenCompra, FirestoreTimestamp } from "@/frontend/app/types"
 import { CreateOrdenCompraModal } from "@/frontend/app/components/modals/CreateOrdenCompraModal"
+
+// Función auxiliar para formatear fecha
+function formatearFecha(fecha: string | FirestoreTimestamp): string {
+  if (!fecha) return 'Sin fecha'
+  
+  // Si es string
+  if (typeof fecha === 'string') {
+    return new Date(fecha).toLocaleDateString('es-MX', { 
+      day: '2-digit', 
+      month: 'short', 
+      year: 'numeric' 
+    })
+  }
+  
+  // Si es Timestamp de Firestore (tiene método toDate)
+  if (fecha && typeof fecha === 'object' && 'toDate' in fecha) {
+    return fecha.toDate().toLocaleDateString('es-MX', { 
+      day: '2-digit', 
+      month: 'short', 
+      year: 'numeric' 
+    })
+  }
+  
+  // Si es Date
+  if (fecha instanceof Date) {
+    return fecha.toLocaleDateString('es-MX', { 
+      day: '2-digit', 
+      month: 'short', 
+      year: 'numeric' 
+    })
+  }
+  
+  return 'Sin fecha'
+}
 
 export default function BentoOrdenesCompra() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -180,7 +214,7 @@ export default function BentoOrdenesCompra() {
                           <div className="font-mono text-sm text-blue-400">{orden.id}</div>
                         </td>
                         <td className="py-4 px-4">
-                          <div className="text-sm text-zinc-400">{orden.fecha}</div>
+                          <div className="text-sm text-zinc-400">{formatearFecha(orden.fecha)}</div>
                         </td>
                         <td className="py-4 px-4">
                           <div className="font-medium text-white group-hover/row:text-blue-400 transition-colors">
@@ -247,7 +281,7 @@ export default function BentoOrdenesCompra() {
                             <div className="font-mono text-sm text-blue-400">{orden.id}</div>
                           </td>
                           <td className="py-4 px-4">
-                            <div className="text-sm text-zinc-400">{orden.fecha}</div>
+                            <div className="text-sm text-zinc-400">{formatearFecha(orden.fecha)}</div>
                           </td>
                           <td className="py-4 px-4">
                             <div className="font-medium text-white group-hover/row:text-blue-400 transition-colors">
@@ -307,7 +341,7 @@ export default function BentoOrdenesCompra() {
                             <div className="font-mono text-sm text-blue-400">{orden.id}</div>
                           </td>
                           <td className="py-4 px-4">
-                            <div className="text-sm text-zinc-400">{orden.fecha}</div>
+                            <div className="text-sm text-zinc-400">{formatearFecha(orden.fecha)}</div>
                           </td>
                           <td className="py-4 px-4">
                             <div className="font-medium text-white group-hover/row:text-blue-400 transition-colors">

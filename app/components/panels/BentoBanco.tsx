@@ -36,9 +36,9 @@ import {
 } from "@/frontend/app/lib/firebase/firestore-hooks.service"
 import { Skeleton } from "@/frontend/app/components/ui/skeleton"
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from "recharts"
-import { QuickStatWidget } from "@/app/components/widgets/QuickStatWidget"
-import { MiniChartWidget } from "@/app/components/widgets/MiniChartWidget"
-import { ActivityFeedWidget, ActivityItem } from "@/app/components/widgets/ActivityFeedWidget"
+import { QuickStatWidget } from "@/frontend/app/components/widgets/QuickStatWidget"
+import { MiniChartWidget } from "@/frontend/app/components/widgets/MiniChartWidget"
+import { ActivityFeedWidget, ActivityItem } from "@/frontend/app/components/widgets/ActivityFeedWidget"
 
 // Interfaces para tipado
 interface MovimientoBanco {

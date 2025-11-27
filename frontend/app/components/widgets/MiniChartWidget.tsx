@@ -449,7 +449,7 @@ export function MiniChartWidget({
       </div>
       
       {/* Gráfico */}
-      <div className="px-2 pb-2">
+      <div className="px-2 pb-2" style={{ minHeight: height, height }}>
         {ChartComponent}
       </div>
       

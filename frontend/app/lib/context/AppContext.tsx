@@ -64,14 +64,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
       color: banco.color,
       tipo: banco.tipo || "operativo",
       descripcion: banco.descripcion || "",
-      capitalActual: 0,
-      historicoIngresos: 0,
-      historicoGastos: 0,
-      historicoTransferencias: 0,
-      estado: "activo" as const,
-      operaciones: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      moneda: banco.moneda || "MXN",
+      capitalActual: banco.capitalActual || 0,
+      capitalInicial: banco.capitalInicial || 0,
+      historicoIngresos: banco.historicoIngresos || 0,
+      historicoGastos: banco.historicoGastos || 0,
+      historicoTransferencias: banco.historicoTransferencias || 0,
+      estado: banco.estado || "activo",
+      createdAt: banco.createdAt || new Date(),
+      updatedAt: banco.updatedAt || new Date(),
     }))
 
     setBancos(initBancos)

@@ -6,6 +6,7 @@ import { X, Package, DollarSign, Truck, Check, ChevronRight, Building } from "lu
 import { Dialog, DialogContent, DialogDescription } from "@/frontend/app/components/ui/dialog"
 import { useToast } from "@/frontend/app/hooks/use-toast"
 import { firestoreService } from "@/frontend/app/lib/firebase/firestore-service"
+import type { BancoId } from "@/frontend/app/types"
 
 interface CreateOrdenCompraModalProps {
   open: boolean
@@ -17,7 +18,16 @@ export function CreateOrdenCompraModal({ open, onClose }: CreateOrdenCompraModal
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    distribuidor: string
+    origen: string
+    producto: string
+    cantidad: number
+    costoDistribuidor: number
+    costoTransporte: number
+    pagoInicial: number
+    bancoOrigen: BancoId
+  }>({
     distribuidor: "",
     origen: "",
     producto: "",
@@ -25,7 +35,7 @@ export function CreateOrdenCompraModal({ open, onClose }: CreateOrdenCompraModal
     costoDistribuidor: 0,
     costoTransporte: 0,
     pagoInicial: 0,
-    bancoOrigen: "bovedaMonte",
+    bancoOrigen: "boveda_monte",
   })
 
   const steps = [
@@ -48,8 +58,16 @@ export function CreateOrdenCompraModal({ open, onClose }: CreateOrdenCompraModal
         formData.pagoInicial === costoTotal ? "pagado" : 
         formData.pagoInicial > 0 ? "parcial" : "pendiente"
 
+      // Generar keywords para búsqueda
+      const keywords = [
+        formData.distribuidor.toLowerCase(),
+        formData.origen.toLowerCase(),
+        formData.producto.toLowerCase(),
+      ].filter(Boolean)
+
       const ordenCompra = {
         fecha: new Date().toISOString(),
+        distribuidorId: formData.distribuidor.toLowerCase().replace(/\s+/g, '_'),
         distribuidor: formData.distribuidor,
         origen: formData.origen,
         producto: formData.producto,
@@ -58,10 +76,14 @@ export function CreateOrdenCompraModal({ open, onClose }: CreateOrdenCompraModal
         costoTransporte: formData.costoTransporte,
         costoPorUnidad,
         costoTotal,
+        stockActual: formData.cantidad,
+        stockInicial: formData.cantidad,
         pagoDistribuidor: formData.pagoInicial,
+        pagoInicial: formData.pagoInicial,
         deuda: costoTotal - formData.pagoInicial,
         estado,
         bancoOrigen: formData.bancoOrigen,
+        keywords,
         createdAt: new Date(),
         updatedAt: new Date(),
       }
@@ -83,7 +105,7 @@ export function CreateOrdenCompraModal({ open, onClose }: CreateOrdenCompraModal
         costoDistribuidor: 0,
         costoTransporte: 0,
         pagoInicial: 0,
-        bancoOrigen: "bovedaMonte",
+        bancoOrigen: "boveda_monte",
       })
       setStep(1)
     } catch (error) {
@@ -245,11 +267,15 @@ export function CreateOrdenCompraModal({ open, onClose }: CreateOrdenCompraModal
                       <label className="text-sm text-white/60">Banco para Pago</label>
                       <select
                         value={formData.bancoOrigen}
-                        onChange={(e) => setFormData({ ...formData, bancoOrigen: e.target.value })}
+                        onChange={(e) => setFormData({ ...formData, bancoOrigen: e.target.value as BancoId })}
                         className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-blue-500 focus:outline-none"
                       >
-                        <option value="bovedaMonte">Bóveda Monte</option>
-                        <option value="fletes">Fletes</option>
+                        <option value="boveda_monte">Bóveda Monte</option>
+                        <option value="boveda_usa">Bóveda USA</option>
+                        <option value="profit">Profit</option>
+                        <option value="leftie">Leftie</option>
+                        <option value="azteca">Azteca</option>
+                        <option value="flete_sur">Flete Sur</option>
                         <option value="utilidades">Utilidades</option>
                       </select>
                     </div>
