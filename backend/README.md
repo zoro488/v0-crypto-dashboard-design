@@ -23,7 +23,7 @@ Backend API RESTful para el sistema CHRONOS. Node.js + Express + TypeScript + Fi
 
 ## 🏗️ Estructura
 
-```
+\`\`\`
 backend/
 ├── src/
 │   ├── api/              # Controllers y rutas
@@ -70,7 +70,7 @@ backend/
 ├── tsconfig.json
 ├── .env.example
 └── README.md
-```
+\`\`\`
 
 ---
 
@@ -78,20 +78,20 @@ backend/
 
 ### 1. Instalar dependencias
 
-```bash
+\`\`\`bash
 cd backend
 pnpm install
-```
+\`\`\`
 
 ### 2. Configurar variables de entorno
 
-```bash
+\`\`\`bash
 cp .env.example .env
-```
+\`\`\`
 
 Editar `.env` con tus credenciales:
 
-```env
+\`\`\`env
 # Firebase Admin SDK
 FIREBASE_PROJECT_ID=tu-proyecto-id
 FIREBASE_CLIENT_EMAIL=tu-service-account@...
@@ -102,7 +102,7 @@ JWT_SECRET=tu-super-secret-key
 
 # CORS
 CORS_ORIGIN=http://localhost:3000
-```
+\`\`\`
 
 ### 3. Obtener credenciales de Firebase
 
@@ -121,27 +121,27 @@ CORS_ORIGIN=http://localhost:3000
 
 ### Desarrollo
 
-```bash
+\`\`\`bash
 pnpm dev
-```
+\`\`\`
 
 El servidor estará en: `http://localhost:3001`
 
 ### Build
 
-```bash
+\`\`\`bash
 pnpm build
-```
+\`\`\`
 
 ### Producción
 
-```bash
+\`\`\`bash
 pnpm start
-```
+\`\`\`
 
 ### Testing
 
-```bash
+\`\`\`bash
 # Unit tests
 pnpm test
 
@@ -153,11 +153,11 @@ pnpm test:e2e
 
 # Watch mode
 pnpm test:watch
-```
+\`\`\`
 
 ### Linting
 
-```bash
+\`\`\`bash
 # Check
 pnpm lint
 
@@ -166,7 +166,7 @@ pnpm lint:fix
 
 # Format
 pnpm format
-```
+\`\`\`
 
 ---
 
@@ -179,7 +179,7 @@ pnpm format
 
 ### Autenticación
 
-```bash
+\`\`\`bash
 # Login
 POST /auth/login
 Content-Type: application/json
@@ -204,11 +204,11 @@ Authorization: Bearer <token>
 # Logout
 POST /auth/logout
 Authorization: Bearer <token>
-```
+\`\`\`
 
 ### Ventas
 
-```bash
+\`\`\`bash
 # Get all ventas (requiere auth)
 GET /ventas
 Authorization: Bearer <token>
@@ -236,7 +236,7 @@ Content-Type: application/json
 # Delete venta
 DELETE /ventas/:id
 Authorization: Bearer <token>
-```
+\`\`\`
 
 ### Compras, Almacén, Banco, Clientes, Distribuidores
 
@@ -250,21 +250,21 @@ El API usa JWT (JSON Web Tokens) para autenticación.
 
 ### Headers requeridos
 
-```
+\`\`\`
 Authorization: Bearer <your-jwt-token>
-```
+\`\`\`
 
 ### Obtener token
 
-```bash
+\`\`\`bash
 curl -X POST http://localhost:3001/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"user@example.com","password":"password123"}'
-```
+\`\`\`
 
 Respuesta:
 
-```json
+\`\`\`json
 {
   "success": true,
   "data": {
@@ -275,13 +275,13 @@ Respuesta:
     }
   }
 }
-```
+\`\`\`
 
 ---
 
 ## 🧪 Testing
 
-```bash
+\`\`\`bash
 # Run all tests
 pnpm test
 
@@ -293,7 +293,7 @@ pnpm test --coverage
 
 # E2E tests
 pnpm test:e2e
-```
+\`\`\`
 
 ---
 
@@ -320,7 +320,7 @@ Los logs se guardan en:
 
 ### Railway
 
-```bash
+\`\`\`bash
 # Install Railway CLI
 npm install -g railway
 
@@ -336,23 +336,23 @@ railway variables set JWT_SECRET=...
 
 # Deploy
 railway up
-```
+\`\`\`
 
 ### Render
 
-```bash
+\`\`\`bash
 # Connect GitHub repo
 # Add environment variables in dashboard
 # Deploy automatically on push
-```
+\`\`\`
 
 ### Heroku
 
-```bash
+\`\`\`bash
 heroku create chronos-api
 heroku config:set FIREBASE_PROJECT_ID=...
 git push heroku main
-```
+\`\`\`
 
 ---
 
@@ -384,15 +384,15 @@ git push heroku main
 
 ### Logs en tiempo real
 
-```bash
+\`\`\`bash
 pnpm dev
-```
+\`\`\`
 
 ### Inspeccionar con Node
 
-```bash
+\`\`\`bash
 node --inspect dist/index.js
-```
+\`\`\`
 
 Abrir Chrome DevTools: `chrome://inspect`
 

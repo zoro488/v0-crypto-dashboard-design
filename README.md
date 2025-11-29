@@ -57,15 +57,15 @@
 ## 🚀 Quick Start
 
 ### Prerequisitos
-```bash
+\`\`\`bash
 Node.js >= 18.0.0
 npm o pnpm
 Cuenta Firebase (opcional para dev)
-```
+\`\`\`
 
 ### Instalación en 30 Segundos
 
-```bash
+\`\`\`bash
 # Clonar repositorio
 git clone https://github.com/zoro488/v0-crypto-dashboard-design.git
 cd v0-crypto-dashboard-design
@@ -73,17 +73,17 @@ cd v0-crypto-dashboard-design
 # Usar script de inicio rápido
 chmod +x start.sh
 ./start.sh
-```
+\`\`\`
 
 **¡Listo!** 🎉 Abre `http://localhost:3000` en tu navegador.
 
 ### Instalación Manual
 
-```bash
+\`\`\`bash
 cd frontend
 npm install
 npm run dev
-```
+\`\`\`
 
 ---
 
@@ -109,7 +109,7 @@ npm run dev
 
 ## 🎯 Arquitectura del Proyecto
 
-```
+\`\`\`
 frontend/
 ├── app/
 │   ├── components/
@@ -158,7 +158,7 @@ frontend/
 ├── types/                            # 📘 TypeScript Types
 ├── next.config.mjs                   # ⚙️ Next.js Config
 └── tsconfig.json                     # 📘 TypeScript Config
-```
+\`\`\`
 
 **Total de Código**: ~15,000 líneas  
 **Visualizaciones Canvas**: ~3,800 líneas
@@ -195,7 +195,7 @@ frontend/
 
 Crear `frontend/.env.local`:
 
-```env
+\`\`\`env
 # Firebase Configuration
 NEXT_PUBLIC_FIREBASE_API_KEY=AIza...
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=flowdistributor-ultra.firebaseapp.com
@@ -206,13 +206,13 @@ NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abc123
 
 # Optional: Banxico API
 NEXT_PUBLIC_BANXICO_API_KEY=tu_api_key_banxico
-```
+\`\`\`
 
 ### 5. Reglas de Seguridad
 
 En Firestore → **Rules**, pegar:
 
-```javascript
+\`\`\`javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -227,13 +227,13 @@ service cloud.firestore {
     // }
   }
 }
-```
+\`\`\`
 
 ---
 
 ## 🛠️ Comandos Disponibles
 
-```bash
+\`\`\`bash
 # Desarrollo
 npm run dev              # Iniciar dev server (localhost:3000)
 npm run build            # Build de producción (~14s)
@@ -246,14 +246,14 @@ npx tsc --noEmit         # Verificar tipos TypeScript
 # Testing (cuando se implemente)
 npm test                 # Unit tests
 npm run test:e2e         # End-to-end tests
-```
+\`\`\`
 
 ---
 
 ## 🎨 Tecnologías de Visualización
 
 ### Canvas API Avanzado
-```javascript
+\`\`\`javascript
 // Ejemplo de rendering optimizado
 const animate = () => {
   ctx.clearRect(0, 0, width, height)
@@ -274,29 +274,29 @@ const animate = () => {
   
   requestAnimationFrame(animate)
 }
-```
+\`\`\`
 
 ### Matemáticas Aplicadas
 
 **Órbitas Circulares**:
-```javascript
+\`\`\`javascript
 x = centerX + radius * Math.cos(angle)
 y = centerY + radius * Math.sin(angle)
-```
+\`\`\`
 
 **Curvas de Bézier Cúbicas**:
-```javascript
+\`\`\`javascript
 B(t) = (1-t)³P₀ + 3(1-t)²tP₁ + 3(1-t)t²P₂ + t³P₃
-```
+\`\`\`
 
 **Proyección Isométrica**:
-```javascript
+\`\`\`javascript
 isoX = (x - y) * Math.cos(30deg)
 isoY = (x + y) * Math.sin(30deg) - z
-```
+\`\`\`
 
 **Física de Partículas**:
-```javascript
+\`\`\`javascript
 // Gravedad
 particle.vy += gravity
 particle.y += particle.vy
@@ -304,7 +304,7 @@ particle.y += particle.vy
 // Fricción
 particle.vx *= 0.98
 particle.vy *= 0.98
-```
+\`\`\`
 
 ---
 
@@ -322,13 +322,13 @@ particle.vy *= 0.98
 ## 🎯 Performance Metrics
 
 ### Build Performance
-```
+\`\`\`
 ✓ Compiled successfully in 14.2s
 ✓ Static pages: 3
 ✓ Bundle size: Optimized
 ✓ TypeScript: 0 errors
 ✓ Turbopack: Enabled
-```
+\`\`\`
 
 ### Runtime Performance
 | Métrica | Target | Actual |
@@ -346,24 +346,24 @@ particle.vy *= 0.98
 ## 🚢 Deploy a Producción
 
 ### Vercel (Recomendado)
-```bash
+\`\`\`bash
 npm i -g vercel
 cd frontend
 vercel --prod
-```
+\`\`\`
 
 ### Docker
-```bash
+\`\`\`bash
 docker build -t flowdistributor .
 docker run -p 3000:3000 flowdistributor
-```
+\`\`\`
 
 ### Manual
-```bash
+\`\`\`bash
 cd frontend
 npm run build
 npm start
-```
+\`\`\`
 
 Ver [RECOMENDACIONES_PROXIMOS_PASOS.md](./RECOMENDACIONES_PROXIMOS_PASOS.md) para más opciones.
 

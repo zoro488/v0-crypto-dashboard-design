@@ -7,7 +7,7 @@
 
 ### 1. Configuración Inicial (Primera vez)
 
-```bash
+\`\`\`bash
 # 1. Clonar el repositorio (si aún no lo tienes)
 git clone <tu-repo-url>
 cd v0-crypto-dashboard-design
@@ -24,11 +24,11 @@ pnpm run cleanup
 
 # 5. Iniciar en modo desarrollo
 pnpm dev
-```
+\`\`\`
 
 ### 2. Comandos Disponibles
 
-```bash
+\`\`\`bash
 # Desarrollo
 pnpm dev                 # Iniciar servidor de desarrollo (puerto 3000)
 pnpm build              # Crear build de producción
@@ -48,11 +48,11 @@ pnpm cleanup            # Ejecutar script de limpieza
 pnpm migrate            # Migrar datos a Firestore
 pnpm migrate:web        # Migrar desde navegador
 pnpm migrate:verify     # Verificar migración
-```
+\`\`\`
 
 ### 3. Estructura del Proyecto
 
-```
+\`\`\`
 v0-crypto-dashboard-design/
 ├── app/                        # Página principal de Next.js
 ├── frontend/app/               # Aplicación frontend principal
@@ -82,13 +82,13 @@ v0-crypto-dashboard-design/
 ├── public/                   # Archivos estáticos
 ├── scripts/                  # Scripts de utilidad
 └── [archivos de config]      # Configuraciones (next, ts, tailwind, etc.)
-```
+\`\`\`
 
 ### 4. Variables de Entorno Requeridas
 
 Copiar `.env.example` a `.env.local` y configurar:
 
-```env
+\`\`\`env
 # Firebase Frontend
 NEXT_PUBLIC_FIREBASE_API_KEY=tu_api_key
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=tu_project.firebaseapp.com
@@ -98,7 +98,7 @@ NEXT_PUBLIC_FIREBASE_PROJECT_ID=tu_project_id
 # Backend (si aplica)
 FIREBASE_PROJECT_ID=tu_project_id
 JWT_SECRET=tu_secret_aqui
-```
+\`\`\`
 
 ### 5. Navegación del Sistema
 
@@ -130,7 +130,7 @@ Una vez iniciado, el sistema incluye:
 
 ### 7. Desarrollo
 
-```bash
+\`\`\`bash
 # Terminal 1: Frontend
 pnpm dev
 
@@ -140,32 +140,32 @@ pnpm dev
 
 # El frontend estará en: http://localhost:3000
 # El backend estará en: http://localhost:3001
-```
+\`\`\`
 
 ### 8. Solución de Problemas Comunes
 
 #### Puerto 3000 ocupado
-```bash
+\`\`\`bash
 # Cambiar puerto en package.json o usar:
 PORT=3001 pnpm dev
-```
+\`\`\`
 
 #### Errores de TypeScript
-```bash
+\`\`\`bash
 # Verificar tipos
 pnpm type-check
 
 # Reconstruir
 rm -rf .next
 pnpm dev
-```
+\`\`\`
 
 #### Problemas con node_modules
-```bash
+\`\`\`bash
 # Limpiar y reinstalar
 pnpm run cleanup
 pnpm install
-```
+\`\`\`
 
 #### Firebase no conecta
 - Verificar `.env.local` existe y tiene valores correctos
@@ -174,7 +174,7 @@ pnpm install
 
 ### 9. Build para Producción
 
-```bash
+\`\`\`bash
 # 1. Crear build optimizado
 pnpm build
 
@@ -185,11 +185,11 @@ pnpm start
 vercel deploy
 
 # O usar el deploy configurado en tu plataforma
-```
+\`\`\`
 
 ### 10. Mantenimiento
 
-```bash
+\`\`\`bash
 # Actualizar dependencias (con cuidado)
 pnpm update --interactive
 
@@ -198,7 +198,7 @@ pnpm audit
 
 # Limpiar proyecto regularmente
 pnpm run cleanup
-```
+\`\`\`
 
 ## 📚 Documentación Adicional
 

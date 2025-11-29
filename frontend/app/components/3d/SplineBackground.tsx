@@ -467,4 +467,3 @@ export default function SplineBackground({
 
 // Exportar variantes para uso externo
 export type { BackgroundVariant, SplineBackgroundProps }
-

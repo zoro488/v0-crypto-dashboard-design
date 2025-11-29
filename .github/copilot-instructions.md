@@ -11,9 +11,9 @@ Has cometido errores en el pasado por ser permisivo. A partir de ahora, sigue es
 - **PROHIBIDO ABSOLUTO**: `allow read, write: if true` en reglas de Firestore
 - **OBLIGATORIO**: Siempre requiere autenticación (`request.auth != null`)
 - **OBLIGATORIO**: Valida ownership antes de `update` o `delete`:
-  ```javascript
+  \`\`\`javascript
   allow update, delete: if request.auth.uid == resource.data.userId;
-  ```
+  \`\`\`
 - Si te pido generar reglas permisivas, **DETENTE** y advierte: "⚠️ RIESGO DE SEGURIDAD: Esto expone toda la base de datos"
 
 ### 2. Credenciales y Secrets
@@ -47,7 +47,7 @@ Has cometido errores en el pasado por ser permisivo. A partir de ahora, sigue es
 - Si te pido ignorar errores de tipo, **DETENTE** y advierte: "⚠️ Esto ocultará bugs. Mejor arreglemos el tipo."
 
 ### 3. Type Safety en Firestore
-```typescript
+\`\`\`typescript
 // ❌ MAL
 const data: any = doc.data()
 
@@ -63,7 +63,7 @@ const data = doc.data() as Usuario
 // Mejor aún: validar con Zod
 const usuarioSchema = z.object({...})
 const data = usuarioSchema.parse(doc.data())
-```
+\`\`\`
 
 ---
 
@@ -72,19 +72,19 @@ const data = usuarioSchema.parse(doc.data())
 ### 1. Logging
 - **PROHIBIDO ABSOLUTO**: `console.log` en código de producción
 - **OBLIGATORIO**: Usar logger centralizado:
-  ```typescript
+  \`\`\`typescript
   // ❌ MAL
   console.log('Usuario logueado:', user)
   
   // ✅ BIEN
   logger.info('Usuario logueado', { userId: user.id })
   logger.error('Error al cargar datos', error)
-  ```
+  \`\`\`
 - **PERMITIDO**: `console.debug` solo en desarrollo para debugging temporal
 
 ### 2. Memory Leaks Prevention
 - **OBLIGATORIO**: Siempre limpiar `useEffect` con listeners de Firebase:
-  ```typescript
+  \`\`\`typescript
   // ❌ MAL
   useEffect(() => {
     const unsubscribe = onSnapshot(q, callback)
@@ -95,12 +95,12 @@ const data = usuarioSchema.parse(doc.data())
     const unsubscribe = onSnapshot(q, callback)
     return () => unsubscribe() // CRÍTICO: Limpiar
   }, [])
-  ```
+  \`\`\`
 
 ### 3. Separation of Concerns
 - **OBLIGATORIO**: Separar lógica de Firebase de componentes UI
 - **OBLIGATORIO**: Usar Custom Hooks o Repository Pattern:
-  ```typescript
+  \`\`\`typescript
   // ❌ MAL: Firebase directo en componente
   function UserList() {
     const [users, setUsers] = useState([])
@@ -120,12 +120,12 @@ const data = usuarioSchema.parse(doc.data())
     const { users, loading } = useUsers()
     // Solo UI aquí
   }
-  ```
+  \`\`\`
 
 ### 4. Error Handling
 - **OBLIGATORIO**: Siempre usar `try/catch` en funciones async
 - **OBLIGATORIO**: Proporcionar fallbacks y mensajes claros:
-  ```typescript
+  \`\`\`typescript
   try {
     const data = await fetchData()
     return data
@@ -133,7 +133,7 @@ const data = usuarioSchema.parse(doc.data())
     logger.error('Error en fetchData', error)
     throw new Error('No se pudo cargar la información. Intenta de nuevo.')
   }
-  ```
+  \`\`\`
 
 ---
 
@@ -172,7 +172,7 @@ Si alguna respuesta es NO, **DETENTE** y corrige antes de continuar.
 
 #### Ejemplos:
 
-```typescript
+\`\`\`typescript
 // ❌ MAL: Ejecutar y asumir éxito
 run_in_terminal("git commit -m 'fix'")
 // Siguiente comando sin verificar...
@@ -183,7 +183,7 @@ run_in_terminal("git commit -m 'fix'")
 // Leer output...
 // Si salió bien (exit code 0): continuar
 // Si falló: investigar qué pasó
-```
+\`\`\`
 
 #### Comandos que SIEMPRE requieren verificación:
 - `git status` - Verificar qué archivos están staged
@@ -209,28 +209,28 @@ run_in_terminal("git commit -m 'fix'")
 Cuando detectes que estoy pidiendo algo peligroso, usa estos templates:
 
 ### Riesgo de Seguridad
-```
+\`\`\`
 ⚠️ ALERTA DE SEGURIDAD
 Lo que pides expone [describe el riesgo].
 Alternativa segura: [propón solución]
 ¿Continuar? (No recomendado)
-```
+\`\`\`
 
 ### Violación de Tipos
-```
+\`\`\`
 ⚠️ ALERTA DE TYPESCRIPT
 Esto requiere usar `any` o ignorar errores.
 Causa raíz: [explica el problema]
 Solución correcta: [propón fix]
-```
+\`\`\`
 
 ### Code Smell
-```
+\`\`\`
 ⚠️ ALERTA DE CALIDAD
 Esto viola [principio de código limpio].
 Problema: [explica]
 Refactorización sugerida: [muestra código mejor]
-```
+\`\`\`
 
 ---
 
@@ -319,7 +319,7 @@ Refactorización sugerida: [muestra código mejor]
 ## Ejemplos de Código
 
 ### Componente React Típico
-```typescript
+\`\`\`typescript
 interface UserCardProps {
   user: User;
   onSelect?: (userId: string) => void;
@@ -337,10 +337,10 @@ export const UserCard: React.FC<UserCardProps> = ({ user, onSelect }) => {
     </div>
   );
 };
-```
+\`\`\`
 
 ### Función Asíncrona con Manejo de Errores
-```typescript
+\`\`\`typescript
 export async function fetchUserData(userId: string): Promise<User> {
   try {
     const response = await fetch(`/api/users/${userId}`);
@@ -356,10 +356,10 @@ export async function fetchUserData(userId: string): Promise<User> {
     throw new Error('No se pudo cargar la información del usuario');
   }
 }
-```
+\`\`\`
 
 ### Custom Hook
-```typescript
+\`\`\`typescript
 export function useUserData(userId: string) {
   return useQuery({
     queryKey: ['user', userId],
@@ -368,7 +368,7 @@ export function useUserData(userId: string) {
     retry: 3,
   });
 }
-```
+\`\`\`
 
 ## Prioridades de Optimización
 
