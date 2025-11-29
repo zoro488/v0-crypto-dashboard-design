@@ -24,7 +24,7 @@ import {
 } from "recharts"
 import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from "@/app/components/ui/SafeChartContainer"
 import { useState, useEffect, useMemo, useCallback, memo } from "react"
-import { useVentas, useOrdenesCompra, useProductos, useClientes } from "@/app/lib/firebase/firestore-hooks.service"
+import { useVentas, useOrdenesCompra, useProductos, useClientes, useBancosData } from "@/app/lib/firebase/firestore-hooks.service"
 import { Skeleton } from "@/app/components/ui/skeleton"
 import { CreateOrdenCompraModalPremium } from "@/app/components/modals/CreateOrdenCompraModalPremium"
 import { CreateVentaModalPremium } from "@/app/components/modals/CreateVentaModalPremium"
@@ -38,10 +38,22 @@ import { PremiumSplineOrb } from "@/app/components/3d/PremiumSplineOrb"
 interface VentaData {
   id?: string
   montoTotal?: number
+  precioTotalVenta?: number
+  totalVenta?: number
   precioVenta?: number
   cantidad?: number
   ganancia?: number
+  utilidad?: number
   fecha?: { seconds: number } | Date | string
+  [key: string]: unknown
+}
+
+interface BancoData {
+  id?: string
+  nombre?: string
+  capitalActual?: number
+  capitalInicial?: number
+  saldo?: number
   [key: string]: unknown
 }
 
@@ -54,6 +66,7 @@ interface OrdenCompraData {
 interface ProductoData {
   id?: string
   stock?: number
+  stockActual?: number
   [key: string]: unknown
 }
 
@@ -88,15 +101,18 @@ const CustomTooltip = memo(function CustomTooltip({ active, payload, label }: Cu
 })
 
 export default memo(function BentoDashboard() {
-  const { bancos } = useAppStore()
+  const { bancos: storebancos } = useAppStore()
   const { data: ventasRaw, loading: loadingVentas } = useVentas()
   const { data: ordenesCompraRaw, loading: loadingOC } = useOrdenesCompra()
   const { data: productosRaw, loading: loadingProductos } = useProductos()
+  const { data: bancosRaw, loading: loadingBancos } = useBancosData()
 
   // Casting seguro
   const ventas = ventasRaw as VentaData[] | undefined
   const ordenesCompra = ordenesCompraRaw as OrdenCompraData[] | undefined
   const productos = productosRaw as ProductoData[] | undefined
+  // Siempre usar datos de los hooks de Firebase/mock, estos ya tienen los datos reales
+  const bancos = bancosRaw as BancoData[]
 
   const [mounted, setMounted] = useState(false)
   const [showChronos, setShowChronos] = useState(true)
@@ -119,10 +135,23 @@ export default memo(function BentoDashboard() {
   // ═══════════════════════════════════════════════════════════════════════════
   
   const metrics = useMemo(() => {
-    const capitalTotal = bancos?.reduce((acc, b) => acc + (b?.saldo || 0), 0) || 0
-    const ventasMes = ventas?.reduce((acc, v) => acc + (v?.montoTotal ?? 0), 0) ?? 0
-    const stockActual = productos?.reduce((acc, p) => acc + (p?.stock ?? 0), 0) ?? 0
-    const ordenesActivas = ordenesCompra?.filter((oc) => oc?.estado === "pendiente")?.length ?? 0
+    // Capital total de bancos - usar capitalActual o capitalInicial o saldo según el esquema
+    const capitalTotal = bancos?.reduce((acc: number, b) => {
+      const valor = Number(b?.capitalActual ?? b?.capitalInicial ?? b?.saldo ?? 0)
+      return acc + (isNaN(valor) ? 0 : valor)
+    }, 0) || 0
+    // Ventas del mes - usar precioTotalVenta o totalVenta o montoTotal según el esquema
+    const ventasMes = ventas?.reduce((acc: number, v) => {
+      const valor = Number(v?.precioTotalVenta ?? v?.totalVenta ?? v?.montoTotal ?? 0)
+      return acc + (isNaN(valor) ? 0 : valor)
+    }, 0) ?? 0
+    // Stock - usar stockActual o stock
+    const stockActual = productos?.reduce((acc: number, p) => {
+      const valor = Number(p?.stockActual ?? p?.stock ?? 0)
+      return acc + (isNaN(valor) ? 0 : valor)
+    }, 0) ?? 0
+    // Órdenes activas - pendiente o activo
+    const ordenesActivas = ordenesCompra?.filter((oc) => oc?.estado === "pendiente" || oc?.estado === "activo")?.length ?? 0
     
     return { capitalTotal, ventasMes, stockActual, ordenesActivas }
   }, [bancos, ventas, productos, ordenesCompra])
@@ -192,7 +221,7 @@ export default memo(function BentoDashboard() {
     },
   ], [metrics])
 
-  if (loadingVentas || loadingOC || loadingProductos) {
+  if (loadingVentas || loadingOC || loadingProductos || loadingBancos) {
     return (
       <div className="bento-container min-h-screen">
         {[...Array(4)].map((_, i) => (
@@ -448,9 +477,16 @@ export default memo(function BentoDashboard() {
           </motion.button>
         </div>
         <div className="space-y-3 max-h-[280px] overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.2) transparent' }}>
-          {bancos?.slice(0, 5).map((banco, index) => (
+          {bancos?.slice(0, 5).map((banco, index) => {
+            // Obtener valores de forma segura
+            const bancoId = String(banco?.id || `banco-${index}`)
+            const bancoNombre = String(banco?.nombre || 'Banco')
+            const bancoSaldo = Number(banco?.capitalActual ?? banco?.capitalInicial ?? banco?.saldo ?? 0)
+            const bancoColor = String(banco?.color || 'from-gray-500 to-gray-600')
+            
+            return (
             <motion.div
-              key={banco.id}
+              key={bancoId}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
@@ -458,24 +494,24 @@ export default memo(function BentoDashboard() {
             >
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${banco.color} flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300`}
+                  className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${bancoColor} flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300`}
                 >
                   <DollarSign className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="text-white font-medium tracking-wide">{banco.nombre}</p>
-                  <p className="text-white/40 text-xs font-mono mt-0.5">**** {banco.id.slice(-4)}</p>
+                  <p className="text-white font-medium tracking-wide">{bancoNombre}</p>
+                  <p className="text-white/40 text-xs font-mono mt-0.5">**** {bancoId.slice(-4)}</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-white font-bold tracking-tight">${banco.saldo.toLocaleString()}</p>
+                <p className="text-white font-bold tracking-tight">${bancoSaldo.toLocaleString()}</p>
                 <div className="flex items-center justify-end gap-1 text-emerald-400 text-xs mt-0.5">
                   <TrendingUp className="w-3 h-3" />
-                  <span>2.4%</span>
+                  <span>+2.4%</span>
                 </div>
               </div>
             </motion.div>
-          ))}
+          )})}
         </div>
       </motion.div>
 
@@ -644,8 +680,8 @@ export default memo(function BentoDashboard() {
           color="purple"
           showLegend
           data={bancos?.slice(0, 4).map((b, i) => ({
-            name: b.nombre,
-            value: b.saldo,
+            name: String(b?.nombre || `Banco ${i + 1}`),
+            value: Number(b?.capitalActual ?? b?.capitalInicial ?? b?.saldo ?? 0),
             color: ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b'][i]
           })) || []}
           height={140}
