@@ -1,13 +1,26 @@
 import '@testing-library/jest-dom'
 
-// Mock de fetch para Firebase Auth
-global.fetch = jest.fn(() =>
-  Promise.resolve({
-    json: () => Promise.resolve({}),
+// Mock de fetch para Firebase Auth - soporte para diferentes escenarios
+global.fetch = jest.fn((url: string) => {
+  // Simular respuestas exitosas por defecto
+  return Promise.resolve({
+    json: () => Promise.resolve({ success: true }),
+    text: () => Promise.resolve(''),
     ok: true,
     status: 200,
-  })
-) as jest.Mock
+    statusText: 'OK',
+    headers: new Headers(),
+    redirected: false,
+    type: 'basic' as ResponseType,
+    url: url || '',
+    clone: () => ({ json: () => Promise.resolve({}) }),
+    body: null,
+    bodyUsed: false,
+    arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+    blob: () => Promise.resolve(new Blob()),
+    formData: () => Promise.resolve(new FormData()),
+  } as Response)
+}) as jest.Mock
 
 // Polyfills para jsdom - TextEncoder y TextDecoder
 if (typeof global.TextEncoder === 'undefined') {
