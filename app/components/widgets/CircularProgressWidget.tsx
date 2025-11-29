@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { motion } from "framer-motion"
-import { Package, TrendingDown } from "lucide-react"
-import { useState, useEffect } from "react"
+import { motion } from 'framer-motion'
+import { Package, TrendingDown } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 interface CircularProgressWidgetProps {
   title: string
@@ -17,9 +17,9 @@ export default function CircularProgressWidget({
   title,
   value,
   max,
-  unit = "",
+  unit = '',
   change = 0,
-  color = "from-violet-500 to-purple-400",
+  color = 'from-violet-500 to-purple-400',
 }: CircularProgressWidgetProps) {
   const [animatedValue, setAnimatedValue] = useState(0)
   const [isHovered, setIsHovered] = useState(false)
@@ -119,10 +119,10 @@ export default function CircularProgressWidget({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className={`flex items-center gap-1 px-2 py-1 rounded-full ${
-              change < 0 ? "bg-rose-500/15 text-rose-400" : "bg-emerald-500/15 text-emerald-400"
+              change < 0 ? 'bg-rose-500/15 text-rose-400' : 'bg-emerald-500/15 text-emerald-400'
             }`}
           >
-            <TrendingDown className={`w-3 h-3 ${change >= 0 ? "rotate-180" : ""}`} />
+            <TrendingDown className={`w-3 h-3 ${change >= 0 ? 'rotate-180' : ''}`} />
             <span className="text-xs font-bold">{Math.abs(change)}%</span>
           </motion.div>
         )}

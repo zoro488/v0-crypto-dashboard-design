@@ -1,25 +1,25 @@
-"use client"
+'use client'
 
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion"
-import { TrendingUp, Plus, DollarSign, Users, Package, CheckCircle2, Clock, ArrowUpRight, ArrowDownRight, Sparkles, Target, Zap, BarChart3, PieChart as PieChartIcon } from "lucide-react"
-import { Button } from "@/app/components/ui/button"
-import { Badge } from "@/app/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs"
-import { useState, useEffect, useMemo, useRef, memo } from "react"
-import { useVentasData } from "@/app/lib/firebase/firestore-hooks.service"
-import { CreateVentaModalPremium } from "@/app/components/modals/CreateVentaModalPremium"
-import { SalesFlowDiagram } from "@/app/components/visualizations/SalesFlowDiagram"
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion'
+import { TrendingUp, Plus, DollarSign, Users, Package, CheckCircle2, Clock, ArrowUpRight, ArrowDownRight, Sparkles, Target, Zap, BarChart3, PieChart as PieChartIcon } from 'lucide-react'
+import { Button } from '@/app/components/ui/button'
+import { Badge } from '@/app/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/components/ui/tabs'
+import { useState, useEffect, useMemo, useRef, memo } from 'react'
+import { useVentasData } from '@/app/lib/firebase/firestore-hooks.service'
+import { CreateVentaModalPremium } from '@/app/components/modals/CreateVentaModalPremium'
+import { SalesFlowDiagram } from '@/app/components/visualizations/SalesFlowDiagram'
 import { 
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, 
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
-} from "recharts"
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+} from 'recharts'
 
 interface VentaData {
   id: string
   precioTotalVenta?: number
   montoPagado?: number
   montoRestante?: number
-  estadoPago?: "completo" | "parcial" | "pendiente"
+  estadoPago?: 'completo' | 'parcial' | 'pendiente'
   cliente?: string
   fecha?: string
   producto?: string
@@ -40,7 +40,7 @@ interface VentaData {
 // COMPONENTES DE ANIMACIÓN PREMIUM (Optimizados con memo)
 // ============================================================================
 
-const AnimatedCounter = memo(function AnimatedCounter({ value, prefix = "", suffix = "", className = "" }: {
+const AnimatedCounter = memo(function AnimatedCounter({ value, prefix = '', suffix = '', className = '' }: {
   value: number
   prefix?: string
   suffix?: string
@@ -75,13 +75,13 @@ const AnimatedCounter = memo(function AnimatedCounter({ value, prefix = "", suff
   )
 })
 
-const PulsingOrb = memo(function PulsingOrb({ color = "green" }: { color?: string }) {
+const PulsingOrb = memo(function PulsingOrb({ color = 'green' }: { color?: string }) {
   const colorMap: Record<string, string> = useMemo(() => ({
-    green: "from-green-500 to-emerald-500",
-    blue: "from-blue-500 to-cyan-500",
-    purple: "from-purple-500 to-violet-500",
-    yellow: "from-yellow-500 to-orange-500",
-    cyan: "from-cyan-500 to-teal-500"
+    green: 'from-green-500 to-emerald-500',
+    blue: 'from-blue-500 to-cyan-500',
+    purple: 'from-purple-500 to-violet-500',
+    yellow: 'from-yellow-500 to-orange-500',
+    cyan: 'from-cyan-500 to-teal-500',
   }), [])
   
   return (
@@ -89,12 +89,12 @@ const PulsingOrb = memo(function PulsingOrb({ color = "green" }: { color?: strin
       className={`absolute -top-3 -right-3 w-6 h-6 rounded-full bg-gradient-to-r ${colorMap[color]} shadow-lg`}
       animate={{
         scale: [1, 1.3, 1],
-        opacity: [0.8, 0.4, 0.8]
+        opacity: [0.8, 0.4, 0.8],
       }}
       transition={{
         duration: 2,
         repeat: Infinity,
-        ease: "easeInOut"
+        ease: 'easeInOut',
       }}
     >
       <motion.div
@@ -125,7 +125,7 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
     cobrado: 'Cobrado',
     bovedaMonte: 'Bóveda Monte',
     fletes: 'Flete Sur',
-    utilidades: 'Utilidades'
+    utilidades: 'Utilidades',
   }
   
   return (
@@ -165,9 +165,9 @@ export default memo(function BentoVentas() {
     const totalVentas = ventasData.reduce((acc, v) => acc + (v.precioTotalVenta || 0), 0)
     const totalCobrado = ventasData.reduce((acc, v) => acc + (v.montoPagado || 0), 0)
     const totalPendiente = ventasData.reduce((acc, v) => acc + (v.montoRestante || 0), 0)
-    const ventasPendientes = ventasData.filter((v) => v.estadoPago === "pendiente").length
-    const ventasCompletas = ventasData.filter((v) => v.estadoPago === "completo").length
-    const ventasParciales = ventasData.filter((v) => v.estadoPago === "parcial").length
+    const ventasPendientes = ventasData.filter((v) => v.estadoPago === 'pendiente').length
+    const ventasCompletas = ventasData.filter((v) => v.estadoPago === 'completo').length
+    const ventasParciales = ventasData.filter((v) => v.estadoPago === 'parcial').length
     const promedioVenta = ventasData.length > 0 ? totalVentas / ventasData.length : 0
     const tasaCobro = totalVentas > 0 ? (totalCobrado / totalVentas) * 100 : 0
     
@@ -235,7 +235,7 @@ export default memo(function BentoVentas() {
       cobrado: agrupado[dia].cobrado,
       bovedaMonte: agrupado[dia].bovedaMonte,
       fletes: agrupado[dia].fletes,
-      utilidades: agrupado[dia].utilidades
+      utilidades: agrupado[dia].utilidades,
     }))
   }, [ventasData])
   
@@ -618,7 +618,7 @@ export default memo(function BentoVentas() {
                 className="h-full bg-gradient-to-r from-emerald-500 to-green-400"
                 initial={{ width: 0 }}
                 animate={{ width: `${metrics.tasaCobro}%` }}
-                transition={{ duration: 1.5, ease: "easeOut" }}
+                transition={{ duration: 1.5, ease: 'easeOut' }}
               />
             </div>
           </div>
@@ -656,8 +656,8 @@ export default memo(function BentoVentas() {
               <motion.div
                 className="h-full bg-gradient-to-r from-purple-500 to-pink-400"
                 initial={{ width: 0 }}
-                animate={{ width: "78%" }}
-                transition={{ duration: 1.5, ease: "easeOut", delay: 0.3 }}
+                animate={{ width: '78%' }}
+                transition={{ duration: 1.5, ease: 'easeOut', delay: 0.3 }}
               />
             </div>
           </div>
@@ -749,12 +749,12 @@ export default memo(function BentoVentas() {
                           </div>
                         </td>
                         <td className="py-4 px-4 text-center">
-                          {venta.estadoPago === "completo" ? (
+                          {venta.estadoPago === 'completo' ? (
                             <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/20">
                               <CheckCircle2 className="w-3 h-3 mr-1" />
                               Completo
                             </Badge>
-                          ) : venta.estadoPago === "parcial" ? (
+                          ) : venta.estadoPago === 'parcial' ? (
                             <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/20">
                               <Clock className="w-3 h-3 mr-1" />
                               Parcial
@@ -793,7 +793,7 @@ export default memo(function BentoVentas() {
                   </thead>
                   <tbody>
                     {ventasData
-                      .filter((venta: VentaData) => venta.estadoPago === "pendiente")
+                      .filter((venta: VentaData) => venta.estadoPago === 'pendiente')
                       .map((venta, idx) => (
                         <motion.tr
                           key={venta.id}
@@ -878,7 +878,7 @@ export default memo(function BentoVentas() {
                   </thead>
                   <tbody>
                     {ventasData
-                      .filter((venta: VentaData) => venta.estadoPago === "completo")
+                      .filter((venta: VentaData) => venta.estadoPago === 'completo')
                       .map((venta, idx) => (
                         <motion.tr
                           key={venta.id}

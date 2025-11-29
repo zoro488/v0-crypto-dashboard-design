@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import { TrendingUp, TrendingDown, DollarSign, Activity, AlertTriangle, ArrowUpDown } from "lucide-react"
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { TrendingUp, TrendingDown, DollarSign, Activity, AlertTriangle, ArrowUpDown } from 'lucide-react'
 
 interface ExchangeRate {
   rate: number
@@ -87,11 +87,11 @@ export default function CurrencyExchangeWidget({
   const mxnPercentage = 100 - usdPercentage
 
   const getTradingSignal = () => {
-    if (rate.rsi < 30) return { signal: "BUY", color: "text-emerald-400", confidence: 85 }
-    if (rate.rsi > 70) return { signal: "SELL", color: "text-rose-400", confidence: 85 }
-    if (rate.macd.histogram > 0.05) return { signal: "BUY", color: "text-emerald-400", confidence: 70 }
-    if (rate.macd.histogram < -0.05) return { signal: "SELL", color: "text-rose-400", confidence: 70 }
-    return { signal: "HOLD", color: "text-blue-400", confidence: 50 }
+    if (rate.rsi < 30) return { signal: 'BUY', color: 'text-emerald-400', confidence: 85 }
+    if (rate.rsi > 70) return { signal: 'SELL', color: 'text-rose-400', confidence: 85 }
+    if (rate.macd.histogram > 0.05) return { signal: 'BUY', color: 'text-emerald-400', confidence: 70 }
+    if (rate.macd.histogram < -0.05) return { signal: 'SELL', color: 'text-rose-400', confidence: 70 }
+    return { signal: 'HOLD', color: 'text-blue-400', confidence: 50 }
   }
 
   const signal = getTradingSignal()
@@ -118,8 +118,8 @@ export default function CurrencyExchangeWidget({
               ) : (
                 <TrendingDown className="w-4 h-4 text-rose-400" />
               )}
-              <span className={`text-sm ${rate.change24h >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                {rate.change24h >= 0 ? "+" : ""}
+              <span className={`text-sm ${rate.change24h >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                {rate.change24h >= 0 ? '+' : ''}
                 {rate.change24h.toFixed(2)}%
               </span>
               <span className="text-xs text-white/40">24h</span>
@@ -161,7 +161,7 @@ export default function CurrencyExchangeWidget({
               <span className="text-sm text-white/60">RSI (14)</span>
               <span
                 className={`text-sm font-medium ${
-                  rate.rsi < 30 ? "text-emerald-400" : rate.rsi > 70 ? "text-rose-400" : "text-blue-400"
+                  rate.rsi < 30 ? 'text-emerald-400' : rate.rsi > 70 ? 'text-rose-400' : 'text-blue-400'
                 }`}
               >
                 {rate.rsi.toFixed(1)}
@@ -170,7 +170,7 @@ export default function CurrencyExchangeWidget({
             <div className="h-2 bg-white/5 rounded-full overflow-hidden">
               <div
                 className={`h-full transition-all duration-500 ${
-                  rate.rsi < 30 ? "bg-emerald-500" : rate.rsi > 70 ? "bg-rose-500" : "bg-blue-500"
+                  rate.rsi < 30 ? 'bg-emerald-500' : rate.rsi > 70 ? 'bg-rose-500' : 'bg-blue-500'
                 }`}
                 style={{ width: `${rate.rsi}%` }}
               />
@@ -180,8 +180,8 @@ export default function CurrencyExchangeWidget({
           <div>
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm text-white/60">MACD</span>
-              <span className={`text-sm font-medium ${rate.macd.histogram > 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                {rate.macd.histogram >= 0 ? "↑" : "↓"} {Math.abs(rate.macd.histogram).toFixed(4)}
+              <span className={`text-sm font-medium ${rate.macd.histogram > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                {rate.macd.histogram >= 0 ? '↑' : '↓'} {Math.abs(rate.macd.histogram).toFixed(4)}
               </span>
             </div>
           </div>
@@ -248,8 +248,8 @@ export default function CurrencyExchangeWidget({
               <AlertTriangle className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
               <div className="text-xs text-amber-300">
                 {usdPercentage > 70
-                  ? "Inventario USD alto. Considera vender."
-                  : "Inventario USD bajo. Considera comprar."}
+                  ? 'Inventario USD alto. Considera vender.'
+                  : 'Inventario USD bajo. Considera comprar.'}
               </div>
             </div>
           )}

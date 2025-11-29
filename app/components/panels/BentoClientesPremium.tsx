@@ -1,31 +1,31 @@
-"use client"
+'use client'
 
-import { useState, useMemo, useCallback } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { useState, useMemo, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Users, AlertTriangle, CheckCircle2, Clock, DollarSign, Plus, TrendingUp, 
   BarChart3, Activity, Zap, Phone, Mail, MapPin, Calendar, FileText,
-  X, Edit2, Eye, History, CreditCard, User, ShoppingCart
-} from "lucide-react"
-import { Button } from "@/app/components/ui/button"
-import { Badge } from "@/app/components/ui/badge"
-import { useClientes, useVentas } from "@/app/lib/firebase/firestore-hooks.service"
-import { useFirestoreCRUD } from "@/app/hooks/useFirestoreCRUD"
-import { CreateClienteModalPremium } from "@/app/components/modals/CreateClienteModalPremium"
-import { CreateAbonoModalPremium } from "@/app/components/modals/CreateAbonoModalPremium"
-import { Skeleton } from "@/app/components/ui/skeleton"
-import { AreaChart, Area, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, BarChart, Bar } from "recharts"
-import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from "@/app/components/ui/SafeChartContainer"
-import { QuickStatWidget } from "@/app/components/widgets/QuickStatWidget"
-import { MiniChartWidget } from "@/app/components/widgets/MiniChartWidget"
-import { ActivityFeedWidget, ActivityItem } from "@/app/components/widgets/ActivityFeedWidget"
-import { PremiumDataTable, Column, STATUS_CONFIGS } from "@/app/components/ui/PremiumDataTable"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/app/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs"
-import { Cliente, Venta } from "@/app/types"
-import { cn } from "@/app/lib/utils"
-import { logger } from "@/app/lib/utils/logger"
-import { toast } from "sonner"
+  X, Edit2, Eye, History, CreditCard, User, ShoppingCart,
+} from 'lucide-react'
+import { Button } from '@/app/components/ui/button'
+import { Badge } from '@/app/components/ui/badge'
+import { useClientes, useVentas } from '@/app/lib/firebase/firestore-hooks.service'
+import { useFirestoreCRUD } from '@/app/hooks/useFirestoreCRUD'
+import { CreateClienteModalPremium } from '@/app/components/modals/CreateClienteModalPremium'
+import { CreateAbonoModalPremium } from '@/app/components/modals/CreateAbonoModalPremium'
+import { Skeleton } from '@/app/components/ui/skeleton'
+import { AreaChart, Area, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, BarChart, Bar } from 'recharts'
+import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/components/ui/SafeChartContainer'
+import { QuickStatWidget } from '@/app/components/widgets/QuickStatWidget'
+import { MiniChartWidget } from '@/app/components/widgets/MiniChartWidget'
+import { ActivityFeedWidget, ActivityItem } from '@/app/components/widgets/ActivityFeedWidget'
+import { PremiumDataTable, Column, STATUS_CONFIGS } from '@/app/components/ui/PremiumDataTable'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/components/ui/tabs'
+import { Cliente, Venta } from '@/app/types'
+import { cn } from '@/app/lib/utils'
+import { logger } from '@/app/lib/utils/logger'
+import { toast } from 'sonner'
 
 // ============================================
 // Types
@@ -42,7 +42,7 @@ interface ClienteData extends Record<string, unknown> {
   totalPagado: number
   numeroCompras: number
   ultimaCompra?: Date | string
-  estado: "activo" | "inactivo"
+  estado: 'activo' | 'inactivo'
   observaciones?: string
 }
 
@@ -112,13 +112,13 @@ function ClienteProfileModal({ cliente, isOpen, onClose, onEdit, ventas }: Clien
                   <Badge 
                     variant="outline" 
                     className={cn(
-                      "mt-2",
-                      cliente.estado === "activo" 
-                        ? "bg-green-500/10 text-green-400 border-green-500/20"
-                        : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
+                      'mt-2',
+                      cliente.estado === 'activo' 
+                        ? 'bg-green-500/10 text-green-400 border-green-500/20'
+                        : 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20',
                     )}
                   >
-                    {cliente.estado === "activo" ? "Cliente Activo" : "Inactivo"}
+                    {cliente.estado === 'activo' ? 'Cliente Activo' : 'Inactivo'}
                   </Badge>
                 </div>
               </div>
@@ -219,9 +219,9 @@ function ClienteProfileModal({ cliente, isOpen, onClose, onEdit, ventas }: Clien
                     >
                       <div className="flex items-center gap-3">
                         <div className={cn(
-                          "w-2 h-2 rounded-full",
-                          venta.estadoPago === "completo" ? "bg-green-400" :
-                          venta.estadoPago === "parcial" ? "bg-yellow-400" : "bg-red-400"
+                          'w-2 h-2 rounded-full',
+                          venta.estadoPago === 'completo' ? 'bg-green-400' :
+                          venta.estadoPago === 'parcial' ? 'bg-yellow-400' : 'bg-red-400',
                         )} />
                         <div>
                           <div className="font-medium text-white text-sm">
@@ -236,14 +236,14 @@ function ClienteProfileModal({ cliente, isOpen, onClose, onEdit, ventas }: Clien
                         </div>
                       </div>
                       <Badge variant="outline" className={cn(
-                        "text-xs",
-                        venta.estadoPago === "completo" 
-                          ? "bg-green-500/10 text-green-400 border-green-500/20"
-                          : venta.estadoPago === "parcial"
-                          ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
-                          : "bg-red-500/10 text-red-400 border-red-500/20"
+                        'text-xs',
+                        venta.estadoPago === 'completo' 
+                          ? 'bg-green-500/10 text-green-400 border-green-500/20'
+                          : venta.estadoPago === 'parcial'
+                          ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+                          : 'bg-red-500/10 text-red-400 border-red-500/20',
                       )}>
-                        {venta.estadoPago || "pendiente"}
+                        {venta.estadoPago || 'pendiente'}
                       </Badge>
                     </div>
                   ))}
@@ -383,7 +383,7 @@ export default function BentoClientesPremium() {
       numeroCompras: c.numeroCompras || 0,
       ultimaCompra: c.ultimaCompra,
       estado: c.estado || 'activo',
-      observaciones: c.observaciones
+      observaciones: c.observaciones,
     } as ClienteData))
   }, [clientesRaw])
 
@@ -424,7 +424,7 @@ export default function BentoClientesPremium() {
         title: c.nombre,
         description: `Ventas: $${(c.totalVentas / 1000).toFixed(0)}K | Adeudo: $${(c.deudaTotal / 1000).toFixed(0)}K`,
         timestamp: new Date(Date.now() - i * 3600000),
-        status: (c.deudaTotal > 0 ? 'pending' : 'success') as 'pending' | 'success'
+        status: (c.deudaTotal > 0 ? 'pending' : 'success') as 'pending' | 'success',
       }))
   }, [clientes])
 
@@ -444,14 +444,14 @@ export default function BentoClientesPremium() {
             <div className="text-xs text-zinc-500">{row.telefono || row.email || row.id}</div>
           </div>
         </div>
-      )
+      ),
     },
     {
       key: 'totalVentas',
       header: 'Total Ventas',
       type: 'currency',
       sortable: true,
-      align: 'right'
+      align: 'right',
     },
     {
       key: 'deudaTotal',
@@ -459,10 +459,10 @@ export default function BentoClientesPremium() {
       sortable: true,
       align: 'right',
       render: (row) => (
-        <span className={cn("font-mono", row.deudaTotal > 0 ? "text-red-400" : "text-green-400")}>
+        <span className={cn('font-mono', row.deudaTotal > 0 ? 'text-red-400' : 'text-green-400')}>
           ${row.deudaTotal.toLocaleString()}
         </span>
-      )
+      ),
     },
     {
       key: 'totalPagado',
@@ -473,7 +473,7 @@ export default function BentoClientesPremium() {
         <span className="font-mono text-green-400">
           ${row.totalPagado.toLocaleString()}
         </span>
-      )
+      ),
     },
     {
       key: 'estado',
@@ -491,8 +491,8 @@ export default function BentoClientesPremium() {
             Pendiente
           </Badge>
         )
-      )
-    }
+      ),
+    },
   ], [])
 
   // Handlers

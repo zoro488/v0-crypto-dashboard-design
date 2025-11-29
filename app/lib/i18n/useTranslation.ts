@@ -34,8 +34,8 @@ export const useI18nStore = create<I18nStore>()(
     }),
     {
       name: 'chronos-i18n',
-    }
-  )
+    },
+  ),
 )
 
 export function useTranslation() {
@@ -74,7 +74,7 @@ export function formatDate(date: Date, locale: Locale): string {
 export function formatNumber(
   number: number,
   locale: Locale,
-  options?: Intl.NumberFormatOptions
+  options?: Intl.NumberFormatOptions,
 ): string {
   return new Intl.NumberFormat(locale === 'es' ? 'es-ES' : 'en-US', options).format(number)
 }

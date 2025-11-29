@@ -3,10 +3,10 @@
  * Con indicadores técnicos RSI, MACD, Bollinger Bands
  */
 
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import {
   TrendingUp,
   TrendingDown,
@@ -15,7 +15,7 @@ import {
   AlertTriangle,
   RefreshCw,
   Info,
-} from 'lucide-react';
+} from 'lucide-react'
 import {
   LineChart,
   Line,
@@ -24,11 +24,11 @@ import {
   CartesianGrid,
   Tooltip,
   ReferenceLine,
-} from 'recharts';
-import { SafeChartContainer, SAFE_ANIMATION_PROPS } from "@/app/components/ui/SafeChartContainer";
-import { casaCambioService } from '@/app/lib/services/casa-cambio.service';
-import { AnimatedCounter, AnimatedBadge } from '@/app/components/ui/PremiumComponents';
-import { logger } from '@/app/lib/utils/logger';
+} from 'recharts'
+import { SafeChartContainer, SAFE_ANIMATION_PROPS } from '@/app/components/ui/SafeChartContainer'
+import { casaCambioService } from '@/app/lib/services/casa-cambio.service'
+import { AnimatedCounter, AnimatedBadge } from '@/app/components/ui/PremiumComponents'
+import { logger } from '@/app/lib/utils/logger'
 
 interface ExchangeRateData {
   currentRate: number;
@@ -45,29 +45,29 @@ interface ExchangeRateData {
 }
 
 export default function CasaCambioWidget() {
-  const [data, setData] = useState<ExchangeRateData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
-  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [data, setData] = useState<ExchangeRateData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
+  const [autoRefresh, setAutoRefresh] = useState(true)
 
   const fetchExchangeData = async () => {
     try {
-      setLoading(true);
+      setLoading(true)
       
       // Obtener datos en paralelo
       const [currentRate, historical] = await Promise.all([
         casaCambioService.getCurrentRate(),
         casaCambioService.getHistoricalRates(30),
-      ]);
+      ])
 
       // Calcular spread óptimo
-      const { buy, sell, spread } = casaCambioService.calculateOptimalSpread(historical);
+      const { buy, sell, spread } = casaCambioService.calculateOptimalSpread(historical)
 
       // Calcular indicadores técnicos
-      const indicators = casaCambioService.calculateTechnicalIndicators(historical);
+      const indicators = casaCambioService.calculateTechnicalIndicators(historical)
 
       // Detectar alertas
-      const alerts = casaCambioService.detectVolatilityAlerts(indicators, currentRate);
+      const alerts = casaCambioService.detectVolatilityAlerts(indicators, currentRate)
 
       setData({
         currentRate,
@@ -77,25 +77,25 @@ export default function CasaCambioWidget() {
         historical,
         indicators,
         alerts,
-      });
+      })
 
-      setLastUpdate(new Date());
+      setLastUpdate(new Date())
     } catch (error) {
-      logger.error('Error fetching exchange data:', error);
+      logger.error('Error fetching exchange data:', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    fetchExchangeData();
+    fetchExchangeData()
 
     if (autoRefresh) {
       // Actualizar cada 5 minutos
-      const interval = setInterval(fetchExchangeData, 5 * 60 * 1000);
-      return () => clearInterval(interval);
+      const interval = setInterval(fetchExchangeData, 5 * 60 * 1000)
+      return () => clearInterval(interval)
     }
-  }, [autoRefresh]);
+  }, [autoRefresh])
 
   if (loading || !data) {
     return (
@@ -104,14 +104,14 @@ export default function CasaCambioWidget() {
         <div className="h-24 bg-white/5 rounded mb-4" />
         <div className="h-64 bg-white/5 rounded" />
       </div>
-    );
+    )
   }
 
   const trend = data.historical.length > 1
     ? data.currentRate > data.historical[data.historical.length - 2].value
       ? 'up'
       : 'down'
-    : 'neutral';
+    : 'neutral'
 
   const chartData = data.historical.map((item) => ({
     date: new Date(item.date).toLocaleDateString('es-MX', { month: 'short', day: 'numeric' }),
@@ -119,7 +119,7 @@ export default function CasaCambioWidget() {
     upper: data.indicators.bollinger.upper,
     middle: data.indicators.bollinger.middle,
     lower: data.indicators.bollinger.lower,
-  }));
+  }))
 
   return (
     <div className="space-y-6">
@@ -417,5 +417,5 @@ export default function CasaCambioWidget() {
         </div>
       )}
     </div>
-  );
+  )
 }

@@ -5,7 +5,7 @@
  * ╚════════════════════════════════════════════════════════════════════════════╝
  */
 
-type LogLevel = "debug" | "info" | "warn" | "error"
+type LogLevel = 'debug' | 'info' | 'warn' | 'error'
 
 interface LogOptions {
   timestamp?: boolean
@@ -14,13 +14,13 @@ interface LogOptions {
 }
 
 class Logger {
-  private isDevelopment = process.env.NODE_ENV === "development"
-  private enabledLevels: Set<LogLevel> = new Set(["error", "warn"])
+  private isDevelopment = process.env.NODE_ENV === 'development'
+  private enabledLevels: Set<LogLevel> = new Set(['error', 'warn'])
 
   constructor() {
     if (this.isDevelopment) {
-      this.enabledLevels.add("info")
-      this.enabledLevels.add("debug")
+      this.enabledLevels.add('info')
+      this.enabledLevels.add('debug')
     }
   }
 
@@ -39,7 +39,7 @@ class Logger {
 
     parts.push(message)
 
-    return parts.join(" ")
+    return parts.join(' ')
   }
 
   private log(level: LogLevel, message: string, options?: LogOptions): void {
@@ -48,31 +48,31 @@ class Logger {
     const formattedMessage = this.formatMessage(level, message, options)
 
     switch (level) {
-      case "debug":
-        console.debug(formattedMessage, options?.data || "")
+      case 'debug':
+        console.debug(formattedMessage, options?.data || '')
         break
-      case "info":
-        console.info(formattedMessage, options?.data || "")
+      case 'info':
+        console.info(formattedMessage, options?.data || '')
         break
-      case "warn":
-        console.warn(formattedMessage, options?.data || "")
+      case 'warn':
+        console.warn(formattedMessage, options?.data || '')
         break
-      case "error":
-        console.error(formattedMessage, options?.data || "")
+      case 'error':
+        console.error(formattedMessage, options?.data || '')
         break
     }
   }
 
   debug(message: string, options?: LogOptions): void {
-    this.log("debug", message, options)
+    this.log('debug', message, options)
   }
 
   info(message: string, options?: LogOptions): void {
-    this.log("info", message, options)
+    this.log('info', message, options)
   }
 
   warn(message: string, options?: LogOptions): void {
-    this.log("warn", message, options)
+    this.log('warn', message, options)
   }
 
   error(message: string, error?: Error | unknown, options?: LogOptions): void {
@@ -82,7 +82,7 @@ class Logger {
       stack: error.stack,
     } : error
 
-    this.log("error", message, {
+    this.log('error', message, {
       ...options,
       data: errorData,
     })

@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 /**
  * 🤖 ImmersiveAIPanel - Panel de IA Completamente Inmersivo
@@ -12,8 +12,8 @@
  * - HUD táctico
  */
 
-import { useState, useCallback, useRef, useEffect, Suspense, useMemo } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { useState, useCallback, useRef, useEffect, Suspense, useMemo } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { 
   Environment, 
   Float, 
@@ -26,23 +26,23 @@ import {
   ContactShadows,
   MeshTransmissionMaterial,
   useGLTF,
-  Sparkles
-} from '@react-three/drei';
-import { EffectComposer, Bloom, ChromaticAberration, Vignette, SSAO } from '@react-three/postprocessing';
-import { BlendFunction } from 'postprocessing';
-import { motion, AnimatePresence } from 'framer-motion';
-import * as THREE from 'three';
+  Sparkles,
+} from '@react-three/drei'
+import { EffectComposer, Bloom, ChromaticAberration, Vignette, SSAO } from '@react-three/postprocessing'
+import { BlendFunction } from 'postprocessing'
+import { motion, AnimatePresence } from 'framer-motion'
+import * as THREE from 'three'
 import { 
   Send, Mic, MicOff, X, Minimize2, Maximize2, 
   BarChart3, PieChart, TrendingUp, FileText, 
   Package, Users, DollarSign, AlertTriangle,
   CheckCircle, Clock, Database, Cpu, Activity,
-  ChevronRight, Plus, Edit3, Save, Trash2
-} from 'lucide-react';
+  ChevronRight, Plus, Edit3, Save, Trash2,
+} from 'lucide-react'
 
-import { Button } from '@/app/components/ui/button';
-import { Input } from '@/app/components/ui/input';
-import { ScrollArea } from '@/app/components/ui/scroll-area';
+import { Button } from '@/app/components/ui/button'
+import { Input } from '@/app/components/ui/input'
+import { ScrollArea } from '@/app/components/ui/scroll-area'
 
 // ============================================================================
 // TIPOS
@@ -88,7 +88,7 @@ const STATE_COLORS: Record<RobotState, { primary: string; glow: string; emissive
   success: { primary: '#10b981', glow: '#34d399', emissive: 0.5 },
   error: { primary: '#ef4444', glow: '#f87171', emissive: 0.6 },
   working: { primary: '#f59e0b', glow: '#fbbf24', emissive: 0.5 },
-};
+}
 
 // ============================================================================
 // ROBOT 3D INTERACTIVO
@@ -101,61 +101,61 @@ interface RobotAvatarProps {
 }
 
 function RobotAvatar({ state, audioLevel, onInteraction }: RobotAvatarProps) {
-  const groupRef = useRef<THREE.Group>(null);
-  const headRef = useRef<THREE.Group>(null);
-  const eyeLeftRef = useRef<THREE.Mesh>(null);
-  const eyeRightRef = useRef<THREE.Mesh>(null);
-  const antennaRef = useRef<THREE.Mesh>(null);
-  const screenRef = useRef<THREE.Mesh>(null);
+  const groupRef = useRef<THREE.Group>(null)
+  const headRef = useRef<THREE.Group>(null)
+  const eyeLeftRef = useRef<THREE.Mesh>(null)
+  const eyeRightRef = useRef<THREE.Mesh>(null)
+  const antennaRef = useRef<THREE.Mesh>(null)
+  const screenRef = useRef<THREE.Mesh>(null)
   
-  const colors = STATE_COLORS[state];
-  const { camera } = useThree();
+  const colors = STATE_COLORS[state]
+  const { camera } = useThree()
   
   // Seguimiento del cursor/cámara
   useFrame((frameState, delta) => {
-    if (!groupRef.current || !headRef.current) return;
+    if (!groupRef.current || !headRef.current) return
     
-    const time = frameState.clock.getElapsedTime();
+    const time = frameState.clock.getElapsedTime()
     
     // Movimiento de respiración
-    groupRef.current.position.y = Math.sin(time * 2) * 0.05;
+    groupRef.current.position.y = Math.sin(time * 2) * 0.05
     
     // La cabeza mira hacia la cámara suavemente
     if (headRef.current) {
-      const targetRotY = Math.sin(time * 0.5) * 0.1;
-      const targetRotX = Math.cos(time * 0.3) * 0.05;
-      headRef.current.rotation.y = THREE.MathUtils.lerp(headRef.current.rotation.y, targetRotY, 0.05);
-      headRef.current.rotation.x = THREE.MathUtils.lerp(headRef.current.rotation.x, targetRotX, 0.05);
+      const targetRotY = Math.sin(time * 0.5) * 0.1
+      const targetRotX = Math.cos(time * 0.3) * 0.05
+      headRef.current.rotation.y = THREE.MathUtils.lerp(headRef.current.rotation.y, targetRotY, 0.05)
+      headRef.current.rotation.x = THREE.MathUtils.lerp(headRef.current.rotation.x, targetRotX, 0.05)
     }
     
     // Parpadeo de ojos
     if (eyeLeftRef.current && eyeRightRef.current) {
-      const blink = Math.sin(time * 10) > 0.95 ? 0.1 : 1;
-      eyeLeftRef.current.scale.y = blink;
-      eyeRightRef.current.scale.y = blink;
+      const blink = Math.sin(time * 10) > 0.95 ? 0.1 : 1
+      eyeLeftRef.current.scale.y = blink
+      eyeRightRef.current.scale.y = blink
       
       // Escala basada en audio cuando habla
       if (state === 'speaking') {
-        const audioScale = 1 + audioLevel * 0.3;
-        eyeLeftRef.current.scale.x = audioScale;
-        eyeRightRef.current.scale.x = audioScale;
+        const audioScale = 1 + audioLevel * 0.3
+        eyeLeftRef.current.scale.x = audioScale
+        eyeRightRef.current.scale.x = audioScale
       }
     }
     
     // Antena animada
     if (antennaRef.current) {
-      antennaRef.current.rotation.z = Math.sin(time * 3) * 0.1;
-      const intensity = state === 'thinking' ? 2 : state === 'speaking' ? 1.5 : 0.5;
+      antennaRef.current.rotation.z = Math.sin(time * 3) * 0.1
+      const intensity = state === 'thinking' ? 2 : state === 'speaking' ? 1.5 : 0.5
       if (antennaRef.current.material instanceof THREE.MeshStandardMaterial) {
-        antennaRef.current.material.emissiveIntensity = intensity + Math.sin(time * 5) * 0.3;
+        antennaRef.current.material.emissiveIntensity = intensity + Math.sin(time * 5) * 0.3
       }
     }
     
     // Pantalla del pecho
     if (screenRef.current && screenRef.current.material instanceof THREE.MeshStandardMaterial) {
-      screenRef.current.material.emissiveIntensity = colors.emissive + audioLevel * 0.5;
+      screenRef.current.material.emissiveIntensity = colors.emissive + audioLevel * 0.5
     }
-  });
+  })
 
   return (
     <Float speed={2} rotationIntensity={0.1} floatIntensity={0.2}>
@@ -302,7 +302,7 @@ function RobotAvatar({ state, audioLevel, onInteraction }: RobotAvatarProps) {
         />
       </group>
     </Float>
-  );
+  )
 }
 
 // ============================================================================
@@ -326,17 +326,17 @@ function FloatingPanel3D({
   isVisible,
   onClose,
   width = 300,
-  height = 200
+  height = 200,
 }: FloatingPanel3DProps) {
-  const groupRef = useRef<THREE.Group>(null);
+  const groupRef = useRef<THREE.Group>(null)
   
   useFrame((state) => {
-    if (!groupRef.current) return;
+    if (!groupRef.current) return
     // Suave movimiento flotante
-    groupRef.current.position.y = position[1] + Math.sin(state.clock.getElapsedTime() * 2) * 0.02;
-  });
+    groupRef.current.position.y = position[1] + Math.sin(state.clock.getElapsedTime() * 2) * 0.02
+  })
 
-  if (!isVisible) return null;
+  if (!isVisible) return null
 
   return (
     <group ref={groupRef} position={position}>
@@ -373,7 +373,7 @@ function FloatingPanel3D({
         </motion.div>
       </Html>
     </group>
-  );
+  )
 }
 
 // ============================================================================
@@ -381,21 +381,21 @@ function FloatingPanel3D({
 // ============================================================================
 
 function Chart3DPanel({ data, position }: { data: number[]; position: [number, number, number] }) {
-  const groupRef = useRef<THREE.Group>(null);
+  const groupRef = useRef<THREE.Group>(null)
   
   useFrame((state) => {
-    if (!groupRef.current) return;
-    groupRef.current.rotation.y = Math.sin(state.clock.getElapsedTime() * 0.5) * 0.1;
-  });
+    if (!groupRef.current) return
+    groupRef.current.rotation.y = Math.sin(state.clock.getElapsedTime() * 0.5) * 0.1
+  })
   
-  const maxValue = Math.max(...data);
+  const maxValue = Math.max(...data)
   
   return (
     <group ref={groupRef} position={position}>
       {data.map((value, i) => {
-        const height = (value / maxValue) * 1.5;
-        const x = (i - data.length / 2) * 0.25;
-        const hue = (i / data.length) * 0.3 + 0.55; // Azul a púrpura
+        const height = (value / maxValue) * 1.5
+        const x = (i - data.length / 2) * 0.25
+        const hue = (i / data.length) * 0.3 + 0.55 // Azul a púrpura
         
         return (
           <mesh key={i} position={[x, height / 2, 0]} castShadow>
@@ -408,7 +408,7 @@ function Chart3DPanel({ data, position }: { data: number[]; position: [number, n
               roughness={0.3}
             />
           </mesh>
-        );
+        )
       })}
       
       {/* Base */}
@@ -417,7 +417,7 @@ function Chart3DPanel({ data, position }: { data: number[]; position: [number, n
         <meshStandardMaterial color="#1a1a2e" metalness={0.8} roughness={0.3} />
       </mesh>
     </group>
-  );
+  )
 }
 
 // ============================================================================
@@ -493,7 +493,7 @@ function AnimatedForm({ fields, onFieldUpdate }: AnimatedFormProps) {
         </motion.div>
       ))}
     </div>
-  );
+  )
 }
 
 // ============================================================================
@@ -567,7 +567,7 @@ function HUD({ stats, state }: HUDProps) {
         </motion.div>
       ))}
     </motion.div>
-  );
+  )
 }
 
 // ============================================================================
@@ -697,7 +697,7 @@ function Scene3D({ state, audioLevel, panels, onPanelClose }: Scene3DProps) {
         <Vignette darkness={0.4} offset={0.3} />
       </EffectComposer>
     </>
-  );
+  )
 }
 
 // ============================================================================
@@ -705,66 +705,66 @@ function Scene3D({ state, audioLevel, panels, onPanelClose }: Scene3DProps) {
 // ============================================================================
 
 export function ImmersiveAIPanel() {
-  const [state, setState] = useState<RobotState>('idle');
-  const [audioLevel, setAudioLevel] = useState(0);
-  const [query, setQuery] = useState('');
-  const [isListening, setIsListening] = useState(false);
+  const [state, setState] = useState<RobotState>('idle')
+  const [audioLevel, setAudioLevel] = useState(0)
+  const [query, setQuery] = useState('')
+  const [isListening, setIsListening] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
       role: 'assistant',
       content: '¡Bienvenido al Panel de IA Inmersivo! Puedo ayudarte a visualizar datos, llenar formularios automáticamente, generar reportes y más. ¿Qué necesitas?',
-      timestamp: new Date()
-    }
-  ]);
-  const [panels, setPanels] = useState<DataPanel[]>([]);
-  const [formFields, setFormFields] = useState<FormField[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [hudStats] = useState({ cpu: 45, memory: 62, tasks: 8, accuracy: 94 });
+      timestamp: new Date(),
+    },
+  ])
+  const [panels, setPanels] = useState<DataPanel[]>([])
+  const [formFields, setFormFields] = useState<FormField[]>([])
+  const [showForm, setShowForm] = useState(false)
+  const [hudStats] = useState({ cpu: 45, memory: 62, tasks: 8, accuracy: 94 })
   
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   // Simular audio cuando habla
   useEffect(() => {
     if (state === 'speaking') {
-      const interval = setInterval(() => setAudioLevel(Math.random() * 0.8 + 0.2), 100);
-      return () => clearInterval(interval);
+      const interval = setInterval(() => setAudioLevel(Math.random() * 0.8 + 0.2), 100)
+      return () => clearInterval(interval)
     }
-    setAudioLevel(0);
-  }, [state]);
+    setAudioLevel(0)
+  }, [state])
 
   // Auto-scroll
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
-  }, [messages]);
+  }, [messages])
 
   const handleSend = async () => {
-    if (!query.trim()) return;
+    if (!query.trim()) return
     
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
       content: query,
-      timestamp: new Date()
-    };
-    setMessages(prev => [...prev, userMessage]);
-    setQuery('');
+      timestamp: new Date(),
+    }
+    setMessages(prev => [...prev, userMessage])
+    setQuery('')
     
-    setState('listening');
-    await new Promise(r => setTimeout(r, 500));
-    setState('thinking');
-    await new Promise(r => setTimeout(r, 1500));
-    setState('speaking');
+    setState('listening')
+    await new Promise(r => setTimeout(r, 500))
+    setState('thinking')
+    await new Promise(r => setTimeout(r, 1500))
+    setState('speaking')
     
     // Determinar acción basada en el query
-    let action: ChatMessage['action'];
-    let responseContent = '';
+    let action: ChatMessage['action']
+    let responseContent = ''
     
     if (query.toLowerCase().includes('gráfico') || query.toLowerCase().includes('ventas')) {
-      action = 'show_chart';
-      responseContent = 'Aquí tienes el gráfico de ventas. He detectado una tendencia positiva del 15% esta semana.';
+      action = 'show_chart'
+      responseContent = 'Aquí tienes el gráfico de ventas. He detectado una tendencia positiva del 15% esta semana.'
       
       // Mostrar panel de gráfico
       setPanels(prev => [...prev, {
@@ -773,12 +773,12 @@ export function ImmersiveAIPanel() {
         title: 'Ventas Semanales',
         position: [2, 0.5, 0],
         data: [65, 40, 85, 55, 70, 90, 75],
-        isVisible: true
-      }]);
+        isVisible: true,
+      }])
     } else if (query.toLowerCase().includes('formulario') || query.toLowerCase().includes('registro') || query.toLowerCase().includes('llenar')) {
-      action = 'fill_form';
-      responseContent = 'Entendido, voy a preparar el formulario y llenarlo automáticamente con los datos detectados.';
-      setShowForm(true);
+      action = 'fill_form'
+      responseContent = 'Entendido, voy a preparar el formulario y llenarlo automáticamente con los datos detectados.'
+      setShowForm(true)
       
       // Inicializar campos del formulario
       const fields: FormField[] = [
@@ -786,14 +786,14 @@ export function ImmersiveAIPanel() {
         { id: '2', label: 'Cantidad', type: 'number', value: '', status: 'empty' },
         { id: '3', label: 'Precio Unitario', type: 'number', value: '', status: 'empty' },
         { id: '4', label: 'Cliente', type: 'text', value: '', status: 'empty' },
-      ];
-      setFormFields(fields);
+      ]
+      setFormFields(fields)
       
       // Simular llenado automático
-      setTimeout(() => simulateAutoFill(), 1000);
+      setTimeout(() => simulateAutoFill(), 1000)
     } else if (query.toLowerCase().includes('inventario') || query.toLowerCase().includes('stock')) {
-      action = 'show_data';
-      responseContent = 'He analizado el inventario actual. Aquí están los datos más relevantes.';
+      action = 'show_data'
+      responseContent = 'He analizado el inventario actual. Aquí están los datos más relevantes.'
       
       setPanels(prev => [...prev, {
         id: Date.now().toString(),
@@ -801,10 +801,10 @@ export function ImmersiveAIPanel() {
         title: 'Estado del Inventario',
         position: [-2, 0.5, 0],
         data: { total: 1234, bajo: 15, medio: 45, alto: 89 },
-        isVisible: true
-      }]);
+        isVisible: true,
+      }])
     } else {
-      responseContent = `He procesado tu solicitud: "${query}". ¿Necesitas que genere un gráfico, llene un formulario o muestre datos específicos?`;
+      responseContent = `He procesado tu solicitud: "${query}". ¿Necesitas que genere un gráfico, llene un formulario o muestre datos específicos?`
     }
     
     const aiMessage: ChatMessage = {
@@ -812,48 +812,48 @@ export function ImmersiveAIPanel() {
       role: 'assistant',
       content: responseContent,
       timestamp: new Date(),
-      action
-    };
-    setMessages(prev => [...prev, aiMessage]);
+      action,
+    }
+    setMessages(prev => [...prev, aiMessage])
     
-    await new Promise(r => setTimeout(r, 2000));
-    setState('success');
-    await new Promise(r => setTimeout(r, 500));
-    setState('idle');
-  };
+    await new Promise(r => setTimeout(r, 2000))
+    setState('success')
+    await new Promise(r => setTimeout(r, 500))
+    setState('idle')
+  }
 
   const simulateAutoFill = async () => {
-    setState('working');
-    const values = ['Laptop HP ProBook', '5', '12500', 'Empresa ABC'];
+    setState('working')
+    const values = ['Laptop HP ProBook', '5', '12500', 'Empresa ABC']
     
     for (let i = 0; i < values.length; i++) {
       setFormFields(prev => prev.map((f, idx) => 
-        idx === i ? { ...f, status: 'filling' } : f
-      ));
+        idx === i ? { ...f, status: 'filling' } : f,
+      ))
       
-      await new Promise(r => setTimeout(r, 800));
+      await new Promise(r => setTimeout(r, 800))
       
       setFormFields(prev => prev.map((f, idx) => 
-        idx === i ? { ...f, value: values[i], status: 'filled' } : f
-      ));
+        idx === i ? { ...f, value: values[i], status: 'filled' } : f,
+      ))
       
-      await new Promise(r => setTimeout(r, 200));
+      await new Promise(r => setTimeout(r, 200))
     }
     
-    setState('success');
-    await new Promise(r => setTimeout(r, 1000));
-    setState('idle');
-  };
+    setState('success')
+    await new Promise(r => setTimeout(r, 1000))
+    setState('idle')
+  }
 
   const handlePanelClose = (id: string) => {
-    setPanels(prev => prev.filter(p => p.id !== id));
-  };
+    setPanels(prev => prev.filter(p => p.id !== id))
+  }
 
   const handleFieldUpdate = (fieldId: string, value: string) => {
     setFormFields(prev => prev.map(f => 
-      f.id === fieldId ? { ...f, value, status: value ? 'filled' : 'empty' } : f
-    ));
-  };
+      f.id === fieldId ? { ...f, value, status: value ? 'filled' : 'empty' } : f,
+    ))
+  }
 
   return (
     <div className="relative w-full h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden">
@@ -990,7 +990,7 @@ export function ImmersiveAIPanel() {
         </h1>
       </motion.div>
     </div>
-  );
+  )
 }
 
-export default ImmersiveAIPanel;
+export default ImmersiveAIPanel

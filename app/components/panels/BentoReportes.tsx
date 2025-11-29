@@ -1,28 +1,28 @@
-"use client"
+'use client'
 
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   FileText, Download, Calendar, Filter, Search, TrendingUp, TrendingDown,
   DollarSign, Users, Package, ShoppingCart, Building2, PieChart as PieChartIcon,
   BarChart3, LineChart, Clock, CheckCircle2, AlertCircle, RefreshCw,
   FileSpreadsheet, FileType, Printer, Share2, Star, ArrowUpRight, ArrowDownRight,
   Wallet, Receipt, Truck, Scissors, Eye, ChevronRight, Sparkles,
-  type LucideIcon
-} from "lucide-react"
-import { Button } from "@/app/components/ui/button"
-import { Badge } from "@/app/components/ui/badge"
-import { Input } from "@/app/components/ui/input"
-import { Skeleton } from "@/app/components/ui/skeleton"
-import { useState, useMemo } from "react"
+  type LucideIcon,
+} from 'lucide-react'
+import { Button } from '@/app/components/ui/button'
+import { Badge } from '@/app/components/ui/badge'
+import { Input } from '@/app/components/ui/input'
+import { Skeleton } from '@/app/components/ui/skeleton'
+import { useState, useMemo } from 'react'
 import { 
   useVentas, useClientes, useDistribuidores, useOrdenesCompra, 
-  useProductos, useBancosData 
-} from "@/app/lib/firebase/firestore-hooks.service"
+  useProductos, useBancosData, 
+} from '@/app/lib/firebase/firestore-hooks.service'
 import { 
   AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, 
   Tooltip, PieChart, Pie, Cell, CartesianGrid, Legend, LineChart as RechartsLineChart, Line,
-  ComposedChart, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis
-} from "recharts"
+  ComposedChart, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+} from 'recharts'
 
 // ============================================================================
 // TIPOS E INTERFACES
@@ -50,13 +50,13 @@ const formatCurrency = (value: number | undefined): string => {
   return new Intl.NumberFormat('es-MX', { 
     style: 'currency', 
     currency: 'MXN',
-    minimumFractionDigits: 0 
+    minimumFractionDigits: 0, 
   }).format(value ?? 0)
 }
 
 const formatDate = (date: Date): string => {
   return date.toLocaleDateString('es-MX', { 
-    day: '2-digit', month: 'short', year: 'numeric' 
+    day: '2-digit', month: 'short', year: 'numeric', 
   })
 }
 
@@ -77,7 +77,7 @@ const CATEGORIAS = [
 
 // Tarjeta de estadística
 function StatCard({ 
-  title, value, subtitle, icon: Icon, color, trend, trendValue 
+  title, value, subtitle, icon: Icon, color, trend, trendValue, 
 }: { 
   title: string
   value: string | number
@@ -120,7 +120,7 @@ function StatCard({
 function ReporteCard({ 
   reporte, 
   onGenerar, 
-  onToggleFavorito 
+  onToggleFavorito, 
 }: { 
   reporte: ReporteConfig
   onGenerar: () => void
@@ -138,7 +138,7 @@ function ReporteCard({
     >
       {/* Indicador de favorito */}
       <button
-        onClick={(e) => { e.stopPropagation(); onToggleFavorito(); }}
+        onClick={(e) => { e.stopPropagation(); onToggleFavorito() }}
         className="absolute top-4 right-4 z-10"
       >
         <Star 
@@ -187,7 +187,7 @@ function ReporteCard({
 // ============================================================================
 export default function BentoReportes() {
   const [categoriaActiva, setCategoriaActiva] = useState('todos')
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState('')
   const [periodoActivo, setPeriodoActivo] = useState('mes')
   const [generandoReporte, setGenerandoReporte] = useState<string | null>(null)
 
@@ -204,19 +204,19 @@ export default function BentoReportes() {
   // Métricas calculadas
   const metricas = useMemo(() => {
     const totalVentas = ventas.reduce((sum, v: Record<string, unknown>) => 
-      sum + (Number(v.precioTotalVenta) || Number(v.montoTotal) || 0), 0
+      sum + (Number(v.precioTotalVenta) || Number(v.montoTotal) || 0), 0,
     )
     const totalCompras = ordenesCompra.reduce((sum, oc: Record<string, unknown>) => 
-      sum + (Number(oc.costoTotal) || 0), 0
+      sum + (Number(oc.costoTotal) || 0), 0,
     )
     const totalStock = productos.reduce((sum, p: Record<string, unknown>) => 
-      sum + (Number(p.stock) || Number(p.stockActual) || 0), 0
+      sum + (Number(p.stock) || Number(p.stockActual) || 0), 0,
     )
     const totalDeudaClientes = clientes.reduce((sum, c: Record<string, unknown>) => 
-      sum + (Number(c.deudaTotal) || Number(c.deuda) || 0), 0
+      sum + (Number(c.deudaTotal) || Number(c.deuda) || 0), 0,
     )
     const capitalTotal = bancos.reduce((sum, b: Record<string, unknown>) => 
-      sum + (Number(b.capitalActual) || 0), 0
+      sum + (Number(b.capitalActual) || 0), 0,
     )
     
     return {
@@ -380,7 +380,7 @@ export default function BentoReportes() {
       const q = searchQuery.toLowerCase()
       result = result.filter(r => 
         r.nombre.toLowerCase().includes(q) ||
-        r.descripcion.toLowerCase().includes(q)
+        r.descripcion.toLowerCase().includes(q),
       )
     }
 
@@ -392,7 +392,7 @@ export default function BentoReportes() {
   // Toggle favorito
   const toggleFavorito = (id: string) => {
     setReportes(prev => prev.map(r => 
-      r.id === id ? { ...r, favorito: !r.favorito } : r
+      r.id === id ? { ...r, favorito: !r.favorito } : r,
     ))
   }
 
@@ -550,7 +550,7 @@ export default function BentoReportes() {
                   contentStyle={{ 
                     backgroundColor: 'rgba(0,0,0,0.8)', 
                     border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '8px'
+                    borderRadius: '8px',
                   }}
                   formatter={(value: number) => formatCurrency(value)}
                 />

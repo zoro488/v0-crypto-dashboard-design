@@ -145,6 +145,19 @@ export default [
       '.git/**',
       '__tests__/**', // Opcional: no lintear tests si usan reglas diferentes
       'scripts/**', // Scripts de migración pueden tener console.log
+      'SPLINE COMPONENTS/**', // Componentes externos de Spline
+      '_deprecated/**', // Código deprecado
+      'e2e/**', // Tests E2E usan configuración diferente
+      'jest.setup.ts', // Configuración de Jest
+      'playwright.config.ts', // Configuración de Playwright
+      'evaluation/**', // Carpeta de evaluación
+      'next.config.*.js', // Configuraciones alternativas de Next.js
+      'sentry.*.config.ts', // Configuraciones de Sentry
+      'automation/**', // Scripts de automatización
+      'components/ui/**', // Componentes shadcn/ui generados
+      'hooks/**', // Hooks de shadcn/ui generados
+      'lib/**', // Utilidades generadas
+      'dataconnect/**', // Configuración de DataConnect
     ],
   },
   

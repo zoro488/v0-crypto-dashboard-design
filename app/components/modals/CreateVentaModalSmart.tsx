@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 💎 CREATE VENTA MODAL - La Joya de la Corona
@@ -12,20 +12,20 @@
  * 6. Distribución automática a bancos
  */
 
-import * as React from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useForm, Controller } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import * as React from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from "@/app/components/ui/dialog"
-import { Button } from "@/app/components/ui/button"
-import { Input } from "@/app/components/ui/input"
-import { Label } from "@/app/components/ui/label"
-import { Badge } from "@/app/components/ui/badge"
+} from '@/app/components/ui/dialog'
+import { Button } from '@/app/components/ui/button'
+import { Input } from '@/app/components/ui/input'
+import { Label } from '@/app/components/ui/label'
+import { Badge } from '@/app/components/ui/badge'
 import {
   ShoppingCart,
   User,
@@ -47,20 +47,20 @@ import {
   AlertCircle,
   CheckCircle2,
   Zap,
-} from "lucide-react"
-import { cn } from "@/app/lib/utils"
-import { HybridCombobox } from "@/app/components/ui/hybrid-combobox"
-import { useToast } from "@/app/hooks/use-toast"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { logger } from "@/app/lib/utils/logger"
+} from 'lucide-react'
+import { cn } from '@/app/lib/utils'
+import { HybridCombobox } from '@/app/components/ui/hybrid-combobox'
+import { useToast } from '@/app/hooks/use-toast'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { logger } from '@/app/lib/utils/logger'
 import { 
   ventaSchema, 
   type VentaInput,
   formatearMonto,
   generarKeywords,
-} from "@/app/lib/validations/smart-forms-schemas"
-import { procesarVentaAtomica, type VentaData } from "@/app/lib/services/ventas-transaction.service"
-import { Timestamp } from "firebase/firestore"
+} from '@/app/lib/validations/smart-forms-schemas'
+import { procesarVentaAtomica, type VentaData } from '@/app/lib/services/ventas-transaction.service'
+import { Timestamp } from 'firebase/firestore'
 
 // ============================================
 // TIPOS
@@ -92,14 +92,14 @@ interface ClienteSeleccionado {
   deudaTotal?: number
 }
 
-type MetodoPago = "efectivo" | "transferencia" | "deposito" | "mixto"
-type EstadoPago = "completo" | "parcial" | "pendiente"
+type MetodoPago = 'efectivo' | 'transferencia' | 'deposito' | 'mixto'
+type EstadoPago = 'completo' | 'parcial' | 'pendiente'
 
 // Pasos del wizard
 const STEPS = [
-  { id: 1, title: "Cliente", icon: User, description: "¿Quién compra?" },
-  { id: 2, title: "Carrito", icon: ShoppingCart, description: "¿Qué lleva?" },
-  { id: 3, title: "Pago", icon: DollarSign, description: "¿Cómo paga?" },
+  { id: 1, title: 'Cliente', icon: User, description: '¿Quién compra?' },
+  { id: 2, title: 'Carrito', icon: ShoppingCart, description: '¿Qué lleva?' },
+  { id: 3, title: 'Pago', icon: DollarSign, description: '¿Cómo paga?' },
 ]
 
 // Variantes de animación
@@ -141,15 +141,15 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
   
   // Estado de voz
   const [isListening, setIsListening] = React.useState(false)
-  const [voiceTranscript, setVoiceTranscript] = React.useState("")
+  const [voiceTranscript, setVoiceTranscript] = React.useState('')
   
   // Estado del formulario
   const [cliente, setCliente] = React.useState<ClienteSeleccionado | null>(null)
   const [carrito, setCarrito] = React.useState<CarritoItem[]>([])
-  const [metodoPago, setMetodoPago] = React.useState<MetodoPago>("efectivo")
-  const [estadoPago, setEstadoPago] = React.useState<EstadoPago>("completo")
+  const [metodoPago, setMetodoPago] = React.useState<MetodoPago>('efectivo')
+  const [estadoPago, setEstadoPago] = React.useState<EstadoPago>('completo')
   const [montoPagado, setMontoPagado] = React.useState(0)
-  const [notas, setNotas] = React.useState("")
+  const [notas, setNotas] = React.useState('')
 
   // Cálculos del carrito con distribución correcta a 3 bancos
   const totales = React.useMemo(() => {
@@ -164,7 +164,7 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
     
     // Utilidades = (precioVenta - precioCompra - precioFlete) × cantidad (GANANCIA NETA)
     const totalUtilidades = carrito.reduce((acc, item) => 
-      acc + ((item.precioUnitario - item.precioCompra - item.precioFlete) * item.cantidad), 0
+      acc + ((item.precioUnitario - item.precioCompra - item.precioFlete) * item.cantidad), 0,
     )
     
     return {
@@ -179,14 +179,14 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
         bovedaMonte: totalBovedaMonte,
         fletes: totalFletes,
         utilidades: totalUtilidades,
-      }
+      },
     }
   }, [carrito])
 
   // Monto real pagado según estado
   const montoRealPagado = React.useMemo(() => {
-    if (estadoPago === "completo") return totales.total
-    if (estadoPago === "parcial") return Math.min(montoPagado, totales.total)
+    if (estadoPago === 'completo') return totales.total
+    if (estadoPago === 'parcial') return Math.min(montoPagado, totales.total)
     return 0 // pendiente
   }, [estadoPago, montoPagado, totales.total])
 
@@ -200,7 +200,7 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
       case 2:
         return carrito.length > 0
       case 3:
-        return estadoPago !== "parcial" || (montoPagado > 0 && montoPagado < totales.total)
+        return estadoPago !== 'parcial' || (montoPagado > 0 && montoPagado < totales.total)
       default:
         return false
     }
@@ -253,9 +253,9 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
         // Verificar stock
         if (existe.cantidad >= stockDisponible) {
           toast({
-            title: "Stock limitado",
+            title: 'Stock limitado',
             description: `Solo hay ${stockDisponible} unidades disponibles`,
-            variant: "destructive",
+            variant: 'destructive',
           })
           return prev
         }
@@ -267,7 +267,7 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
                 cantidad: item.cantidad + 1,
                 subtotal: (item.cantidad + 1) * item.precioUnitario,
               }
-            : item
+            : item,
         )
       }
       
@@ -290,7 +290,7 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
     
     toast({
       title: `🛒 ${producto.nombre}`,
-      description: "Agregado al carrito",
+      description: 'Agregado al carrito',
     })
   }
 
@@ -306,7 +306,7 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
           cantidad: nuevaCantidad,
           subtotal: nuevaCantidad * item.precioUnitario,
         }
-      })
+      }),
     )
   }
 
@@ -325,7 +325,7 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
           precioUnitario: Math.max(0, nuevoPrecio),
           subtotal: item.cantidad * Math.max(0, nuevoPrecio),
         }
-      })
+      }),
     )
   }
 
@@ -338,7 +338,7 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
           ...item,
           precioCompra: Math.max(0, nuevoPrecio),
         }
-      })
+      }),
     )
   }
 
@@ -351,7 +351,7 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
           ...item,
           precioFlete: Math.max(0, nuevoPrecio),
         }
-      })
+      }),
     )
   }
 
@@ -368,26 +368,26 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
 
     if (!SpeechRecognition) {
       toast({
-        title: "No soportado",
-        description: "Tu navegador no soporta reconocimiento de voz",
-        variant: "destructive",
+        title: 'No soportado',
+        description: 'Tu navegador no soporta reconocimiento de voz',
+        variant: 'destructive',
       })
       return
     }
 
     const recognition = new SpeechRecognition()
     recognition.continuous = false
-    recognition.lang = "es-MX"
+    recognition.lang = 'es-MX'
     recognition.interimResults = true
 
     setIsListening(true)
-    setVoiceTranscript("")
+    setVoiceTranscript('')
 
     recognition.onresult = (event: Event) => {
       const speechEvent = event as unknown as { results: SpeechRecognitionResultList }
       const transcript = Array.from(speechEvent.results)
         .map((result: SpeechRecognitionResult) => result[0].transcript)
-        .join("")
+        .join('')
       setVoiceTranscript(transcript)
     }
 
@@ -401,9 +401,9 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
     recognition.onerror = () => {
       setIsListening(false)
       toast({
-        title: "Error de voz",
-        description: "No se pudo procesar el audio",
-        variant: "destructive",
+        title: 'Error de voz',
+        description: 'No se pudo procesar el audio',
+        variant: 'destructive',
       })
     }
 
@@ -413,22 +413,22 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
   // Procesar comando de voz (simplificado - en producción usar AI)
   const processVoiceCommand = async (text: string) => {
     toast({
-      title: "🎤 Procesando...",
+      title: '🎤 Procesando...',
       description: `"${text}"`,
     })
 
     // TODO: Integrar con Vercel AI SDK para parsing inteligente
     // Por ahora, solo mostramos el texto
-    logger.info("Voice command received", { data: { text } })
+    logger.info('Voice command received', { data: { text } })
   }
 
   // Procesar venta usando servicio de transacciones atómicas
   const handleSubmit = async () => {
     if (!cliente || carrito.length === 0) {
       toast({
-        title: "Error",
-        description: "Completa todos los campos requeridos",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Completa todos los campos requeridos',
+        variant: 'destructive',
       })
       return
     }
@@ -460,12 +460,12 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
       const resultado = await procesarVentaAtomica(ventaData)
 
       if (!resultado.success) {
-        throw new Error(resultado.error || "Error desconocido al procesar venta")
+        throw new Error(resultado.error || 'Error desconocido al procesar venta')
       }
 
       toast({
-        title: "✅ Venta Exitosa",
-        description: `Total: ${formatearMonto(totales.total)}${saldoPendiente > 0 ? ` | Pendiente: ${formatearMonto(saldoPendiente)}` : ""}`,
+        title: '✅ Venta Exitosa',
+        description: `Total: ${formatearMonto(totales.total)}${saldoPendiente > 0 ? ` | Pendiente: ${formatearMonto(saldoPendiente)}` : ''}`,
       })
 
       // Limpiar y cerrar
@@ -477,11 +477,11 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
       useAppStore.getState().triggerDataRefresh()
 
     } catch (error) {
-      logger.error("Error procesando venta", error)
+      logger.error('Error procesando venta', error)
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "No se pudo procesar la venta",
-        variant: "destructive",
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'No se pudo procesar la venta',
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -494,11 +494,11 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
     setDirection(1)
     setCliente(null)
     setCarrito([])
-    setMetodoPago("efectivo")
-    setEstadoPago("completo")
+    setMetodoPago('efectivo')
+    setEstadoPago('completo')
     setMontoPagado(0)
-    setNotas("")
-    setVoiceTranscript("")
+    setNotas('')
+    setVoiceTranscript('')
   }
 
   // Cerrar modal
@@ -511,12 +511,12 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
         className={cn(
-          "max-w-3xl h-[90vh] max-h-[700px] p-0",
+          'max-w-3xl h-[90vh] max-h-[700px] p-0',
           // 🎨 GLASSMORPHISM ULTRA PREMIUM
-          "bg-black/40 backdrop-blur-xl",
-          "border border-white/10",
-          "text-white overflow-hidden flex flex-col",
-          "shadow-[0_0_40px_rgba(0,0,0,0.5),0_0_80px_rgba(16,185,129,0.1)]"
+          'bg-black/40 backdrop-blur-xl',
+          'border border-white/10',
+          'text-white overflow-hidden flex flex-col',
+          'shadow-[0_0_40px_rgba(0,0,0,0.5),0_0_80px_rgba(16,185,129,0.1)]',
         )}
       >
         <DialogTitle className="sr-only">Nueva Venta</DialogTitle>
@@ -551,11 +551,11 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
                 size="icon"
                 onClick={toggleVoice}
                 className={cn(
-                  "w-10 h-10 rounded-full transition-all duration-500",
-                  "border-white/20",
+                  'w-10 h-10 rounded-full transition-all duration-500',
+                  'border-white/20',
                   isListening
-                    ? "bg-red-500 border-red-500 text-white shadow-[0_0_30px_rgba(239,68,68,0.6)] animate-pulse scale-110"
-                    : "hover:bg-white/10 hover:border-white/40"
+                    ? 'bg-red-500 border-red-500 text-white shadow-[0_0_30px_rgba(239,68,68,0.6)] animate-pulse scale-110'
+                    : 'hover:bg-white/10 hover:border-white/40',
                 )}
               >
                 {isListening ? (
@@ -582,7 +582,7 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/5">
             <motion.div
               className="h-full bg-gradient-to-r from-green-500 to-emerald-400"
-              initial={{ width: "33%" }}
+              initial={{ width: '33%' }}
               animate={{ width: `${(step / 3) * 100}%` }}
               transition={{ duration: 0.3 }}
             />
@@ -604,24 +604,24 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
                     {index < STEPS.length - 1 && (
                       <div
                         className={cn(
-                          "absolute left-5 top-12 w-0.5 h-8",
-                          isCompleted ? "bg-green-500" : "bg-white/10"
+                          'absolute left-5 top-12 w-0.5 h-8',
+                          isCompleted ? 'bg-green-500' : 'bg-white/10',
                         )}
                       />
                     )}
                     
                     <div className={cn(
-                      "flex items-center gap-3 p-2 rounded-lg transition-all",
-                      isCurrent && "bg-white/5"
+                      'flex items-center gap-3 p-2 rounded-lg transition-all',
+                      isCurrent && 'bg-white/5',
                     )}>
                       <div
                         className={cn(
-                          "w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all",
+                          'w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all',
                           isCompleted
-                            ? "bg-green-500 border-green-500 text-white"
+                            ? 'bg-green-500 border-green-500 text-white'
                             : isCurrent
-                            ? "bg-white/10 border-green-500 text-green-400"
-                            : "bg-white/5 border-white/20 text-gray-500"
+                            ? 'bg-white/10 border-green-500 text-green-400'
+                            : 'bg-white/5 border-white/20 text-gray-500',
                         )}
                       >
                         {isCompleted ? (
@@ -632,8 +632,8 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
                       </div>
                       <span
                         className={cn(
-                          "text-sm font-medium",
-                          isCurrent ? "text-white" : isCompleted ? "text-green-400" : "text-gray-500"
+                          'text-sm font-medium',
+                          isCurrent ? 'text-white' : isCompleted ? 'text-green-400' : 'text-gray-500',
                         )}
                       >
                         {s.title}
@@ -709,8 +709,8 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
                         className="mt-6 max-w-md mx-auto w-full"
                       >
                         <div className={cn(
-                          "p-4 rounded-xl border",
-                          "bg-green-500/10 border-green-500/30"
+                          'p-4 rounded-xl border',
+                          'bg-green-500/10 border-green-500/30',
                         )}>
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
@@ -766,8 +766,8 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
                     <Badge 
                       variant="outline" 
                       className={cn(
-                        "border-blue-500/50 text-blue-400",
-                        carrito.length > 0 && "bg-blue-500/10"
+                        'border-blue-500/50 text-blue-400',
+                        carrito.length > 0 && 'bg-blue-500/10',
                       )}
                     >
                       {carrito.length} productos
@@ -808,9 +808,9 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
                             exit="exit"
                             transition={{ delay: index * 0.05 }}
                             className={cn(
-                              "p-4 rounded-xl border transition-all",
-                              "bg-white/5 border-white/10",
-                              "hover:bg-white/10 hover:border-white/20"
+                              'p-4 rounded-xl border transition-all',
+                              'bg-white/5 border-white/10',
+                              'hover:bg-white/10 hover:border-white/20',
                             )}
                           >
                             <div className="flex flex-col gap-3">
@@ -862,8 +862,8 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
                                   value={item.precioUnitario}
                                   onChange={(e) => actualizarPrecio(item.id, Number(e.target.value))}
                                   className={cn(
-                                    "w-24 h-8 text-right text-sm",
-                                    "bg-black/50 border-white/10"
+                                    'w-24 h-8 text-right text-sm',
+                                    'bg-black/50 border-white/10',
                                   )}
                                 />
                                 <p className="text-xs text-green-400 mt-1">
@@ -973,10 +973,10 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
                         <Badge 
                           variant="outline" 
                           className={cn(
-                            "font-bold",
+                            'font-bold',
                             totales.utilidad > 0 
-                              ? "border-green-500/50 text-green-400 bg-green-500/10" 
-                              : "border-red-500/50 text-red-400 bg-red-500/10"
+                              ? 'border-green-500/50 text-green-400 bg-green-500/10' 
+                              : 'border-red-500/50 text-red-400 bg-red-500/10',
                           )}
                         >
                           {totales.total > 0 ? ((totales.distribucion.utilidades / totales.total) * 100).toFixed(1) : 0}%
@@ -1006,7 +1006,7 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
                       className="text-5xl font-bold text-white"
                       initial={{ scale: 0.5, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
-                      transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                      transition={{ type: 'spring', stiffness: 200, damping: 15 }}
                     >
                       {formatearMonto(totales.total)}
                     </motion.p>
@@ -1020,18 +1020,18 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
                     <Label className="text-sm text-gray-400">Método de Pago</Label>
                     <div className="grid grid-cols-2 gap-3">
                       {[
-                        { id: "efectivo" as MetodoPago, icon: Wallet, label: "Efectivo" },
-                        { id: "transferencia" as MetodoPago, icon: CreditCard, label: "Transferencia" },
+                        { id: 'efectivo' as MetodoPago, icon: Wallet, label: 'Efectivo' },
+                        { id: 'transferencia' as MetodoPago, icon: CreditCard, label: 'Transferencia' },
                       ].map((metodo) => (
                         <button
                           key={metodo.id}
                           type="button"
                           onClick={() => setMetodoPago(metodo.id)}
                           className={cn(
-                            "p-4 rounded-xl border text-center transition-all",
+                            'p-4 rounded-xl border text-center transition-all',
                             metodoPago === metodo.id
-                              ? "bg-green-500/20 border-green-500 text-green-400"
-                              : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+                              ? 'bg-green-500/20 border-green-500 text-green-400'
+                              : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10',
                           )}
                         >
                           <metodo.icon className="w-6 h-6 mx-auto mb-2" />
@@ -1046,28 +1046,28 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
                     <Label className="text-sm text-gray-400">Estado del Pago</Label>
                     <div className="grid grid-cols-3 gap-3">
                       {[
-                        { id: "completo" as EstadoPago, label: "Completo", desc: "100%" },
-                        { id: "parcial" as EstadoPago, label: "Parcial", desc: "Abono" },
-                        { id: "pendiente" as EstadoPago, label: "Crédito", desc: "0%" },
+                        { id: 'completo' as EstadoPago, label: 'Completo', desc: '100%' },
+                        { id: 'parcial' as EstadoPago, label: 'Parcial', desc: 'Abono' },
+                        { id: 'pendiente' as EstadoPago, label: 'Crédito', desc: '0%' },
                       ].map((estado) => (
                         <button
                           key={estado.id}
                           type="button"
                           onClick={() => setEstadoPago(estado.id)}
                           className={cn(
-                            "p-3 rounded-xl border transition-all",
+                            'p-3 rounded-xl border transition-all',
                             estadoPago === estado.id
-                              ? estado.id === "completo"
-                                ? "bg-green-500/20 border-green-500"
-                                : estado.id === "parcial"
-                                ? "bg-yellow-500/20 border-yellow-500"
-                                : "bg-orange-500/20 border-orange-500"
-                              : "bg-white/5 border-white/10 hover:bg-white/10"
+                              ? estado.id === 'completo'
+                                ? 'bg-green-500/20 border-green-500'
+                                : estado.id === 'parcial'
+                                ? 'bg-yellow-500/20 border-yellow-500'
+                                : 'bg-orange-500/20 border-orange-500'
+                              : 'bg-white/5 border-white/10 hover:bg-white/10',
                           )}
                         >
                           <p className={cn(
-                            "font-medium",
-                            estadoPago === estado.id ? "text-white" : "text-gray-400"
+                            'font-medium',
+                            estadoPago === estado.id ? 'text-white' : 'text-gray-400',
                           )}>
                             {estado.label}
                           </p>
@@ -1079,10 +1079,10 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
 
                   {/* Monto parcial */}
                   <AnimatePresence>
-                    {estadoPago === "parcial" && (
+                    {estadoPago === 'parcial' && (
                       <motion.div
                         initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
+                        animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         className="mb-6 overflow-hidden"
                       >
@@ -1103,9 +1103,9 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
 
                   {/* Resumen final */}
                   <div className={cn(
-                    "p-4 rounded-xl border mt-auto",
-                    "bg-gradient-to-br from-white/5 to-transparent",
-                    "border-white/10"
+                    'p-4 rounded-xl border mt-auto',
+                    'bg-gradient-to-br from-white/5 to-transparent',
+                    'border-white/10',
                   )}>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
@@ -1177,7 +1177,7 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${(totales.distribucion.bovedaMonte / totales.total) * 100}%` }}
-                          transition={{ duration: 0.8, ease: "easeOut" }}
+                          transition={{ duration: 0.8, ease: 'easeOut' }}
                           className="h-full flex items-center justify-center text-xs font-bold bg-gradient-to-r from-blue-600 to-blue-500 text-white"
                         >
                           <span className="drop-shadow-lg">COSTO</span>
@@ -1188,7 +1188,7 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${(totales.distribucion.fletes / totales.total) * 100}%` }}
-                          transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+                          transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
                           className="h-full flex items-center justify-center text-xs font-bold bg-gradient-to-r from-orange-600 to-orange-500 text-white"
                         >
                           <span className="drop-shadow-lg">FLETE</span>
@@ -1199,7 +1199,7 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${(totales.distribucion.utilidades / totales.total) * 100}%` }}
-                          transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
+                          transition={{ duration: 0.8, ease: 'easeOut', delay: 0.4 }}
                           className="h-full flex items-center justify-center text-xs font-bold bg-gradient-to-r from-green-600 to-emerald-500 text-white"
                         >
                           <span className="drop-shadow-lg">GANANCIA</span>
@@ -1271,14 +1271,14 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
                     <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs">
                       <span className="text-gray-500">Total distribuido:</span>
                       <span className={cn(
-                        "font-bold",
+                        'font-bold',
                         Math.abs(totales.distribucion.bovedaMonte + totales.distribucion.fletes + totales.distribucion.utilidades - totales.total) < 1
-                          ? "text-green-400"
-                          : "text-red-400"
+                          ? 'text-green-400'
+                          : 'text-red-400',
                       )}>
                         {formatearMonto(totales.distribucion.bovedaMonte + totales.distribucion.fletes + totales.distribucion.utilidades)}
                         {Math.abs(totales.distribucion.bovedaMonte + totales.distribucion.fletes + totales.distribucion.utilidades - totales.total) < 1 
-                          ? " ✓" 
+                          ? ' ✓' 
                           : ` (≠ ${formatearMonto(totales.total)})`}
                       </span>
                     </div>
@@ -1291,9 +1291,9 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
 
         {/* ===== FOOTER ===== */}
         <div className={cn(
-          "h-20 border-t border-white/10",
-          "bg-gradient-to-r from-black/50 via-white/5 to-black/50",
-          "px-6 flex items-center justify-between"
+          'h-20 border-t border-white/10',
+          'bg-gradient-to-r from-black/50 via-white/5 to-black/50',
+          'px-6 flex items-center justify-between',
         )}>
           <Button
             type="button"
@@ -1303,7 +1303,7 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
             className="text-gray-400 hover:text-white hover:bg-white/10"
           >
             {step === 1 ? (
-              "Cancelar"
+              'Cancelar'
             ) : (
               <>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -1318,9 +1318,9 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
               onClick={nextStep}
               disabled={!canProceed}
               className={cn(
-                "min-w-[140px]",
-                "bg-white text-black hover:bg-gray-200",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
+                'min-w-[140px]',
+                'bg-white text-black hover:bg-gray-200',
+                'disabled:opacity-50 disabled:cursor-not-allowed',
               )}
             >
               Siguiente
@@ -1332,12 +1332,12 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
               onClick={handleSubmit}
               disabled={isSubmitting || !canProceed}
               className={cn(
-                "min-w-[180px]",
-                "bg-gradient-to-r from-green-600 to-emerald-600",
-                "hover:from-green-500 hover:to-emerald-500",
-                "text-white font-bold",
-                "shadow-[0_0_30px_rgba(34,197,94,0.4)]",
-                "transition-all duration-300"
+                'min-w-[180px]',
+                'bg-gradient-to-r from-green-600 to-emerald-600',
+                'hover:from-green-500 hover:to-emerald-500',
+                'text-white font-bold',
+                'shadow-[0_0_30px_rgba(34,197,94,0.4)]',
+                'transition-all duration-300',
               )}
             >
               {isSubmitting ? (

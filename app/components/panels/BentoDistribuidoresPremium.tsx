@@ -1,32 +1,32 @@
-"use client"
+'use client'
 
-import { useState, useMemo, useCallback, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { useState, useMemo, useCallback, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Building2, AlertCircle, CheckCircle2, Clock, DollarSign, Plus, TrendingUp, 
   BarChart3, Activity, Package, Phone, Mail, MapPin, Calendar, FileText,
-  X, Edit2, Eye, History, CreditCard, Truck, ShoppingBag
-} from "lucide-react"
-import { Button } from "@/app/components/ui/button"
-import { Badge } from "@/app/components/ui/badge"
-import { useDistribuidores, useOrdenesCompra } from "@/app/lib/firebase/firestore-hooks.service"
-import { useFirestoreCRUD } from "@/app/hooks/useFirestoreCRUD"
-import { CreateDistribuidorModalPremium } from "@/app/components/modals/CreateDistribuidorModalPremium"
-import { CreatePagoDistribuidorModalPremium } from "@/app/components/modals/CreatePagoDistribuidorModalPremium"
-import { Skeleton } from "@/app/components/ui/skeleton"
-import { Alert, AlertDescription, AlertTitle } from "@/app/components/ui/alert"
-import { AreaChart, Area, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, BarChart, Bar } from "recharts"
-import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from "@/app/components/ui/SafeChartContainer"
-import { QuickStatWidget } from "@/app/components/widgets/QuickStatWidget"
-import { MiniChartWidget } from "@/app/components/widgets/MiniChartWidget"
-import { ActivityFeedWidget, ActivityItem } from "@/app/components/widgets/ActivityFeedWidget"
-import { PremiumDataTable, Column } from "@/app/components/ui/PremiumDataTable"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/app/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs"
-import { Distribuidor, OrdenCompra } from "@/app/types"
-import { cn } from "@/app/lib/utils"
-import { logger } from "@/app/lib/utils/logger"
-import { toast } from "sonner"
+  X, Edit2, Eye, History, CreditCard, Truck, ShoppingBag,
+} from 'lucide-react'
+import { Button } from '@/app/components/ui/button'
+import { Badge } from '@/app/components/ui/badge'
+import { useDistribuidores, useOrdenesCompra } from '@/app/lib/firebase/firestore-hooks.service'
+import { useFirestoreCRUD } from '@/app/hooks/useFirestoreCRUD'
+import { CreateDistribuidorModalPremium } from '@/app/components/modals/CreateDistribuidorModalPremium'
+import { CreatePagoDistribuidorModalPremium } from '@/app/components/modals/CreatePagoDistribuidorModalPremium'
+import { Skeleton } from '@/app/components/ui/skeleton'
+import { Alert, AlertDescription, AlertTitle } from '@/app/components/ui/alert'
+import { AreaChart, Area, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, BarChart, Bar } from 'recharts'
+import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/components/ui/SafeChartContainer'
+import { QuickStatWidget } from '@/app/components/widgets/QuickStatWidget'
+import { MiniChartWidget } from '@/app/components/widgets/MiniChartWidget'
+import { ActivityFeedWidget, ActivityItem } from '@/app/components/widgets/ActivityFeedWidget'
+import { PremiumDataTable, Column } from '@/app/components/ui/PremiumDataTable'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/components/ui/tabs'
+import { Distribuidor, OrdenCompra } from '@/app/types'
+import { cn } from '@/app/lib/utils'
+import { logger } from '@/app/lib/utils/logger'
+import { toast } from 'sonner'
 
 // ============================================
 // Types
@@ -45,7 +45,7 @@ interface DistribuidorData extends Record<string, unknown> {
   totalPagado: number
   numeroOrdenes: number
   ultimaOrden?: Date | string
-  estado: "activo" | "inactivo" | "suspendido"
+  estado: 'activo' | 'inactivo' | 'suspendido'
   ordenesActivas?: OrdenCompra[]
 }
 
@@ -84,7 +84,7 @@ function DistribuidorProfileModal({ distribuidor, isOpen, onClose, onEdit, orden
     return distribuidorOrdenes.slice(0, 5).map(o => ({
       name: o.id?.slice(-4) || 'OC',
       stock: o.stockActual || 0,
-      inicial: o.stockInicial || o.cantidad || 0
+      inicial: o.stockInicial || o.cantidad || 0,
     }))
   }, [distribuidorOrdenes])
 
@@ -126,16 +126,16 @@ function DistribuidorProfileModal({ distribuidor, isOpen, onClose, onEdit, orden
                   <Badge 
                     variant="outline" 
                     className={cn(
-                      "mt-2",
-                      distribuidor.estado === "activo" 
-                        ? "bg-green-500/10 text-green-400 border-green-500/20"
-                        : distribuidor.estado === "suspendido"
-                        ? "bg-red-500/10 text-red-400 border-red-500/20"
-                        : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
+                      'mt-2',
+                      distribuidor.estado === 'activo' 
+                        ? 'bg-green-500/10 text-green-400 border-green-500/20'
+                        : distribuidor.estado === 'suspendido'
+                        ? 'bg-red-500/10 text-red-400 border-red-500/20'
+                        : 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20',
                     )}
                   >
-                    {distribuidor.estado === "activo" ? "Proveedor Activo" : 
-                     distribuidor.estado === "suspendido" ? "Suspendido" : "Inactivo"}
+                    {distribuidor.estado === 'activo' ? 'Proveedor Activo' : 
+                     distribuidor.estado === 'suspendido' ? 'Suspendido' : 'Inactivo'}
                   </Badge>
                 </div>
               </div>
@@ -236,9 +236,9 @@ function DistribuidorProfileModal({ distribuidor, isOpen, onClose, onEdit, orden
                     >
                       <div className="flex items-center gap-3">
                         <div className={cn(
-                          "w-2 h-2 rounded-full",
-                          orden.estado === "pagado" ? "bg-green-400" :
-                          orden.estado === "parcial" ? "bg-yellow-400" : "bg-red-400"
+                          'w-2 h-2 rounded-full',
+                          orden.estado === 'pagado' ? 'bg-green-400' :
+                          orden.estado === 'parcial' ? 'bg-yellow-400' : 'bg-red-400',
                         )} />
                         <div>
                           <div className="font-medium text-white text-sm">
@@ -258,14 +258,14 @@ function DistribuidorProfileModal({ distribuidor, isOpen, onClose, onEdit, orden
                         </div>
                       </div>
                       <Badge variant="outline" className={cn(
-                        "text-xs",
-                        orden.estado === "pagado" 
-                          ? "bg-green-500/10 text-green-400 border-green-500/20"
-                          : orden.estado === "parcial"
-                          ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
-                          : "bg-red-500/10 text-red-400 border-red-500/20"
+                        'text-xs',
+                        orden.estado === 'pagado' 
+                          ? 'bg-green-500/10 text-green-400 border-green-500/20'
+                          : orden.estado === 'parcial'
+                          ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+                          : 'bg-red-500/10 text-red-400 border-red-500/20',
                       )}>
-                        {orden.estado || "pendiente"}
+                        {orden.estado || 'pendiente'}
                       </Badge>
                     </div>
                   ))}
@@ -434,7 +434,7 @@ export default function BentoDistribuidoresPremium() {
       numeroOrdenes: d.numeroOrdenes || 0,
       ultimaOrden: d.ultimaOrden,
       estado: d.estado || 'activo',
-      ordenesActivas: d.ordenesActivas
+      ordenesActivas: d.ordenesActivas,
     } as DistribuidorData))
   }, [distribuidoresRaw])
 
@@ -475,7 +475,7 @@ export default function BentoDistribuidoresPremium() {
         title: d.nombre,
         description: `Compras: $${(d.totalOrdenesCompra / 1000).toFixed(0)}K | Deuda: $${(d.deudaTotal / 1000).toFixed(0)}K`,
         timestamp: new Date(Date.now() - i * 3600000),
-        status: (d.deudaTotal > 0 ? 'pending' : 'success') as 'pending' | 'success'
+        status: (d.deudaTotal > 0 ? 'pending' : 'success') as 'pending' | 'success',
       }))
   }, [distribuidores])
 
@@ -495,14 +495,14 @@ export default function BentoDistribuidoresPremium() {
             <div className="text-xs text-zinc-500">{row.empresa || row.contacto || row.id}</div>
           </div>
         </div>
-      )
+      ),
     },
     {
       key: 'totalOrdenesCompra',
       header: 'Total Compras',
       type: 'currency',
       sortable: true,
-      align: 'right'
+      align: 'right',
     },
     {
       key: 'deudaTotal',
@@ -510,10 +510,10 @@ export default function BentoDistribuidoresPremium() {
       sortable: true,
       align: 'right',
       render: (row) => (
-        <span className={cn("font-mono", row.deudaTotal > 0 ? "text-red-400" : "text-green-400")}>
+        <span className={cn('font-mono', row.deudaTotal > 0 ? 'text-red-400' : 'text-green-400')}>
           ${row.deudaTotal.toLocaleString()}
         </span>
-      )
+      ),
     },
     {
       key: 'totalPagado',
@@ -524,7 +524,7 @@ export default function BentoDistribuidoresPremium() {
         <span className="font-mono text-green-400">
           ${row.totalPagado.toLocaleString()}
         </span>
-      )
+      ),
     },
     {
       key: 'numeroOrdenes',
@@ -534,7 +534,7 @@ export default function BentoDistribuidoresPremium() {
         <Badge variant="outline" className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20">
           {row.numeroOrdenes || 0}
         </Badge>
-      )
+      ),
     },
     {
       key: 'estado',
@@ -552,8 +552,8 @@ export default function BentoDistribuidoresPremium() {
             Pendiente
           </Badge>
         )
-      )
-    }
+      ),
+    },
   ], [])
 
   // Handlers

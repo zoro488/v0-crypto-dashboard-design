@@ -1,20 +1,20 @@
-"use client"
+'use client'
 
-import { Suspense, useState } from "react"
-import Spline from "@splinetool/react-spline"
-import { motion } from "framer-motion"
-import { Loader2, Maximize2, Minimize2 } from "lucide-react"
+import { Suspense, useState } from 'react'
+import Spline from '@splinetool/react-spline'
+import { motion } from 'framer-motion'
+import { Loader2, Maximize2, Minimize2 } from 'lucide-react'
 
 interface SplineWidget3DProps {
   className?: string
-  size?: "sm" | "md" | "lg"
+  size?: 'sm' | 'md' | 'lg'
   interactive?: boolean
 }
 
 export function SplineWidget3D({ 
-  className = "", 
-  size = "md",
-  interactive = true 
+  className = '', 
+  size = 'md',
+  interactive = true, 
 }: SplineWidget3DProps) {
   const [isLoaded, setIsLoaded] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
@@ -36,7 +36,7 @@ export function SplineWidget3D({
       animate={{ 
         opacity: 1, 
         scale: isExpanded ? 1.5 : 1,
-        zIndex: isExpanded ? 50 : 1
+        zIndex: isExpanded ? 50 : 1,
       }}
       transition={{ duration: 0.3 }}
       style={{

@@ -1,11 +1,11 @@
-"use client"
+'use client'
 
-import { Canvas } from "@react-three/fiber"
-import { OrbitControls, Environment, MeshTransmissionMaterial, Float, Sparkles } from "@react-three/drei"
-import { EffectComposer, N8AO, Bloom } from "@react-three/postprocessing"
-import { useRef } from "react"
-import { useFrame } from "@react-three/fiber"
-import type * as THREE from "three"
+import { Canvas } from '@react-three/fiber'
+import { OrbitControls, Environment, MeshTransmissionMaterial, Float, Sparkles } from '@react-three/drei'
+import { EffectComposer, N8AO, Bloom } from '@react-three/postprocessing'
+import { useRef } from 'react'
+import { useFrame } from '@react-three/fiber'
+import type * as THREE from 'three'
 
 function CrystalSphere() {
   const meshRef = useRef<THREE.Mesh>(null)
@@ -88,7 +88,7 @@ export default function Scene3DBackground() {
   return (
     <div className="fixed inset-0 w-full h-full -z-10 pointer-events-none">
       <Canvas camera={{ position: [0, 0, 5], fov: 45 }} gl={{ antialias: true, alpha: true }}>
-        <color attach="background" args={["#0a0e1a"]} />
+        <color attach="background" args={['#0a0e1a']} />
         <ambientLight intensity={0.3} />
         <directionalLight position={[10, 10, 5]} intensity={1} />
         <pointLight position={[-10, -10, -5]} intensity={0.5} color="#3b82f6" />

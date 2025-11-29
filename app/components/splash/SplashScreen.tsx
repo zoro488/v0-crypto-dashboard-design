@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 🎬 SPLASH SCREEN WRAPPER
@@ -7,12 +7,12 @@
  * y la transición al contenido principal de la aplicación.
  */
 
-import { useState, useEffect, ReactNode } from "react"
-import dynamic from "next/dynamic"
+import { useState, useEffect, ReactNode } from 'react'
+import dynamic from 'next/dynamic'
 
 // Carga dinámica para evitar SSR issues con Three.js
 const ChronosParticles = dynamic(
-  () => import("./ChronosParticles"),
+  () => import('./ChronosParticles'),
   { 
     ssr: false,
     loading: () => (
@@ -21,8 +21,8 @@ const ChronosParticles = dynamic(
           LOADING...
         </div>
       </div>
-    )
-  }
+    ),
+  },
 )
 
 interface SplashScreenProps {
@@ -39,7 +39,7 @@ export default function SplashScreen({
   children, 
   duration = 5500,
   enabled = true,
-  forceShowKey = "chronos-splash-shown"
+  forceShowKey = 'chronos-splash-shown',
 }: SplashScreenProps) {
   const [showSplash, setShowSplash] = useState(false)
   const [isReady, setIsReady] = useState(false)
@@ -61,7 +61,7 @@ export default function SplashScreen({
   }, [enabled, forceShowKey])
   
   const handleSplashComplete = () => {
-    sessionStorage.setItem(forceShowKey, "true")
+    sessionStorage.setItem(forceShowKey, 'true')
     setShowSplash(false)
     // Pequeño delay para transición suave
     setTimeout(() => setIsReady(true), 100)

@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 📈 LIVE MARKET TICKER - Indicador de mercado en tiempo real
@@ -7,9 +7,9 @@
  * con efectos premium y actualizaciones en tiempo real
  */
 
-import { motion, useAnimation, AnimatePresence } from "framer-motion"
-import { useEffect, useState, useMemo } from "react"
-import { TrendingUp, TrendingDown, DollarSign, Activity, Zap, Clock, Wallet, CreditCard, type LucideIcon } from "lucide-react"
+import { motion, useAnimation, AnimatePresence } from 'framer-motion'
+import { useEffect, useState, useMemo } from 'react'
+import { TrendingUp, TrendingDown, DollarSign, Activity, Zap, Clock, Wallet, CreditCard, type LucideIcon } from 'lucide-react'
 
 interface TickerItem {
   id: string
@@ -28,12 +28,12 @@ interface LiveMarketTickerProps {
 
 // Datos de ejemplo para el ticker
 const defaultTickerItems: TickerItem[] = [
-  { id: "btc", label: "Capital Total", value: "$2.4M", change: 2.34, icon: DollarSign, color: "from-blue-500 to-cyan-500" },
-  { id: "eth", label: "Ventas Hoy", value: "$45.2K", change: -1.23, icon: TrendingUp, color: "from-green-500 to-emerald-500" },
-  { id: "profit", label: "Profit Mensual", value: "$128K", change: 5.67, icon: Zap, color: "from-purple-500 to-pink-500" },
-  { id: "ordenes", label: "Órdenes Activas", value: "24", change: 8.9, icon: Activity, color: "from-orange-500 to-amber-500" },
-  { id: "bancos", label: "Bóveda Monte", value: "$1.2M", change: 1.45, icon: Wallet, color: "from-indigo-500 to-violet-500" },
-  { id: "transacciones", label: "Transacciones", value: "156", change: 12.3, icon: CreditCard, color: "from-pink-500 to-rose-500" },
+  { id: 'btc', label: 'Capital Total', value: '$2.4M', change: 2.34, icon: DollarSign, color: 'from-blue-500 to-cyan-500' },
+  { id: 'eth', label: 'Ventas Hoy', value: '$45.2K', change: -1.23, icon: TrendingUp, color: 'from-green-500 to-emerald-500' },
+  { id: 'profit', label: 'Profit Mensual', value: '$128K', change: 5.67, icon: Zap, color: 'from-purple-500 to-pink-500' },
+  { id: 'ordenes', label: 'Órdenes Activas', value: '24', change: 8.9, icon: Activity, color: 'from-orange-500 to-amber-500' },
+  { id: 'bancos', label: 'Bóveda Monte', value: '$1.2M', change: 1.45, icon: Wallet, color: 'from-indigo-500 to-violet-500' },
+  { id: 'transacciones', label: 'Transacciones', value: '156', change: 12.3, icon: CreditCard, color: 'from-pink-500 to-rose-500' },
 ]
 
 // Componente de item individual del ticker
@@ -51,10 +51,10 @@ const TickerItemComponent = ({ item }: { item: TickerItem }) => {
         className={`p-2 rounded-xl bg-gradient-to-br ${item.color} shadow-lg`}
         animate={{
           boxShadow: [
-            `0 0 20px rgba(59, 130, 246, 0.2)`,
-            `0 0 30px rgba(59, 130, 246, 0.4)`,
-            `0 0 20px rgba(59, 130, 246, 0.2)`,
-          ]
+            '0 0 20px rgba(59, 130, 246, 0.2)',
+            '0 0 30px rgba(59, 130, 246, 0.4)',
+            '0 0 20px rgba(59, 130, 246, 0.2)',
+          ],
         }}
         transition={{ duration: 2, repeat: Infinity }}
       >
@@ -74,7 +74,7 @@ const TickerItemComponent = ({ item }: { item: TickerItem }) => {
       {/* Change Indicator */}
       <motion.div
         className={`flex items-center gap-1 px-2 py-1 rounded-lg ${
-          isPositive ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"
+          isPositive ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'
         }`}
         animate={{
           scale: [1, 1.05, 1],
@@ -87,7 +87,7 @@ const TickerItemComponent = ({ item }: { item: TickerItem }) => {
           <TrendingDown className="w-3 h-3" />
         )}
         <span className="text-xs font-bold">
-          {isPositive ? "+" : ""}{item.change.toFixed(2)}%
+          {isPositive ? '+' : ''}{item.change.toFixed(2)}%
         </span>
       </motion.div>
 
@@ -101,19 +101,19 @@ const TickerItemComponent = ({ item }: { item: TickerItem }) => {
 export function LiveMarketTicker({ 
   items = defaultTickerItems, 
   speed = 30,
-  className = "" 
+  className = '', 
 }: LiveMarketTickerProps) {
-  const [currentTime, setCurrentTime] = useState<string>("")
+  const [currentTime, setCurrentTime] = useState<string>('')
   const [isHovered, setIsHovered] = useState(false)
 
   // Actualizar hora
   useEffect(() => {
     const updateTime = () => {
       const now = new Date()
-      setCurrentTime(now.toLocaleTimeString("es-MX", { 
-        hour: "2-digit", 
-        minute: "2-digit",
-        second: "2-digit"
+      setCurrentTime(now.toLocaleTimeString('es-MX', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        second: '2-digit',
       }))
     }
     updateTime()
@@ -163,8 +163,8 @@ export function LiveMarketTicker({
           x: {
             duration: items.length * (speed / 10),
             repeat: Infinity,
-            ease: "linear",
-          }
+            ease: 'linear',
+          },
         }}
       >
         {duplicatedItems.map((item, index) => (
@@ -199,10 +199,10 @@ export function VerticalMarketTicker({ items = defaultTickerItems }: { items?: T
               </div>
             </div>
             <div className={`flex items-center gap-1 px-2 py-1 rounded-lg ${
-              item.change >= 0 ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"
+              item.change >= 0 ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'
             }`}>
               {item.change >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-              <span className="text-xs font-bold">{item.change >= 0 ? "+" : ""}{item.change.toFixed(2)}%</span>
+              <span className="text-xs font-bold">{item.change >= 0 ? '+' : ''}{item.change.toFixed(2)}%</span>
             </div>
           </motion.div>
         )
@@ -225,8 +225,8 @@ export function MiniMarketTicker({ items = defaultTickerItems.slice(0, 3) }: { i
           >
             <span className="text-sm text-white/60">{item.label}</span>
             <span className="text-sm font-bold text-white">{item.value}</span>
-            <span className={`text-xs font-bold ${isPositive ? "text-emerald-400" : "text-red-400"}`}>
-              {isPositive ? "+" : ""}{item.change.toFixed(1)}%
+            <span className={`text-xs font-bold ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
+              {isPositive ? '+' : ''}{item.change.toFixed(1)}%
             </span>
           </motion.div>
         )

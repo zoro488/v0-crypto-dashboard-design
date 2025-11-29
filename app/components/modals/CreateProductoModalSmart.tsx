@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 📦 CREATE PRODUCTO MODAL - Smart Form
@@ -11,28 +11,28 @@
  * 5. Glassmorphism futurista
  */
 
-import * as React from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useForm, Controller } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import * as React from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from "@/app/components/ui/dialog"
-import { Button } from "@/app/components/ui/button"
-import { Input } from "@/app/components/ui/input"
-import { Label } from "@/app/components/ui/label"
-import { Textarea } from "@/app/components/ui/textarea"
-import { Badge } from "@/app/components/ui/badge"
+} from '@/app/components/ui/dialog'
+import { Button } from '@/app/components/ui/button'
+import { Input } from '@/app/components/ui/input'
+import { Label } from '@/app/components/ui/label'
+import { Textarea } from '@/app/components/ui/textarea'
+import { Badge } from '@/app/components/ui/badge'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/app/components/ui/select"
+} from '@/app/components/ui/select'
 import {
   Package,
   DollarSign,
@@ -52,23 +52,23 @@ import {
   Hash,
   Layers,
   BarChart3,
-} from "lucide-react"
-import { cn } from "@/app/lib/utils"
-import { useToast } from "@/app/hooks/use-toast"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { logger } from "@/app/lib/utils/logger"
+} from 'lucide-react'
+import { cn } from '@/app/lib/utils'
+import { useToast } from '@/app/hooks/use-toast'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { logger } from '@/app/lib/utils/logger'
 import { 
   productoSchema, 
   type ProductoInput,
   formatearMonto,
   generarKeywords,
-} from "@/app/lib/validations/smart-forms-schemas"
+} from '@/app/lib/validations/smart-forms-schemas'
 import {
   collection,
   addDoc,
   Timestamp,
-} from "firebase/firestore"
-import { db, isFirebaseConfigured } from "@/app/lib/firebase/config"
+} from 'firebase/firestore'
+import { db, isFirebaseConfigured } from '@/app/lib/firebase/config'
 
 // ============================================
 // TIPOS
@@ -82,18 +82,18 @@ interface CreateProductoModalProps {
 
 // Categorías predefinidas
 const CATEGORIAS = [
-  { value: "electronica", label: "Electrónica", icon: "💻" },
-  { value: "accesorios", label: "Accesorios", icon: "🎧" },
-  { value: "ropa", label: "Ropa", icon: "👕" },
-  { value: "hogar", label: "Hogar", icon: "🏠" },
-  { value: "deportes", label: "Deportes", icon: "⚽" },
-  { value: "otros", label: "Otros", icon: "📦" },
+  { value: 'electronica', label: 'Electrónica', icon: '💻' },
+  { value: 'accesorios', label: 'Accesorios', icon: '🎧' },
+  { value: 'ropa', label: 'Ropa', icon: '👕' },
+  { value: 'hogar', label: 'Hogar', icon: '🏠' },
+  { value: 'deportes', label: 'Deportes', icon: '⚽' },
+  { value: 'otros', label: 'Otros', icon: '📦' },
 ]
 
 // Pasos del wizard
 const STEPS = [
-  { id: 1, title: "Info Básica", icon: Package, description: "Nombre y categoría" },
-  { id: 2, title: "Precios", icon: DollarSign, description: "Costos y márgenes" },
+  { id: 1, title: 'Info Básica', icon: Package, description: 'Nombre y categoría' },
+  { id: 2, title: 'Precios', icon: DollarSign, description: 'Costos y márgenes' },
 ]
 
 // Variantes de animación
@@ -128,15 +128,15 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   
   // Estado del formulario
-  const [nombre, setNombre] = React.useState("")
-  const [descripcion, setDescripcion] = React.useState("")
-  const [sku, setSku] = React.useState("")
-  const [categoria, setCategoria] = React.useState("")
+  const [nombre, setNombre] = React.useState('')
+  const [descripcion, setDescripcion] = React.useState('')
+  const [sku, setSku] = React.useState('')
+  const [categoria, setCategoria] = React.useState('')
   const [precioCompra, setPrecioCompra] = React.useState(0)
   const [precioVenta, setPrecioVenta] = React.useState(0)
   const [stockActual, setStockActual] = React.useState(0)
   const [stockMinimo, setStockMinimo] = React.useState(5)
-  const [unidad, setUnidad] = React.useState("pz")
+  const [unidad, setUnidad] = React.useState('pz')
   
   // Estado de imagen (placeholder para implementación futura)
   const [imagePreview, setImagePreview] = React.useState<string | null>(null)
@@ -179,7 +179,7 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
 
   // Generar SKU aleatorio
   const generarSKU = () => {
-    const prefijo = categoria ? categoria.substring(0, 3).toUpperCase() : "PRD"
+    const prefijo = categoria ? categoria.substring(0, 3).toUpperCase() : 'PRD'
     const random = Math.random().toString(36).substring(2, 8).toUpperCase()
     const timestamp = Date.now().toString(36).substring(-4).toUpperCase()
     setSku(`${prefijo}-${random}${timestamp}`)
@@ -209,7 +209,7 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
     const files = e.dataTransfer.files
     if (files.length > 0) {
       const file = files[0]
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         const reader = new FileReader()
         reader.onload = (e) => {
           setImagePreview(e.target?.result as string)
@@ -223,7 +223,7 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
     const files = e.target.files
     if (files && files.length > 0) {
       const file = files[0]
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         const reader = new FileReader()
         reader.onload = (e) => {
           setImagePreview(e.target?.result as string)
@@ -237,9 +237,9 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
   const handleSubmit = async () => {
     if (!nombre.trim() || precioVenta <= 0) {
       toast({
-        title: "Error",
-        description: "Completa los campos requeridos",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Completa los campos requeridos',
+        variant: 'destructive',
       })
       return
     }
@@ -249,9 +249,9 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
     // Verificar que Firestore está disponible
     if (!isFirebaseConfigured || !db) {
       toast({
-        title: "Error de conexión",
-        description: "Firebase no está configurado. Por favor verifica tu conexión.",
-        variant: "destructive",
+        title: 'Error de conexión',
+        description: 'Firebase no está configurado. Por favor verifica tu conexión.',
+        variant: 'destructive',
       })
       setIsSubmitting(false)
       return
@@ -290,10 +290,10 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
         updatedAt: Timestamp.now(),
       }
 
-      await addDoc(collection(firestore, "almacen"), productoData)
+      await addDoc(collection(firestore, 'almacen'), productoData)
 
       toast({
-        title: "✅ Producto Creado",
+        title: '✅ Producto Creado',
         description: `${nombre} agregado al inventario`,
       })
 
@@ -305,11 +305,11 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
       useAppStore.getState().triggerDataRefresh()
 
     } catch (error) {
-      logger.error("Error creando producto", error)
+      logger.error('Error creando producto', error)
       toast({
-        title: "Error",
-        description: "No se pudo crear el producto",
-        variant: "destructive",
+        title: 'Error',
+        description: 'No se pudo crear el producto',
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -320,15 +320,15 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
   const resetForm = () => {
     setStep(1)
     setDirection(1)
-    setNombre("")
-    setDescripcion("")
-    setSku("")
-    setCategoria("")
+    setNombre('')
+    setDescripcion('')
+    setSku('')
+    setCategoria('')
     setPrecioCompra(0)
     setPrecioVenta(0)
     setStockActual(0)
     setStockMinimo(5)
-    setUnidad("pz")
+    setUnidad('pz')
     setImagePreview(null)
   }
 
@@ -341,10 +341,10 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
         className={cn(
-          "max-w-2xl h-[85vh] max-h-[650px] p-0",
-          "bg-black/95 border-white/10 backdrop-blur-2xl",
-          "text-white overflow-hidden flex flex-col",
-          "shadow-[0_0_100px_rgba(0,0,0,0.8)]"
+          'max-w-2xl h-[85vh] max-h-[650px] p-0',
+          'bg-black/95 border-white/10 backdrop-blur-2xl',
+          'text-white overflow-hidden flex flex-col',
+          'shadow-[0_0_100px_rgba(0,0,0,0.8)]',
         )}
       >
         <DialogTitle className="sr-only">Nuevo Producto</DialogTitle>
@@ -384,7 +384,7 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/5">
             <motion.div
               className="h-full bg-gradient-to-r from-purple-500 to-pink-400"
-              initial={{ width: "50%" }}
+              initial={{ width: '50%' }}
               animate={{ width: `${(step / 2) * 100}%` }}
               transition={{ duration: 0.3 }}
             />
@@ -405,24 +405,24 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
                     {index < STEPS.length - 1 && (
                       <div
                         className={cn(
-                          "absolute left-5 top-12 w-0.5 h-8",
-                          isCompleted ? "bg-purple-500" : "bg-white/10"
+                          'absolute left-5 top-12 w-0.5 h-8',
+                          isCompleted ? 'bg-purple-500' : 'bg-white/10',
                         )}
                       />
                     )}
                     
                     <div className={cn(
-                      "flex items-center gap-3 p-2 rounded-lg transition-all",
-                      isCurrent && "bg-white/5"
+                      'flex items-center gap-3 p-2 rounded-lg transition-all',
+                      isCurrent && 'bg-white/5',
                     )}>
                       <div
                         className={cn(
-                          "w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all",
+                          'w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all',
                           isCompleted
-                            ? "bg-purple-500 border-purple-500 text-white"
+                            ? 'bg-purple-500 border-purple-500 text-white'
                             : isCurrent
-                            ? "bg-white/10 border-purple-500 text-purple-400"
-                            : "bg-white/5 border-white/20 text-gray-500"
+                            ? 'bg-white/10 border-purple-500 text-purple-400'
+                            : 'bg-white/5 border-white/20 text-gray-500',
                         )}
                       >
                         {isCompleted ? (
@@ -433,8 +433,8 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
                       </div>
                       <span
                         className={cn(
-                          "text-sm font-medium",
-                          isCurrent ? "text-white" : isCompleted ? "text-purple-400" : "text-gray-500"
+                          'text-sm font-medium',
+                          isCurrent ? 'text-white' : isCompleted ? 'text-purple-400' : 'text-gray-500',
                         )}
                       >
                         {s.title}
@@ -468,13 +468,13 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
                     className={cn(
-                      "relative h-40 rounded-xl border-2 border-dashed transition-all",
-                      "flex items-center justify-center cursor-pointer",
+                      'relative h-40 rounded-xl border-2 border-dashed transition-all',
+                      'flex items-center justify-center cursor-pointer',
                       isDragging
-                        ? "border-purple-500 bg-purple-500/10"
+                        ? 'border-purple-500 bg-purple-500/10'
                         : imagePreview
-                        ? "border-white/20 bg-white/5"
-                        : "border-white/10 bg-white/5 hover:border-white/30"
+                        ? 'border-white/20 bg-white/5'
+                        : 'border-white/10 bg-white/5 hover:border-white/30',
                     )}
                   >
                     {imagePreview ? (
@@ -520,8 +520,8 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
                       onChange={(e) => setNombre(e.target.value)}
                       placeholder="Ej: iPhone 15 Pro Max 256GB"
                       className={cn(
-                        "h-12 bg-black/50 border-white/10",
-                        "focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30"
+                        'h-12 bg-black/50 border-white/10',
+                        'focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30',
                       )}
                       autoFocus
                     />
@@ -617,7 +617,7 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                         <Input
                           type="number"
-                          value={precioCompra || ""}
+                          value={precioCompra || ''}
                           onChange={(e) => setPrecioCompra(Number(e.target.value))}
                           placeholder="0.00"
                           className="h-12 pl-8 bg-black/50 border-white/10"
@@ -635,7 +635,7 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
                           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                           <Input
                             type="number"
-                            value={precioVenta || ""}
+                            value={precioVenta || ''}
                             onChange={(e) => setPrecioVenta(Number(e.target.value))}
                             placeholder="0.00"
                             className="h-12 pl-8 bg-black/50 border-white/10"
@@ -665,42 +665,42 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         className={cn(
-                          "p-4 rounded-xl border",
+                          'p-4 rounded-xl border',
                           margen.ganancia > 0
-                            ? "bg-green-500/10 border-green-500/30"
+                            ? 'bg-green-500/10 border-green-500/30'
                             : margen.ganancia < 0
-                            ? "bg-red-500/10 border-red-500/30"
-                            : "bg-gray-500/10 border-gray-500/30"
+                            ? 'bg-red-500/10 border-red-500/30'
+                            : 'bg-gray-500/10 border-gray-500/30',
                         )}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <div className={cn(
-                              "w-10 h-10 rounded-full flex items-center justify-center",
+                              'w-10 h-10 rounded-full flex items-center justify-center',
                               margen.ganancia > 0
-                                ? "bg-green-500/20"
+                                ? 'bg-green-500/20'
                                 : margen.ganancia < 0
-                                ? "bg-red-500/20"
-                                : "bg-gray-500/20"
+                                ? 'bg-red-500/20'
+                                : 'bg-gray-500/20',
                             )}>
                               <TrendingUp className={cn(
-                                "w-5 h-5",
+                                'w-5 h-5',
                                 margen.ganancia > 0
-                                  ? "text-green-400"
+                                  ? 'text-green-400'
                                   : margen.ganancia < 0
-                                  ? "text-red-400 rotate-180"
-                                  : "text-gray-400"
+                                  ? 'text-red-400 rotate-180'
+                                  : 'text-gray-400',
                               )} />
                             </div>
                             <div>
                               <p className="text-sm text-gray-400">Margen de Ganancia</p>
                               <p className={cn(
-                                "text-lg font-bold",
+                                'text-lg font-bold',
                                 margen.ganancia > 0
-                                  ? "text-green-400"
+                                  ? 'text-green-400'
                                   : margen.ganancia < 0
-                                  ? "text-red-400"
-                                  : "text-gray-400"
+                                  ? 'text-red-400'
+                                  : 'text-gray-400',
                               )}>
                                 {formatearMonto(margen.ganancia)}
                               </p>
@@ -709,12 +709,12 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
                           <Badge
                             variant="outline"
                             className={cn(
-                              "text-lg px-4 py-1",
+                              'text-lg px-4 py-1',
                               margen.porcentaje >= 30
-                                ? "border-green-500/50 text-green-400"
+                                ? 'border-green-500/50 text-green-400'
                                 : margen.porcentaje >= 15
-                                ? "border-yellow-500/50 text-yellow-400"
-                                : "border-red-500/50 text-red-400"
+                                ? 'border-yellow-500/50 text-yellow-400'
+                                : 'border-red-500/50 text-red-400',
                             )}
                           >
                             {margen.porcentaje.toFixed(1)}%
@@ -740,7 +740,7 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
                       </Label>
                       <Input
                         type="number"
-                        value={stockActual || ""}
+                        value={stockActual || ''}
                         onChange={(e) => setStockActual(Number(e.target.value))}
                         placeholder="0"
                         min={0}
@@ -755,7 +755,7 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
                       </Label>
                       <Input
                         type="number"
-                        value={stockMinimo || ""}
+                        value={stockMinimo || ''}
                         onChange={(e) => setStockMinimo(Number(e.target.value))}
                         placeholder="5"
                         min={0}
@@ -785,9 +785,9 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
 
                   {/* Resumen */}
                   <div className={cn(
-                    "p-4 rounded-xl border mt-4",
-                    "bg-gradient-to-br from-white/5 to-transparent",
-                    "border-white/10"
+                    'p-4 rounded-xl border mt-4',
+                    'bg-gradient-to-br from-white/5 to-transparent',
+                    'border-white/10',
                   )}>
                     <h4 className="text-sm font-medium text-gray-400 mb-3">
                       Resumen del Producto
@@ -795,7 +795,7 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-gray-500">Nombre:</span>
-                        <span className="text-white font-medium">{nombre || "—"}</span>
+                        <span className="text-white font-medium">{nombre || '—'}</span>
                       </div>
                       {sku && (
                         <div className="flex justify-between">
@@ -806,7 +806,7 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
                       <div className="flex justify-between">
                         <span className="text-gray-500">Precio Venta:</span>
                         <span className="text-purple-400 font-bold">
-                          {precioVenta > 0 ? formatearMonto(precioVenta) : "—"}
+                          {precioVenta > 0 ? formatearMonto(precioVenta) : '—'}
                         </span>
                       </div>
                       <div className="flex justify-between">
@@ -823,9 +823,9 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
 
         {/* ===== FOOTER ===== */}
         <div className={cn(
-          "h-20 border-t border-white/10",
-          "bg-gradient-to-r from-black/50 via-white/5 to-black/50",
-          "px-6 flex items-center justify-between"
+          'h-20 border-t border-white/10',
+          'bg-gradient-to-r from-black/50 via-white/5 to-black/50',
+          'px-6 flex items-center justify-between',
         )}>
           <Button
             type="button"
@@ -835,7 +835,7 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
             className="text-gray-400 hover:text-white hover:bg-white/10"
           >
             {step === 1 ? (
-              "Cancelar"
+              'Cancelar'
             ) : (
               <>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -850,9 +850,9 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
               onClick={nextStep}
               disabled={!canProceed}
               className={cn(
-                "min-w-[140px]",
-                "bg-white text-black hover:bg-gray-200",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
+                'min-w-[140px]',
+                'bg-white text-black hover:bg-gray-200',
+                'disabled:opacity-50 disabled:cursor-not-allowed',
               )}
             >
               Siguiente
@@ -864,12 +864,12 @@ export function CreateProductoModal({ open, onClose, onSuccess }: CreateProducto
               onClick={handleSubmit}
               disabled={isSubmitting || !canProceed}
               className={cn(
-                "min-w-[180px]",
-                "bg-gradient-to-r from-purple-600 to-pink-600",
-                "hover:from-purple-500 hover:to-pink-500",
-                "text-white font-bold",
-                "shadow-[0_0_30px_rgba(168,85,247,0.4)]",
-                "transition-all duration-300"
+                'min-w-[180px]',
+                'bg-gradient-to-r from-purple-600 to-pink-600',
+                'hover:from-purple-500 hover:to-pink-500',
+                'text-white font-bold',
+                'shadow-[0_0_30px_rgba(168,85,247,0.4)]',
+                'transition-all duration-300',
               )}
             >
               {isSubmitting ? (

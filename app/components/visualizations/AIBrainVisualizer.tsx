@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { useEffect, useRef, useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Brain, Zap, Activity, Sparkles } from "lucide-react"
+import { useEffect, useRef, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Brain, Zap, Activity, Sparkles } from 'lucide-react'
 
 interface NeuralNode {
   id: string
@@ -29,7 +29,7 @@ export function AIBrainVisualizer({
   activityLevel = 0.5,
   width = 900,
   height = 700,
-  className = ""
+  className = '',
 }: AIBrainVisualizerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationFrameRef = useRef<number | null>(null)
@@ -57,7 +57,7 @@ export function AIBrainVisualizer({
           radius: 8 + Math.random() * 6,
           activity: Math.random(),
           layer,
-          connections: []
+          connections: [],
         }
         nodes.push(node)
       }
@@ -104,7 +104,7 @@ export function AIBrainVisualizer({
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const ctx = canvas.getContext("2d")
+    const ctx = canvas.getContext('2d')
     if (!ctx) return
 
     let time = 0
@@ -116,11 +116,11 @@ export function AIBrainVisualizer({
       // Fondo con efecto cerebral
       const bgGradient = ctx.createRadialGradient(
         width / 2, height / 2, 0,
-        width / 2, height / 2, width / 2
+        width / 2, height / 2, width / 2,
       )
-      bgGradient.addColorStop(0, "rgba(30, 20, 50, 1)")
-      bgGradient.addColorStop(0.5, "rgba(20, 15, 40, 1)")
-      bgGradient.addColorStop(1, "rgba(10, 10, 25, 1)")
+      bgGradient.addColorStop(0, 'rgba(30, 20, 50, 1)')
+      bgGradient.addColorStop(0.5, 'rgba(20, 15, 40, 1)')
+      bgGradient.addColorStop(1, 'rgba(10, 10, 25, 1)')
       ctx.fillStyle = bgGradient
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -176,9 +176,9 @@ export function AIBrainVisualizer({
             // Chispa eléctrica
             ctx.beginPath()
             ctx.arc(pulseX, pulseY, 4, 0, Math.PI * 2)
-            ctx.fillStyle = "#ffffff"
+            ctx.fillStyle = '#ffffff'
             ctx.shadowBlur = 20
-            ctx.shadowColor = "#8b5cf6"
+            ctx.shadowColor = '#8b5cf6'
             ctx.fill()
             ctx.shadowBlur = 0
 
@@ -220,21 +220,21 @@ export function AIBrainVisualizer({
         // Glow si activo
         if (isActive) {
           ctx.shadowBlur = 25
-          ctx.shadowColor = "#8b5cf6"
+          ctx.shadowColor = '#8b5cf6'
         }
 
         // Color según actividad
         const activityColor = 
-          node.activity > 0.7 ? "#8b5cf6" :
-          node.activity > 0.4 ? "#3b82f6" :
-          node.activity > 0.2 ? "#10b981" : "#6b7280"
+          node.activity > 0.7 ? '#8b5cf6' :
+          node.activity > 0.4 ? '#3b82f6' :
+          node.activity > 0.2 ? '#10b981' : '#6b7280'
 
         // Gradiente del nodo
         const nodeGradient = ctx.createRadialGradient(
           node.x - radius * 0.3, node.y - radius * 0.3, 0,
-          node.x, node.y, radius
+          node.x, node.y, radius,
         )
-        nodeGradient.addColorStop(0, "#ffffff")
+        nodeGradient.addColorStop(0, '#ffffff')
         nodeGradient.addColorStop(0.4, activityColor)
         nodeGradient.addColorStop(1, `${activityColor}cc`)
 
@@ -273,24 +273,24 @@ export function AIBrainVisualizer({
 
       // Indicador de actividad
       if (isThinking) {
-        ctx.fillStyle = "#ffffff"
-        ctx.font = "bold 14px sans-serif"
-        ctx.textAlign = "center"
-        ctx.fillText("🧠 Procesando...", width / 2, 40)
+        ctx.fillStyle = '#ffffff'
+        ctx.font = 'bold 14px sans-serif'
+        ctx.textAlign = 'center'
+        ctx.fillText('🧠 Procesando...', width / 2, 40)
 
         // Barra de actividad
         const barWidth = 200
         const barX = (width - barWidth) / 2
         const barY = 60
 
-        ctx.fillStyle = "rgba(255, 255, 255, 0.1)"
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)'
         ctx.fillRect(barX, barY, barWidth, 6)
 
-        ctx.fillStyle = "#8b5cf6"
+        ctx.fillStyle = '#8b5cf6'
         ctx.fillRect(barX, barY, barWidth * activityLevel, 6)
 
         ctx.shadowBlur = 10
-        ctx.shadowColor = "#8b5cf6"
+        ctx.shadowColor = '#8b5cf6'
         ctx.fillRect(barX, barY, barWidth * activityLevel, 6)
         ctx.shadowBlur = 0
       }
@@ -337,7 +337,7 @@ export function AIBrainVisualizer({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="rounded-2xl cursor-pointer"
-        style={{ boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)" }}
+        style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)' }}
         onMouseMove={handleMouseMove}
       />
 

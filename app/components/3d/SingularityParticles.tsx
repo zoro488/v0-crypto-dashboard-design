@@ -199,7 +199,7 @@ export default function SingularityParticles({
   count = 12000,
   radius = 4.0,
   interactionRadius = 3.5,
-  interactionStrength = 0.8
+  interactionStrength = 0.8,
 }: SingularityParticlesProps) {
   const points = useRef<THREE.Points>(null!)
   const { viewport } = useThree()
@@ -288,7 +288,7 @@ export default function SingularityParticles({
     uPixelRatio: { value: typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 2) : 1 },
     uMouse: { value: new THREE.Vector2(0, 0) },
     uInteractionRadius: { value: interactionRadius },
-    uInteractionStrength: { value: interactionStrength }
+    uInteractionStrength: { value: interactionStrength },
   }), [interactionRadius, interactionStrength])
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -306,10 +306,10 @@ export default function SingularityParticles({
     const targetX = state.pointer.x
     const targetY = state.pointer.y
     material.uniforms.uMouse.value.x = THREE.MathUtils.lerp(
-      material.uniforms.uMouse.value.x, targetX, 0.1
+      material.uniforms.uMouse.value.x, targetX, 0.1,
     )
     material.uniforms.uMouse.value.y = THREE.MathUtils.lerp(
-      material.uniforms.uMouse.value.y, targetY, 0.1
+      material.uniforms.uMouse.value.y, targetY, 0.1,
     )
     
     // Rotación lenta del sistema completo

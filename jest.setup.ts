@@ -1,5 +1,14 @@
 import '@testing-library/jest-dom'
 
+// Mock de fetch para Firebase Auth
+global.fetch = jest.fn(() =>
+  Promise.resolve({
+    json: () => Promise.resolve({}),
+    ok: true,
+    status: 200,
+  })
+) as jest.Mock
+
 // Polyfills para jsdom - TextEncoder y TextDecoder
 if (typeof global.TextEncoder === 'undefined') {
   const { TextEncoder, TextDecoder } = require('util')

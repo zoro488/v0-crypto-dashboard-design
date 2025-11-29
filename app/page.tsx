@@ -1,34 +1,34 @@
-"use client"
+'use client'
 
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import ChronosHeader from "@/app/components/layout/ChronosHeader"
-import { FloatingSplineAIWidget } from "@/app/components/FloatingSplineAIWidget"
-import { FirestoreSetupAlert } from "@/app/components/ui/FirestoreSetupAlert"
-import { CommandMenu } from "@/app/components/CommandMenu"
-import { motion, AnimatePresence } from "framer-motion"
-import { useEffect, lazy, Suspense, useState, useCallback } from "react"
-import { useOptimizedPerformance } from "@/app/lib/hooks/useOptimizedPerformance"
-import { ScrollProgress, ScrollReveal } from "@/app/components/ui/ScrollReveal"
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import ChronosHeader from '@/app/components/layout/ChronosHeader'
+import { FloatingSplineAIWidget } from '@/app/components/FloatingSplineAIWidget'
+import { FirestoreSetupAlert } from '@/app/components/ui/FirestoreSetupAlert'
+import { CommandMenu } from '@/app/components/CommandMenu'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, lazy, Suspense, useState, useCallback } from 'react'
+import { useOptimizedPerformance } from '@/app/lib/hooks/useOptimizedPerformance'
+import { ScrollProgress, ScrollReveal } from '@/app/components/ui/ScrollReveal'
 
 // Nuevo Dashboard Premium con animación CHRONOS
-const ChronosDashboard = lazy(() => import("@/app/components/panels/ChronosDashboard"))
+const ChronosDashboard = lazy(() => import('@/app/components/panels/ChronosDashboard'))
 
 // Paneles existentes
-const BentoOrdenesCompra = lazy(() => import("@/app/components/panels/BentoOrdenesCompra"))
-const BentoBanco = lazy(() => import("@/app/components/panels/BentoBanco"))
+const BentoOrdenesCompra = lazy(() => import('@/app/components/panels/BentoOrdenesCompra'))
+const BentoBanco = lazy(() => import('@/app/components/panels/BentoBanco'))
 
 // Panel Ventas Premium con CRUD completo, perfiles y tabla avanzada
-const BentoVentasPremium = lazy(() => import("@/app/components/panels/BentoVentasPremium"))
-const BentoAlmacen = lazy(() => import("@/app/components/panels/BentoAlmacen"))
-const BentoReportes = lazy(() => import("@/app/components/panels/BentoReportes"))
-const BentoProfit = lazy(() => import("@/app/components/panels/BentoProfit"))
+const BentoVentasPremium = lazy(() => import('@/app/components/panels/BentoVentasPremium'))
+const BentoAlmacen = lazy(() => import('@/app/components/panels/BentoAlmacen'))
+const BentoReportes = lazy(() => import('@/app/components/panels/BentoReportes'))
+const BentoProfit = lazy(() => import('@/app/components/panels/BentoProfit'))
 
 // Paneles Premium con CRUD completo, perfiles y tabla avanzada
-const BentoClientesPremium = lazy(() => import("@/app/components/panels/BentoClientesPremium"))
-const BentoDistribuidoresPremium = lazy(() => import("@/app/components/panels/BentoDistribuidoresPremium"))
+const BentoClientesPremium = lazy(() => import('@/app/components/panels/BentoClientesPremium'))
+const BentoDistribuidoresPremium = lazy(() => import('@/app/components/panels/BentoDistribuidoresPremium'))
 
 // Panel IA Inmersivo con Nexbot 3D
-const BentoIAImmersive = lazy(() => import("@/app/components/panels/BentoIAImmersive"))
+const BentoIAImmersive = lazy(() => import('@/app/components/panels/BentoIAImmersive'))
 
 const PanelLoader = () => (
   <div className="flex items-center justify-center min-h-[60vh]">
@@ -42,12 +42,12 @@ const PanelLoader = () => (
       <motion.div 
         className="w-20 h-20 rounded-full border-4 border-white/10 border-t-cyan-500 border-r-purple-500"
         animate={{ rotate: 360 }}
-        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
       />
       <motion.div 
         className="absolute inset-2 w-16 h-16 rounded-full border-4 border-white/5 border-b-blue-500"
         animate={{ rotate: -360 }}
-        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+        transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
       />
       <motion.div 
         className="absolute inset-0 w-20 h-20 rounded-full bg-gradient-to-r from-cyan-500/30 to-purple-500/30 blur-xl"
@@ -58,13 +58,13 @@ const PanelLoader = () => (
         transition={{
           duration: 2,
           repeat: Infinity,
-          ease: "easeInOut"
+          ease: 'easeInOut',
         }}
       />
       <motion.div
         className="absolute inset-0 flex items-center justify-center"
         animate={{ scale: [0.8, 1, 0.8] }}
-        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
       >
         <div className="w-3 h-3 rounded-full bg-white/80" />
       </motion.div>
@@ -114,8 +114,8 @@ export default function Chronos() {
   }, [])
 
   useEffect(() => {
-    document.documentElement.style.scrollBehavior = "smooth"
-    document.body.classList.add("gpu-accelerated")
+    document.documentElement.style.scrollBehavior = 'smooth'
+    document.body.classList.add('gpu-accelerated')
     
     // Añadir estilos de escalado global
     document.documentElement.style.setProperty('--viewport-scale', '1')
@@ -129,31 +129,31 @@ export default function Chronos() {
     }
 
     return () => {
-      document.documentElement.style.scrollBehavior = "auto"
+      document.documentElement.style.scrollBehavior = 'auto'
     }
   }, [currentPanel])
 
   const renderPanel = () => {
     switch (currentPanel) {
-      case "dashboard":
+      case 'dashboard':
         return <ChronosDashboard />
-      case "ordenes":
+      case 'ordenes':
         return <BentoOrdenesCompra />
-      case "ventas":
+      case 'ventas':
         return <BentoVentasPremium />
-      case "distribuidores":
+      case 'distribuidores':
         return <BentoDistribuidoresPremium />
-      case "clientes":
+      case 'clientes':
         return <BentoClientesPremium />
-      case "banco":
+      case 'banco':
         return <BentoBanco />
-      case "almacen":
+      case 'almacen':
         return <BentoAlmacen />
-      case "reportes":
+      case 'reportes':
         return <BentoReportes />
-      case "ia":
+      case 'ia':
         return <BentoIAImmersive />
-      case "profit":
+      case 'profit':
         return <BentoProfit />
       default:
         return <ChronosDashboard />
@@ -182,7 +182,7 @@ export default function Chronos() {
           transition={{
             duration: 25,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: 'easeInOut',
           }}
         />
         <motion.div
@@ -195,8 +195,8 @@ export default function Chronos() {
           transition={{
             duration: 30,
             repeat: Infinity,
-            ease: "easeInOut",
-            delay: 2
+            ease: 'easeInOut',
+            delay: 2,
           }}
         />
         <motion.div
@@ -208,8 +208,8 @@ export default function Chronos() {
           transition={{
             duration: 35,
             repeat: Infinity,
-            ease: "easeInOut",
-            delay: 4
+            ease: 'easeInOut',
+            delay: 4,
           }}
         />
         <motion.div
@@ -221,8 +221,8 @@ export default function Chronos() {
           transition={{
             duration: 20,
             repeat: Infinity,
-            ease: "easeInOut",
-            delay: 6
+            ease: 'easeInOut',
+            delay: 6,
           }}
         />
         
@@ -234,7 +234,7 @@ export default function Chronos() {
               linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
               linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
             `,
-            backgroundSize: '50px 50px'
+            backgroundSize: '50px 50px',
           }}
         />
         
@@ -251,9 +251,9 @@ export default function Chronos() {
           <AnimatePresence mode="wait">
             <motion.div
               key={currentPanel}
-              initial={{ opacity: 0, y: 30, scale: 0.97, filter: "blur(12px)" }}
-              animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-              exit={{ opacity: 0, y: -30, scale: 0.97, filter: "blur(12px)" }}
+              initial={{ opacity: 0, y: 30, scale: 0.97, filter: 'blur(12px)' }}
+              animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: -30, scale: 0.97, filter: 'blur(12px)' }}
               transition={{
                 duration: 0.6,
                 ease: [0.16, 1, 0.3, 1],

@@ -1,27 +1,27 @@
-"use client"
+'use client'
 
-import { Suspense, useRef, useState, useCallback, useMemo, useEffect } from "react"
-import { Canvas, useFrame, useThree } from "@react-three/fiber"
-import useSpline from "@splinetool/r3f-spline"
-import * as THREE from "three"
-import { motion, AnimatePresence } from "framer-motion"
+import { Suspense, useRef, useState, useCallback, useMemo, useEffect } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import useSpline from '@splinetool/r3f-spline'
+import * as THREE from 'three'
+import { motion, AnimatePresence } from 'framer-motion'
 
 // URL de la escena de iconos de Spline
-const SPLINE_ICONS_URL = "https://prod.spline.design/DUQQ1uM7jFjBMRzW/scene.splinecode"
+const SPLINE_ICONS_URL = 'https://prod.spline.design/DUQQ1uM7jFjBMRzW/scene.splinecode'
 
 // Mapeo de secciones del sidebar a nombres de nodos en Spline
 // Nota: Estos nombres deben ajustarse según los nodos reales en tu escena de Spline
 const SECTION_NODE_MAP: Record<string, string[]> = {
-  dashboard: ["Dashboard", "Icon_Dashboard", "dashboard_icon", "Home"],
-  analytics: ["Analytics", "Icon_Analytics", "analytics_icon", "Chart", "Graph"],
-  wallets: ["Wallets", "Icon_Wallets", "wallets_icon", "Wallet", "Money"],
-  settings: ["Settings", "Icon_Settings", "settings_icon", "Gear", "Config"],
-  ordenes: ["Orders", "Icon_Orders", "ordenes_icon", "Cart", "Shopping"],
-  ventas: ["Sales", "Icon_Sales", "ventas_icon", "TrendingUp", "Graph"],
-  almacen: ["Warehouse", "Icon_Warehouse", "almacen_icon", "Box", "Storage"],
-  distribuidores: ["Distributors", "Icon_Distributors", "distribuidores_icon", "Users", "People"],
-  clientes: ["Clients", "Icon_Clients", "clientes_icon", "User", "Person"],
-  reportes: ["Reports", "Icon_Reports", "reportes_icon", "BarChart", "Stats"],
+  dashboard: ['Dashboard', 'Icon_Dashboard', 'dashboard_icon', 'Home'],
+  analytics: ['Analytics', 'Icon_Analytics', 'analytics_icon', 'Chart', 'Graph'],
+  wallets: ['Wallets', 'Icon_Wallets', 'wallets_icon', 'Wallet', 'Money'],
+  settings: ['Settings', 'Icon_Settings', 'settings_icon', 'Gear', 'Config'],
+  ordenes: ['Orders', 'Icon_Orders', 'ordenes_icon', 'Cart', 'Shopping'],
+  ventas: ['Sales', 'Icon_Sales', 'ventas_icon', 'TrendingUp', 'Graph'],
+  almacen: ['Warehouse', 'Icon_Warehouse', 'almacen_icon', 'Box', 'Storage'],
+  distribuidores: ['Distributors', 'Icon_Distributors', 'distribuidores_icon', 'Users', 'People'],
+  clientes: ['Clients', 'Icon_Clients', 'clientes_icon', 'User', 'Person'],
+  reportes: ['Reports', 'Icon_Reports', 'reportes_icon', 'BarChart', 'Stats'],
 }
 
 // Interface para las props del componente
@@ -113,8 +113,8 @@ function SplineIcon({
         <mesh>
           <icosahedronGeometry args={[0.4, 2]} />
           <meshStandardMaterial
-            color={isActive ? "#4a90d9" : isHovered ? "#6366f1" : "#374151"}
-            emissive={isActive ? "#4a90d9" : isHovered ? "#6366f1" : "#000000"}
+            color={isActive ? '#4a90d9' : isHovered ? '#6366f1' : '#374151'}
+            emissive={isActive ? '#4a90d9' : isHovered ? '#6366f1' : '#000000'}
             emissiveIntensity={isActive ? 0.5 : isHovered ? 0.3 : 0}
             metalness={0.8}
             roughness={0.2}
@@ -125,7 +125,7 @@ function SplineIcon({
           <mesh rotation={[Math.PI / 2, 0, 0]}>
             <torusGeometry args={[0.6, 0.02, 16, 32]} />
             <meshBasicMaterial
-              color={isActive ? "#4a90d9" : "#6366f1"}
+              color={isActive ? '#4a90d9' : '#6366f1'}
               transparent
               opacity={0.6}
             />
@@ -142,7 +142,7 @@ function SplineIcon({
       {/* Efecto de glow cuando está activo */}
       {(isActive || isHovered) && (
         <pointLight
-          color={isActive ? "#4a90d9" : "#6366f1"}
+          color={isActive ? '#4a90d9' : '#6366f1'}
           intensity={isActive ? 1 : 0.5}
           distance={2}
           decay={2}
@@ -179,7 +179,7 @@ export function NavIcons3D({
   onClick,
   onHover,
   size = 40,
-  className = "",
+  className = '',
 }: NavIcons3DProps) {
   const [internalHover, setInternalHover] = useState(false)
   const effectiveHover = isHovered || internalHover
@@ -208,7 +208,7 @@ export function NavIcons3D({
         dpr={[1, 2]}
         camera={{ position: [0, 0, 2], fov: 50 }}
         gl={{ antialias: true, alpha: true }}
-        style={{ background: "transparent" }}
+        style={{ background: 'transparent' }}
       >
         <Suspense fallback={<LoadingIcon />}>
           <ambientLight intensity={0.5} />
@@ -246,7 +246,7 @@ interface NavBar3DProps {
   }>
   activeSection: string
   onSectionChange: (section: string) => void
-  orientation?: "horizontal" | "vertical"
+  orientation?: 'horizontal' | 'vertical'
   className?: string
 }
 
@@ -254,8 +254,8 @@ export function NavBar3D({
   items,
   activeSection,
   onSectionChange,
-  orientation = "vertical",
-  className = "",
+  orientation = 'vertical',
+  className = '',
 }: NavBar3DProps) {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
   
@@ -263,7 +263,7 @@ export function NavBar3D({
     <div
       className={`
         flex gap-2
-        ${orientation === "vertical" ? "flex-col" : "flex-row"}
+        ${orientation === 'vertical' ? 'flex-col' : 'flex-row'}
         ${className}
       `}
     >
@@ -271,7 +271,7 @@ export function NavBar3D({
         <motion.div
           key={item.id}
           className="relative group"
-          initial={{ opacity: 0, x: orientation === "vertical" ? -20 : 0, y: orientation === "horizontal" ? -20 : 0 }}
+          initial={{ opacity: 0, x: orientation === 'vertical' ? -20 : 0, y: orientation === 'horizontal' ? -20 : 0 }}
           animate={{ opacity: 1, x: 0, y: 0 }}
           transition={{ delay: items.indexOf(item) * 0.1 }}
         >
@@ -288,14 +288,14 @@ export function NavBar3D({
           <AnimatePresence>
             {hoveredItem === item.id && (
               <motion.div
-                initial={{ opacity: 0, x: orientation === "vertical" ? 10 : 0, y: orientation === "horizontal" ? 10 : 0 }}
+                initial={{ opacity: 0, x: orientation === 'vertical' ? 10 : 0, y: orientation === 'horizontal' ? 10 : 0 }}
                 animate={{ opacity: 1, x: 0, y: 0 }}
-                exit={{ opacity: 0, x: orientation === "vertical" ? 10 : 0, y: orientation === "horizontal" ? 10 : 0 }}
+                exit={{ opacity: 0, x: orientation === 'vertical' ? 10 : 0, y: orientation === 'horizontal' ? 10 : 0 }}
                 className={`
                   absolute z-50 px-3 py-1.5 rounded-lg
                   bg-black/80 backdrop-blur-xl border border-white/10
                   text-white text-sm font-medium whitespace-nowrap
-                  ${orientation === "vertical" ? "left-full ml-2 top-1/2 -translate-y-1/2" : "top-full mt-2 left-1/2 -translate-x-1/2"}
+                  ${orientation === 'vertical' ? 'left-full ml-2 top-1/2 -translate-y-1/2' : 'top-full mt-2 left-1/2 -translate-x-1/2'}
                 `}
               >
                 {item.label}
@@ -303,7 +303,7 @@ export function NavBar3D({
                 <div
                   className={`
                     absolute w-2 h-2 bg-black/80 border-white/10 rotate-45
-                    ${orientation === "vertical" ? "left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 border-l border-b" : "top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 border-l border-t"}
+                    ${orientation === 'vertical' ? 'left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 border-l border-b' : 'top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 border-l border-t'}
                   `}
                 />
               </motion.div>

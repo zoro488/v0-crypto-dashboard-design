@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import React, { useState, useMemo, useCallback } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import React, { useState, useMemo, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   ChevronUp,
   ChevronDown,
@@ -23,11 +23,11 @@ import {
   Building2,
   Package,
   DollarSign,
-  FileText
-} from "lucide-react"
-import { Button } from "@/app/components/ui/button"
-import { Input } from "@/app/components/ui/input"
-import { Badge } from "@/app/components/ui/badge"
+  FileText,
+} from 'lucide-react'
+import { Button } from '@/app/components/ui/button'
+import { Input } from '@/app/components/ui/input'
+import { Badge } from '@/app/components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,7 +35,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/app/components/ui/dropdown-menu"
+} from '@/app/components/ui/dropdown-menu'
 import {
   Dialog,
   DialogContent,
@@ -43,14 +43,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/app/components/ui/dialog"
-import { cn } from "@/app/lib/utils"
+} from '@/app/components/ui/dialog'
+import { cn } from '@/app/lib/utils'
 
 // ============================================
 // Types
 // ============================================
 
-export type ColumnType = "text" | "number" | "currency" | "date" | "status" | "badge" | "avatar" | "actions" | "custom"
+export type ColumnType = 'text' | 'number' | 'currency' | 'date' | 'status' | 'badge' | 'avatar' | 'actions' | 'custom'
 
 export interface Column<T> {
   key: keyof T | string
@@ -59,7 +59,7 @@ export interface Column<T> {
   sortable?: boolean
   filterable?: boolean
   width?: string
-  align?: "left" | "center" | "right"
+  align?: 'left' | 'center' | 'right'
   render?: (row: T, index: number) => React.ReactNode
   statusConfig?: Record<string, { color: string; label: string; icon?: React.ElementType }>
   formatValue?: (value: unknown) => string
@@ -69,7 +69,7 @@ export interface TableAction<T> {
   icon: React.ElementType
   label: string
   onClick: (row: T) => void
-  color?: "default" | "primary" | "danger" | "success" | "warning"
+  color?: 'default' | 'primary' | 'danger' | 'success' | 'warning'
   showCondition?: (row: T) => boolean
 }
 
@@ -80,7 +80,7 @@ export interface PremiumDataTableProps<T extends Record<string, unknown>> {
   title?: string
   subtitle?: string
   icon?: React.ElementType
-  color?: "cyan" | "purple" | "green" | "orange" | "pink" | "blue"
+  color?: 'cyan' | 'purple' | 'green' | 'orange' | 'pink' | 'blue'
   loading?: boolean
   searchPlaceholder?: string
   onAdd?: () => void
@@ -111,55 +111,55 @@ export interface PremiumDataTableProps<T extends Record<string, unknown>> {
 
 const colorConfig = {
   cyan: {
-    gradient: "from-cyan-500/20 to-blue-500/20",
-    text: "text-cyan-400",
-    bg: "bg-cyan-500/10",
-    border: "border-cyan-500/20",
-    button: "from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
+    gradient: 'from-cyan-500/20 to-blue-500/20',
+    text: 'text-cyan-400',
+    bg: 'bg-cyan-500/10',
+    border: 'border-cyan-500/20',
+    button: 'from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600',
   },
   purple: {
-    gradient: "from-purple-500/20 to-pink-500/20",
-    text: "text-purple-400",
-    bg: "bg-purple-500/10",
-    border: "border-purple-500/20",
-    button: "from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+    gradient: 'from-purple-500/20 to-pink-500/20',
+    text: 'text-purple-400',
+    bg: 'bg-purple-500/10',
+    border: 'border-purple-500/20',
+    button: 'from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600',
   },
   green: {
-    gradient: "from-green-500/20 to-emerald-500/20",
-    text: "text-green-400",
-    bg: "bg-green-500/10",
-    border: "border-green-500/20",
-    button: "from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
+    gradient: 'from-green-500/20 to-emerald-500/20',
+    text: 'text-green-400',
+    bg: 'bg-green-500/10',
+    border: 'border-green-500/20',
+    button: 'from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600',
   },
   orange: {
-    gradient: "from-orange-500/20 to-amber-500/20",
-    text: "text-orange-400",
-    bg: "bg-orange-500/10",
-    border: "border-orange-500/20",
-    button: "from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600"
+    gradient: 'from-orange-500/20 to-amber-500/20',
+    text: 'text-orange-400',
+    bg: 'bg-orange-500/10',
+    border: 'border-orange-500/20',
+    button: 'from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600',
   },
   pink: {
-    gradient: "from-pink-500/20 to-rose-500/20",
-    text: "text-pink-400",
-    bg: "bg-pink-500/10",
-    border: "border-pink-500/20",
-    button: "from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600"
+    gradient: 'from-pink-500/20 to-rose-500/20',
+    text: 'text-pink-400',
+    bg: 'bg-pink-500/10',
+    border: 'border-pink-500/20',
+    button: 'from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600',
   },
   blue: {
-    gradient: "from-blue-500/20 to-indigo-500/20",
-    text: "text-blue-400",
-    bg: "bg-blue-500/10",
-    border: "border-blue-500/20",
-    button: "from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600"
-  }
+    gradient: 'from-blue-500/20 to-indigo-500/20',
+    text: 'text-blue-400',
+    bg: 'bg-blue-500/10',
+    border: 'border-blue-500/20',
+    button: 'from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600',
+  },
 }
 
 const actionColors = {
-  default: "text-zinc-400 hover:text-white hover:bg-zinc-700/50",
-  primary: "text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10",
-  danger: "text-red-400 hover:text-red-300 hover:bg-red-500/10",
-  success: "text-green-400 hover:text-green-300 hover:bg-green-500/10",
-  warning: "text-orange-400 hover:text-orange-300 hover:bg-orange-500/10"
+  default: 'text-zinc-400 hover:text-white hover:bg-zinc-700/50',
+  primary: 'text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10',
+  danger: 'text-red-400 hover:text-red-300 hover:bg-red-500/10',
+  success: 'text-green-400 hover:text-green-300 hover:bg-green-500/10',
+  warning: 'text-orange-400 hover:text-orange-300 hover:bg-orange-500/10',
 }
 
 // ============================================
@@ -195,16 +195,16 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
   title,
   subtitle,
   icon: Icon,
-  color = "cyan",
+  color = 'cyan',
   loading = false,
-  searchPlaceholder = "Buscar...",
+  searchPlaceholder = 'Buscar...',
   onAdd,
-  addLabel = "Agregar",
+  addLabel = 'Agregar',
   onRowClick,
   onDelete,
   onEdit,
   onView,
-  emptyMessage = "No hay datos disponibles",
+  emptyMessage = 'No hay datos disponibles',
   emptyIcon: EmptyIcon = FileText,
   pageSize = 10,
   showPagination = true,
@@ -222,9 +222,9 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
   const colors = colorConfig[color]
 
   // State
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState('')
   const [sortColumn, setSortColumn] = useState<string | null>(null)
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [currentPage, setCurrentPage] = useState(1)
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set())
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set())
@@ -258,7 +258,7 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
       if (bValue === null || bValue === undefined) return -1
 
       const comparison = aValue < bValue ? -1 : 1
-      return sortDirection === "asc" ? comparison : -comparison
+      return sortDirection === 'asc' ? comparison : -comparison
     })
   }, [filteredData, sortColumn, sortDirection])
 
@@ -273,10 +273,10 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
   // Handlers
   const handleSort = useCallback((column: string) => {
     if (sortColumn === column) {
-      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"))
+      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'))
     } else {
       setSortColumn(column)
-      setSortDirection("asc")
+      setSortDirection('asc')
     }
   }, [sortColumn])
 
@@ -332,74 +332,74 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
     const value = row[column.key as keyof T]
 
     switch (column.type) {
-      case "currency":
+      case 'currency':
         return (
           <span className="font-mono">
-            ${typeof value === "number" ? value.toLocaleString() : String(value ?? "-")}
+            ${typeof value === 'number' ? value.toLocaleString() : String(value ?? '-')}
           </span>
         )
 
-      case "date":
+      case 'date':
         if (!value) return <span className="text-zinc-500">-</span>
         const date = value instanceof Date ? value : new Date(value as string)
         return (
           <span className="text-zinc-300">
-            {date.toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" })}
+            {date.toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}
           </span>
         )
 
-      case "status":
+      case 'status':
         const statusKey = value as string
         const config = column.statusConfig?.[statusKey]
-        if (!config) return <span className="text-zinc-500">{String(value ?? "-")}</span>
+        if (!config) return <span className="text-zinc-500">{String(value ?? '-')}</span>
         const StatusIcon = config.icon as React.ElementType | undefined
         return (
           <Badge
             variant="outline"
-            className={cn("gap-1", config.color)}
+            className={cn('gap-1', config.color)}
           >
-            {StatusIcon && React.createElement(StatusIcon, { className: "w-3 h-3" })}
+            {StatusIcon && React.createElement(StatusIcon, { className: 'w-3 h-3' })}
             {config.label}
           </Badge>
         )
 
-      case "avatar":
-        const emailValue = "email" in row ? String(row.email) : null
+      case 'avatar':
+        const emailValue = 'email' in row ? String(row.email) : null
         return (
           <div className="flex items-center gap-3">
-            <div className={cn("w-10 h-10 rounded-full flex items-center justify-center", colors.bg)}>
-              <User className={cn("w-5 h-5", colors.text)} />
+            <div className={cn('w-10 h-10 rounded-full flex items-center justify-center', colors.bg)}>
+              <User className={cn('w-5 h-5', colors.text)} />
             </div>
             <div>
-              <div className="font-medium text-white">{String(value ?? "-")}</div>
+              <div className="font-medium text-white">{String(value ?? '-')}</div>
               {emailValue && <div className="text-xs text-zinc-500">{emailValue}</div>}
             </div>
           </div>
         )
 
-      case "number":
+      case 'number':
         return (
           <span className="font-mono text-white">
-            {typeof value === "number" ? value.toLocaleString() : String(value ?? "-")}
+            {typeof value === 'number' ? value.toLocaleString() : String(value ?? '-')}
           </span>
         )
 
       default:
-        return <span className="text-white">{String(value ?? "-")}</span>
+        return <span className="text-white">{String(value ?? '-')}</span>
     }
   }
 
   // Default actions
   const defaultActions: TableAction<T>[] = [
-    ...(onView ? [{ icon: Eye, label: "Ver detalles", onClick: onView, color: "default" as const }] : []),
-    ...(onEdit ? [{ icon: Edit2, label: "Editar", onClick: onEdit, color: "primary" as const }] : []),
+    ...(onView ? [{ icon: Eye, label: 'Ver detalles', onClick: onView, color: 'default' as const }] : []),
+    ...(onEdit ? [{ icon: Edit2, label: 'Editar', onClick: onEdit, color: 'primary' as const }] : []),
     ...(onDelete
       ? [
           {
             icon: Trash2,
-            label: "Eliminar",
+            label: 'Eliminar',
             onClick: (row: T) => setDeleteConfirm({ open: true, row }),
-            color: "danger" as const,
+            color: 'danger' as const,
           },
         ]
       : []),
@@ -410,10 +410,10 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn("relative group", className)}
+      className={cn('relative group', className)}
     >
       {/* Glow Effect */}
-      <div className={cn("absolute inset-0 bg-gradient-to-r rounded-2xl blur-2xl transition-all", colors.gradient)} />
+      <div className={cn('absolute inset-0 bg-gradient-to-r rounded-2xl blur-2xl transition-all', colors.gradient)} />
 
       {/* Main Container */}
       <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl overflow-hidden">
@@ -425,8 +425,8 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
               {title && (
                 <div className="flex items-center gap-3">
                   {Icon && (
-                    <div className={cn("p-2 rounded-xl", colors.bg)}>
-                      {React.createElement(Icon, { className: cn("w-5 h-5", colors.text) })}
+                    <div className={cn('p-2 rounded-xl', colors.bg)}>
+                      {React.createElement(Icon, { className: cn('w-5 h-5', colors.text) })}
                     </div>
                   )}
                   <div>
@@ -453,7 +453,7 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
                     />
                     {searchQuery && (
                       <button
-                        onClick={() => setSearchQuery("")}
+                        onClick={() => setSearchQuery('')}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white"
                       >
                         <X className="w-4 h-4" />
@@ -482,7 +482,7 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
                 {onAdd && (
                   <Button
                     onClick={onAdd}
-                    className={cn("bg-gradient-to-r text-white", colors.button)}
+                    className={cn('bg-gradient-to-r text-white', colors.button)}
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     {addLabel}
@@ -499,12 +499,12 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
             <TableSkeleton columns={columns.length} />
           ) : paginatedData.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-zinc-500">
-              {React.createElement(EmptyIcon, { className: "w-16 h-16 mb-4 opacity-50" })}
+              {React.createElement(EmptyIcon, { className: 'w-16 h-16 mb-4 opacity-50' })}
               <p className="text-lg">{emptyMessage}</p>
               {onAdd && (
                 <Button
                   onClick={onAdd}
-                  className={cn("mt-4 bg-gradient-to-r text-white", colors.button)}
+                  className={cn('mt-4 bg-gradient-to-r text-white', colors.button)}
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   {addLabel}
@@ -513,7 +513,7 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
             </div>
           ) : (
             <table className="w-full">
-              <thead className={cn(stickyHeader && "sticky top-0 z-10 bg-zinc-900/95")}>
+              <thead className={cn(stickyHeader && 'sticky top-0 z-10 bg-zinc-900/95')}>
                 <tr className="border-b border-zinc-800/50">
                   {/* Selection Column */}
                   {selectable && (
@@ -521,14 +521,14 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
                       <button
                         onClick={handleSelectAll}
                         className={cn(
-                          "w-5 h-5 rounded border-2 flex items-center justify-center transition-all",
+                          'w-5 h-5 rounded border-2 flex items-center justify-center transition-all',
                           selectedRows.size === paginatedData.length
                             ? cn(colors.border, colors.bg)
-                            : "border-zinc-600 hover:border-zinc-500"
+                            : 'border-zinc-600 hover:border-zinc-500',
                         )}
                       >
                         {selectedRows.size === paginatedData.length && (
-                          <Check className={cn("w-3 h-3", colors.text)} />
+                          <Check className={cn('w-3 h-3', colors.text)} />
                         )}
                       </button>
                     </th>
@@ -542,25 +542,25 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
                     <th
                       key={String(column.key)}
                       className={cn(
-                        "py-4 px-4 text-sm font-medium text-zinc-400",
-                        column.align === "center" && "text-center",
-                        column.align === "right" && "text-right",
-                        !column.align && "text-left",
-                        column.sortable && "cursor-pointer select-none hover:text-white transition-colors"
+                        'py-4 px-4 text-sm font-medium text-zinc-400',
+                        column.align === 'center' && 'text-center',
+                        column.align === 'right' && 'text-right',
+                        !column.align && 'text-left',
+                        column.sortable && 'cursor-pointer select-none hover:text-white transition-colors',
                       )}
                       style={column.width ? { width: column.width } : undefined}
                       onClick={() => column.sortable && handleSort(String(column.key))}
                     >
                       <div className={cn(
-                        "flex items-center gap-1",
-                        column.align === "center" && "justify-center",
-                        column.align === "right" && "justify-end"
+                        'flex items-center gap-1',
+                        column.align === 'center' && 'justify-center',
+                        column.align === 'right' && 'justify-end',
                       )}>
                         {column.header}
                         {column.sortable && (
                           <span className="ml-1">
                             {sortColumn === column.key ? (
-                              sortDirection === "asc" ? (
+                              sortDirection === 'asc' ? (
                                 <ChevronUp className="w-4 h-4" />
                               ) : (
                                 <ChevronDown className="w-4 h-4" />
@@ -589,7 +589,7 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
                     const globalIndex = (currentPage - 1) * pageSize + rowIndex
                     const isExpanded = expandedRows.has(rowIndex)
                     const isSelected = selectedRows.has(rowIndex)
-                    const rowClasses = typeof rowClassName === "function" ? rowClassName(row, rowIndex) : rowClassName
+                    const rowClasses = typeof rowClassName === 'function' ? rowClassName(row, rowIndex) : rowClassName
 
                     return (
                       <motion.tr
@@ -599,10 +599,10 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
                         exit={{ opacity: 0, x: 20 }}
                         transition={{ delay: rowIndex * 0.05 }}
                         className={cn(
-                          "border-b border-zinc-800/50 hover:bg-zinc-800/20 transition-colors group/row",
-                          onRowClick && "cursor-pointer",
+                          'border-b border-zinc-800/50 hover:bg-zinc-800/20 transition-colors group/row',
+                          onRowClick && 'cursor-pointer',
                           isSelected && colors.bg,
-                          rowClasses
+                          rowClasses,
                         )}
                         onClick={() => onRowClick?.(row)}
                       >
@@ -612,13 +612,13 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
                             <button
                               onClick={() => handleToggleSelect(rowIndex)}
                               className={cn(
-                                "w-5 h-5 rounded border-2 flex items-center justify-center transition-all",
+                                'w-5 h-5 rounded border-2 flex items-center justify-center transition-all',
                                 isSelected
                                   ? cn(colors.border, colors.bg)
-                                  : "border-zinc-600 hover:border-zinc-500"
+                                  : 'border-zinc-600 hover:border-zinc-500',
                               )}
                             >
-                              {isSelected && <Check className={cn("w-3 h-3", colors.text)} />}
+                              {isSelected && <Check className={cn('w-3 h-3', colors.text)} />}
                             </button>
                           </td>
                         )}
@@ -631,7 +631,7 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
                               className="w-6 h-6 rounded flex items-center justify-center text-zinc-500 hover:text-white hover:bg-zinc-700/50 transition-all"
                             >
                               <ChevronDown
-                                className={cn("w-4 h-4 transition-transform", isExpanded && "rotate-180")}
+                                className={cn('w-4 h-4 transition-transform', isExpanded && 'rotate-180')}
                               />
                             </button>
                           </td>
@@ -642,9 +642,9 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
                           <td
                             key={String(column.key)}
                             className={cn(
-                              "py-4 px-4",
-                              column.align === "center" && "text-center",
-                              column.align === "right" && "text-right"
+                              'py-4 px-4',
+                              column.align === 'center' && 'text-center',
+                              column.align === 'right' && 'text-right',
                             )}
                           >
                             {renderCell(row, column, rowIndex)}
@@ -663,12 +663,12 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
                                       key={actionIndex}
                                       onClick={() => action.onClick(row)}
                                       className={cn(
-                                        "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
-                                        actionColors[action.color || "default"]
+                                        'w-8 h-8 rounded-lg flex items-center justify-center transition-all',
+                                        actionColors[action.color || 'default'],
                                       )}
                                       title={action.label}
                                     >
-                                      {React.createElement(action.icon, { className: "w-4 h-4" })}
+                                      {React.createElement(action.icon, { className: 'w-4 h-4' })}
                                     </button>
                                   )
                                 })
@@ -694,11 +694,11 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
                                           key={actionIndex}
                                           onClick={() => action.onClick(row)}
                                           className={cn(
-                                            "cursor-pointer",
-                                            actionColors[action.color || "default"]
+                                            'cursor-pointer',
+                                            actionColors[action.color || 'default'],
                                           )}
                                         >
-                                          {React.createElement(action.icon, { className: "w-4 h-4 mr-2" })}
+                                          {React.createElement(action.icon, { className: 'w-4 h-4 mr-2' })}
                                           {action.label}
                                         </DropdownMenuItem>
                                       )
@@ -722,7 +722,7 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
         {showPagination && totalPages > 1 && (
           <div className="p-4 border-t border-zinc-800/50 flex items-center justify-between">
             <div className="text-sm text-zinc-400">
-              Mostrando {(currentPage - 1) * pageSize + 1} -{" "}
+              Mostrando {(currentPage - 1) * pageSize + 1} -{' '}
               {Math.min(currentPage * pageSize, sortedData.length)} de {sortedData.length}
             </div>
             <div className="flex items-center gap-2">
@@ -752,10 +752,10 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
                       key={pageNum}
                       onClick={() => setCurrentPage(pageNum)}
                       className={cn(
-                        "w-8 h-8 rounded-lg text-sm font-medium transition-all",
+                        'w-8 h-8 rounded-lg text-sm font-medium transition-all',
                         currentPage === pageNum
                           ? cn(colors.bg, colors.text)
-                          : "text-zinc-400 hover:text-white hover:bg-zinc-800/50"
+                          : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50',
                       )}
                     >
                       {pageNum}
@@ -802,7 +802,7 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
               disabled={isDeleting}
               className="bg-red-500 hover:bg-red-600 text-white"
             >
-              {isDeleting ? "Eliminando..." : "Eliminar"}
+              {isDeleting ? 'Eliminando...' : 'Eliminar'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -818,20 +818,20 @@ export function PremiumDataTable<T extends Record<string, unknown>>({
 // Status configs for common use cases
 export const STATUS_CONFIGS = {
   payment: {
-    completo: { color: "bg-green-500/10 text-green-400 border-green-500/20", label: "Pagado", icon: Check },
-    parcial: { color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20", label: "Parcial", icon: AlertCircle },
-    pendiente: { color: "bg-red-500/10 text-red-400 border-red-500/20", label: "Pendiente", icon: X },
+    completo: { color: 'bg-green-500/10 text-green-400 border-green-500/20', label: 'Pagado', icon: Check },
+    parcial: { color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20', label: 'Parcial', icon: AlertCircle },
+    pendiente: { color: 'bg-red-500/10 text-red-400 border-red-500/20', label: 'Pendiente', icon: X },
   },
   order: {
-    pendiente: { color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20", label: "Pendiente", icon: AlertCircle },
-    enviado: { color: "bg-blue-500/10 text-blue-400 border-blue-500/20", label: "Enviado", icon: Package },
-    entregado: { color: "bg-green-500/10 text-green-400 border-green-500/20", label: "Entregado", icon: Check },
-    cancelado: { color: "bg-red-500/10 text-red-400 border-red-500/20", label: "Cancelado", icon: X },
+    pendiente: { color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20', label: 'Pendiente', icon: AlertCircle },
+    enviado: { color: 'bg-blue-500/10 text-blue-400 border-blue-500/20', label: 'Enviado', icon: Package },
+    entregado: { color: 'bg-green-500/10 text-green-400 border-green-500/20', label: 'Entregado', icon: Check },
+    cancelado: { color: 'bg-red-500/10 text-red-400 border-red-500/20', label: 'Cancelado', icon: X },
   },
   active: {
-    true: { color: "bg-green-500/10 text-green-400 border-green-500/20", label: "Activo", icon: Check },
-    false: { color: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20", label: "Inactivo", icon: X },
-  }
+    true: { color: 'bg-green-500/10 text-green-400 border-green-500/20', label: 'Activo', icon: Check },
+    false: { color: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20', label: 'Inactivo', icon: X },
+  },
 }
 
 export default PremiumDataTable

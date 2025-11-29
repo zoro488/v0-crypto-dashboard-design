@@ -1,7 +1,7 @@
-import { create } from "zustand"
-import { devtools, persist } from "zustand/middleware"
-import { firestoreService } from "../firebase/firestore-service"
-import { logger } from "../utils/logger"
+import { create } from 'zustand'
+import { devtools, persist } from 'zustand/middleware'
+import { firestoreService } from '../firebase/firestore-service'
+import { logger } from '../utils/logger'
 
 // ============================================================
 // TIPOS LOCALES DEL STORE
@@ -58,7 +58,7 @@ interface OrdenCompra {
   costoTotal: number
   pagoInicial: number
   deuda: number
-  estado: "pendiente" | "parcial" | "pagada"
+  estado: 'pendiente' | 'parcial' | 'pagada'
 }
 
 interface Venta {
@@ -75,7 +75,7 @@ interface Venta {
   precioTotalVenta: number
   montoPagado: number
   montoRestante: number
-  estadoPago: "completo" | "parcial" | "pendiente"
+  estadoPago: 'completo' | 'parcial' | 'pendiente'
 }
 
 interface Producto {
@@ -87,14 +87,14 @@ interface Producto {
 
 // IDs de bancos con snake_case (estandarizado)
 type BancoIdStore = 
-  | "boveda_monte"
-  | "boveda_usa"
-  | "utilidades"
-  | "flete_sur"  // Nota: en el store usamos "fletes" por compatibilidad
-  | "fletes"     // Alias para compatibilidad
-  | "azteca"
-  | "leftie"
-  | "profit"
+  | 'boveda_monte'
+  | 'boveda_usa'
+  | 'utilidades'
+  | 'flete_sur'  // Nota: en el store usamos "fletes" por compatibilidad
+  | 'fletes'     // Alias para compatibilidad
+  | 'azteca'
+  | 'leftie'
+  | 'profit'
 
 interface BancoStore {
   id: string
@@ -107,11 +107,11 @@ interface AppState {
   // UI State
   currentPanel: string
   sidebarCollapsed: boolean
-  theme: "light" | "dark" | "cyber"
+  theme: 'light' | 'dark' | 'cyber'
 
   // Voice Agent State
   voiceAgentActive: boolean
-  voiceAgentStatus: "idle" | "listening" | "thinking" | "speaking"
+  voiceAgentStatus: 'idle' | 'listening' | 'thinking' | 'speaking'
   audioFrequencies: number[]
 
   // 3D State
@@ -136,15 +136,15 @@ interface AppState {
   // Actions
   setCurrentPanel: (panel: string) => void
   toggleSidebar: () => void
-  setTheme: (theme: "light" | "dark" | "cyber") => void
+  setTheme: (theme: 'light' | 'dark' | 'cyber') => void
   setVoiceAgentActive: (active: boolean) => void
-  setVoiceAgentStatus: (status: "idle" | "listening" | "thinking" | "speaking") => void
+  setVoiceAgentStatus: (status: 'idle' | 'listening' | 'thinking' | 'speaking') => void
   setAudioFrequencies: (frequencies: number[]) => void
   setModelRotation: (rotation: number) => void
   setActiveScene: (scene: string | null) => void
   updateBancoSaldo: (id: string, saldo: number) => void
-  crearOrdenCompra: (data: Omit<OrdenCompra, "id">) => void
-  crearVenta: (data: Omit<Venta, "id" | "clienteId">) => void
+  crearOrdenCompra: (data: Omit<OrdenCompra, 'id'>) => void
+  crearVenta: (data: Omit<Venta, 'id' | 'clienteId'>) => void
   abonarDistribuidor: (distribuidorId: string, monto: number, bancoDestino: string) => void
   abonarCliente: (clienteId: string, monto: number) => void
   crearTransferencia: (origen: string, destino: string, monto: number) => void
@@ -157,28 +157,28 @@ interface AppState {
 // CONSTANTES - 7 Bancos del Sistema CHRONOS
 // ============================================================
 const BANCOS_INICIALES: BancoStore[] = [
-  { id: "boveda_monte", nombre: "Bóveda Monte", saldo: 0, color: "from-blue-500 to-cyan-500" },
-  { id: "boveda_usa", nombre: "Bóveda USA", saldo: 0, color: "from-red-500 to-blue-500" },
-  { id: "utilidades", nombre: "Utilidades", saldo: 0, color: "from-green-500 to-emerald-500" },
-  { id: "fletes", nombre: "Fletes", saldo: 0, color: "from-orange-500 to-amber-500" },      // Alias de flete_sur
-  { id: "flete_sur", nombre: "Flete Sur", saldo: 0, color: "from-orange-500 to-amber-500" },
-  { id: "azteca", nombre: "Azteca", saldo: 0, color: "from-purple-500 to-pink-500" },
-  { id: "leftie", nombre: "Leftie", saldo: 0, color: "from-yellow-500 to-orange-500" },
-  { id: "profit", nombre: "Profit", saldo: 0, color: "from-indigo-500 to-purple-500" },
+  { id: 'boveda_monte', nombre: 'Bóveda Monte', saldo: 0, color: 'from-blue-500 to-cyan-500' },
+  { id: 'boveda_usa', nombre: 'Bóveda USA', saldo: 0, color: 'from-red-500 to-blue-500' },
+  { id: 'utilidades', nombre: 'Utilidades', saldo: 0, color: 'from-green-500 to-emerald-500' },
+  { id: 'fletes', nombre: 'Fletes', saldo: 0, color: 'from-orange-500 to-amber-500' },      // Alias de flete_sur
+  { id: 'flete_sur', nombre: 'Flete Sur', saldo: 0, color: 'from-orange-500 to-amber-500' },
+  { id: 'azteca', nombre: 'Azteca', saldo: 0, color: 'from-purple-500 to-pink-500' },
+  { id: 'leftie', nombre: 'Leftie', saldo: 0, color: 'from-yellow-500 to-orange-500' },
+  { id: 'profit', nombre: 'Profit', saldo: 0, color: 'from-indigo-500 to-purple-500' },
 ]
 
 interface AppState {
   // UI State
   currentPanel: string
   sidebarCollapsed: boolean
-  theme: "light" | "dark" | "cyber"
+  theme: 'light' | 'dark' | 'cyber'
   
   // User State
   currentUserId: string | null
 
   // Voice Agent State
   voiceAgentActive: boolean
-  voiceAgentStatus: "idle" | "listening" | "thinking" | "speaking"
+  voiceAgentStatus: 'idle' | 'listening' | 'thinking' | 'speaking'
   audioFrequencies: number[]
 
   // 3D State
@@ -208,15 +208,15 @@ interface AppState {
   // Actions
   setCurrentPanel: (panel: string) => void
   toggleSidebar: () => void
-  setTheme: (theme: "light" | "dark" | "cyber") => void
+  setTheme: (theme: 'light' | 'dark' | 'cyber') => void
   setVoiceAgentActive: (active: boolean) => void
-  setVoiceAgentStatus: (status: "idle" | "listening" | "thinking" | "speaking") => void
+  setVoiceAgentStatus: (status: 'idle' | 'listening' | 'thinking' | 'speaking') => void
   setAudioFrequencies: (frequencies: number[]) => void
   setModelRotation: (rotation: number) => void
   setActiveScene: (scene: string | null) => void
   updateBancoSaldo: (id: string, saldo: number) => void
-  crearOrdenCompra: (data: Omit<OrdenCompra, "id">) => void
-  crearVenta: (data: Omit<Venta, "id" | "clienteId">) => void
+  crearOrdenCompra: (data: Omit<OrdenCompra, 'id'>) => void
+  crearVenta: (data: Omit<Venta, 'id' | 'clienteId'>) => void
   abonarDistribuidor: (distribuidorId: string, monto: number, bancoDestino: string) => void
   abonarCliente: (clienteId: string, monto: number) => void
   crearTransferencia: (origen: string, destino: string, monto: number) => void
@@ -230,12 +230,12 @@ export const useAppStore = create<AppState>()(
     persist(
       (set, get) => ({
         // Initial State
-        currentPanel: "dashboard",
+        currentPanel: 'dashboard',
         sidebarCollapsed: false,
-        theme: "dark",
-        currentUserId: "anonymous",
+        theme: 'dark',
+        currentUserId: 'anonymous',
         voiceAgentActive: false,
-        voiceAgentStatus: "idle",
+        voiceAgentStatus: 'idle',
         audioFrequencies: Array(32).fill(0),
         modelRotation: 0,
         activeScene: null,
@@ -280,8 +280,8 @@ export const useAppStore = create<AppState>()(
               id: `dist-${Date.now()}`,
               nombre: data.distribuidor,
               empresa: data.distribuidor,
-              telefono: "",
-              email: "",
+              telefono: '',
+              email: '',
               deudaTotal: data.deuda,
               totalPagado: data.pagoInicial || 0,
               ordenesActivas: 1,
@@ -328,9 +328,9 @@ export const useAppStore = create<AppState>()(
 
           // Si hubo pago inicial, registrar en banco
           if (data.pagoInicial > 0) {
-            const bancoBovedaMonte = state.bancos.find((b) => b.id === "boveda-monte")
+            const bancoBovedaMonte = state.bancos.find((b) => b.id === 'boveda-monte')
             if (bancoBovedaMonte) {
-              get().updateBancoSaldo("boveda-monte", bancoBovedaMonte.saldo - data.pagoInicial)
+              get().updateBancoSaldo('boveda-monte', bancoBovedaMonte.saldo - data.pagoInicial)
             }
           }
         },
@@ -345,8 +345,8 @@ export const useAppStore = create<AppState>()(
             cliente = {
               id: `cli-${Date.now()}`,
               nombre: data.cliente,
-              telefono: "",
-              email: "",
+              telefono: '',
+              email: '',
               deudaTotal: data.montoRestante,
               pendiente: data.montoRestante,
               deuda: data.precioTotalVenta,
@@ -388,19 +388,19 @@ export const useAppStore = create<AppState>()(
           if (data.montoPagado > 0) {
             const proporcionPagada = data.montoPagado / data.precioTotalVenta
 
-            const bancoBovedaMonte = state.bancos.find((b) => b.id === "boveda-monte")
+            const bancoBovedaMonte = state.bancos.find((b) => b.id === 'boveda-monte')
             if (bancoBovedaMonte) {
-              get().updateBancoSaldo("boveda-monte", bancoBovedaMonte.saldo + montoBovedaMonte * proporcionPagada)
+              get().updateBancoSaldo('boveda-monte', bancoBovedaMonte.saldo + montoBovedaMonte * proporcionPagada)
             }
 
-            const bancoFletes = state.bancos.find((b) => b.id === "fletes")
+            const bancoFletes = state.bancos.find((b) => b.id === 'fletes')
             if (bancoFletes) {
-              get().updateBancoSaldo("fletes", bancoFletes.saldo + montoFletes * proporcionPagada)
+              get().updateBancoSaldo('fletes', bancoFletes.saldo + montoFletes * proporcionPagada)
             }
 
-            const bancoUtilidades = state.bancos.find((b) => b.id === "utilidades")
+            const bancoUtilidades = state.bancos.find((b) => b.id === 'utilidades')
             if (bancoUtilidades) {
-              get().updateBancoSaldo("utilidades", bancoUtilidades.saldo + montoUtilidades * proporcionPagada)
+              get().updateBancoSaldo('utilidades', bancoUtilidades.saldo + montoUtilidades * proporcionPagada)
             }
           }
           // Si es pago pendiente (montoPagado = 0), los históricos se registran pero capital actual = 0
@@ -472,18 +472,18 @@ export const useAppStore = create<AppState>()(
             const proporcionAbono = montoAAplicar / venta.precioTotalVenta
 
             // Distribuir proporcionalmente a los bancos
-            const bancoBovedaMonte = state.bancos.find((b) => b.id === "boveda-monte")
-            const bancoFletes = state.bancos.find((b) => b.id === "fletes")
-            const bancoUtilidades = state.bancos.find((b) => b.id === "utilidades")
+            const bancoBovedaMonte = state.bancos.find((b) => b.id === 'boveda-monte')
+            const bancoFletes = state.bancos.find((b) => b.id === 'fletes')
+            const bancoUtilidades = state.bancos.find((b) => b.id === 'utilidades')
 
             if (bancoBovedaMonte) {
-              get().updateBancoSaldo("boveda-monte", bancoBovedaMonte.saldo + montoBovedaMonte * proporcionAbono)
+              get().updateBancoSaldo('boveda-monte', bancoBovedaMonte.saldo + montoBovedaMonte * proporcionAbono)
             }
             if (bancoFletes) {
-              get().updateBancoSaldo("fletes", bancoFletes.saldo + montoFletes * proporcionAbono)
+              get().updateBancoSaldo('fletes', bancoFletes.saldo + montoFletes * proporcionAbono)
             }
             if (bancoUtilidades) {
-              get().updateBancoSaldo("utilidades", bancoUtilidades.saldo + montoUtilidades * proporcionAbono)
+              get().updateBancoSaldo('utilidades', bancoUtilidades.saldo + montoUtilidades * proporcionAbono)
             }
 
             // Actualizar la venta en el array
@@ -494,7 +494,7 @@ export const useAppStore = create<AppState>()(
                 ...venta,
                 montoPagado: venta.montoPagado + montoAAplicar,
                 montoRestante: Math.max(0, nuevoRestante),
-                estadoPago: nuevoRestante <= 0 ? "completo" : "parcial",
+                estadoPago: nuevoRestante <= 0 ? 'completo' : 'parcial',
               }
             }
 
@@ -511,25 +511,25 @@ export const useAppStore = create<AppState>()(
 
           // Validaciones
           if (!bancoOrigen || !bancoDestino) {
-            logger.warn("crearTransferencia: Banco no encontrado", { 
-              context: "AppStore",
-              data: { origen, destino }
+            logger.warn('crearTransferencia: Banco no encontrado', { 
+              context: 'AppStore',
+              data: { origen, destino },
             })
             return
           }
 
           if (bancoOrigen.saldo < monto) {
-            logger.warn("crearTransferencia: Saldo insuficiente", {
-              context: "AppStore",
-              data: { saldo: bancoOrigen.saldo, monto }
+            logger.warn('crearTransferencia: Saldo insuficiente', {
+              context: 'AppStore',
+              data: { saldo: bancoOrigen.saldo, monto },
             })
             return
           }
 
           if (monto <= 0) {
-            logger.warn("crearTransferencia: Monto inválido", {
-              context: "AppStore",
-              data: { monto }
+            logger.warn('crearTransferencia: Monto inválido', {
+              context: 'AppStore',
+              data: { monto },
             })
             return
           }
@@ -547,16 +547,16 @@ export const useAppStore = create<AppState>()(
             origen,
             destino,
             monto,
-            `Transferencia de ${bancoOrigen.nombre} a ${bancoDestino.nombre}`
+            `Transferencia de ${bancoOrigen.nombre} a ${bancoDestino.nombre}`,
           ).then(() => {
-            logger.info("Transferencia completada", {
-              context: "AppStore",
-              data: { origen, destino, monto }
+            logger.info('Transferencia completada', {
+              context: 'AppStore',
+              data: { origen, destino, monto },
             })
           }).catch((error) => {
             // Rollback si falla Firestore
-            logger.error("Error en transferencia, revirtiendo cambios", error, {
-              context: "AppStore"
+            logger.error('Error en transferencia, revirtiendo cambios', error, {
+              context: 'AppStore',
             })
             get().updateBancoSaldo(origen, saldoOrigenOriginal)
             get().updateBancoSaldo(destino, saldoDestinoOriginal)
@@ -607,7 +607,7 @@ export const useAppStore = create<AppState>()(
         },
       }),
       {
-        name: "chronos-storage",
+        name: 'chronos-storage',
         partialize: (state) => ({
           theme: state.theme,
           sidebarCollapsed: state.sidebarCollapsed,

@@ -23,7 +23,7 @@ import {
   onSnapshot,
   getDocs,
   Timestamp,
-  limit as firestoreLimit
+  limit as firestoreLimit,
 } from 'firebase/firestore'
 import { db, isFirestoreAvailable } from '@/app/lib/firebase/config'
 import type { 
@@ -33,7 +33,7 @@ import type {
   OrdenCompra, 
   Movimiento,
   GastoAbono,
-  BancoId 
+  BancoId, 
 } from '@/app/types'
 
 // ====================================================================
@@ -136,18 +136,18 @@ export function useTrazabilidadCliente(clienteId: string | null): TrazabilidadCl
     const ventasQuery = query(
       collection(db, 'ventas'),
       where('clienteId', '==', clienteId),
-      orderBy('createdAt', 'desc')
+      orderBy('createdAt', 'desc'),
     )
 
     const unsubVentas = onSnapshot(ventasQuery, 
       (snapshot) => {
         const ventasData = snapshot.docs.map(doc => ({
           ...doc.data(),
-          id: doc.id
+          id: doc.id,
         })) as Venta[]
         setVentas(ventasData)
       },
-      (err) => setError(`Error cargando ventas: ${err.message}`)
+      (err) => setError(`Error cargando ventas: ${err.message}`),
     )
 
     // Suscripción a abonos del cliente
@@ -155,24 +155,24 @@ export function useTrazabilidadCliente(clienteId: string | null): TrazabilidadCl
       collection(db, 'gastos_abonos'),
       where('entidadId', '==', clienteId),
       where('tipo', '==', 'abono'),
-      orderBy('createdAt', 'desc')
+      orderBy('createdAt', 'desc'),
     )
 
     const unsubAbonos = onSnapshot(abonosQuery,
       (snapshot) => {
         const abonosData = snapshot.docs.map(doc => ({
           ...doc.data(),
-          id: doc.id
+          id: doc.id,
         })) as GastoAbono[]
         setAbonos(abonosData)
       },
-      (err) => console.warn('Abonos query error:', err)
+      (err) => console.warn('Abonos query error:', err),
     )
 
     // Cargar datos del cliente
     const clienteQuery = query(
       collection(db, 'clientes'),
-      where('id', '==', clienteId)
+      where('id', '==', clienteId),
     )
 
     const unsubCliente = onSnapshot(clienteQuery,
@@ -185,7 +185,7 @@ export function useTrazabilidadCliente(clienteId: string | null): TrazabilidadCl
       (err) => {
         setError(`Error cargando cliente: ${err.message}`)
         setLoading(false)
-      }
+      },
     )
 
     return () => {
@@ -240,7 +240,7 @@ export function useTrazabilidadCliente(clienteId: string | null): TrazabilidadCl
       deudaActual,
       promedioCompra,
       ultimaCompra,
-      frecuenciaCompra
+      frecuenciaCompra,
     }
   }, [ventas, abonos])
 
@@ -282,18 +282,18 @@ export function useTrazabilidadDistribuidor(distribuidorId: string | null): Traz
     const ocQuery = query(
       collection(db, 'ordenes_compra'),
       where('distribuidorId', '==', distribuidorId),
-      orderBy('createdAt', 'desc')
+      orderBy('createdAt', 'desc'),
     )
 
     const unsubOC = onSnapshot(ocQuery,
       (snapshot) => {
         const ocData = snapshot.docs.map(doc => ({
           ...doc.data(),
-          id: doc.id
+          id: doc.id,
         })) as OrdenCompra[]
         setOrdenesCompra(ocData)
       },
-      (err) => setError(`Error cargando órdenes: ${err.message}`)
+      (err) => setError(`Error cargando órdenes: ${err.message}`),
     )
 
     // Suscripción a pagos (gastos tipo pago_distribuidor)
@@ -301,24 +301,24 @@ export function useTrazabilidadDistribuidor(distribuidorId: string | null): Traz
       collection(db, 'gastos_abonos'),
       where('entidadId', '==', distribuidorId),
       where('tipo', '==', 'gasto'),
-      orderBy('createdAt', 'desc')
+      orderBy('createdAt', 'desc'),
     )
 
     const unsubPagos = onSnapshot(pagosQuery,
       (snapshot) => {
         const pagosData = snapshot.docs.map(doc => ({
           ...doc.data(),
-          id: doc.id
+          id: doc.id,
         })) as GastoAbono[]
         setPagos(pagosData)
       },
-      (err) => console.warn('Pagos query error:', err)
+      (err) => console.warn('Pagos query error:', err),
     )
 
     // Cargar distribuidor
     const distQuery = query(
       collection(db, 'distribuidores'),
-      where('id', '==', distribuidorId)
+      where('id', '==', distribuidorId),
     )
 
     const unsubDist = onSnapshot(distQuery,
@@ -331,7 +331,7 @@ export function useTrazabilidadDistribuidor(distribuidorId: string | null): Traz
       (err) => {
         setError(`Error cargando distribuidor: ${err.message}`)
         setLoading(false)
-      }
+      },
     )
 
     return () => {
@@ -367,7 +367,7 @@ export function useTrazabilidadDistribuidor(distribuidorId: string | null): Traz
       deudaActual,
       promedioOrden,
       ultimaOrden,
-      stockDisponible
+      stockDisponible,
     }
   }, [ordenesCompra])
 
@@ -406,7 +406,7 @@ export function useTrazabilidadOC(ocId: string | null): TrazabilidadOC {
     // Suscripción a la OC
     const ocQuery = query(
       collection(db, 'ordenes_compra'),
-      where('id', '==', ocId)
+      where('id', '==', ocId),
     )
 
     const unsubOC = onSnapshot(ocQuery,
@@ -415,21 +415,21 @@ export function useTrazabilidadOC(ocId: string | null): TrazabilidadOC {
           setOrdenCompra(snapshot.docs[0].data() as OrdenCompra)
         }
       },
-      (err) => setError(`Error cargando OC: ${err.message}`)
+      (err) => setError(`Error cargando OC: ${err.message}`),
     )
 
     // Suscripción a ventas de esta OC
     const ventasQuery = query(
       collection(db, 'ventas'),
       where('ocRelacionada', '==', ocId),
-      orderBy('createdAt', 'desc')
+      orderBy('createdAt', 'desc'),
     )
 
     const unsubVentas = onSnapshot(ventasQuery,
       (snapshot) => {
         const ventasData = snapshot.docs.map(doc => ({
           ...doc.data(),
-          id: doc.id
+          id: doc.id,
         })) as Venta[]
         setVentas(ventasData)
         setLoading(false)
@@ -437,7 +437,7 @@ export function useTrazabilidadOC(ocId: string | null): TrazabilidadOC {
       (err) => {
         setError(`Error cargando ventas: ${err.message}`)
         setLoading(false)
-      }
+      },
     )
 
     return () => {
@@ -461,7 +461,7 @@ export function useTrazabilidadOC(ocId: string | null): TrazabilidadOC {
       stockRestante,
       ingresoGenerado,
       gananciaGenerada,
-      porcentajeVendido
+      porcentajeVendido,
     }
   }, [ventas, ordenCompra])
 
@@ -513,14 +513,14 @@ export function useAnalisisGastosAbonos(filtros?: FiltrosAnalisis): AnalisisGast
       collection(db, 'gastos_abonos'),
       where('tipo', '==', 'gasto'),
       orderBy('createdAt', 'desc'),
-      firestoreLimit(500)
+      firestoreLimit(500),
     )
 
     const unsubGastos = onSnapshot(gastosQuery,
       (snapshot) => {
         let gastosData = snapshot.docs.map(doc => ({
           ...doc.data(),
-          id: doc.id
+          id: doc.id,
         })) as GastoAbono[]
 
         // Aplicar filtros en cliente
@@ -543,7 +543,7 @@ export function useAnalisisGastosAbonos(filtros?: FiltrosAnalisis): AnalisisGast
 
         setGastos(gastosData)
       },
-      (err) => setError(`Error cargando gastos: ${err.message}`)
+      (err) => setError(`Error cargando gastos: ${err.message}`),
     )
 
     // Query de abonos
@@ -551,14 +551,14 @@ export function useAnalisisGastosAbonos(filtros?: FiltrosAnalisis): AnalisisGast
       collection(db, 'gastos_abonos'),
       where('tipo', '==', 'abono'),
       orderBy('createdAt', 'desc'),
-      firestoreLimit(500)
+      firestoreLimit(500),
     )
 
     const unsubAbonos = onSnapshot(abonosQuery,
       (snapshot) => {
         let abonosData = snapshot.docs.map(doc => ({
           ...doc.data(),
-          id: doc.id
+          id: doc.id,
         })) as GastoAbono[]
 
         // Aplicar filtros
@@ -572,7 +572,7 @@ export function useAnalisisGastosAbonos(filtros?: FiltrosAnalisis): AnalisisGast
       (err) => {
         setError(`Error cargando abonos: ${err.message}`)
         setLoading(false)
-      }
+      },
     )
 
     return () => {
@@ -606,7 +606,7 @@ export function useAnalisisGastosAbonos(filtros?: FiltrosAnalisis): AnalisisGast
         } else {
           abonosPorClienteMap.set(a.entidadId, {
             nombre: a.origen ?? 'Desconocido',
-            total: a.monto ?? a.valor ?? 0
+            total: a.monto ?? a.valor ?? 0,
           })
         }
       }
@@ -625,7 +625,7 @@ export function useAnalisisGastosAbonos(filtros?: FiltrosAnalisis): AnalisisGast
         } else {
           gastosPorDistMap.set(g.entidadId, {
             nombre: g.concepto ?? 'Desconocido',
-            total: g.monto ?? g.valor ?? 0
+            total: g.monto ?? g.valor ?? 0,
           })
         }
       }
@@ -640,7 +640,7 @@ export function useAnalisisGastosAbonos(filtros?: FiltrosAnalisis): AnalisisGast
       balance,
       gastosPorBanco,
       abonosPorCliente,
-      gastosPorDistribuidor
+      gastosPorDistribuidor,
     }
   }, [gastos, abonos])
 
@@ -680,7 +680,7 @@ export function useDashboardMetricas(): DashboardMetricas {
     deudaDistribuidores: 0,
     stockTotal: 0,
     capitalTotal: 0,
-    loading: true
+    loading: true,
   })
 
   useEffect(() => {
@@ -701,7 +701,7 @@ export function useDashboardMetricas(): DashboardMetricas {
     const ventasQuery = query(
       collection(db, 'ventas'),
       orderBy('createdAt', 'desc'),
-      firestoreLimit(1000)
+      firestoreLimit(1000),
     )
 
     const unsubVentas = onSnapshot(ventasQuery, (snapshot) => {
@@ -748,7 +748,7 @@ export function useDashboardMetricas(): DashboardMetricas {
         ventasMes,
         gananciaHoy,
         gananciaSemana,
-        gananciaMes
+        gananciaMes,
       }))
     })
 
@@ -825,7 +825,7 @@ export interface UseFilteredDataResult<T> {
  * Hook genérico para filtrar datos
  */
 export function useFilteredData<T extends { fecha?: unknown; monto?: number }>(
-  collectionName: string
+  collectionName: string,
 ): UseFilteredDataResult<T> {
   const [data, setData] = useState<T[]>([])
   const [loading, setLoading] = useState(true)
@@ -852,14 +852,14 @@ export function useFilteredData<T extends { fecha?: unknown; monto?: number }>(
     const q = query(
       collection(db, collectionName),
       orderBy('createdAt', 'desc'),
-      firestoreLimit(1000)
+      firestoreLimit(1000),
     )
 
     const unsub = onSnapshot(q,
       (snapshot) => {
         let items = snapshot.docs.map(doc => ({
           ...doc.data(),
-          id: doc.id
+          id: doc.id,
         })) as unknown as T[]
 
         // Aplicar filtros
@@ -903,7 +903,7 @@ export function useFilteredData<T extends { fecha?: unknown; monto?: number }>(
       (err) => {
         setError(`Error: ${err.message}`)
         setLoading(false)
-      }
+      },
     )
 
     return () => unsub()

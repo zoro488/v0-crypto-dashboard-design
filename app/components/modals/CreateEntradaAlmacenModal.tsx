@@ -1,12 +1,12 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { X, PackagePlus, ChevronRight } from "lucide-react"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { useToast } from "@/app/hooks/use-toast"
-import { firestoreService } from "@/app/lib/firebase/firestore-service"
-import { useAlmacenData } from "@/app/lib/firebase/firestore-hooks.service"
-import { logger } from "@/app/lib/utils/logger"
+import { useState } from 'react'
+import { X, PackagePlus, ChevronRight } from 'lucide-react'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { useToast } from '@/app/hooks/use-toast'
+import { firestoreService } from '@/app/lib/firebase/firestore-service'
+import { useAlmacenData } from '@/app/lib/firebase/firestore-hooks.service'
+import { logger } from '@/app/lib/utils/logger'
 
 interface CreateEntradaAlmacenModalProps {
   isOpen: boolean
@@ -20,17 +20,17 @@ export default function CreateEntradaAlmacenModal({ isOpen, onClose }: CreateEnt
   const { data: productos = [] } = useAlmacenData()
 
   const [formData, setFormData] = useState({
-    productoId: "",
-    productoNombre: "",
+    productoId: '',
+    productoNombre: '',
     cantidad: 1,
-    origen: "",
+    origen: '',
     costoUnitario: 0,
-    ordenCompraRef: "",
+    ordenCompraRef: '',
   })
 
   const handleSubmit = async () => {
     if (!formData.productoId || !formData.origen || formData.cantidad <= 0) {
-      toast({ title: "Error", description: "Completa todos los campos requeridos", variant: "destructive" })
+      toast({ title: 'Error', description: 'Completa todos los campos requeridos', variant: 'destructive' })
       return
     }
 
@@ -46,7 +46,7 @@ export default function CreateEntradaAlmacenModal({ isOpen, onClose }: CreateEnt
 
       // Actualizar store local para UI inmediata
       addEntradaAlmacen({
-        tipo: "entrada",
+        tipo: 'entrada',
         fecha: new Date().toISOString(),
         cantidad: formData.cantidad,
         origen: formData.origen,
@@ -60,26 +60,26 @@ export default function CreateEntradaAlmacenModal({ isOpen, onClose }: CreateEnt
       triggerDataRefresh()
 
       toast({
-        title: "✅ Entrada Registrada",
+        title: '✅ Entrada Registrada',
         description: `${formData.cantidad} unidades de "${formData.productoNombre}" agregadas al inventario`,
       })
       
       // Resetear formulario
       setFormData({
-        productoId: "",
-        productoNombre: "",
+        productoId: '',
+        productoNombre: '',
         cantidad: 1,
-        origen: "",
+        origen: '',
         costoUnitario: 0,
-        ordenCompraRef: "",
+        ordenCompraRef: '',
       })
       onClose()
     } catch (error) {
-      logger.error("Error creating entrada", error, { context: "CreateEntradaAlmacenModal" })
+      logger.error('Error creating entrada', error, { context: 'CreateEntradaAlmacenModal' })
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "No se pudo registrar la entrada. Intenta de nuevo.",
-        variant: "destructive",
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'No se pudo registrar la entrada. Intenta de nuevo.',
+        variant: 'destructive',
       })
     }
   }
@@ -89,7 +89,7 @@ export default function CreateEntradaAlmacenModal({ isOpen, onClose }: CreateEnt
     setFormData({
       ...formData,
       productoId,
-      productoNombre: (producto?.nombre as string) || "",
+      productoNombre: (producto?.nombre as string) || '',
       costoUnitario: (producto?.valorUnitario as number) || 0,
     })
   }

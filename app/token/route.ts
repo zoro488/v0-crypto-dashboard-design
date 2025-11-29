@@ -9,8 +9,8 @@
  * @see https://platform.openai.com/docs/guides/realtime-webrtc
  */
 
-import { NextRequest, NextResponse } from "next/server"
-import { logger } from "@/app/lib/utils/logger"
+import { NextRequest, NextResponse } from 'next/server'
+import { logger } from '@/app/lib/utils/logger'
 
 // Tipos para la respuesta de OpenAI
 interface OpenAISessionResponse {
@@ -40,7 +40,7 @@ interface OpenAISessionResponse {
   }>
   tool_choice: string
   temperature: number
-  max_response_output_tokens: number | "inf"
+  max_response_output_tokens: number | 'inf'
   client_secret: {
     value: string
     expires_at: number
@@ -48,10 +48,10 @@ interface OpenAISessionResponse {
 }
 
 interface TokenRequestBody {
-  voice?: "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer"
+  voice?: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'
   instructions?: string
   tools?: Array<{
-    type: "function"
+    type: 'function'
     name: string
     description: string
     parameters: Record<string, unknown>
@@ -64,10 +64,10 @@ export async function POST(request: NextRequest) {
     const apiKey = process.env.OPENAI_API_KEY
     
     if (!apiKey) {
-      logger.error("OPENAI_API_KEY not configured")
+      logger.error('OPENAI_API_KEY not configured')
       return NextResponse.json(
-        { error: "OpenAI API key not configured" },
-        { status: 500 }
+        { error: 'OpenAI API key not configured' },
+        { status: 500 },
       )
     }
 
@@ -81,18 +81,18 @@ export async function POST(request: NextRequest) {
 
     // Configurar la sesión
     const sessionConfig = {
-      model: "gpt-4o-realtime-preview-2024-12-17",
-      voice: body.voice || "alloy",
+      model: 'gpt-4o-realtime-preview-2024-12-17',
+      voice: body.voice || 'alloy',
       instructions: body.instructions || getDefaultInstructions(),
       tools: body.tools || getDefaultTools(),
-      modalities: ["audio", "text"],
-      input_audio_format: "pcm16",
-      output_audio_format: "pcm16",
+      modalities: ['audio', 'text'],
+      input_audio_format: 'pcm16',
+      output_audio_format: 'pcm16',
       input_audio_transcription: {
-        model: "whisper-1",
+        model: 'whisper-1',
       },
       turn_detection: {
-        type: "server_vad",
+        type: 'server_vad',
         threshold: 0.5,
         prefix_padding_ms: 300,
         silence_duration_ms: 500,
@@ -101,22 +101,22 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear sesión efímera con OpenAI
-    const response = await fetch("https://api.openai.com/v1/realtime/sessions", {
-      method: "POST",
+    const response = await fetch('https://api.openai.com/v1/realtime/sessions', {
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(sessionConfig),
     })
 
     if (!response.ok) {
       const errorText = await response.text()
-      logger.error("OpenAI session creation failed", { status: response.status, error: errorText })
+      logger.error('OpenAI session creation failed', { status: response.status, error: errorText })
       
       return NextResponse.json(
-        { error: "Failed to create OpenAI session", details: errorText },
-        { status: response.status }
+        { error: 'Failed to create OpenAI session', details: errorText },
+        { status: response.status },
       )
     }
 
@@ -133,11 +133,11 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    logger.error("Error in realtime token endpoint", error)
+    logger.error('Error in realtime token endpoint', error)
     
     return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
+      { error: 'Internal server error' },
+      { status: 500 },
     )
   }
 }
@@ -173,154 +173,154 @@ Cuando detectes una intención clara, llama la función correspondiente.`
  * Tools/funciones disponibles para el agente
  */
 function getDefaultTools(): Array<{
-  type: "function"
+  type: 'function'
   name: string
   description: string
   parameters: Record<string, unknown>
 }> {
   return [
     {
-      type: "function",
-      name: "registrar_venta",
-      description: "Registra una nueva venta con cliente y productos",
+      type: 'function',
+      name: 'registrar_venta',
+      description: 'Registra una nueva venta con cliente y productos',
       parameters: {
-        type: "object",
+        type: 'object',
         properties: {
           clienteNombre: {
-            type: "string",
-            description: "Nombre del cliente",
+            type: 'string',
+            description: 'Nombre del cliente',
           },
           productos: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "object",
+              type: 'object',
               properties: {
-                nombre: { type: "string" },
-                cantidad: { type: "number" },
-                precio: { type: "number" },
+                nombre: { type: 'string' },
+                cantidad: { type: 'number' },
+                precio: { type: 'number' },
               },
             },
-            description: "Lista de productos vendidos",
+            description: 'Lista de productos vendidos',
           },
           metodoPago: {
-            type: "string",
-            enum: ["efectivo", "transferencia", "tarjeta", "credito"],
+            type: 'string',
+            enum: ['efectivo', 'transferencia', 'tarjeta', 'credito'],
           },
           esCredito: {
-            type: "boolean",
-            description: "Si la venta es a crédito (fiado)",
+            type: 'boolean',
+            description: 'Si la venta es a crédito (fiado)',
           },
         },
-        required: ["productos"],
+        required: ['productos'],
       },
     },
     {
-      type: "function",
-      name: "crear_orden_compra",
-      description: "Crea una orden de compra a un proveedor",
+      type: 'function',
+      name: 'crear_orden_compra',
+      description: 'Crea una orden de compra a un proveedor',
       parameters: {
-        type: "object",
+        type: 'object',
         properties: {
           distribuidorNombre: {
-            type: "string",
-            description: "Nombre del proveedor/distribuidor",
+            type: 'string',
+            description: 'Nombre del proveedor/distribuidor',
           },
           productos: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "object",
+              type: 'object',
               properties: {
-                nombre: { type: "string" },
-                cantidad: { type: "number" },
-                costo: { type: "number" },
+                nombre: { type: 'string' },
+                cantidad: { type: 'number' },
+                costo: { type: 'number' },
               },
             },
           },
           costoTotal: {
-            type: "number",
+            type: 'number',
           },
         },
-        required: ["productos"],
+        required: ['productos'],
       },
     },
     {
-      type: "function",
-      name: "agregar_producto",
-      description: "Agrega un nuevo producto al inventario",
+      type: 'function',
+      name: 'agregar_producto',
+      description: 'Agrega un nuevo producto al inventario',
       parameters: {
-        type: "object",
+        type: 'object',
         properties: {
           nombre: {
-            type: "string",
-            description: "Nombre del producto",
+            type: 'string',
+            description: 'Nombre del producto',
           },
           precioCompra: {
-            type: "number",
-            description: "Precio de compra/costo",
+            type: 'number',
+            description: 'Precio de compra/costo',
           },
           precioVenta: {
-            type: "number",
-            description: "Precio de venta",
+            type: 'number',
+            description: 'Precio de venta',
           },
           stock: {
-            type: "number",
-            description: "Stock inicial",
+            type: 'number',
+            description: 'Stock inicial',
           },
           categoria: {
-            type: "string",
+            type: 'string',
           },
         },
-        required: ["nombre"],
+        required: ['nombre'],
       },
     },
     {
-      type: "function",
-      name: "consultar_stock",
-      description: "Consulta el stock de un producto",
+      type: 'function',
+      name: 'consultar_stock',
+      description: 'Consulta el stock de un producto',
       parameters: {
-        type: "object",
+        type: 'object',
         properties: {
           productoNombre: {
-            type: "string",
-            description: "Nombre del producto a consultar",
+            type: 'string',
+            description: 'Nombre del producto a consultar',
           },
         },
-        required: ["productoNombre"],
+        required: ['productoNombre'],
       },
     },
     {
-      type: "function",
-      name: "consultar_deuda_cliente",
-      description: "Consulta cuánto debe un cliente",
+      type: 'function',
+      name: 'consultar_deuda_cliente',
+      description: 'Consulta cuánto debe un cliente',
       parameters: {
-        type: "object",
+        type: 'object',
         properties: {
           clienteNombre: {
-            type: "string",
-            description: "Nombre del cliente",
+            type: 'string',
+            description: 'Nombre del cliente',
           },
         },
-        required: ["clienteNombre"],
+        required: ['clienteNombre'],
       },
     },
     {
-      type: "function",
-      name: "abrir_modal",
-      description: "Abre un modal específico en la interfaz",
+      type: 'function',
+      name: 'abrir_modal',
+      description: 'Abre un modal específico en la interfaz',
       parameters: {
-        type: "object",
+        type: 'object',
         properties: {
           tipo: {
-            type: "string",
-            enum: ["venta", "orden_compra", "producto", "cliente", "distribuidor"],
-            description: "Tipo de modal a abrir",
+            type: 'string',
+            enum: ['venta', 'orden_compra', 'producto', 'cliente', 'distribuidor'],
+            description: 'Tipo de modal a abrir',
           },
           datosIniciales: {
-            type: "object",
-            description: "Datos para prellenar el formulario",
+            type: 'object',
+            description: 'Datos para prellenar el formulario',
           },
         },
-        required: ["tipo"],
+        required: ['tipo'],
       },
     },
   ]

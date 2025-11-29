@@ -36,7 +36,7 @@ import {
   serverTimestamp,
   runTransaction,
   Timestamp,
-  increment as firestoreIncrement
+  increment as firestoreIncrement,
 } from 'firebase/firestore'
 import { db, getFirestoreInstance } from '@/app/lib/firebase/config'
 import { logger } from '@/app/lib/utils/logger'
@@ -48,7 +48,7 @@ import type {
   Movimiento,
   BancoId,
   GastoAbono,
-  CalculoVentaResult 
+  CalculoVentaResult, 
 } from '@/app/types'
 
 // ====================================================================
@@ -66,7 +66,7 @@ export const BANCOS_IDS: BancoId[] = [
   'leftie',
   'azteca',
   'flete_sur',
-  'utilidades'
+  'utilidades',
 ]
 
 /** Bancos que reciben de ventas */
@@ -143,7 +143,7 @@ export function calcularDistribucionVenta(
   precioVenta: number,
   precioCompra: number,
   aplicaFlete: boolean,
-  precioFlete: number = PRECIO_FLETE_DEFAULT
+  precioFlete: number = PRECIO_FLETE_DEFAULT,
 ): CalculoVentaResult {
   // Monto que va a Bóveda Monte (COSTO de la mercancía)
   const montoBovedaMonte = precioCompra * cantidad
@@ -174,8 +174,8 @@ export function calcularDistribucionVenta(
     distribucionParcial: {
       bovedaMonte: montoBovedaMonte,
       fletes: montoFletes,
-      utilidades: montoUtilidades
-    }
+      utilidades: montoUtilidades,
+    },
   }
 }
 
@@ -187,14 +187,14 @@ export function calcularDistribucionParcial(
   totalVenta: number,
   montoBovedaMonte: number,
   montoFletes: number,
-  montoUtilidades: number
+  montoUtilidades: number,
 ): { bovedaMonte: number; fletes: number; utilidades: number } {
   const proporcion = montoPagado / totalVenta
   
   return {
     bovedaMonte: montoBovedaMonte * proporcion,
     fletes: montoFletes * proporcion,
-    utilidades: montoUtilidades * proporcion
+    utilidades: montoUtilidades * proporcion,
   }
 }
 
@@ -237,7 +237,7 @@ export async function registrarVenta(input: NuevaVentaInput): Promise<string> {
         input.precioVenta,
         input.precioCompra,
         input.flete === 'Aplica',
-        input.precioFlete ?? PRECIO_FLETE_DEFAULT
+        input.precioFlete ?? PRECIO_FLETE_DEFAULT,
       )
       
       // 2. Determinar estado de pago
@@ -272,7 +272,7 @@ export async function registrarVenta(input: NuevaVentaInput): Promise<string> {
         distribucionBancos: {
           bovedaMonte: distribucion.montoBovedaMonte,
           fletes: distribucion.montoFletes,
-          utilidades: distribucion.montoUtilidades
+          utilidades: distribucion.montoUtilidades,
         },
         estatus: estadoPago === 'completo' ? 'Pagado' : 'Pendiente',
         estadoPago,
@@ -285,10 +285,10 @@ export async function registrarVenta(input: NuevaVentaInput): Promise<string> {
         keywords: [
           (input.clienteNombre || '').toLowerCase(),
           ventaId.toLowerCase(),
-          (input.ocRelacionada || '').toLowerCase()
+          (input.ocRelacionada || '').toLowerCase(),
         ],
         createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now()
+        updatedAt: Timestamp.now(),
       }
       transaction.set(ventaRef, ventaData)
       
@@ -300,7 +300,7 @@ export async function registrarVenta(input: NuevaVentaInput): Promise<string> {
         const nuevoStock = (ocData.stockActual ?? ocData.cantidad) - input.cantidad
         transaction.update(ocRef, {
           stockActual: nuevoStock,
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
         })
       }
       
@@ -318,7 +318,7 @@ export async function registrarVenta(input: NuevaVentaInput): Promise<string> {
           pendiente: (clienteData.deuda ?? 0) + montoRestante - ((clienteData.abonos ?? 0) + montoPagado),
           numeroCompras: (clienteData.numeroCompras ?? 0) + 1,
           ultimaCompra: serverTimestamp(),
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
         })
       }
       
@@ -335,14 +335,14 @@ export async function registrarVenta(input: NuevaVentaInput): Promise<string> {
           distribucion.ingresoVenta,
           distribucion.montoBovedaMonte,
           distribucion.montoFletes,
-          distribucion.montoUtilidades
+          distribucion.montoUtilidades,
         )
         
         // Actualizar Bóveda Monte (capital + histórico)
         transaction.update(bovedaRef, {
           capitalActual: firestoreIncrement(distribucionParcial.bovedaMonte),
           historicoIngresos: firestoreIncrement(distribucion.montoBovedaMonte), // Histórico completo
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
         })
         
         // Actualizar Fletes (capital + histórico)
@@ -350,7 +350,7 @@ export async function registrarVenta(input: NuevaVentaInput): Promise<string> {
           transaction.update(fletesRef, {
             capitalActual: firestoreIncrement(distribucionParcial.fletes),
             historicoIngresos: firestoreIncrement(distribucion.montoFletes), // Histórico completo
-            updatedAt: serverTimestamp()
+            updatedAt: serverTimestamp(),
           })
         }
         
@@ -358,25 +358,25 @@ export async function registrarVenta(input: NuevaVentaInput): Promise<string> {
         transaction.update(utilidadesRef, {
           capitalActual: firestoreIncrement(distribucionParcial.utilidades),
           historicoIngresos: firestoreIncrement(distribucion.montoUtilidades), // Histórico completo
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
         })
       } else {
         // Venta PENDIENTE: Solo registrar en históricos, NO en capitalActual
         transaction.update(bovedaRef, {
           historicoIngresos: firestoreIncrement(distribucion.montoBovedaMonte),
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
         })
         
         if (distribucion.montoFletes > 0) {
           transaction.update(fletesRef, {
             historicoIngresos: firestoreIncrement(distribucion.montoFletes),
-            updatedAt: serverTimestamp()
+            updatedAt: serverTimestamp(),
           })
         }
         
         transaction.update(utilidadesRef, {
           historicoIngresos: firestoreIncrement(distribucion.montoUtilidades),
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
         })
       }
         
@@ -390,7 +390,7 @@ export async function registrarVenta(input: NuevaVentaInput): Promise<string> {
         referenciaTipo: 'venta' as const,
         referenciaId: ventaId,
         estadoPago, // Incluir estado para identificar pendientes
-        createdAt: Timestamp.now()
+        createdAt: Timestamp.now(),
       }
       
       // Movimiento Bóveda Monte
@@ -478,9 +478,9 @@ export async function registrarAbonoCliente(input: AbonoClienteInput): Promise<s
           {
             fecha: Timestamp.now(),
             monto: input.monto,
-            ventaId: input.ventaRelacionada
-          }
-        ]
+            ventaId: input.ventaRelacionada,
+          },
+        ],
       })
       
       // 3. Si hay venta relacionada, actualizar su estado
@@ -504,7 +504,7 @@ export async function registrarAbonoCliente(input: AbonoClienteInput): Promise<s
             adeudo: Math.max(0, nuevoMontoRestante),
             estadoPago: nuevoEstado,
             estatus: nuevoEstado === 'completo' ? 'Pagado' : 'Pendiente',
-            updatedAt: serverTimestamp()
+            updatedAt: serverTimestamp(),
           })
           
           // 4. Distribuir a bancos proporcionalmente
@@ -512,7 +512,7 @@ export async function registrarAbonoCliente(input: AbonoClienteInput): Promise<s
           const distribucion = ventaData.distribucionBancos ?? {
             bovedaMonte: ventaData.bovedaMonte ?? 0,
             fletes: ventaData.fleteUtilidad ?? 0,
-            utilidades: ventaData.utilidad ?? 0
+            utilidades: ventaData.utilidad ?? 0,
           }
           
           // Bóveda Monte
@@ -521,7 +521,7 @@ export async function registrarAbonoCliente(input: AbonoClienteInput): Promise<s
           transaction.update(bovedaRef, {
             capitalActual: firestoreIncrement(montoBovedaMonte),
             historicoIngresos: firestoreIncrement(montoBovedaMonte),
-            updatedAt: serverTimestamp()
+            updatedAt: serverTimestamp(),
           })
           
           // Fletes
@@ -531,7 +531,7 @@ export async function registrarAbonoCliente(input: AbonoClienteInput): Promise<s
             transaction.update(fletesRef, {
               capitalActual: firestoreIncrement(montoFletes),
               historicoIngresos: firestoreIncrement(montoFletes),
-              updatedAt: serverTimestamp()
+              updatedAt: serverTimestamp(),
             })
           }
           
@@ -541,7 +541,7 @@ export async function registrarAbonoCliente(input: AbonoClienteInput): Promise<s
           transaction.update(utilidadesRef, {
             capitalActual: firestoreIncrement(montoUtilidades),
             historicoIngresos: firestoreIncrement(montoUtilidades),
-            updatedAt: serverTimestamp()
+            updatedAt: serverTimestamp(),
           })
         }
       } else {
@@ -559,21 +559,21 @@ export async function registrarAbonoCliente(input: AbonoClienteInput): Promise<s
         transaction.update(bovedaRef, {
           capitalActual: firestoreIncrement(montoBovedaMonte),
           historicoIngresos: firestoreIncrement(montoBovedaMonte),
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
         })
         
         const fletesRef = doc(firestore, 'bancos', 'flete_sur')
         transaction.update(fletesRef, {
           capitalActual: firestoreIncrement(montoFletes),
           historicoIngresos: firestoreIncrement(montoFletes),
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
         })
         
         const utilidadesRef = doc(firestore, 'bancos', 'utilidades')
         transaction.update(utilidadesRef, {
           capitalActual: firestoreIncrement(montoUtilidades),
           historicoIngresos: firestoreIncrement(montoUtilidades),
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
         })
       }
       
@@ -593,7 +593,7 @@ export async function registrarAbonoCliente(input: AbonoClienteInput): Promise<s
         concepto: input.concepto ?? `Abono cliente ${input.clienteNombre}`,
         entidadId: input.clienteId,
         entidadTipo: 'cliente',
-        createdAt: Timestamp.now()
+        createdAt: Timestamp.now(),
       }
       transaction.set(gastoAbonoRef, gastoAbonoData)
     })
@@ -636,7 +636,7 @@ export async function registrarPagoDistribuidor(input: PagoDistribuidorInput): P
       transaction.update(bancoRef, {
         capitalActual: firestoreIncrement(-input.monto),
         historicoGastos: firestoreIncrement(input.monto),
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       })
       
       // 2. Actualizar distribuidor
@@ -659,9 +659,9 @@ export async function registrarPagoDistribuidor(input: PagoDistribuidorInput): P
               fecha: Timestamp.now(),
               monto: input.monto,
               bancoOrigen: input.bancoOrigen,
-              ordenCompraId: input.ordenCompraRelacionada
-            }
-          ]
+              ordenCompraId: input.ordenCompraRelacionada,
+            },
+          ],
         })
       }
       
@@ -683,7 +683,7 @@ export async function registrarPagoDistribuidor(input: PagoDistribuidorInput): P
             deuda: nuevaDeudaOC,
             pagoDistribuidor: (ocData.pagoDistribuidor ?? 0) + input.monto,
             estado: nuevoEstadoOC,
-            updatedAt: serverTimestamp()
+            updatedAt: serverTimestamp(),
           })
         }
       }
@@ -707,7 +707,7 @@ export async function registrarPagoDistribuidor(input: PagoDistribuidorInput): P
           : undefined,
         entidadId: input.distribuidorId,
         entidadTipo: 'distribuidor',
-        createdAt: Timestamp.now()
+        createdAt: Timestamp.now(),
       }
       transaction.set(gastoRef, gastoData)
       
@@ -722,7 +722,7 @@ export async function registrarPagoDistribuidor(input: PagoDistribuidorInput): P
         concepto: input.concepto ?? `Pago distribuidor ${input.distribuidorNombre || ''}`,
         referenciaId: input.ordenCompraRelacionada,
         referenciaTipo: 'orden_compra',
-        createdAt: Timestamp.now()
+        createdAt: Timestamp.now(),
       })
     })
     
@@ -749,7 +749,7 @@ export async function registrarTransferencia(input: TransferenciaInput): Promise
       transaction.update(bancoOrigenRef, {
         capitalActual: firestoreIncrement(-input.monto),
         historicoTransferencias: firestoreIncrement(input.monto),
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       })
       
       // Agregar al banco destino
@@ -757,7 +757,7 @@ export async function registrarTransferencia(input: TransferenciaInput): Promise
       transaction.update(bancoDestinoRef, {
         capitalActual: firestoreIncrement(input.monto),
         historicoTransferencias: firestoreIncrement(input.monto),
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       })
       
       // Crear registro de transferencia
@@ -771,7 +771,7 @@ export async function registrarTransferencia(input: TransferenciaInput): Promise
         tc: input.tc ?? 1,
         concepto: input.concepto ?? 'Transferencia entre cuentas',
         estado: 'completada',
-        createdAt: Timestamp.now()
+        createdAt: Timestamp.now(),
       })
       
       // Movimiento de salida en origen
@@ -786,7 +786,7 @@ export async function registrarTransferencia(input: TransferenciaInput): Promise
         destino: input.bancoDestino,
         referenciaId: transferenciaId,
         referenciaTipo: 'transferencia',
-        createdAt: Timestamp.now()
+        createdAt: Timestamp.now(),
       })
       
       // Movimiento de entrada en destino
@@ -801,7 +801,7 @@ export async function registrarTransferencia(input: TransferenciaInput): Promise
         origen: input.bancoOrigen,
         referenciaId: transferenciaId,
         referenciaTipo: 'transferencia',
-        createdAt: Timestamp.now()
+        createdAt: Timestamp.now(),
       })
     })
     
@@ -831,7 +831,7 @@ export async function registrarOrdenCompra(
   costoTransporte: number = 0,
   pagoInicial: number = 0,
   bancoOrigen?: BancoId,
-  notas?: string
+  notas?: string,
 ): Promise<string> {
   const ocId = `OC${String(Date.now()).slice(-4).padStart(4, '0')}`
   const firestore = getFirestoreInstance()
@@ -869,11 +869,11 @@ export async function registrarOrdenCompra(
         estado,
         keywords: [
           ocId.toLowerCase(),
-          distribuidorNombre.toLowerCase()
+          distribuidorNombre.toLowerCase(),
         ],
         notas,
         createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now()
+        updatedAt: Timestamp.now(),
       })
       
       // 2. Actualizar distribuidor
@@ -892,7 +892,7 @@ export async function registrarOrdenCompra(
           numeroOrdenes: (distribuidorData.numeroOrdenes ?? 0) + 1,
           ultimaOrden: serverTimestamp(),
           updatedAt: serverTimestamp(),
-          ordenesCompra: [...(distribuidorData.ordenesCompra ?? []), ocId]
+          ordenesCompra: [...(distribuidorData.ordenesCompra ?? []), ocId],
         })
       }
       
@@ -902,7 +902,7 @@ export async function registrarOrdenCompra(
         transaction.update(bancoRef, {
           capitalActual: firestoreIncrement(-pagoInicial),
           historicoGastos: firestoreIncrement(pagoInicial),
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
         })
         
         // Registrar como gasto
@@ -921,7 +921,7 @@ export async function registrarOrdenCompra(
           concepto: `Pago inicial OC ${ocId} - ${distribuidorNombre}`,
           entidadId: distribuidorId,
           entidadTipo: 'distribuidor',
-          createdAt: Timestamp.now()
+          createdAt: Timestamp.now(),
         })
       }
       
@@ -941,7 +941,7 @@ export async function registrarOrdenCompra(
         referenciaId: ocId,
         referenciaTipo: 'orden_compra',
         origen: distribuidorNombre,
-        createdAt: Timestamp.now()
+        createdAt: Timestamp.now(),
       })
     })
     
@@ -982,7 +982,7 @@ export async function obtenerResumenCliente(clienteId: string): Promise<{
       totalVentas: clienteData.totalVentas ?? 0,
       totalPagado: clienteData.totalPagado ?? 0,
       deudaActual: clienteData.pendiente ?? (clienteData.deuda ?? 0) - (clienteData.abonos ?? 0),
-      ventasPendientes: (clienteData.ventas ?? []).length // Aproximado, idealmente consultar ventas
+      ventasPendientes: (clienteData.ventas ?? []).length, // Aproximado, idealmente consultar ventas
     }
   } catch (error) {
     logger.error('Error al obtener resumen de cliente', { data: { error, clienteId } })
@@ -1014,7 +1014,7 @@ export async function obtenerResumenDistribuidor(distribuidorId: string): Promis
       totalCompras: distribuidorData.totalOrdenesCompra ?? 0,
       totalPagado: distribuidorData.totalPagado ?? 0,
       deudaActual: distribuidorData.deudaTotal ?? 0,
-      ordenesActivas: (distribuidorData.ordenesCompra ?? []).length
+      ordenesActivas: (distribuidorData.ordenesCompra ?? []).length,
     }
   } catch (error) {
     logger.error('Error al obtener resumen de distribuidor', { data: { error, distribuidorId } })

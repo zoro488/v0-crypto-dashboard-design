@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 🤖 BENTO IA IMMERSIVE - Panel de Asistente Chronos Premium
@@ -12,8 +12,8 @@
  * - Analytics overlay con predicciones IA
  */
 
-import React from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import React from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Sparkles, 
   Mic, 
@@ -33,37 +33,37 @@ import {
   Maximize2,
   Minimize2,
   Settings,
-  RefreshCw
-} from "lucide-react"
-import { useState, useEffect, useRef, useMemo, useCallback, lazy, Suspense } from "react"
-import { useVoiceAgent } from "@/app/hooks/useVoiceAgent"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { AIAnalyticsOverlay } from "@/app/components/3d/AIAnalyticsOverlay"
-import { AreaChart, Area, XAxis, YAxis, Tooltip, RadarChart, PolarGrid, PolarAngleAxis, Radar } from "recharts"
-import { SafeChartContainer, SAFE_ANIMATION_PROPS } from "@/app/components/ui/SafeChartContainer"
-import { QuickStatWidget } from "@/app/components/widgets/QuickStatWidget"
-import { MiniChartWidget } from "@/app/components/widgets/MiniChartWidget"
-import { ActivityFeedWidget, ActivityItem } from "@/app/components/widgets/ActivityFeedWidget"
-import { logger } from "@/app/lib/utils/logger"
+  RefreshCw,
+} from 'lucide-react'
+import { useState, useEffect, useRef, useMemo, useCallback, lazy, Suspense } from 'react'
+import { useVoiceAgent } from '@/app/hooks/useVoiceAgent'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { AIAnalyticsOverlay } from '@/app/components/3d/AIAnalyticsOverlay'
+import { AreaChart, Area, XAxis, YAxis, Tooltip, RadarChart, PolarGrid, PolarAngleAxis, Radar } from 'recharts'
+import { SafeChartContainer, SAFE_ANIMATION_PROPS } from '@/app/components/ui/SafeChartContainer'
+import { QuickStatWidget } from '@/app/components/widgets/QuickStatWidget'
+import { MiniChartWidget } from '@/app/components/widgets/MiniChartWidget'
+import { ActivityFeedWidget, ActivityItem } from '@/app/components/widgets/ActivityFeedWidget'
+import { logger } from '@/app/lib/utils/logger'
 
 // Lazy load Spline para optimización
 const Spline = lazy(() => import('@splinetool/react-spline'))
 
 // URLs de los escenarios Spline
 const SPLINE_SCENES = {
-  nexbot: "https://prod.spline.design/eGbfbvp0WBojpcqu/scene.splinecode",
-  particle_nebula: "https://prod.spline.design/Umjz4tA2QXT43ljm/scene.splinecode",
-  fire_portal: "https://prod.spline.design/NgWU8fD6towEaxnr/scene.splinecode"
+  nexbot: 'https://prod.spline.design/eGbfbvp0WBojpcqu/scene.splinecode',
+  particle_nebula: 'https://prod.spline.design/Umjz4tA2QXT43ljm/scene.splinecode',
+  fire_portal: 'https://prod.spline.design/NgWU8fD6towEaxnr/scene.splinecode',
 }
 
 // Datos de análisis para gráficos
 const analysisData = [
-  { month: "Ene", ventas: 45000, compras: 32000, prediccion: 48000 },
-  { month: "Feb", ventas: 52000, compras: 38000, prediccion: 54000 },
-  { month: "Mar", ventas: 61000, compras: 42000, prediccion: 63000 },
-  { month: "Abr", ventas: 58000, compras: 40000, prediccion: 60000 },
-  { month: "May", ventas: 67000, compras: 45000, prediccion: 70000 },
-  { month: "Jun", ventas: 72000, compras: 48000, prediccion: 76000 },
+  { month: 'Ene', ventas: 45000, compras: 32000, prediccion: 48000 },
+  { month: 'Feb', ventas: 52000, compras: 38000, prediccion: 54000 },
+  { month: 'Mar', ventas: 61000, compras: 42000, prediccion: 63000 },
+  { month: 'Abr', ventas: 58000, compras: 40000, prediccion: 60000 },
+  { month: 'May', ventas: 67000, compras: 45000, prediccion: 70000 },
+  { month: 'Jun', ventas: 72000, compras: 48000, prediccion: 76000 },
 ]
 
 // Capacidades IA para radar
@@ -79,9 +79,9 @@ const aiCapabilities = [
 interface Message {
   id: string
   text: string
-  sender: "user" | "ai"
+  sender: 'user' | 'ai'
   timestamp: Date
-  type?: "normal" | "insight" | "alert" | "action"
+  type?: 'normal' | 'insight' | 'alert' | 'action'
 }
 
 // Estado del Nexbot
@@ -128,7 +128,7 @@ function NexbotSpline({ state, onLoad, className }: NexbotSplineProps) {
         <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-950/60 via-purple-950/60 to-black/60 rounded-3xl">
           <motion.div
             animate={{ rotate: 360 }}
-            transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+            transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
             className="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full"
           />
           <span className="absolute text-white/60 text-sm mt-24">Cargando Nexbot...</span>
@@ -179,7 +179,7 @@ function NexbotSpline({ state, onLoad, className }: NexbotSplineProps) {
               <>
                 <motion.div 
                   animate={{ rotate: 360 }} 
-                  transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                  transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
                 >
                   <Brain className="w-4 h-4" />
                 </motion.div>
@@ -239,13 +239,13 @@ interface ChatMessageProps {
 }
 
 function ChatMessage({ message }: ChatMessageProps) {
-  const isAI = message.sender === "ai"
+  const isAI = message.sender === 'ai'
   
   const typeStyles = {
-    normal: "",
-    insight: "border-l-2 border-purple-500",
-    alert: "border-l-2 border-amber-500",
-    action: "border-l-2 border-green-500"
+    normal: '',
+    insight: 'border-l-2 border-purple-500',
+    alert: 'border-l-2 border-amber-500',
+    action: 'border-l-2 border-green-500',
   }
   
   return (
@@ -253,14 +253,14 @@ function ChatMessage({ message }: ChatMessageProps) {
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.3 }}
-      className={`flex ${isAI ? "justify-start" : "justify-end"}`}
+      className={`flex ${isAI ? 'justify-start' : 'justify-end'}`}
     >
       <div
         className={`
           max-w-[80%] p-4 rounded-2xl relative
           ${isAI 
             ? `bg-gradient-to-br from-white/10 to-white/5 text-white backdrop-blur-sm ${typeStyles[message.type || 'normal']}` 
-            : "bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-lg shadow-purple-500/20"
+            : 'bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-lg shadow-purple-500/20'
           }
         `}
       >
@@ -276,9 +276,9 @@ function ChatMessage({ message }: ChatMessageProps) {
         <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
         
         <span className="text-xs opacity-50 mt-2 block text-right">
-          {message.timestamp.toLocaleTimeString("es-MX", {
-            hour: "2-digit",
-            minute: "2-digit",
+          {message.timestamp.toLocaleTimeString('es-MX', {
+            hour: '2-digit',
+            minute: '2-digit',
           })}
         </span>
       </div>
@@ -308,7 +308,7 @@ function QuickAction({ icon: Icon, label, onClick, delay = 0 }: QuickActionProps
       className="px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white flex items-center gap-3 transition-all border border-white/5 hover:border-white/10 group"
     >
       <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/20 to-purple-500/20 group-hover:from-blue-500/30 group-hover:to-purple-500/30 transition-colors">
-        {React.createElement(Icon, { className: "w-4 h-4 text-blue-300" })}
+        {React.createElement(Icon, { className: 'w-4 h-4 text-blue-300' })}
       </div>
       <span className="text-sm font-medium">{label}</span>
     </motion.button>
@@ -350,10 +350,10 @@ function TypingIndicator() {
 export default function BentoIAImmersive() {
   // State
   const [messages, setMessages] = useState<Message[]>([])
-  const [inputText, setInputText] = useState("")
+  const [inputText, setInputText] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const [showAnalytics, setShowAnalytics] = useState(false)
-  const [analyticsType, setAnalyticsType] = useState<"sales" | "inventory" | "clients" | "predictions">("sales")
+  const [analyticsType, setAnalyticsType] = useState<'sales' | 'inventory' | 'clients' | 'predictions'>('sales')
   const [nexbotState, setNexbotState] = useState<NexbotState>('idle')
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [soundEnabled, setSoundEnabled] = useState(true)
@@ -373,7 +373,7 @@ export default function BentoIAImmersive() {
       title: 'Análisis completado',
       description: 'Predicción de ventas Q2 procesada',
       timestamp: new Date(Date.now() - 300000),
-      status: 'success'
+      status: 'success',
     },
     {
       id: 'ai-2',
@@ -381,7 +381,7 @@ export default function BentoIAImmersive() {
       title: 'Recomendación generada',
       description: 'Optimización de inventario sugerida',
       timestamp: new Date(Date.now() - 900000),
-      status: 'success'
+      status: 'success',
     },
     {
       id: 'ai-3',
@@ -389,13 +389,13 @@ export default function BentoIAImmersive() {
       title: 'Alerta detectada',
       description: 'Stock bajo en 3 productos',
       timestamp: new Date(Date.now() - 1800000),
-      status: 'pending'
-    }
+      status: 'pending',
+    },
   ], [])
 
   // Auto scroll messages
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
   // Sync nexbot state with voice agent
@@ -428,55 +428,55 @@ export default function BentoIAImmersive() {
   const generateAIResponse = useCallback((userInput: string): { text: string; type: Message['type'] } => {
     const input = userInput.toLowerCase()
 
-    if (input.includes("ventas") || input.includes("vender")) {
+    if (input.includes('ventas') || input.includes('vender')) {
       setShowAnalytics(true)
-      setAnalyticsType("sales")
+      setAnalyticsType('sales')
       setNexbotState('excited')
       return {
-        text: "📊 **Análisis de Ventas Activado**\n\nLas ventas totales ascienden a $3,378,700 con un promedio de $1,126,233 por transacción.\n\n✨ Tendencia: +18% vs mes anterior\n🎯 Predicción: Alcanzar $4.2M este trimestre\n\n¿Deseas ver desglose por cliente o predicciones detalladas?",
-        type: 'insight'
+        text: '📊 **Análisis de Ventas Activado**\n\nLas ventas totales ascienden a $3,378,700 con un promedio de $1,126,233 por transacción.\n\n✨ Tendencia: +18% vs mes anterior\n🎯 Predicción: Alcanzar $4.2M este trimestre\n\n¿Deseas ver desglose por cliente o predicciones detalladas?',
+        type: 'insight',
       }
     }
 
-    if (input.includes("inventario") || input.includes("stock")) {
+    if (input.includes('inventario') || input.includes('stock')) {
       setShowAnalytics(true)
-      setAnalyticsType("inventory")
+      setAnalyticsType('inventory')
       return {
-        text: "📦 **Estado del Inventario**\n\nStock actual: 17 unidades\nEntradas totales: 2,296\nSalidas totales: 2,279\n\n⚠️ Alerta: Stock en nivel bajo\n💡 Recomendación: Generar orden de compra para mantener 30+ unidades\n\n¿Genero una orden de compra automática?",
-        type: 'alert'
+        text: '📦 **Estado del Inventario**\n\nStock actual: 17 unidades\nEntradas totales: 2,296\nSalidas totales: 2,279\n\n⚠️ Alerta: Stock en nivel bajo\n💡 Recomendación: Generar orden de compra para mantener 30+ unidades\n\n¿Genero una orden de compra automática?',
+        type: 'alert',
       }
     }
 
-    if (input.includes("clientes") || input.includes("cliente")) {
+    if (input.includes('clientes') || input.includes('cliente')) {
       setShowAnalytics(true)
-      setAnalyticsType("clients")
+      setAnalyticsType('clients')
       setNexbotState('excited')
       return {
-        text: "👥 **Análisis de Clientes**\n\n31 clientes activos\nTasa de retención: 94%\nValor promedio por cliente: $108,990\n\n⭐ Top 3 clientes representan 45% de ingresos\n📈 Oportunidad: 5 clientes con potencial de upselling\n\n¿Ver perfiles detallados?",
-        type: 'insight'
+        text: '👥 **Análisis de Clientes**\n\n31 clientes activos\nTasa de retención: 94%\nValor promedio por cliente: $108,990\n\n⭐ Top 3 clientes representan 45% de ingresos\n📈 Oportunidad: 5 clientes con potencial de upselling\n\n¿Ver perfiles detallados?',
+        type: 'insight',
       }
     }
 
-    if (input.includes("predicción") || input.includes("prediccion") || input.includes("futuro")) {
+    if (input.includes('predicción') || input.includes('prediccion') || input.includes('futuro')) {
       setShowAnalytics(true)
-      setAnalyticsType("predictions")
+      setAnalyticsType('predictions')
       setNexbotState('thinking')
       return {
-        text: "🔮 **Predicciones IA Generadas**\n\nModelo: Neural Network v3.2\nConfianza: 87%\n\nProyecciones Q3:\n• Ventas: $4.5M (+22%)\n• Margen: 34% (estable)\n• Nuevos clientes: +8\n\n🚀 Escenario optimista: +35% si se activan campañas\n\n¿Explorar escenarios alternativos?",
-        type: 'insight'
+        text: '🔮 **Predicciones IA Generadas**\n\nModelo: Neural Network v3.2\nConfianza: 87%\n\nProyecciones Q3:\n• Ventas: $4.5M (+22%)\n• Margen: 34% (estable)\n• Nuevos clientes: +8\n\n🚀 Escenario optimista: +35% si se activan campañas\n\n¿Explorar escenarios alternativos?',
+        type: 'insight',
       }
     }
 
-    if (input.includes("hola") || input.includes("hey") || input.includes("saludos")) {
+    if (input.includes('hola') || input.includes('hey') || input.includes('saludos')) {
       return {
-        text: "¡Hola! 👋 Soy Nexbot, tu asistente inteligente de Chronos.\n\nPuedo ayudarte con:\n• 📊 Análisis de ventas y predicciones\n• 📦 Gestión de inventario\n• 👥 Insights de clientes\n• 💰 Estado financiero\n\n¿En qué te puedo asistir hoy?",
-        type: 'normal'
+        text: '¡Hola! 👋 Soy Nexbot, tu asistente inteligente de Chronos.\n\nPuedo ayudarte con:\n• 📊 Análisis de ventas y predicciones\n• 📦 Gestión de inventario\n• 👥 Insights de clientes\n• 💰 Estado financiero\n\n¿En qué te puedo asistir hoy?',
+        type: 'normal',
       }
     }
 
     return {
-      text: "🤖 Entendido. Estoy procesando tu solicitud...\n\nPuedo ayudarte con análisis de ventas, inventario, clientes o predicciones. También puedo ejecutar acciones como generar reportes o crear órdenes.\n\n¿Qué necesitas específicamente?",
-      type: 'normal'
+      text: '🤖 Entendido. Estoy procesando tu solicitud...\n\nPuedo ayudarte con análisis de ventas, inventario, clientes o predicciones. También puedo ejecutar acciones como generar reportes o crear órdenes.\n\n¿Qué necesitas específicamente?',
+      type: 'normal',
     }
   }, [])
 
@@ -487,13 +487,13 @@ export default function BentoIAImmersive() {
     const userMessage: Message = {
       id: Date.now().toString(),
       text: inputText,
-      sender: "user",
+      sender: 'user',
       timestamp: new Date(),
-      type: "normal"
+      type: 'normal',
     }
 
     setMessages((prev) => [...prev, userMessage])
-    setInputText("")
+    setInputText('')
     setIsTyping(true)
     setNexbotState('thinking')
 
@@ -503,9 +503,9 @@ export default function BentoIAImmersive() {
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         text: response.text,
-        sender: "ai",
+        sender: 'ai',
         timestamp: new Date(),
-        type: response.type
+        type: response.type,
       }
       setMessages((prev) => [...prev, aiResponse])
       setIsTyping(false)
@@ -515,20 +515,20 @@ export default function BentoIAImmersive() {
 
   // Quick actions
   const quickActions: Array<{ label: string; icon: React.ElementType; type: string }> = [
-    { label: "Análisis de Ventas", icon: TrendingUp, type: "sales" },
-    { label: "Estado de Inventario", icon: Package, type: "inventory" },
-    { label: "Insights de Clientes", icon: Users, type: "clients" },
-    { label: "Predicciones IA", icon: Brain, type: "predictions" },
+    { label: 'Análisis de Ventas', icon: TrendingUp, type: 'sales' },
+    { label: 'Estado de Inventario', icon: Package, type: 'inventory' },
+    { label: 'Insights de Clientes', icon: Users, type: 'clients' },
+    { label: 'Predicciones IA', icon: Brain, type: 'predictions' },
   ]
 
   const handleQuickAction = useCallback((type: string) => {
     const actionMessages: Record<string, string> = {
-      sales: "Muéstrame el análisis de ventas",
-      inventory: "¿Cuál es el estado del inventario?",
-      clients: "Quiero ver insights de clientes",
-      predictions: "Genera predicciones con IA"
+      sales: 'Muéstrame el análisis de ventas',
+      inventory: '¿Cuál es el estado del inventario?',
+      clients: 'Quiero ver insights de clientes',
+      predictions: 'Genera predicciones con IA',
     }
-    setInputText(actionMessages[type] || "")
+    setInputText(actionMessages[type] || '')
   }, [])
 
   return (
@@ -582,8 +582,8 @@ export default function BentoIAImmersive() {
                 className={`
                   px-6 py-3 rounded-2xl font-medium flex items-center gap-2 transition-all shadow-lg
                   ${isConnected 
-                    ? "bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 shadow-red-500/30" 
-                    : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-blue-500/30"
+                    ? 'bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 shadow-red-500/30' 
+                    : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-blue-500/30'
                   }
                 `}
               >
@@ -612,7 +612,7 @@ export default function BentoIAImmersive() {
                     animate={{
                       boxShadow: isConnected 
                         ? ['0 0 20px rgba(59,130,246,0.5)', '0 0 40px rgba(139,92,246,0.5)', '0 0 20px rgba(59,130,246,0.5)']
-                        : '0 0 0px transparent'
+                        : '0 0 0px transparent',
                     }}
                     transition={{ repeat: Infinity, duration: 2 }}
                     className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center"
@@ -671,7 +671,7 @@ export default function BentoIAImmersive() {
                   <motion.div
                     initial={{ scale: 0, rotate: -180 }}
                     animate={{ scale: 1, rotate: 0 }}
-                    transition={{ type: "spring", duration: 0.8 }}
+                    transition={{ type: 'spring', duration: 0.8 }}
                     className="w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center mb-6 shadow-lg shadow-purple-500/30"
                   >
                     <Brain className="w-10 h-10 text-white" />
@@ -724,7 +724,7 @@ export default function BentoIAImmersive() {
                   type="text"
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
+                  onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
                   placeholder="Escribe tu mensaje o pregunta..."
                   className="flex-1 bg-white/5 text-white px-5 py-4 rounded-2xl border border-white/10 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-white/30"
                 />
@@ -826,10 +826,10 @@ export default function BentoIAImmersive() {
                 <YAxis stroke="#fff" opacity={0.5} />
                 <Tooltip
                   contentStyle={{
-                    background: "rgba(15, 23, 42, 0.95)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: "12px",
-                    boxShadow: "0 8px 32px rgba(0,0,0,0.4)"
+                    background: 'rgba(15, 23, 42, 0.95)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '12px',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
                   }}
                 />
                 <Area 

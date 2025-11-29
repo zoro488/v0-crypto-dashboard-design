@@ -5,7 +5,7 @@
  * ╚════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { logger } from "./logger"
+import { logger } from './logger'
 
 interface PerformanceMetrics {
   name: string
@@ -16,7 +16,7 @@ interface PerformanceMetrics {
 class PerformanceMonitor {
   private metrics: PerformanceMetrics[] = []
   private maxMetrics = 100
-  private enabled = typeof window !== "undefined" && "performance" in window
+  private enabled = typeof window !== 'undefined' && 'performance' in window
 
   /**
    * Measure performance of an async function
@@ -71,13 +71,13 @@ class PerformanceMonitor {
     if (!this.enabled) return
     try {
       performance.measure(name, startMark, endMark)
-      const measures = performance.getEntriesByName(name, "measure")
+      const measures = performance.getEntriesByName(name, 'measure')
       if (measures.length > 0) {
         const lastMeasure = measures[measures.length - 1]
         this.recordMetric(name, lastMeasure.duration)
       }
     } catch (error) {
-      logger.warn("Failed to measure between marks", { data: error })
+      logger.warn('Failed to measure between marks', { data: error })
     }
   }
 
@@ -101,7 +101,7 @@ class PerformanceMonitor {
     // Log slow operations
     if (duration > 1000) {
       logger.warn(`Slow operation detected: ${name}`, {
-        context: "PerformanceMonitor",
+        context: 'PerformanceMonitor',
         data: { duration: `${duration.toFixed(2)}ms` },
       })
     }
@@ -147,12 +147,12 @@ class PerformanceMonitor {
    */
   getReport(): string {
     if (this.metrics.length === 0) {
-      return "No performance metrics recorded"
+      return 'No performance metrics recorded'
     }
 
     const report = this.metrics
       .map((m) => `${m.name}: ${m.duration.toFixed(2)}ms`)
-      .join("\n")
+      .join('\n')
 
     return `Performance Report:\n${report}`
   }

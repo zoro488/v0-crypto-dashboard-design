@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 🛡️ HOOKS DE FIRESTORE BLINDADOS
@@ -12,14 +12,14 @@
  * - 🔄 Auto-refresh cuando el store dispara triggerDataRefresh
  */
 
-import { useEffect, useState, useRef, useCallback } from "react"
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { 
   collection, query, orderBy, where, limit, getDocs, onSnapshot,
-  DocumentData, QueryDocumentSnapshot, Unsubscribe
-} from "firebase/firestore"
-import { db, isFirebaseConfigured } from "./config"
-import { logger } from "../utils/logger"
-import { useAppStore } from "../store/useAppStore"
+  DocumentData, QueryDocumentSnapshot, Unsubscribe,
+} from 'firebase/firestore'
+import { db, isFirebaseConfigured } from './config'
+import { logger } from '../utils/logger'
+import { useAppStore } from '../store/useAppStore'
 
 // ===================================================================
 // CONFIGURACIÓN
@@ -40,21 +40,21 @@ async function checkFirestore(): Promise<boolean> {
   
   // Guard: verificar que Firestore está disponible
   if (!isFirebaseConfigured || !db) {
-    logger.warn("[Firestore] ⚠️ Firebase no configurado - usando modo mock")
+    logger.warn('[Firestore] ⚠️ Firebase no configurado - usando modo mock')
     FIRESTORE_CHECKED = true
     USE_MOCK_DATA = true
     return false
   }
   
   try {
-    const testQ = query(collection(db, "dashboard_totales"), limit(1))
+    const testQ = query(collection(db, 'dashboard_totales'), limit(1))
     await getDocs(testQ)
     FIRESTORE_CHECKED = true
     USE_MOCK_DATA = false
-    logger.info("[Firestore] ✅ Conexión verificada")
+    logger.info('[Firestore] ✅ Conexión verificada')
     return true
   } catch (err) {
-    logger.warn("[Firestore] ⚠️ Sin conexión - usando modo mock")
+    logger.warn('[Firestore] ⚠️ Sin conexión - usando modo mock')
     FIRESTORE_CHECKED = true
     USE_MOCK_DATA = true
     return false
@@ -96,7 +96,7 @@ function useFirestoreQuery<T extends DocumentData>(
     pageSize?: number
     mockData: T[]
     transform?: (doc: QueryDocumentSnapshot<DocumentData>) => T
-  }
+  },
 ): HookResult<T> {
   const [data, setData] = useState<T[]>([])
   const [loading, setLoading] = useState(true)
@@ -117,7 +117,7 @@ function useFirestoreQuery<T extends DocumentData>(
       collectionName,
       whereField: options.whereField,
       whereValue: options.whereValue,
-      orderByField: options.orderByField
+      orderByField: options.orderByField,
     })
     
     // Evitar fetch duplicados con mismas opciones
@@ -141,7 +141,7 @@ function useFirestoreQuery<T extends DocumentData>(
       if (isMountedRef.current) {
         setData(options.mockData)
         setLoading(false)
-        setError("Firebase no configurado")
+        setError('Firebase no configurado')
       }
       fetchingRef.current = false
       return
@@ -188,7 +188,7 @@ function useFirestoreQuery<T extends DocumentData>(
       setLoading(false)
       setError(null)
     } catch (err) {
-      const errMsg = err instanceof Error ? err.message : "Error desconocido"
+      const errMsg = err instanceof Error ? err.message : 'Error desconocido'
       logger.error(`[Firestore] Error en ${collectionName}:`, errMsg)
 
       // 🛡️ Verificar montaje antes de actualizar estado
@@ -197,7 +197,7 @@ function useFirestoreQuery<T extends DocumentData>(
         return
       }
 
-      if (errMsg.includes("Missing or insufficient permissions")) {
+      if (errMsg.includes('Missing or insufficient permissions')) {
         USE_MOCK_DATA = true
         logger.warn(`[Firestore] Usando mock para ${collectionName}`)
         setData(options.mockData)
@@ -237,7 +237,7 @@ function useRealtimeQuery<T extends DocumentData>(
     whereField?: string
     whereValue?: string
     mockData: T[]
-  }
+  },
 ): HookResult<T> {
   const [data, setData] = useState<T[]>([])
   const [loading, setLoading] = useState(true)
@@ -280,7 +280,7 @@ function useRealtimeQuery<T extends DocumentData>(
           
           const items = snapshot.docs.map(doc => ({
             id: doc.id,
-            ...doc.data()
+            ...doc.data(),
           })) as unknown as T[]
           
           logger.info(`[Firestore RT] ${collectionName}: ${items.length} registros`)
@@ -294,10 +294,10 @@ function useRealtimeQuery<T extends DocumentData>(
           setData(options.mockData)
           setLoading(false)
           setError(err.message)
-        }
+        },
       )
     } catch (err) {
-      const errMsg = err instanceof Error ? err.message : "Error desconocido"
+      const errMsg = err instanceof Error ? err.message : 'Error desconocido'
       logger.error(`[Firestore RT] Error configurando ${collectionName}:`, errMsg)
       setData(options.mockData)
       setLoading(false)
@@ -326,14 +326,14 @@ export function useBancoData(bancoId: string): HookResult<DocumentData> & { stat
     orderByField: 'fecha',
     orderDirection: 'desc',
     pageSize: LARGE_PAGE_SIZE,
-    mockData: MOCK_MOVIMIENTOS.filter(m => m.bancoId === bancoId || !m.bancoId)
+    mockData: MOCK_MOVIMIENTOS.filter(m => m.bancoId === bancoId || !m.bancoId),
   })
 
   const stats: BancoStats = {
     totalIngresos: result.data.filter(m => m.tipoMovimiento === 'ingreso' || m.tipoMovimiento === 'transferencia_entrada').reduce((s, m) => s + (m.monto || 0), 0),
     totalGastos: result.data.filter(m => m.tipoMovimiento === 'gasto' || m.tipoMovimiento === 'transferencia_salida').reduce((s, m) => s + (m.monto || 0), 0),
     saldoNeto: 0,
-    transacciones: result.data.length
+    transacciones: result.data.length,
   }
   stats.saldoNeto = stats.totalIngresos - stats.totalGastos
 
@@ -345,7 +345,7 @@ export function useBancosData(): HookResult<DocumentData> {
   return useRealtimeQuery('bancos', {
     orderByField: 'nombre',
     orderDirection: 'asc',
-    mockData: MOCK_BANCOS
+    mockData: MOCK_BANCOS,
   })
 }
 
@@ -353,7 +353,7 @@ export function useAlmacenData(): HookResult<DocumentData> {
   return useRealtimeQuery('almacen_productos', {
     orderByField: 'nombre',
     orderDirection: 'asc',
-    mockData: MOCK_PRODUCTOS
+    mockData: MOCK_PRODUCTOS,
   })
 }
 
@@ -361,7 +361,7 @@ export function useVentasData(): HookResult<DocumentData> {
   return useRealtimeQuery('ventas', {
     orderByField: 'fecha',
     orderDirection: 'desc',
-    mockData: MOCK_VENTAS
+    mockData: MOCK_VENTAS,
   })
 }
 
@@ -369,7 +369,7 @@ export function useClientesData(): HookResult<DocumentData> {
   return useRealtimeQuery('clientes', {
     orderByField: 'nombre',
     orderDirection: 'asc',
-    mockData: MOCK_CLIENTES
+    mockData: MOCK_CLIENTES,
   })
 }
 
@@ -377,7 +377,7 @@ export function useDistribuidoresData(): HookResult<DocumentData> {
   return useRealtimeQuery('distribuidores', {
     orderByField: 'nombre',
     orderDirection: 'asc',
-    mockData: MOCK_DISTRIBUIDORES
+    mockData: MOCK_DISTRIBUIDORES,
   })
 }
 
@@ -385,13 +385,13 @@ export function useOrdenesCompraData(): HookResult<DocumentData> {
   return useRealtimeQuery('ordenes_compra', {
     orderByField: 'fecha',
     orderDirection: 'desc',
-    mockData: MOCK_ORDENES_COMPRA
+    mockData: MOCK_ORDENES_COMPRA,
   })
 }
 
 export function useDashboardData(): HookResult<DocumentData> & { totales: Record<string, unknown> } {
   const result = useRealtimeQuery('dashboard_paneles', {
-    mockData: []
+    mockData: [],
   })
   
   // Usar estadísticas reales calculadas desde los CSVs
@@ -413,7 +413,7 @@ export function useDashboardData(): HookResult<DocumentData> & { totales: Record
     // Legacy aliases
     ventas: STATS.totalVentas,
     gastos: 50000,
-    clientes: STATS.clientesCount
+    clientes: STATS.clientesCount,
   }
   
   return { ...result, totales }
@@ -423,7 +423,7 @@ export function useGYAData(): HookResult<DocumentData> {
   return useRealtimeQuery('movimientos', {
     orderByField: 'fecha',
     orderDirection: 'desc',
-    mockData: MOCK_MOVIMIENTOS
+    mockData: MOCK_MOVIMIENTOS,
   })
 }
 
@@ -434,7 +434,7 @@ export function useIngresosBanco(bancoId: string): HookResult<DocumentData> {
   return useRealtimeQuery(collectionName, {
     orderByField: 'fecha',
     orderDirection: 'desc',
-    mockData: MOCK_MOVIMIENTOS.filter(m => m.tipo === 'ingreso')
+    mockData: MOCK_MOVIMIENTOS.filter(m => m.tipo === 'ingreso'),
   })
 }
 
@@ -445,7 +445,7 @@ export function useGastos(bancoId: string): HookResult<DocumentData> {
   return useRealtimeQuery(collectionName, {
     orderByField: 'fecha',
     orderDirection: 'desc',
-    mockData: MOCK_MOVIMIENTOS.filter(m => m.tipo === 'gasto')
+    mockData: MOCK_MOVIMIENTOS.filter(m => m.tipo === 'gasto'),
   })
 }
 
@@ -454,7 +454,7 @@ export function useTransferencias(bancoId?: string): HookResult<DocumentData> {
   const result = useRealtimeQuery('transferencias', {
     orderByField: 'fecha',
     orderDirection: 'desc',
-    mockData: MOCK_TRANSFERENCIAS
+    mockData: MOCK_TRANSFERENCIAS,
   })
   
   // Si se especifica bancoId, filtrar por origen
@@ -463,8 +463,8 @@ export function useTransferencias(bancoId?: string): HookResult<DocumentData> {
       ...result,
       data: result.data.filter(t => 
         (t as Record<string, unknown>).bancoOrigenId === bancoId ||
-        (t as Record<string, unknown>).bancoDestinoId === bancoId
-      )
+        (t as Record<string, unknown>).bancoDestinoId === bancoId,
+      ),
     }
   }
   
@@ -478,7 +478,7 @@ export function useCorteBancario(bancoId: string): HookResult<DocumentData> {
   return useRealtimeQuery(collectionName, {
     orderByField: 'fecha',
     orderDirection: 'desc',
-    mockData: MOCK_CORTES
+    mockData: MOCK_CORTES,
   })
 }
 
@@ -486,7 +486,7 @@ export function useEntradasAlmacen(): HookResult<DocumentData> {
   return useRealtimeQuery('almacen_entradas', {
     orderByField: 'fecha',
     orderDirection: 'desc',
-    mockData: MOCK_ENTRADAS
+    mockData: MOCK_ENTRADAS,
   })
 }
 
@@ -494,7 +494,7 @@ export function useSalidasAlmacen(): HookResult<DocumentData> {
   return useRealtimeQuery('almacen_salidas', {
     orderByField: 'fecha',
     orderDirection: 'desc',
-    mockData: MOCK_SALIDAS
+    mockData: MOCK_SALIDAS,
   })
 }
 
@@ -519,7 +519,7 @@ import {
   MOCK_DISTRIBUIDORES as GENERATED_DISTRIBUIDORES,
   MOCK_BANCOS as GENERATED_BANCOS,
   MOCK_MOVIMIENTOS as GENERATED_MOVIMIENTOS,
-  STATS
+  STATS,
 } from '@/app/lib/data/mock-data-generated'
 
 // Re-exportar estadísticas para uso global
@@ -528,16 +528,16 @@ export { STATS as CHRONOS_STATS }
 const MOCK_CLIENTES = GENERATED_CLIENTES
 
 const MOCK_MOVIMIENTOS = GENERATED_MOVIMIENTOS.length > 0 ? GENERATED_MOVIMIENTOS : [
-  { id: "M-001", tipo: "ingreso", tipoMovimiento: "ingreso", fecha: new Date().toISOString(), monto: 5000, concepto: "Venta", bancoId: "boveda_monte" },
-  { id: "M-002", tipo: "gasto", tipoMovimiento: "gasto", fecha: new Date().toISOString(), monto: 2000, concepto: "Pago", bancoId: "boveda_monte" },
+  { id: 'M-001', tipo: 'ingreso', tipoMovimiento: 'ingreso', fecha: new Date().toISOString(), monto: 5000, concepto: 'Venta', bancoId: 'boveda_monte' },
+  { id: 'M-002', tipo: 'gasto', tipoMovimiento: 'gasto', fecha: new Date().toISOString(), monto: 2000, concepto: 'Pago', bancoId: 'boveda_monte' },
 ]
 
 const MOCK_TRANSFERENCIAS = [
-  { id: "T-001", fecha: new Date().toISOString(), monto: 1000, origen: "Banco A", destino: "Banco B" },
+  { id: 'T-001', fecha: new Date().toISOString(), monto: 1000, origen: 'Banco A', destino: 'Banco B' },
 ]
 
 const MOCK_CORTES = [
-  { id: "CT-001", periodo: "Marzo 2024", fechaInicio: new Date().toISOString(), capitalInicial: 50000, capitalFinal: 65000 },
+  { id: 'CT-001', periodo: 'Marzo 2024', fechaInicio: new Date().toISOString(), capitalInicial: 50000, capitalFinal: 65000 },
 ]
 
 const MOCK_DISTRIBUIDORES = GENERATED_DISTRIBUIDORES
@@ -549,39 +549,39 @@ const MOCK_VENTAS = GENERATED_VENTAS
 // Producto principal con stock actualizado según CSV (2296 entradas - 2279 salidas = 17)
 const MOCK_PRODUCTOS = [
   { 
-    id: "P-001", 
-    nombre: "Producto Principal", 
-    sku: "PROD-001",
+    id: 'P-001', 
+    nombre: 'Producto Principal', 
+    sku: 'PROD-001',
     stock: 17, 
     stockActual: 17,
     stockMinimo: 50,
     precio: 6300, 
     valorUnitario: 6300,
-    categoria: "Principal", 
+    categoria: 'Principal', 
     totalEntradas: 2296, 
     totalSalidas: 2279,
-    ultimaActualizacion: new Date().toISOString()
+    ultimaActualizacion: new Date().toISOString(),
   },
 ]
 
 // Entradas basadas en las 9 órdenes de compra del CSV
 const MOCK_ENTRADAS = [
-  { id: "E-001", fecha: "2025-08-25", distribuidor: "Q-MAYA", ordenCompraId: "OC0001", cantidad: 423, valorTotal: 2664900, valorUnitario: 6300 },
-  { id: "E-002", fecha: "2025-08-25", distribuidor: "Q-MAYA", ordenCompraId: "OC0002", cantidad: 32, valorTotal: 201600, valorUnitario: 6300 },
-  { id: "E-003", fecha: "2025-08-25", distribuidor: "A/X", ordenCompraId: "OC0003", cantidad: 33, valorTotal: 207900, valorUnitario: 6300 },
-  { id: "E-004", fecha: "2025-08-30", distribuidor: "PACMAN", ordenCompraId: "OC0004", cantidad: 487, valorTotal: 3068100, valorUnitario: 6300 },
-  { id: "E-005", fecha: "2025-09-06", distribuidor: "Q-MAYA", ordenCompraId: "OC0005", cantidad: 513, valorTotal: 3231900, valorUnitario: 6300 },
-  { id: "E-006", fecha: "2025-09-09", distribuidor: "CH-MONTE", ordenCompraId: "OC0006", cantidad: 100, valorTotal: 630000, valorUnitario: 6300 },
-  { id: "E-007", fecha: "2025-09-29", distribuidor: "VALLE-MONTE", ordenCompraId: "OC0007", cantidad: 20, valorTotal: 140000, valorUnitario: 7000 },
-  { id: "E-008", fecha: "2025-10-05", distribuidor: "PACMAN", ordenCompraId: "OC0008", cantidad: 488, valorTotal: 3074400, valorUnitario: 6300 },
-  { id: "E-009", fecha: "2025-10-05", distribuidor: "Q-MAYA-MP", ordenCompraId: "OC0009", cantidad: 200, valorTotal: 1260000, valorUnitario: 6300 },
+  { id: 'E-001', fecha: '2025-08-25', distribuidor: 'Q-MAYA', ordenCompraId: 'OC0001', cantidad: 423, valorTotal: 2664900, valorUnitario: 6300 },
+  { id: 'E-002', fecha: '2025-08-25', distribuidor: 'Q-MAYA', ordenCompraId: 'OC0002', cantidad: 32, valorTotal: 201600, valorUnitario: 6300 },
+  { id: 'E-003', fecha: '2025-08-25', distribuidor: 'A/X', ordenCompraId: 'OC0003', cantidad: 33, valorTotal: 207900, valorUnitario: 6300 },
+  { id: 'E-004', fecha: '2025-08-30', distribuidor: 'PACMAN', ordenCompraId: 'OC0004', cantidad: 487, valorTotal: 3068100, valorUnitario: 6300 },
+  { id: 'E-005', fecha: '2025-09-06', distribuidor: 'Q-MAYA', ordenCompraId: 'OC0005', cantidad: 513, valorTotal: 3231900, valorUnitario: 6300 },
+  { id: 'E-006', fecha: '2025-09-09', distribuidor: 'CH-MONTE', ordenCompraId: 'OC0006', cantidad: 100, valorTotal: 630000, valorUnitario: 6300 },
+  { id: 'E-007', fecha: '2025-09-29', distribuidor: 'VALLE-MONTE', ordenCompraId: 'OC0007', cantidad: 20, valorTotal: 140000, valorUnitario: 7000 },
+  { id: 'E-008', fecha: '2025-10-05', distribuidor: 'PACMAN', ordenCompraId: 'OC0008', cantidad: 488, valorTotal: 3074400, valorUnitario: 6300 },
+  { id: 'E-009', fecha: '2025-10-05', distribuidor: 'Q-MAYA-MP', ordenCompraId: 'OC0009', cantidad: 200, valorTotal: 1260000, valorUnitario: 6300 },
 ]
 
 // Salidas resumen - 2279 unidades vendidas según CSV
 const MOCK_SALIDAS = [
-  { id: "S-001", fecha: "2025-08-23", cliente: "Bódega M-P", destino: "Bódega M-P", cantidad: 150, valorTotal: 945000 },
-  { id: "S-002", fecha: "2025-08-23", cliente: "Valle", destino: "Valle", cantidad: 60, valorTotal: 408000 },
-  { id: "S-003", fecha: "2025-08-26", cliente: "Varios", destino: "Múltiples clientes", cantidad: 2069, valorTotal: 7148600, observaciones: "93 ventas adicionales" },
+  { id: 'S-001', fecha: '2025-08-23', cliente: 'Bódega M-P', destino: 'Bódega M-P', cantidad: 150, valorTotal: 945000 },
+  { id: 'S-002', fecha: '2025-08-23', cliente: 'Valle', destino: 'Valle', cantidad: 60, valorTotal: 408000 },
+  { id: 'S-003', fecha: '2025-08-26', cliente: 'Varios', destino: 'Múltiples clientes', cantidad: 2069, valorTotal: 7148600, observaciones: '93 ventas adicionales' },
 ]
 
 // Mock de los 7 bancos del sistema CHRONOS - Usando datos generados

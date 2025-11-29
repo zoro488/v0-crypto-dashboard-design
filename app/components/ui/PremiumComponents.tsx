@@ -2,13 +2,13 @@
  * Componentes UI Premium con animaciones avanzadas
  */
 
-import React, { ReactNode } from 'react';
-import { motion, HTMLMotionProps } from 'framer-motion';
-import { useHoverGlow, useCountUp, useRipple, premiumVariants } from '@/app/hooks/usePremiumAnimations';
-import { cn } from '@/app/lib/utils';
+import React, { ReactNode } from 'react'
+import { motion, HTMLMotionProps } from 'framer-motion'
+import { useHoverGlow, useCountUp, useRipple, premiumVariants } from '@/app/hooks/usePremiumAnimations'
+import { cn } from '@/app/lib/utils'
 
 // Premium Card con hover glow effect
-interface PremiumCardProps extends Omit<HTMLMotionProps<"div">, "children"> {
+interface PremiumCardProps extends Omit<HTMLMotionProps<'div'>, 'children'> {
   children?: ReactNode;
   glowColor?: string;
   className?: string;
@@ -20,7 +20,7 @@ export const PremiumCard = ({
   className,
   ...props
 }: PremiumCardProps) => {
-  const { isHovered, handleMouseEnter, handleMouseLeave, glowStyle } = useHoverGlow(glowColor);
+  const { isHovered, handleMouseEnter, handleMouseLeave, glowStyle } = useHoverGlow(glowColor)
 
   return (
     <motion.div
@@ -28,7 +28,7 @@ export const PremiumCard = ({
         'relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900/50 to-gray-800/30',
         'backdrop-blur-xl border border-white/10',
         'transition-all duration-300',
-        className
+        className,
       )}
       initial="rest"
       whileHover="hover"
@@ -38,8 +38,8 @@ export const PremiumCard = ({
           scale: 1.02, 
           y: -4, 
           boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
-          transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] }
-        }
+          transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] },
+        },
       }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -66,8 +66,8 @@ export const PremiumCard = ({
 
       {children as any}
     </motion.div>
-  );
-};
+  )
+}
 
 // Animated Counter con easing
 interface AnimatedCounterProps {
@@ -89,11 +89,11 @@ export const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
   decimals = 0,
   className,
 }) => {
-  const { displayValue } = useCountUp(value, duration, delay);
+  const { displayValue } = useCountUp(value, duration, delay)
 
   const formattedValue = decimals > 0
     ? displayValue.toFixed(decimals)
-    : displayValue.toLocaleString();
+    : displayValue.toLocaleString()
 
   return (
     <motion.span
@@ -104,8 +104,8 @@ export const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
     >
       {prefix}{formattedValue}{suffix}
     </motion.span>
-  );
-};
+  )
+}
 
 // Button con ripple effect
 interface RippleButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -124,24 +124,24 @@ export const RippleButton: React.FC<RippleButtonProps> = ({
   onClick,
   ...props
 }) => {
-  const { ripples, createRipple } = useRipple();
+  const { ripples, createRipple } = useRipple()
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    createRipple(e);
-    onClick?.(e);
-  };
+    createRipple(e)
+    onClick?.(e)
+  }
 
   const variantStyles = {
     primary: 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600',
     secondary: 'bg-gray-800 text-white border border-white/20 hover:bg-gray-700',
     ghost: 'bg-transparent text-white hover:bg-white/10',
-  };
+  }
 
   const sizeStyles = {
     sm: 'px-3 py-1.5 text-sm',
     md: 'px-4 py-2 text-base',
     lg: 'px-6 py-3 text-lg',
-  };
+  }
 
   return (
     <motion.button
@@ -151,7 +151,7 @@ export const RippleButton: React.FC<RippleButtonProps> = ({
         'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
         variantStyles[variant],
         sizeStyles[size],
-        className
+        className,
       )}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
@@ -182,8 +182,8 @@ export const RippleButton: React.FC<RippleButtonProps> = ({
         />
       ))}
     </motion.button>
-  );
-};
+  )
+}
 
 // Stat Card con animaciones
 interface StatCardProps {
@@ -213,13 +213,13 @@ export const StatCard: React.FC<StatCardProps> = ({
     up: 'text-green-400',
     down: 'text-red-400',
     neutral: 'text-gray-400',
-  };
+  }
 
   const trendIcons = {
     up: '↑',
     down: '↓',
     neutral: '→',
-  };
+  }
 
   return (
     <PremiumCard
@@ -265,8 +265,8 @@ export const StatCard: React.FC<StatCardProps> = ({
         </motion.div>
       )}
     </PremiumCard>
-  );
-};
+  )
+}
 
 // Loading Skeleton Premium
 interface SkeletonProps {
@@ -282,7 +282,7 @@ export const PremiumSkeleton: React.FC<SkeletonProps> = ({
     text: 'h-4 rounded',
     circular: 'rounded-full',
     rectangular: 'rounded-xl',
-  };
+  }
 
   return (
     <motion.div
@@ -290,7 +290,7 @@ export const PremiumSkeleton: React.FC<SkeletonProps> = ({
         'bg-gradient-to-r from-gray-800/50 via-gray-700/50 to-gray-800/50',
         'animate-pulse',
         variantStyles[variant],
-        className
+        className,
       )}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -307,8 +307,8 @@ export const PremiumSkeleton: React.FC<SkeletonProps> = ({
         }}
       />
     </motion.div>
-  );
-};
+  )
+}
 
 // Badge con animación
 interface BadgeProps {
@@ -330,7 +330,7 @@ export const AnimatedBadge: React.FC<BadgeProps> = ({
     warning: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
     error: 'bg-red-500/20 text-red-400 border-red-500/30',
     info: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  };
+  }
 
   return (
     <motion.span
@@ -338,7 +338,7 @@ export const AnimatedBadge: React.FC<BadgeProps> = ({
         'inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold',
         'border backdrop-blur-sm',
         variantStyles[variant],
-        className
+        className,
       )}
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
@@ -361,8 +361,8 @@ export const AnimatedBadge: React.FC<BadgeProps> = ({
       )}
       {children as any}
     </motion.span>
-  );
-};
+  )
+}
 
 // Progress Bar animado
 interface ProgressBarProps {
@@ -382,7 +382,7 @@ export const AnimatedProgressBar: React.FC<ProgressBarProps> = ({
   showLabel = false,
   className,
 }) => {
-  const percentage = (value / max) * 100;
+  const percentage = (value / max) * 100
 
   return (
     <div className={cn('w-full', className)}>
@@ -420,5 +420,5 @@ export const AnimatedProgressBar: React.FC<ProgressBarProps> = ({
         </motion.div>
       </div>
     </div>
-  );
-};
+  )
+}

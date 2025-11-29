@@ -3,7 +3,7 @@
  * @module schemas/clientes
  */
 
-import { z } from "zod"
+import { z } from 'zod'
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ESQUEMAS DE CLIENTE
@@ -14,29 +14,29 @@ import { z } from "zod"
  */
 export const CrearClienteSchema = z.object({
   nombre: z.string()
-    .min(2, "El nombre debe tener al menos 2 caracteres")
-    .max(100, "El nombre no puede exceder 100 caracteres")
+    .min(2, 'El nombre debe tener al menos 2 caracteres')
+    .max(100, 'El nombre no puede exceder 100 caracteres')
     .trim(),
   
   telefono: z.string()
-    .regex(/^\+?[\d\s-()]+$/, "Formato de teléfono inválido")
+    .regex(/^\+?[\d\s-()]+$/, 'Formato de teléfono inválido')
     .optional()
-    .or(z.literal("")),
+    .or(z.literal('')),
   
   email: z.string()
-    .email("Email inválido")
+    .email('Email inválido')
     .optional()
-    .or(z.literal("")),
+    .or(z.literal('')),
   
   direccion: z.string()
-    .max(200, "La dirección no puede exceder 200 caracteres")
+    .max(200, 'La dirección no puede exceder 200 caracteres')
     .optional()
-    .or(z.literal("")),
+    .or(z.literal('')),
   
   observaciones: z.string()
-    .max(500, "Las observaciones no pueden exceder 500 caracteres")
+    .max(500, 'Las observaciones no pueden exceder 500 caracteres')
     .optional()
-    .or(z.literal("")),
+    .or(z.literal('')),
 })
 
 /**
@@ -74,7 +74,7 @@ export const ClienteSchema = CrearClienteSchema.extend({
   keywords: z.array(z.string()).default([]),
   
   // Estado
-  estado: z.enum(["activo", "inactivo"]).default("activo"),
+  estado: z.enum(['activo', 'inactivo']).default('activo'),
   
   // Timestamps
   createdAt: z.any().optional(),
@@ -109,7 +109,7 @@ export function validarCliente(data: unknown): {
   
   return {
     success: false,
-    errors: result.error.errors.map((e) => `${e.path.join(".")}: ${e.message}`),
+    errors: result.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`),
   }
 }
 
@@ -129,7 +129,7 @@ export function validarActualizacionCliente(data: unknown): {
   
   return {
     success: false,
-    errors: result.error.errors.map((e) => `${e.path.join(".")}: ${e.message}`),
+    errors: result.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`),
   }
 }
 

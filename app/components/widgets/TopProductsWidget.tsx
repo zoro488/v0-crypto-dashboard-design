@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { motion } from "framer-motion"
-import { TrendingUp, Package, Star } from "lucide-react"
-import { useState } from "react"
+import { motion } from 'framer-motion'
+import { TrendingUp, Package, Star } from 'lucide-react'
+import { useState } from 'react'
 
 interface Product {
   id: string
@@ -66,12 +66,12 @@ export default function TopProductsWidget({ products = [] }: TopProductsWidgetPr
                 transition={{ duration: 0.4 }}
                 className={`absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow-lg ${
                   index === 0
-                    ? "bg-gradient-to-br from-yellow-400 to-amber-500 text-white"
+                    ? 'bg-gradient-to-br from-yellow-400 to-amber-500 text-white'
                     : index === 1
-                      ? "bg-gradient-to-br from-gray-300 to-gray-400 text-gray-800"
+                      ? 'bg-gradient-to-br from-gray-300 to-gray-400 text-gray-800'
                       : index === 2
-                        ? "bg-gradient-to-br from-orange-400 to-amber-600 text-white"
-                        : "bg-white/10 text-white/60"
+                        ? 'bg-gradient-to-br from-orange-400 to-amber-600 text-white'
+                        : 'bg-white/10 text-white/60'
                 }`}
               >
                 {index + 1}

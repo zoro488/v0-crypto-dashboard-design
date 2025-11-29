@@ -1,24 +1,24 @@
-"use client"
+'use client'
 
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Package, TrendingUp, TrendingDown, Archive, Scissors, Plus, Box, Activity, 
   BarChart3, Zap, RefreshCw, Search, Filter, Calendar, Download, Eye,
   ArrowUpRight, ArrowDownRight, Layers, AlertTriangle, CheckCircle2,
-  type LucideIcon
-} from "lucide-react"
-import { useState, useMemo } from "react"
-import { useProductos, useEntradasAlmacen, useSalidasAlmacen } from "@/app/lib/firebase/firestore-hooks.service"
-import { Skeleton } from "@/app/components/ui/skeleton"
-import { Button } from "@/app/components/ui/button"
-import { Badge } from "@/app/components/ui/badge"
-import { Input } from "@/app/components/ui/input"
-import CreateEntradaAlmacenModal from "@/app/components/modals/CreateEntradaAlmacenModal"
-import CreateSalidaAlmacenModal from "@/app/components/modals/CreateSalidaAlmacenModal"
+  type LucideIcon,
+} from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { useProductos, useEntradasAlmacen, useSalidasAlmacen } from '@/app/lib/firebase/firestore-hooks.service'
+import { Skeleton } from '@/app/components/ui/skeleton'
+import { Button } from '@/app/components/ui/button'
+import { Badge } from '@/app/components/ui/badge'
+import { Input } from '@/app/components/ui/input'
+import CreateEntradaAlmacenModal from '@/app/components/modals/CreateEntradaAlmacenModal'
+import CreateSalidaAlmacenModal from '@/app/components/modals/CreateSalidaAlmacenModal'
 import { 
   AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, 
-  Tooltip, PieChart, Pie, Cell, CartesianGrid, Legend 
-} from "recharts"
+  Tooltip, PieChart, Pie, Cell, CartesianGrid, Legend, 
+} from 'recharts'
 
 // ============================================================================
 // INTERFACES
@@ -68,27 +68,27 @@ interface CorteRF {
 // CONSTANTES Y HELPERS
 // ============================================================================
 const TABS = [
-  { id: "entradas", label: "Entradas", icon: TrendingUp, color: "text-emerald-400" },
-  { id: "stock", label: "Stock Actual", icon: Archive, color: "text-cyan-400" },
-  { id: "salidas", label: "Salidas", icon: TrendingDown, color: "text-rose-400" },
-  { id: "rf", label: "RF Actual (Cortes)", icon: Scissors, color: "text-amber-400" },
+  { id: 'entradas', label: 'Entradas', icon: TrendingUp, color: 'text-emerald-400' },
+  { id: 'stock', label: 'Stock Actual', icon: Archive, color: 'text-cyan-400' },
+  { id: 'salidas', label: 'Salidas', icon: TrendingDown, color: 'text-rose-400' },
+  { id: 'rf', label: 'RF Actual (Cortes)', icon: Scissors, color: 'text-amber-400' },
 ]
 
 const CHART_COLORS = ['#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444', '#3b82f6']
 
 const formatDate = (date: string | Date | { seconds: number } | undefined): string => {
-  if (!date) return "-"
+  if (!date) return '-'
   try {
     if (typeof date === 'object' && 'seconds' in date) {
       return new Date(date.seconds * 1000).toLocaleDateString('es-MX', { 
-        day: '2-digit', month: 'short', year: 'numeric' 
+        day: '2-digit', month: 'short', year: 'numeric', 
       })
     }
     return new Date(date as string | Date).toLocaleDateString('es-MX', { 
-      day: '2-digit', month: 'short', year: 'numeric' 
+      day: '2-digit', month: 'short', year: 'numeric', 
     })
   } catch {
-    return "-"
+    return '-'
   }
 }
 
@@ -100,7 +100,7 @@ const formatCurrency = (value: number | undefined): string => {
   return new Intl.NumberFormat('es-MX', { 
     style: 'currency', 
     currency: 'MXN',
-    minimumFractionDigits: 0 
+    minimumFractionDigits: 0, 
   }).format(value ?? 0)
 }
 
@@ -110,7 +110,7 @@ const formatCurrency = (value: number | undefined): string => {
 
 // Tarjeta de estadística animada
 function StatCard({ 
-  title, value, subtitle, icon: Icon, color, trend, trendValue 
+  title, value, subtitle, icon: Icon, color, trend, trendValue, 
 }: { 
   title: string
   value: string | number
@@ -154,8 +154,8 @@ function DataTable<T extends Record<string, unknown>>({
   data, 
   columns, 
   loading,
-  emptyMessage = "No hay datos disponibles",
-  onRowClick
+  emptyMessage = 'No hay datos disponibles',
+  onRowClick,
 }: { 
   data: T[]
   columns: { key: string; label: string; render?: (item: T) => React.ReactNode; width?: string }[]
@@ -226,8 +226,8 @@ function DataTable<T extends Record<string, unknown>>({
 // COMPONENTE PRINCIPAL
 // ============================================================================
 export default function BentoAlmacen() {
-  const [activeTab, setActiveTab] = useState("entradas")
-  const [searchQuery, setSearchQuery] = useState("")
+  const [activeTab, setActiveTab] = useState('entradas')
+  const [searchQuery, setSearchQuery] = useState('')
   const [showEntradaModal, setShowEntradaModal] = useState(false)
   const [showSalidaModal, setShowSalidaModal] = useState(false)
 
@@ -243,26 +243,26 @@ export default function BentoAlmacen() {
 
   // Cálculos de métricas
   const totalEntradas = useMemo(() => 
-    entradas.reduce((sum, e) => sum + (e.cantidad || 0), 0), [entradas]
+    entradas.reduce((sum, e) => sum + (e.cantidad || 0), 0), [entradas],
   )
   const totalSalidas = useMemo(() => 
-    salidas.reduce((sum, s) => sum + (s.cantidad || 0), 0), [salidas]
+    salidas.reduce((sum, s) => sum + (s.cantidad || 0), 0), [salidas],
   )
   const stockActual = useMemo(() => 
-    productos.reduce((sum, p) => sum + (p.stock || p.stockActual || 0), 0), [productos]
+    productos.reduce((sum, p) => sum + (p.stock || p.stockActual || 0), 0), [productos],
   )
   const valorStock = useMemo(() => 
     productos.reduce((sum, p) => sum + (p.stock || p.stockActual || 0) * (p.valorUnitario || p.precio || 6300), 0), 
-    [productos]
+    [productos],
   )
 
   // Datos de RF/Cortes (basados en el JSON de gg/)
   const cortesRF: CorteRF[] = useMemo(() => [
-    { id: "1", fecha: "2025-08-25", corte: 32, observaciones: "Corte inicial" },
-    { id: "2", fecha: "2025-09-08", corte: 124, observaciones: "Corte mensual" },
-    { id: "3", fecha: "2025-09-22", corte: 22, observaciones: "Corte quincenal" },
-    { id: "4", fecha: "2025-10-06", corte: 165, observaciones: "Corte mensual" },
-    { id: "5", fecha: "2025-10-20", corte: 17, observaciones: "Corte actual" },
+    { id: '1', fecha: '2025-08-25', corte: 32, observaciones: 'Corte inicial' },
+    { id: '2', fecha: '2025-09-08', corte: 124, observaciones: 'Corte mensual' },
+    { id: '3', fecha: '2025-09-22', corte: 22, observaciones: 'Corte quincenal' },
+    { id: '4', fecha: '2025-10-06', corte: 165, observaciones: 'Corte mensual' },
+    { id: '5', fecha: '2025-10-20', corte: 17, observaciones: 'Corte actual' },
   ], [])
 
   const rfActual = cortesRF.reduce((sum, c) => sum + (c.corte || 0), 0)
@@ -274,7 +274,7 @@ export default function BentoAlmacen() {
     return entradas.filter(e => 
       e.distribuidor?.toLowerCase().includes(q) ||
       e.ordenCompraId?.toLowerCase().includes(q) ||
-      e.referencia?.toLowerCase().includes(q)
+      e.referencia?.toLowerCase().includes(q),
     )
   }, [entradas, searchQuery])
 
@@ -284,7 +284,7 @@ export default function BentoAlmacen() {
     return salidas.filter(s => 
       s.cliente?.toLowerCase().includes(q) ||
       s.destino?.toLowerCase().includes(q) ||
-      s.observaciones?.toLowerCase().includes(q)
+      s.observaciones?.toLowerCase().includes(q),
     )
   }, [salidas, searchQuery])
 
@@ -294,7 +294,7 @@ export default function BentoAlmacen() {
     return productos.filter(p => 
       p.nombre?.toLowerCase().includes(q) ||
       p.sku?.toLowerCase().includes(q) ||
-      p.distribuidor?.toLowerCase().includes(q)
+      p.distribuidor?.toLowerCase().includes(q),
     )
   }, [productos, searchQuery])
 
@@ -313,7 +313,7 @@ export default function BentoAlmacen() {
     return distribuidores.map((dist, i) => ({
       name: dist,
       value: Math.floor(Math.random() * 300) + 50,
-      color: CHART_COLORS[i % CHART_COLORS.length]
+      color: CHART_COLORS[i % CHART_COLORS.length],
     }))
   }, [])
 
@@ -362,7 +362,7 @@ export default function BentoAlmacen() {
                 contentStyle={{ 
                   backgroundColor: 'rgba(0,0,0,0.8)', 
                   border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
                 }}
               />
               <Area 
@@ -409,7 +409,7 @@ export default function BentoAlmacen() {
               <span className="text-white/90 font-medium">
                 {formatDate(item.fecha)}
               </span>
-            )
+            ),
           },
           { 
             key: 'ordenCompraId', 
@@ -418,7 +418,7 @@ export default function BentoAlmacen() {
               <Badge variant="outline" className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30">
                 {item.ordenCompraId || item.referencia || '-'}
               </Badge>
-            )
+            ),
           },
           { 
             key: 'distribuidor', 
@@ -427,7 +427,7 @@ export default function BentoAlmacen() {
               <span className="text-white/80">
                 {item.distribuidor || item.origen || '-'}
               </span>
-            )
+            ),
           },
           { 
             key: 'cantidad', 
@@ -436,7 +436,7 @@ export default function BentoAlmacen() {
               <span className="text-emerald-400 font-bold">
                 +{formatNumber(item.cantidad)}
               </span>
-            )
+            ),
           },
           { 
             key: 'valorTotal', 
@@ -445,7 +445,7 @@ export default function BentoAlmacen() {
               <span className="text-white/70">
                 {formatCurrency((item.cantidad || 0) * (item.valorUnitario || 6300))}
               </span>
-            )
+            ),
           },
         ]}
       />
@@ -531,7 +531,7 @@ export default function BentoAlmacen() {
                 contentStyle={{ 
                   backgroundColor: 'rgba(0,0,0,0.8)', 
                   border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
                 }}
               />
               <Legend />
@@ -550,7 +550,7 @@ export default function BentoAlmacen() {
                 contentStyle={{ 
                   backgroundColor: 'rgba(0,0,0,0.8)', 
                   border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
                 }}
               />
               <Bar dataKey="entradas" fill="#10b981" radius={[4, 4, 0, 0]} />
@@ -573,14 +573,14 @@ export default function BentoAlmacen() {
               <Badge variant="outline" className="bg-white/10 text-white/90 border-white/20">
                 {item.ordenCompraId || item.sku || item.id || '-'}
               </Badge>
-            )
+            ),
           },
           { 
             key: 'distribuidor', 
             label: 'Origen',
             render: (item) => (
               <span className="text-white/80">{item.distribuidor || '-'}</span>
-            )
+            ),
           },
           { 
             key: 'stock', 
@@ -596,7 +596,7 @@ export default function BentoAlmacen() {
                   {isLow && <AlertTriangle size={14} className="text-amber-400" />}
                 </div>
               )
-            }
+            },
           },
           { 
             key: 'valorUnitario', 
@@ -605,7 +605,7 @@ export default function BentoAlmacen() {
               <span className="text-white/70">
                 {formatCurrency(item.valorUnitario || item.precio || 6300)}
               </span>
-            )
+            ),
           },
           { 
             key: 'valorTotal', 
@@ -617,7 +617,7 @@ export default function BentoAlmacen() {
                   {formatCurrency(valor)}
                 </span>
               )
-            }
+            },
           },
           { 
             key: 'estado', 
@@ -631,7 +631,7 @@ export default function BentoAlmacen() {
                 return <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30">Bajo</Badge>
               }
               return <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30">OK</Badge>
-            }
+            },
           },
         ]}
       />
@@ -679,7 +679,7 @@ export default function BentoAlmacen() {
                 contentStyle={{ 
                   backgroundColor: 'rgba(0,0,0,0.8)', 
                   border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
                 }}
               />
               <Area 
@@ -724,7 +724,7 @@ export default function BentoAlmacen() {
               <span className="text-white/90 font-medium">
                 {formatDate(item.fecha)}
               </span>
-            )
+            ),
           },
           { 
             key: 'cliente', 
@@ -740,7 +740,7 @@ export default function BentoAlmacen() {
                   </span>
                 )}
               </div>
-            )
+            ),
           },
           { 
             key: 'cantidad', 
@@ -749,7 +749,7 @@ export default function BentoAlmacen() {
               <span className="text-rose-400 font-bold">
                 -{formatNumber(item.cantidad)}
               </span>
-            )
+            ),
           },
           { 
             key: 'concepto', 
@@ -758,7 +758,7 @@ export default function BentoAlmacen() {
               <Badge variant="outline" className="bg-white/5 text-white/70 border-white/20">
                 {item.tipo || 'Venta'}
               </Badge>
-            )
+            ),
           },
         ]}
       />
@@ -835,7 +835,7 @@ export default function BentoAlmacen() {
               contentStyle={{ 
                 backgroundColor: 'rgba(0,0,0,0.8)', 
                 border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '8px'
+                borderRadius: '8px',
               }}
               labelFormatter={(value) => formatDate(value)}
             />
@@ -862,7 +862,7 @@ export default function BentoAlmacen() {
               <span className="text-white/90 font-medium">
                 {formatDate(item.fecha)}
               </span>
-            )
+            ),
           },
           { 
             key: 'corte', 
@@ -871,7 +871,7 @@ export default function BentoAlmacen() {
               <span className="text-amber-400 font-bold text-lg">
                 {formatNumber(item.corte)}
               </span>
-            )
+            ),
           },
           { 
             key: 'acumulado', 
@@ -884,7 +884,7 @@ export default function BentoAlmacen() {
                   {formatNumber(acumulado)}
                 </span>
               )
-            }
+            },
           },
           { 
             key: 'observaciones', 
@@ -893,7 +893,7 @@ export default function BentoAlmacen() {
               <span className="text-white/60">
                 {item.observaciones || '-'}
               </span>
-            )
+            ),
           },
           { 
             key: 'estado', 
@@ -903,7 +903,7 @@ export default function BentoAlmacen() {
                 <CheckCircle2 size={12} className="mr-1" />
                 Completado
               </Badge>
-            )
+            ),
           },
         ]}
       />

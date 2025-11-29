@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 🔮 PREMIUM SPLINE ORB - Orbe 3D Animado Premium
@@ -44,7 +44,7 @@ const stateColors: Record<OrbState, { primary: string; secondary: string; glow: 
   processing: { primary: '#8b5cf6', secondary: '#ec4899', glow: 'rgba(139, 92, 246, 0.5)' },
   success: { primary: '#10b981', secondary: '#06b6d4', glow: 'rgba(16, 185, 129, 0.5)' },
   error: { primary: '#ef4444', secondary: '#f97316', glow: 'rgba(239, 68, 68, 0.5)' },
-  pulse: { primary: '#f59e0b', secondary: '#ec4899', glow: 'rgba(245, 158, 11, 0.5)' }
+  pulse: { primary: '#f59e0b', secondary: '#ec4899', glow: 'rgba(245, 158, 11, 0.5)' },
 }
 
 // ============================================================================
@@ -68,27 +68,27 @@ function OrbParticles({ size, color, count = 12 }: { size: number; color: string
               backgroundColor: color,
               left: '50%',
               top: '50%',
-              boxShadow: `0 0 ${Math.random() * 10 + 5}px ${color}`
+              boxShadow: `0 0 ${Math.random() * 10 + 5}px ${color}`,
             }}
             animate={{
               x: [
                 Math.cos(angle) * radius * 0.8,
                 Math.cos(angle + Math.PI) * radius * 1.2,
-                Math.cos(angle) * radius * 0.8
+                Math.cos(angle) * radius * 0.8,
               ],
               y: [
                 Math.sin(angle) * radius * 0.8,
                 Math.sin(angle + Math.PI) * radius * 1.2,
-                Math.sin(angle) * radius * 0.8
+                Math.sin(angle) * radius * 0.8,
               ],
               opacity: [0.3, 0.8, 0.3],
-              scale: [0.8, 1.2, 0.8]
+              scale: [0.8, 1.2, 0.8],
             }}
             transition={{
               duration: 4 + Math.random() * 2,
               delay,
               repeat: Infinity,
-              ease: 'easeInOut'
+              ease: 'easeInOut',
             }}
           />
         )
@@ -112,15 +112,15 @@ function OrbitalRings({ size, color, isActive }: { size: number; color: string; 
           borderColor: `${color}40`,
           left: '50%',
           top: '50%',
-          transform: 'translate(-50%, -50%) rotateX(75deg)'
+          transform: 'translate(-50%, -50%) rotateX(75deg)',
         }}
         animate={{
-          rotateZ: isActive ? 360 : 0
+          rotateZ: isActive ? 360 : 0,
         }}
         transition={{
           duration: 8,
           repeat: Infinity,
-          ease: 'linear'
+          ease: 'linear',
         }}
       />
       
@@ -134,16 +134,16 @@ function OrbitalRings({ size, color, isActive }: { size: number; color: string; 
           borderWidth: 1,
           left: '50%',
           top: '50%',
-          transform: 'translate(-50%, -50%)'
+          transform: 'translate(-50%, -50%)',
         }}
         animate={{
           rotateY: isActive ? 360 : 0,
-          rotateX: 15
+          rotateX: 15,
         }}
         transition={{
           duration: 12,
           repeat: Infinity,
-          ease: 'linear'
+          ease: 'linear',
         }}
       />
       
@@ -158,15 +158,15 @@ function OrbitalRings({ size, color, isActive }: { size: number; color: string; 
           borderStyle: 'dashed',
           left: '50%',
           top: '50%',
-          transform: 'translate(-50%, -50%) rotateX(45deg) rotateZ(45deg)'
+          transform: 'translate(-50%, -50%) rotateX(45deg) rotateZ(45deg)',
         }}
         animate={{
-          rotateZ: isActive ? [45, 405] : 45
+          rotateZ: isActive ? [45, 405] : 45,
         }}
         transition={{
           duration: 20,
           repeat: Infinity,
-          ease: 'linear'
+          ease: 'linear',
         }}
       />
     </>
@@ -189,7 +189,7 @@ export function PremiumSplineOrb({
   onHover,
   label,
   value,
-  className = ''
+  className = '',
 }: PremiumSplineOrbProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [isPressed, setIsPressed] = useState(false)
@@ -201,7 +201,7 @@ export function PremiumSplineOrb({
     return {
       primary: primaryColor || stateConfig.primary,
       secondary: secondaryColor || stateConfig.secondary,
-      glow: stateConfig.glow
+      glow: stateConfig.glow,
     }
   }, [state, primaryColor, secondaryColor])
   
@@ -245,7 +245,7 @@ export function PremiumSplineOrb({
       style={{
         width: size * 1.5,
         height: size * 1.5,
-        perspective: 1000
+        perspective: 1000,
       }}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
@@ -262,16 +262,16 @@ export function PremiumSplineOrb({
           height: size * 1.4,
           background: `radial-gradient(circle, ${colors.glow} 0%, transparent 70%)`,
           filter: `blur(${size * 0.15}px)`,
-          opacity: 0.6 * glowIntensity
+          opacity: 0.6 * glowIntensity,
         }}
         animate={{
           scale: isActive ? [1, 1.2, 1] : 1,
-          opacity: isActive ? [0.4 * glowIntensity, 0.7 * glowIntensity, 0.4 * glowIntensity] : 0.4 * glowIntensity
+          opacity: isActive ? [0.4 * glowIntensity, 0.7 * glowIntensity, 0.4 * glowIntensity] : 0.4 * glowIntensity,
         }}
         transition={{
           duration: 2,
           repeat: isActive ? Infinity : 0,
-          ease: 'easeInOut'
+          ease: 'easeInOut',
         }}
       />
       
@@ -293,7 +293,7 @@ export function PremiumSplineOrb({
           height: size,
           rotateX: springRotateX,
           rotateY: springRotateY,
-          transformStyle: 'preserve-3d'
+          transformStyle: 'preserve-3d',
         }}
       >
         {/* Gradiente de fondo del orbe */}
@@ -304,15 +304,15 @@ export function PremiumSplineOrb({
               radial-gradient(circle at 30% 30%, ${colors.primary}80 0%, transparent 50%),
               radial-gradient(circle at 70% 70%, ${colors.secondary}60 0%, transparent 50%),
               linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)
-            `
+            `,
           }}
           animate={{
-            rotate: state === 'processing' ? 360 : 0
+            rotate: state === 'processing' ? 360 : 0,
           }}
           transition={{
             duration: 3,
             repeat: state === 'processing' ? Infinity : 0,
-            ease: 'linear'
+            ease: 'linear',
           }}
         />
         
@@ -320,7 +320,7 @@ export function PremiumSplineOrb({
         <div 
           className="absolute inset-0 rounded-full pointer-events-none"
           style={{
-            background: 'linear-gradient(180deg, rgba(255,255,255,0.3) 0%, transparent 50%)'
+            background: 'linear-gradient(180deg, rgba(255,255,255,0.3) 0%, transparent 50%)',
           }}
         />
         
@@ -328,16 +328,16 @@ export function PremiumSplineOrb({
         <motion.div
           className="absolute inset-2 rounded-full pointer-events-none"
           style={{
-            background: `radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 60%)`,
-            filter: 'blur(2px)'
+            background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 60%)',
+            filter: 'blur(2px)',
           }}
           animate={{
-            opacity: isActive ? [0.3, 0.6, 0.3] : 0.3
+            opacity: isActive ? [0.3, 0.6, 0.3] : 0.3,
           }}
           transition={{
             duration: 1.5,
             repeat: isActive ? Infinity : 0,
-            ease: 'easeInOut'
+            ease: 'easeInOut',
           }}
         />
         
@@ -351,16 +351,16 @@ export function PremiumSplineOrb({
             top: '50%',
             transform: 'translate(-50%, -50%)',
             background: `radial-gradient(circle, white 0%, ${colors.primary}80 50%, transparent 100%)`,
-            filter: 'blur(3px)'
+            filter: 'blur(3px)',
           }}
           animate={{
             scale: isActive ? [1, 1.3, 1] : 1,
-            opacity: isActive ? [0.8, 1, 0.8] : 0.8
+            opacity: isActive ? [0.8, 1, 0.8] : 0.8,
           }}
           transition={{
             duration: 1,
             repeat: isActive ? Infinity : 0,
-            ease: 'easeInOut'
+            ease: 'easeInOut',
           }}
         />
         
@@ -372,7 +372,7 @@ export function PremiumSplineOrb({
               inset 0 0 ${size * 0.1}px rgba(255,255,255,0.1),
               0 0 ${size * 0.2 * glowIntensity}px ${colors.glow},
               0 0 ${size * 0.4 * glowIntensity}px ${colors.glow}
-            `
+            `,
           }}
         />
       </motion.div>
@@ -408,7 +408,7 @@ export function PremiumSplineOrb({
           className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center"
           style={{
             backgroundColor: colors.primary,
-            boxShadow: `0 0 10px ${colors.glow}`
+            boxShadow: `0 0 10px ${colors.glow}`,
           }}
         >
           {state === 'processing' && (

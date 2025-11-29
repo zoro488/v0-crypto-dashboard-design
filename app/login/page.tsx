@@ -72,7 +72,7 @@ export default function LoginPage() {
               background: 'linear-gradient(to bottom, #ffffff 0%, rgba(255,255,255,0.1) 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.3))'
+              filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.3))',
             }}
           >
             CHRONOS
