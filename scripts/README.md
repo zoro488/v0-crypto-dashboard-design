@@ -10,10 +10,10 @@ Scripts para limpiar inconsistencias de datos y migrar a Firestore.
 
 ## 🚀 Instalación
 
-```bash
+\`\`\`bash
 cd scripts
 npm install
-```
+\`\`\`
 
 ## 📝 Scripts Disponibles
 
@@ -27,9 +27,9 @@ Corrige las 25 inconsistencias detectadas:
 - ✅ Capitales bancarios → inicialización
 - ✅ Métricas financieras → recálculo
 
-```bash
+\`\`\`bash
 npm run clean
-```
+\`\`\`
 
 **Salida:**
 - `BASE_DATOS_CLEANED.json` - Datos limpios
@@ -46,12 +46,12 @@ Migra datos limpios a Firestore con estructura optimizada:
 - 📦 Almacén + movimientos
 - 📊 Métricas financieras
 
-```bash
+\`\`\`bash
 npm run migrate
-```
+\`\`\`
 
 **Progreso en tiempo real:**
-```
+\`\`\`
 💰 Migrando Bancos...
    📊 bancos: 7/7 (100.0%) - Errores: 0
    ✅ Completado en 2.34s
@@ -59,29 +59,29 @@ npm run migrate
 💰 Migrando Ventas...
    📊 ventas: 96/96 (100.0%) - Errores: 0
    ✅ Completado en 5.12s
-```
+\`\`\`
 
 ### 3. **Clean + Migrate** - Proceso Completo
 
 Ejecuta limpieza y migración en un solo comando:
 
-```bash
+\`\`\`bash
 npm run clean-and-migrate
-```
+\`\`\`
 
 ### 4. **Verify** - Verificación Post-Migración
 
 Verifica que todos los datos se hayan migrado correctamente:
 
-```bash
+\`\`\`bash
 npm run verify
-```
+\`\`\`
 
 ## 📊 Estructura de Datos Migrada
 
 ### Firestore Collections (33 totales)
 
-```
+\`\`\`
 firestore/
 ├── bancos (7 docs)
 │   ├── azteca
@@ -106,7 +106,7 @@ firestore/
 │       └── movimientos (subcollection)
 └── metricas
     └── financieras
-```
+\`\`\`
 
 ## 🔒 Configuración Firebase (Producción)
 
@@ -118,14 +118,14 @@ Para ejecutar en producción, necesitas:
    - Guarda como `firebase-admin-key.json` en carpeta `scripts/`
 
 2. **Variables de entorno:**
-```bash
+\`\`\`bash
 export GOOGLE_APPLICATION_CREDENTIALS="./firebase-admin-key.json"
-```
+\`\`\`
 
 3. **Ejecutar migración:**
-```bash
+\`\`\`bash
 npm run clean-and-migrate
-```
+\`\`\`
 
 ## ⚠️ Notas Importantes
 
@@ -148,18 +148,18 @@ Los scripts pueden ejecutarse sin credenciales de Firebase Admin para:
 ## 🐛 Troubleshooting
 
 ### Error: "Cannot find module 'firebase-admin'"
-```bash
+\`\`\`bash
 cd scripts && npm install
-```
+\`\`\`
 
 ### Error: "Permission denied"
-```bash
+\`\`\`bash
 chmod +x data-cleaner.ts
 chmod +x firestore-migrator.ts
-```
+\`\`\`
 
 ### Error: "GOOGLE_APPLICATION_CREDENTIALS not set"
-```bash
+\`\`\`bash
 # Opción 1: Variable de entorno
 export GOOGLE_APPLICATION_CREDENTIALS="./firebase-admin-key.json"
 
@@ -168,7 +168,7 @@ const serviceAccount = require('./firebase-admin-key.json');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
-```
+\`\`\`
 
 ## 📈 Roadmap
 

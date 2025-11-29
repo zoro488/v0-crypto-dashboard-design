@@ -17,49 +17,49 @@ Para ejecutar la migración a Firestore desde scripts de Node.js, necesitas conf
 3. Click en **Generate New Private Key**
 4. Confirma descargando el archivo JSON
 5. Guarda el archivo en `/workspaces/v0-crypto-dashboard-design/scripts/` con el nombre:
-   ```
+   \`\`\`
    firebase-service-account.json
-   ```
+   \`\`\`
 
 ### 3. Configurar Variable de Entorno
 
 El script de migración buscará las credenciales en:
 
-```bash
+\`\`\`bash
 export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/firebase-service-account.json"
-```
+\`\`\`
 
 O edita `firestore-migrator.ts` para apuntar directamente al archivo:
 
-```typescript
+\`\`\`typescript
 admin.initializeApp({
   credential: admin.credential.cert('./firebase-service-account.json'),
 });
-```
+\`\`\`
 
 ### 4. Proteger el Archivo (IMPORTANTE)
 
 **NUNCA** subas el archivo de credenciales a Git:
 
-```bash
+\`\`\`bash
 # Ya está en .gitignore, pero verifica:
 echo "firebase-service-account.json" >> .gitignore
 echo "scripts/firebase-service-account.json" >> .gitignore
-```
+\`\`\`
 
 ## 🔄 Una Vez Configurado
 
 Ejecuta la migración:
 
-```bash
+\`\`\`bash
 npm run migrate
-```
+\`\`\`
 
 O el proceso completo:
 
-```bash
+\`\`\`bash
 npm run setup:complete
-```
+\`\`\`
 
 ## 🌐 Alternativa: Usar Firebase Web SDK
 
@@ -71,7 +71,7 @@ Si no puedes obtener las credenciales de servicio, puedes usar el SDK web de Fir
 
 ### Verificar Configuración Web:
 
-```typescript
+\`\`\`typescript
 // En lib/firebase/config.ts
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -79,7 +79,7 @@ const firebaseConfig = {
   projectId: "premium-ecosystem-1760790572",
   // ...
 };
-```
+\`\`\`
 
 ## 📊 Estado Actual
 

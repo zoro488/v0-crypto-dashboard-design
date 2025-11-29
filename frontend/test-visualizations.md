@@ -69,7 +69,7 @@
 ## 🎯 Pruebas de Performance
 
 ### FPS (Frames Per Second)
-```javascript
+\`\`\`javascript
 // Agregar en console del navegador:
 let lastTime = performance.now();
 let frames = 0;
@@ -83,7 +83,7 @@ setInterval(() => {
 
 // En cada frame:
 frames++;
-```
+\`\`\`
 
 **Target**: ≥ 55 FPS (mínimo aceptable)
 **Ideal**: 60 FPS constante
@@ -96,11 +96,11 @@ frames++;
 5. Verificar que animationFrame se cancele correctamente
 
 ### Bundle Size
-```bash
+\`\`\`bash
 cd frontend
 npm run build
 # Verificar output size en .next/static/
-```
+\`\`\`
 
 **Target**: < 500KB por visualización
 
@@ -172,7 +172,7 @@ npm run build
 
 ## 🚀 Comandos de Test
 
-```bash
+\`\`\`bash
 # Desarrollo
 cd frontend
 npm run dev
@@ -187,12 +187,12 @@ npx tsc --noEmit
 
 # Linting
 npm run lint
-```
+\`\`\`
 
 ## 📝 Reporte de Bugs
 
 **Template**:
-```
+\`\`\`
 ### [Componente] - [Descripción corta]
 
 **Pasos para reproducir**:
@@ -210,13 +210,13 @@ npm run lint
 ...
 
 **Consola**:
-```console
+\`\`\`console
 ... errores ...
-```
+\`\`\`
 
 **Navegador**: Chrome 120 / Firefox 121 / Safari 17
 **OS**: Windows 11 / macOS 14 / Linux Ubuntu 22.04
-```
+\`\`\`
 
 ---
 
