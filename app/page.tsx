@@ -15,14 +15,20 @@ const ChronosDashboard = lazy(() => import("@/app/components/panels/ChronosDashb
 
 // Paneles existentes
 const BentoOrdenesCompra = lazy(() => import("@/app/components/panels/BentoOrdenesCompra"))
-const BentoVentas = lazy(() => import("@/app/components/panels/BentoVentas"))
 const BentoBanco = lazy(() => import("@/app/components/panels/BentoBanco"))
+
+// Panel Ventas Premium con CRUD completo, perfiles y tabla avanzada
+const BentoVentasPremium = lazy(() => import("@/app/components/panels/BentoVentasPremium"))
 const BentoAlmacen = lazy(() => import("@/app/components/panels/BentoAlmacen"))
 const BentoReportes = lazy(() => import("@/app/components/panels/BentoReportes"))
-const BentoIA = lazy(() => import("@/app/components/panels/BentoIA"))
-const BentoDistribuidores = lazy(() => import("@/app/components/panels/BentoDistribuidores"))
-const BentoClientes = lazy(() => import("@/app/components/panels/BentoClientes"))
 const BentoProfit = lazy(() => import("@/app/components/panels/BentoProfit"))
+
+// Paneles Premium con CRUD completo, perfiles y tabla avanzada
+const BentoClientesPremium = lazy(() => import("@/app/components/panels/BentoClientesPremium"))
+const BentoDistribuidoresPremium = lazy(() => import("@/app/components/panels/BentoDistribuidoresPremium"))
+
+// Panel IA Inmersivo con Nexbot 3D
+const BentoIAImmersive = lazy(() => import("@/app/components/panels/BentoIAImmersive"))
 
 const PanelLoader = () => (
   <div className="flex items-center justify-center min-h-[60vh]">
@@ -134,11 +140,11 @@ export default function Chronos() {
       case "ordenes":
         return <BentoOrdenesCompra />
       case "ventas":
-        return <BentoVentas />
+        return <BentoVentasPremium />
       case "distribuidores":
-        return <BentoDistribuidores />
+        return <BentoDistribuidoresPremium />
       case "clientes":
-        return <BentoClientes />
+        return <BentoClientesPremium />
       case "banco":
         return <BentoBanco />
       case "almacen":
@@ -146,7 +152,7 @@ export default function Chronos() {
       case "reportes":
         return <BentoReportes />
       case "ia":
-        return <BentoIA />
+        return <BentoIAImmersive />
       case "profit":
         return <BentoProfit />
       default:

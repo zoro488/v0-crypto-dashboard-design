@@ -14,7 +14,7 @@
  * </SafeChartContainer>
  */
 
-import { useState, useEffect, useRef, type ReactNode } from "react"
+import { useState, useEffect, useRef, useCallback, type ReactNode } from "react"
 import { ResponsiveContainer } from "recharts"
 
 interface SafeChartContainerProps {
@@ -49,41 +49,91 @@ export function SafeChartContainer({
   minHeight = 100,
   minWidth = 100,
   className = "",
-  debounceMs = 100,
+  debounceMs = 150,
   showSkeleton = true,
   aspect,
 }: SafeChartContainerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isReady, setIsReady] = useState(false)
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
+  const [dimensions, setDimensions] = useState({ width: 200, height: 200 })
+  const mountedRef = useRef(true)
+  const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  useEffect(() => {
-    // Esperar al siguiente frame para asegurar que el DOM está listo
-    const frame = requestAnimationFrame(() => {
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect()
-        if (rect.width > 0 && rect.height > 0) {
-          setDimensions({ width: rect.width, height: rect.height })
-          setIsReady(true)
+  // Función para medir dimensiones de forma segura
+  const measureDimensions = useCallback(() => {
+    if (!containerRef.current || !mountedRef.current) return
+    
+    const rect = containerRef.current.getBoundingClientRect()
+    const w = Math.max(rect.width, minWidth)
+    const h = Math.max(rect.height, minHeight)
+    
+    if (w > 0 && h > 0) {
+      setDimensions(prev => {
+        // Solo actualizar si cambió significativamente (evita loops)
+        if (Math.abs(prev.width - w) > 5 || Math.abs(prev.height - h) > 5) {
+          return { width: w, height: h }
         }
-      }
-    })
+        return prev
+      })
+      if (!isReady) setIsReady(true)
+    }
+  }, [minWidth, minHeight, isReady])
 
-    return () => cancelAnimationFrame(frame)
-  }, [])
+  // Efecto de inicialización
+  useEffect(() => {
+    mountedRef.current = true
+    
+    // Múltiples intentos para asegurar medición correcta
+    const checkDimensions = () => {
+      if (!mountedRef.current) return
+      measureDimensions()
+    }
 
+    // Intento inmediato
+    checkDimensions()
+    
+    // Intento después de un frame
+    const frame1 = requestAnimationFrame(checkDimensions)
+    
+    // Intento después de 100ms (para layouts complejos)
+    const timeout1 = setTimeout(checkDimensions, 100)
+    
+    // Intento después de 300ms (para contenedores con animación)
+    const timeout2 = setTimeout(checkDimensions, 300)
+
+    return () => {
+      mountedRef.current = false
+      cancelAnimationFrame(frame1)
+      clearTimeout(timeout1)
+      clearTimeout(timeout2)
+    }
+  }, [measureDimensions])
+
+  // ResizeObserver con debounce mejorado
   useEffect(() => {
     if (!containerRef.current) return
 
-    let debounceTimer: NodeJS.Timeout
-
     const resizeObserver = new ResizeObserver((entries) => {
-      clearTimeout(debounceTimer)
-      debounceTimer = setTimeout(() => {
+      if (!mountedRef.current) return
+      
+      // Cancelar timeout anterior
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current)
+      }
+      
+      // Debounce la actualización
+      resizeTimeoutRef.current = setTimeout(() => {
+        if (!mountedRef.current) return
+        
         for (const entry of entries) {
           const { width: w, height: h } = entry.contentRect
-          if (w > 0 && h > 0) {
-            setDimensions({ width: w, height: h })
+          if (w > minWidth && h > minHeight) {
+            setDimensions(prev => {
+              if (Math.abs(prev.width - w) > 5 || Math.abs(prev.height - h) > 5) {
+                return { width: w, height: h }
+              }
+              return prev
+            })
             if (!isReady) setIsReady(true)
           }
         }
@@ -93,22 +143,38 @@ export function SafeChartContainer({
     resizeObserver.observe(containerRef.current)
 
     return () => {
-      clearTimeout(debounceTimer)
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current)
+      }
       resizeObserver.disconnect()
     }
-  }, [debounceMs, isReady])
+  }, [debounceMs, isReady, minWidth, minHeight])
 
   // Calcular altura efectiva
   const effectiveHeight = typeof height === "number" 
     ? Math.max(height, minHeight) 
     : height
 
-  // Skeleton de carga
+  // Skeleton de carga mejorado
   const Skeleton = () => (
-    <div className="w-full h-full flex items-center justify-center">
-      <div className="animate-pulse bg-white/5 rounded-lg w-full h-full" />
+    <div className="w-full h-full flex items-center justify-center bg-zinc-900/30 rounded-lg">
+      <div className="flex flex-col items-center gap-2">
+        <div className="animate-pulse bg-white/5 rounded-lg w-3/4 h-2/3" />
+        <div className="flex gap-1">
+          {[0, 1, 2].map(i => (
+            <div 
+              key={i}
+              className="w-1.5 h-1.5 bg-white/20 rounded-full animate-pulse"
+              style={{ animationDelay: `${i * 150}ms` }}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   )
+
+  // Verificar si las dimensiones son válidas
+  const hasValidDimensions = dimensions.width >= minWidth && dimensions.height >= minHeight
 
   return (
     <div
@@ -123,10 +189,10 @@ export function SafeChartContainer({
     >
       {!isReady && showSkeleton ? (
         <Skeleton />
-      ) : dimensions.width > minWidth && dimensions.height > minHeight ? (
+      ) : hasValidDimensions ? (
         <ResponsiveContainer 
-          width="100%" 
-          height="100%"
+          width={dimensions.width}
+          height={dimensions.height}
           minWidth={minWidth}
           minHeight={minHeight}
           aspect={aspect}
