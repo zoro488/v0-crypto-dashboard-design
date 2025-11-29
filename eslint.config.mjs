@@ -145,6 +145,8 @@ export default [
       '.git/**',
       '__tests__/**', // Opcional: no lintear tests si usan reglas diferentes
       'scripts/**', // Scripts de migración pueden tener console.log
+      '_deprecated/**', // Código deprecado
+      'SPLINE COMPONENTS/**', // Componentes Spline externos
     ],
   },
   
