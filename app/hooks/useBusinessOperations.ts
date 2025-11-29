@@ -27,7 +27,7 @@ import {
   type NuevaVentaInput,
   type AbonoClienteInput,
   type PagoDistribuidorInput,
-  type TransferenciaInput
+  type TransferenciaInput,
 } from '@/app/lib/services/business-logic.service'
 import type { BancoId, CalculoVentaResult } from '@/app/types'
 
@@ -131,7 +131,7 @@ export function useCalculoVentaPreview() {
     cantidad: number,
     precioVenta: number,
     precioCompra: number,
-    precioFlete?: number
+    precioFlete?: number,
   ) => {
     if (cantidad > 0 && precioVenta > 0 && precioCompra > 0) {
       const aplicaFlete = precioFlete !== undefined && precioFlete > 0
@@ -296,7 +296,7 @@ export function useRegistrarOrdenCompra(): UseOperationResult<DatosOrdenCompra, 
         datos.cantidad,
         datos.precioCompra,
         datos.precioFlete ?? 0,
-        datos.pagoInicial ?? 0
+        datos.pagoInicial ?? 0,
       )
       
       return { success: true, data: ocId }
@@ -389,7 +389,7 @@ export function useValidarStock() {
       stockActual,
       mensaje: disponible 
         ? `Stock disponible: ${stockActual} unidades` 
-        : `Stock insuficiente. Disponible: ${stockActual}, Solicitado: ${cantidadSolicitada}`
+        : `Stock insuficiente. Disponible: ${stockActual}, Solicitado: ${cantidadSolicitada}`,
     }
     setValidacion(resultado)
     return resultado
@@ -436,7 +436,7 @@ export function useEstadoPago() {
       montoPagado,
       montoTotal,
       montoPendiente,
-      porcentajePagado
+      porcentajePagado,
     }
   }, [])
 
@@ -509,7 +509,7 @@ export function useSeleccionBanco(bancosDisponibles: BancoOption[]) {
     validarSaldo,
     getBanco,
     reset,
-    bancosDisponibles
+    bancosDisponibles,
   }
 }
 
@@ -553,6 +553,6 @@ export function useVentaCompleta() {
     getIconEstado,
     
     // Reset
-    reset
+    reset,
   }
 }

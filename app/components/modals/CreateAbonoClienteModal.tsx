@@ -21,11 +21,11 @@
  * @version 2.0
  */
 
-"use client"
+'use client'
 
-import type React from "react"
-import { useState, useCallback, useMemo, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import type React from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   X, 
   User, 
@@ -38,29 +38,29 @@ import {
   TrendingUp,
   Banknote,
   Building2,
-  Calculator
-} from "lucide-react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
+  Calculator,
+} from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogDescription,
-} from "@/app/components/ui/dialog"
-import { cn } from "@/app/lib/utils"
-import { useToast } from "@/app/hooks/use-toast"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { logger } from "@/app/lib/utils/logger"
-import { useRegistrarAbonoCliente, useEstadoPago } from "@/app/hooks/useBusinessOperations"
-import type { Cliente } from "@/app/types"
+} from '@/app/components/ui/dialog'
+import { cn } from '@/app/lib/utils'
+import { useToast } from '@/app/hooks/use-toast'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { logger } from '@/app/lib/utils/logger'
+import { useRegistrarAbonoCliente, useEstadoPago } from '@/app/hooks/useBusinessOperations'
+import type { Cliente } from '@/app/types'
 
 // Schema de validación
 const abonoClienteSchema = z.object({
-  clienteId: z.string().min(1, "Selecciona un cliente"),
-  monto: z.number().positive("El monto debe ser mayor a 0"),
-  metodo: z.enum(["efectivo", "transferencia", "cheque"]),
+  clienteId: z.string().min(1, 'Selecciona un cliente'),
+  monto: z.number().positive('El monto debe ser mayor a 0'),
+  metodo: z.enum(['efectivo', 'transferencia', 'cheque']),
   referencia: z.string().optional(),
   notas: z.string().optional(),
 })
@@ -74,9 +74,9 @@ interface CreateAbonoClienteModalProps {
 }
 
 const METODO_PAGO_OPTIONS = [
-  { value: "efectivo", label: "Efectivo", icon: "💵" },
-  { value: "transferencia", label: "Transferencia", icon: "📲" },
-  { value: "cheque", label: "Cheque", icon: "📝" },
+  { value: 'efectivo', label: 'Efectivo', icon: '💵' },
+  { value: 'transferencia', label: 'Transferencia', icon: '📲' },
+  { value: 'cheque', label: 'Cheque', icon: '📝' },
 ]
 
 // Nombres legibles de bancos
@@ -89,7 +89,7 @@ const BANCO_NOMBRES: Record<string, string> = {
 export default function CreateAbonoClienteModal({ 
   isOpen, 
   onClose,
-  clientePreseleccionado
+  clientePreseleccionado,
 }: CreateAbonoClienteModalProps) {
   const { toast } = useToast()
   const clientes = useAppStore((state) => state.clientes)
@@ -115,26 +115,26 @@ export default function CreateAbonoClienteModal({
     formState: { errors, isValid },
   } = useForm<AbonoClienteFormData>({
     resolver: zodResolver(abonoClienteSchema),
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
-      clienteId: clientePreseleccionado || "",
+      clienteId: clientePreseleccionado || '',
       monto: 0,
-      metodo: "efectivo",
-      referencia: "",
-      notas: "",
+      metodo: 'efectivo',
+      referencia: '',
+      notas: '',
     },
   })
 
   // Actualizar cliente preseleccionado cuando cambie
   useEffect(() => {
     if (clientePreseleccionado) {
-      setValue("clienteId", clientePreseleccionado)
+      setValue('clienteId', clientePreseleccionado)
     }
   }, [clientePreseleccionado, setValue])
 
-  const watchedClienteId = watch("clienteId")
-  const watchedMonto = watch("monto")
-  const watchedMetodo = watch("metodo")
+  const watchedClienteId = watch('clienteId')
+  const watchedMonto = watch('monto')
+  const watchedMetodo = watch('metodo')
 
   // Cliente seleccionado con datos completos
   const selectedCliente = useMemo(() => {
@@ -191,7 +191,7 @@ export default function CreateAbonoClienteModal({
 
       if (result.success) {
         toast({
-          title: "✅ Abono Registrado",
+          title: '✅ Abono Registrado',
           description: `Se registró el abono de $${data.monto.toLocaleString()} y se distribuyó a los bancos.`,
         })
 
@@ -201,17 +201,17 @@ export default function CreateAbonoClienteModal({
         onClose()
       } else {
         toast({
-          title: "Error",
-          description: result.error || "No se pudo registrar el abono",
-          variant: "destructive",
+          title: 'Error',
+          description: result.error || 'No se pudo registrar el abono',
+          variant: 'destructive',
         })
       }
     } catch (error) {
-      logger.error("Error en formulario de abono", error, { context: "CreateAbonoClienteModal" })
+      logger.error('Error en formulario de abono', error, { context: 'CreateAbonoClienteModal' })
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Error al registrar el abono",
-        variant: "destructive",
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Error al registrar el abono',
+        variant: 'destructive',
       })
     }
   }
@@ -230,10 +230,10 @@ export default function CreateAbonoClienteModal({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
         className={cn(
-          "max-w-2xl max-h-[85vh] p-0",
-          "bg-black/95 border-white/10 backdrop-blur-2xl",
-          "text-white overflow-hidden flex flex-col",
-          "shadow-2xl shadow-green-500/10"
+          'max-w-2xl max-h-[85vh] p-0',
+          'bg-black/95 border-white/10 backdrop-blur-2xl',
+          'text-white overflow-hidden flex flex-col',
+          'shadow-2xl shadow-green-500/10',
         )}
       >
         <DialogTitle className="sr-only">Registrar Abono de Cliente</DialogTitle>
@@ -279,7 +279,7 @@ export default function CreateAbonoClienteModal({
                 <div key={s} className="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: step >= s ? "100%" : "0%" }}
+                    animate={{ width: step >= s ? '100%' : '0%' }}
                     transition={{ duration: 0.3 }}
                     className="h-full bg-gradient-to-r from-green-500 to-emerald-500"
                   />
@@ -287,9 +287,9 @@ export default function CreateAbonoClienteModal({
               ))}
             </div>
             <div className="flex justify-between mt-2 text-xs text-gray-500">
-              <span className={step >= 1 ? "text-green-400" : ""}>Cliente</span>
-              <span className={step >= 2 ? "text-green-400" : ""}>Monto</span>
-              <span className={step >= 3 ? "text-green-400" : ""}>Confirmar</span>
+              <span className={step >= 1 ? 'text-green-400' : ''}>Cliente</span>
+              <span className={step >= 2 ? 'text-green-400' : ''}>Monto</span>
+              <span className={step >= 3 ? 'text-green-400' : ''}>Confirmar</span>
             </div>
           </div>
         </div>
@@ -312,11 +312,11 @@ export default function CreateAbonoClienteModal({
                     Seleccionar Cliente *
                   </label>
                   <select
-                    {...register("clienteId")}
+                    {...register('clienteId')}
                     className={`w-full px-5 py-4 bg-white/5 border rounded-xl text-white text-lg focus:outline-none focus:ring-2 transition-all appearance-none ${
                       errors.clienteId 
-                        ? "border-red-500/50 focus:ring-red-500" 
-                        : "border-white/10 focus:ring-green-500 focus:border-transparent"
+                        ? 'border-red-500/50 focus:ring-red-500' 
+                        : 'border-white/10 focus:ring-green-500 focus:border-transparent'
                     }`}
                   >
                     <option value="" className="bg-gray-900">Seleccionar cliente...</option>
@@ -347,7 +347,7 @@ export default function CreateAbonoClienteModal({
                         <p className="text-sm text-gray-400">Cliente</p>
                       </div>
                       {estadoPagoActual && (
-                        <span className={cn("px-3 py-1 rounded-full text-xs font-medium", getColorEstado(estadoPagoActual.estado))}>
+                        <span className={cn('px-3 py-1 rounded-full text-xs font-medium', getColorEstado(estadoPagoActual.estado))}>
                           {getIconEstado(estadoPagoActual.estado)} {estadoPagoActual.estado.toUpperCase()}
                         </span>
                       )}
@@ -411,11 +411,11 @@ export default function CreateAbonoClienteModal({
                     <input
                       type="number"
                       step="0.01"
-                      {...register("monto", { valueAsNumber: true })}
+                      {...register('monto', { valueAsNumber: true })}
                       className={`w-full pl-10 pr-5 py-4 bg-white/5 border rounded-xl text-white text-2xl font-bold focus:outline-none focus:ring-2 transition-all ${
                         errors.monto 
-                          ? "border-red-500/50 focus:ring-red-500" 
-                          : "border-white/10 focus:ring-green-500 focus:border-transparent"
+                          ? 'border-red-500/50 focus:ring-red-500' 
+                          : 'border-white/10 focus:ring-green-500 focus:border-transparent'
                       }`}
                       placeholder="0.00"
                     />
@@ -429,21 +429,21 @@ export default function CreateAbonoClienteModal({
                     <div className="flex flex-wrap gap-2 mt-3">
                       <button
                         type="button"
-                        onClick={() => setValue("monto", selectedCliente.deudaTotal || selectedCliente.pendiente || 0)}
+                        onClick={() => setValue('monto', selectedCliente.deudaTotal || selectedCliente.pendiente || 0)}
                         className="px-3 py-1.5 text-xs bg-green-500/20 text-green-300 rounded-lg hover:bg-green-500/30 transition-colors"
                       >
                         Pago total (${(selectedCliente.deudaTotal || selectedCliente.pendiente || 0).toLocaleString()})
                       </button>
                       <button
                         type="button"
-                        onClick={() => setValue("monto", Math.round((selectedCliente.deudaTotal || selectedCliente.pendiente || 0) / 2))}
+                        onClick={() => setValue('monto', Math.round((selectedCliente.deudaTotal || selectedCliente.pendiente || 0) / 2))}
                         className="px-3 py-1.5 text-xs bg-white/10 text-gray-300 rounded-lg hover:bg-white/20 transition-colors"
                       >
                         50%
                       </button>
                       <button
                         type="button"
-                        onClick={() => setValue("monto", Math.round((selectedCliente.deudaTotal || selectedCliente.pendiente || 0) / 4))}
+                        onClick={() => setValue('monto', Math.round((selectedCliente.deudaTotal || selectedCliente.pendiente || 0) / 4))}
                         className="px-3 py-1.5 text-xs bg-white/10 text-gray-300 rounded-lg hover:bg-white/20 transition-colors"
                       >
                         25%
@@ -494,13 +494,13 @@ export default function CreateAbonoClienteModal({
                       <motion.button
                         key={option.value}
                         type="button"
-                        onClick={() => setValue("metodo", option.value as AbonoClienteFormData["metodo"])}
+                        onClick={() => setValue('metodo', option.value as AbonoClienteFormData['metodo'])}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         className={`p-3 rounded-xl border text-sm transition-all ${
                           watchedMetodo === option.value
-                            ? "bg-green-500/20 border-green-500 text-white"
-                            : "bg-white/5 border-white/10 text-gray-400 hover:border-white/20"
+                            ? 'bg-green-500/20 border-green-500 text-white'
+                            : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/20'
                         }`}
                       >
                         <span className="mr-1">{option.icon}</span> {option.label}
@@ -548,13 +548,13 @@ export default function CreateAbonoClienteModal({
                     <div className="flex items-center gap-3">
                       <CheckCircle2 className="w-5 h-5 text-green-400" />
                       <div>
-                        <p className="text-white font-medium">{selectedCliente?.nombre || "Cliente"}</p>
+                        <p className="text-white font-medium">{selectedCliente?.nombre || 'Cliente'}</p>
                         <p className="text-sm text-gray-400">Abono de cliente</p>
                       </div>
                     </div>
                     <div className="text-right">
                       <p className="text-2xl font-bold text-green-400">
-                        +${watchedMonto?.toLocaleString() || "0.00"}
+                        +${watchedMonto?.toLocaleString() || '0.00'}
                       </p>
                       <p className="text-xs text-gray-400">
                         {METODO_PAGO_OPTIONS.find(m => m.value === watchedMetodo)?.label}
@@ -571,7 +571,7 @@ export default function CreateAbonoClienteModal({
                   </label>
                   <input
                     type="text"
-                    {...register("referencia")}
+                    {...register('referencia')}
                     className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
                     placeholder="Número de referencia o comprobante"
                   />
@@ -584,7 +584,7 @@ export default function CreateAbonoClienteModal({
                     Notas
                   </label>
                   <textarea
-                    {...register("notas")}
+                    {...register('notas')}
                     className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all resize-none"
                     rows={2}
                     placeholder="Notas adicionales..."
@@ -604,16 +604,16 @@ export default function CreateAbonoClienteModal({
                         <p className="text-lg font-bold text-red-400">
                           ${estadoPagoActual.montoPendiente.toLocaleString()} pendiente
                         </p>
-                        <span className={cn("text-xs px-2 py-0.5 rounded-full", getColorEstado(estadoPagoActual.estado))}>
+                        <span className={cn('text-xs px-2 py-0.5 rounded-full', getColorEstado(estadoPagoActual.estado))}>
                           {estadoPagoActual.estado}
                         </span>
                       </div>
                       <div>
                         <p className="text-xs text-gray-400 mb-1">Después</p>
-                        <p className={cn("text-lg font-bold", estadoPagoDespues.montoPendiente <= 0 ? "text-green-400" : "text-yellow-400")}>
+                        <p className={cn('text-lg font-bold', estadoPagoDespues.montoPendiente <= 0 ? 'text-green-400' : 'text-yellow-400')}>
                           ${Math.max(0, estadoPagoDespues.montoPendiente).toLocaleString()} pendiente
                         </p>
-                        <span className={cn("text-xs px-2 py-0.5 rounded-full", getColorEstado(estadoPagoDespues.estado))}>
+                        <span className={cn('text-xs px-2 py-0.5 rounded-full', getColorEstado(estadoPagoDespues.estado))}>
                           {estadoPagoDespues.estado}
                         </span>
                       </div>
@@ -643,8 +643,8 @@ export default function CreateAbonoClienteModal({
                       <p className="text-sm text-emerald-300 font-medium">Sugerencia IA</p>
                       <p className="text-xs text-gray-400 mt-1">
                         {watchedMonto && selectedCliente?.deudaTotal && watchedMonto >= (selectedCliente.deudaTotal || selectedCliente.pendiente || 0)
-                          ? "¡Excelente! Este abono liquidará la deuda completa del cliente."
-                          : "Registra el comprobante de pago para mejor trazabilidad contable."}
+                          ? '¡Excelente! Este abono liquidará la deuda completa del cliente.'
+                          : 'Registra el comprobante de pago para mejor trazabilidad contable.'}
                       </p>
                     </div>
                   </div>
@@ -678,13 +678,13 @@ export default function CreateAbonoClienteModal({
                       <span className="flex items-center justify-center gap-2">
                         <motion.div
                           animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                           className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
                         />
                         Registrando...
                       </span>
                     ) : (
-                      "Registrar Abono ✓"
+                      'Registrar Abono ✓'
                     )}
                   </motion.button>
                 </div>

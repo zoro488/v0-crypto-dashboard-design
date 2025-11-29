@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 /**
  * ArbitrageGauge - Semáforo Visual de Arbitraje
@@ -9,17 +9,17 @@
  * - HOLD: Mantener posición
  */
 
-import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import React, { useMemo } from 'react'
+import { motion } from 'framer-motion'
 import { 
   Building2, 
   Bitcoin, 
   Pause,
   ArrowRight,
   TrendingUp,
-  Zap
-} from 'lucide-react';
-import { cn } from '@/app/lib/utils';
+  Zap,
+} from 'lucide-react'
+import { cn } from '@/app/lib/utils'
 
 // ============================================
 // TIPOS
@@ -45,24 +45,24 @@ export const ArbitrageGauge: React.FC<ArbitrageGaugeProps> = ({
   // Calcular el ángulo de la aguja (-45° a 45°)
   // Negativo = físico, Positivo = crypto, 0 = neutral
   const needleAngle = useMemo(() => {
-    const maxPremium = 0.50; // 50 centavos máximo para escala
-    const normalizedCrypto = Math.min(cryptoPremium / maxPremium, 1);
-    const normalizedPhysical = Math.min(physicalPremium / maxPremium, 1);
+    const maxPremium = 0.50 // 50 centavos máximo para escala
+    const normalizedCrypto = Math.min(cryptoPremium / maxPremium, 1)
+    const normalizedPhysical = Math.min(physicalPremium / maxPremium, 1)
     
     // Si crypto es mejor, inclinar a la derecha (positivo)
     // Si físico es mejor, inclinar a la izquierda (negativo)
-    const angle = (normalizedCrypto - normalizedPhysical) * 45;
+    const angle = (normalizedCrypto - normalizedPhysical) * 45
     
-    return Math.max(-45, Math.min(45, angle));
-  }, [cryptoPremium, physicalPremium]);
+    return Math.max(-45, Math.min(45, angle))
+  }, [cryptoPremium, physicalPremium])
 
   // Determinar intensidad del color basado en la oportunidad
   const opportunityIntensity = useMemo(() => {
-    const maxPremium = Math.max(Math.abs(cryptoPremium), Math.abs(physicalPremium));
-    if (maxPremium >= 0.20) return 'high';
-    if (maxPremium >= 0.10) return 'medium';
-    return 'low';
-  }, [cryptoPremium, physicalPremium]);
+    const maxPremium = Math.max(Math.abs(cryptoPremium), Math.abs(physicalPremium))
+    if (maxPremium >= 0.20) return 'high'
+    if (maxPremium >= 0.10) return 'medium'
+    return 'low'
+  }, [cryptoPremium, physicalPremium])
 
   // Configuración del canal seleccionado
   const channelConfig = {
@@ -93,9 +93,9 @@ export const ArbitrageGauge: React.FC<ArbitrageGaugeProps> = ({
       borderColor: 'border-zinc-500/30',
       glowColor: 'shadow-zinc-500/20',
     },
-  };
+  }
 
-  const activeChannel = channelConfig[bestChannel];
+  const activeChannel = channelConfig[bestChannel]
 
   return (
     <div className="space-y-4">
@@ -125,7 +125,7 @@ export const ArbitrageGauge: React.FC<ArbitrageGaugeProps> = ({
             strokeLinecap="round"
             className={cn(
               'transition-all duration-300',
-              bestChannel === 'physical' ? 'text-blue-500' : 'text-blue-500/30'
+              bestChannel === 'physical' ? 'text-blue-500' : 'text-blue-500/30',
             )}
           />
           
@@ -138,7 +138,7 @@ export const ArbitrageGauge: React.FC<ArbitrageGaugeProps> = ({
             strokeLinecap="round"
             className={cn(
               'transition-all duration-300',
-              bestChannel === 'hold' ? 'text-zinc-500' : 'text-zinc-500/30'
+              bestChannel === 'hold' ? 'text-zinc-500' : 'text-zinc-500/30',
             )}
           />
           
@@ -151,7 +151,7 @@ export const ArbitrageGauge: React.FC<ArbitrageGaugeProps> = ({
             strokeLinecap="round"
             className={cn(
               'transition-all duration-300',
-              bestChannel === 'crypto' ? 'text-amber-500' : 'text-amber-500/30'
+              bestChannel === 'crypto' ? 'text-amber-500' : 'text-amber-500/30',
             )}
           />
           
@@ -207,7 +207,7 @@ export const ArbitrageGauge: React.FC<ArbitrageGaugeProps> = ({
           'flex items-center justify-between p-3 rounded-lg border',
           activeChannel.bgColor,
           activeChannel.borderColor,
-          opportunityIntensity === 'high' && `shadow-lg ${activeChannel.glowColor}`
+          opportunityIntensity === 'high' && `shadow-lg ${activeChannel.glowColor}`,
         )}
       >
         <div className="flex items-center gap-3">
@@ -239,7 +239,7 @@ export const ArbitrageGauge: React.FC<ArbitrageGaugeProps> = ({
               'text-sm font-medium',
               opportunityIntensity === 'high' && 'text-emerald-400',
               opportunityIntensity === 'medium' && 'text-amber-400',
-              opportunityIntensity === 'low' && 'text-zinc-400'
+              opportunityIntensity === 'low' && 'text-zinc-400',
             )}>
               {opportunityIntensity === 'high' && '¡Oportunidad Alta!'}
               {opportunityIntensity === 'medium' && 'Oportunidad Media'}
@@ -256,7 +256,7 @@ export const ArbitrageGauge: React.FC<ArbitrageGaugeProps> = ({
             <span className="text-zinc-400">Premium Crypto</span>
             <span className={cn(
               'font-mono',
-              cryptoPremium > 0 ? 'text-emerald-400' : 'text-red-400'
+              cryptoPremium > 0 ? 'text-emerald-400' : 'text-red-400',
             )}>
               {cryptoPremium > 0 ? '+' : ''}{cryptoPremium.toFixed(2)}
             </span>
@@ -265,7 +265,7 @@ export const ArbitrageGauge: React.FC<ArbitrageGaugeProps> = ({
             <span className="text-zinc-400">Premium Físico</span>
             <span className={cn(
               'font-mono',
-              physicalPremium > 0 ? 'text-emerald-400' : 'text-red-400'
+              physicalPremium > 0 ? 'text-emerald-400' : 'text-red-400',
             )}>
               {physicalPremium > 0 ? '+' : ''}{physicalPremium.toFixed(2)}
             </span>
@@ -273,7 +273,7 @@ export const ArbitrageGauge: React.FC<ArbitrageGaugeProps> = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default ArbitrageGauge;
+export default ArbitrageGauge

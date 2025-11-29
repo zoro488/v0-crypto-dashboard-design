@@ -3,10 +3,10 @@
  * Búsqueda y navegación rápida estilo Spotlight/Raycast
  */
 
-'use client';
+'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Command,
   CommandDialog,
@@ -17,7 +17,7 @@ import {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-} from '@/app/components/ui/command';
+} from '@/app/components/ui/command'
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -45,8 +45,8 @@ import {
   BarChart3,
   Calendar,
   Wallet,
-} from 'lucide-react';
-import { useAppStore } from '@/app/lib/store/useAppStore';
+} from 'lucide-react'
+import { useAppStore } from '@/app/lib/store/useAppStore'
 
 interface CommandAction {
   id: string;
@@ -64,27 +64,27 @@ interface CommandMenuProps {
 }
 
 export function CommandMenu({ onOpenChange }: CommandMenuProps) {
-  const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState('');
-  const { setCurrentPanel, theme, setTheme } = useAppStore();
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const { setCurrentPanel, theme, setTheme } = useAppStore()
 
   // Toggle del menú
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setOpen((open) => !open);
+        e.preventDefault()
+        setOpen((open) => !open)
       }
-    };
+    }
 
-    document.addEventListener('keydown', down);
-    return () => document.removeEventListener('keydown', down);
-  }, []);
+    document.addEventListener('keydown', down)
+    return () => document.removeEventListener('keydown', down)
+  }, [])
 
   // Notificar cambios
   useEffect(() => {
-    onOpenChange?.(open);
-  }, [open, onOpenChange]);
+    onOpenChange?.(open)
+  }, [open, onOpenChange])
 
   // Acciones disponibles
   const commands: CommandAction[] = useMemo(() => [
@@ -95,7 +95,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       description: 'Ver panel principal',
       icon: LayoutDashboard,
       shortcut: '⌘1',
-      action: () => { setCurrentPanel('dashboard'); setOpen(false); },
+      action: () => { setCurrentPanel('dashboard'); setOpen(false) },
       group: 'navigation',
       keywords: ['inicio', 'home', 'principal'],
     },
@@ -105,7 +105,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       description: 'Gestionar órdenes',
       icon: ShoppingCart,
       shortcut: '⌘2',
-      action: () => { setCurrentPanel('ordenes'); setOpen(false); },
+      action: () => { setCurrentPanel('ordenes'); setOpen(false) },
       group: 'navigation',
       keywords: ['compras', 'pedidos', 'distribuidores'],
     },
@@ -115,7 +115,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       description: 'Registrar y ver ventas',
       icon: TrendingUp,
       shortcut: '⌘3',
-      action: () => { setCurrentPanel('ventas'); setOpen(false); },
+      action: () => { setCurrentPanel('ventas'); setOpen(false) },
       group: 'navigation',
       keywords: ['facturación', 'clientes', 'vender'],
     },
@@ -125,7 +125,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       description: 'Control de bancos y capital',
       icon: Building2,
       shortcut: '⌘4',
-      action: () => { setCurrentPanel('banco'); setOpen(false); },
+      action: () => { setCurrentPanel('banco'); setOpen(false) },
       group: 'navigation',
       keywords: ['dinero', 'capital', 'saldos', 'transferencias'],
     },
@@ -135,7 +135,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       description: 'Gestión de clientes',
       icon: Users,
       shortcut: '⌘5',
-      action: () => { setCurrentPanel('clientes'); setOpen(false); },
+      action: () => { setCurrentPanel('clientes'); setOpen(false) },
       group: 'navigation',
       keywords: ['compradores', 'deudores', 'cartera'],
     },
@@ -145,7 +145,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       description: 'Gestión de proveedores',
       icon: Truck,
       shortcut: '⌘6',
-      action: () => { setCurrentPanel('distribuidores'); setOpen(false); },
+      action: () => { setCurrentPanel('distribuidores'); setOpen(false) },
       group: 'navigation',
       keywords: ['proveedores', 'suppliers'],
     },
@@ -155,7 +155,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       description: 'Control de inventario',
       icon: Package,
       shortcut: '⌘7',
-      action: () => { setCurrentPanel('almacen'); setOpen(false); },
+      action: () => { setCurrentPanel('almacen'); setOpen(false) },
       group: 'navigation',
       keywords: ['stock', 'inventario', 'productos'],
     },
@@ -165,7 +165,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       description: 'Generar informes',
       icon: FileText,
       shortcut: '⌘8',
-      action: () => { setCurrentPanel('reportes'); setOpen(false); },
+      action: () => { setCurrentPanel('reportes'); setOpen(false) },
       group: 'navigation',
       keywords: ['informes', 'estadísticas', 'análisis'],
     },
@@ -175,7 +175,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       description: 'Inteligencia Artificial',
       icon: Brain,
       shortcut: '⌘9',
-      action: () => { setCurrentPanel('ia'); setOpen(false); },
+      action: () => { setCurrentPanel('ia'); setOpen(false) },
       group: 'navigation',
       keywords: ['ai', 'chat', 'asistente', 'bot'],
     },
@@ -185,7 +185,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       description: 'Ver ganancias',
       icon: DollarSign,
       shortcut: '⌘0',
-      action: () => { setCurrentPanel('profit'); setOpen(false); },
+      action: () => { setCurrentPanel('profit'); setOpen(false) },
       group: 'navigation',
       keywords: ['ganancias', 'utilidad', 'rentabilidad'],
     },
@@ -197,7 +197,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       description: 'Registrar una venta',
       icon: PlusCircle,
       shortcut: '⌘N',
-      action: () => { setCurrentPanel('ventas'); setOpen(false); },
+      action: () => { setCurrentPanel('ventas'); setOpen(false) },
       group: 'actions',
       keywords: ['crear', 'agregar', 'registrar'],
     },
@@ -207,7 +207,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       description: 'Crear orden de compra',
       icon: ShoppingCart,
       shortcut: '⌘O',
-      action: () => { setCurrentPanel('ordenes'); setOpen(false); },
+      action: () => { setCurrentPanel('ordenes'); setOpen(false) },
       group: 'actions',
       keywords: ['crear', 'agregar', 'pedido'],
     },
@@ -217,7 +217,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       description: 'Transferir entre bancos',
       icon: ArrowRightLeft,
       shortcut: '⌘T',
-      action: () => { setCurrentPanel('banco'); setOpen(false); },
+      action: () => { setCurrentPanel('banco'); setOpen(false) },
       group: 'actions',
       keywords: ['mover', 'dinero', 'enviar'],
     },
@@ -226,7 +226,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       label: 'Registrar Abono',
       description: 'Abono de cliente',
       icon: Receipt,
-      action: () => { setCurrentPanel('clientes'); setOpen(false); },
+      action: () => { setCurrentPanel('clientes'); setOpen(false) },
       group: 'actions',
       keywords: ['pago', 'cobrar', 'recibir'],
     },
@@ -235,7 +235,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       label: 'Registrar Gasto',
       description: 'Nuevo gasto',
       icon: Wallet,
-      action: () => { setCurrentPanel('banco'); setOpen(false); },
+      action: () => { setCurrentPanel('banco'); setOpen(false) },
       group: 'actions',
       keywords: ['egreso', 'pago', 'salida'],
     },
@@ -246,7 +246,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       label: 'Análisis con IA',
       description: 'Analizar datos con inteligencia artificial',
       icon: Sparkles,
-      action: () => { setCurrentPanel('ia'); setOpen(false); },
+      action: () => { setCurrentPanel('ia'); setOpen(false) },
       group: 'ai',
       keywords: ['análisis', 'predicción', 'insights'],
     },
@@ -255,7 +255,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       label: 'Generar Reporte IA',
       description: 'Crear reporte automatizado',
       icon: BarChart3,
-      action: () => { setCurrentPanel('reportes'); setOpen(false); },
+      action: () => { setCurrentPanel('reportes'); setOpen(false) },
       group: 'ai',
       keywords: ['automático', 'informe'],
     },
@@ -264,7 +264,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       label: 'Predicciones',
       description: 'Ver predicciones de ventas',
       icon: Calculator,
-      action: () => { setCurrentPanel('ia'); setOpen(false); },
+      action: () => { setCurrentPanel('ia'); setOpen(false) },
       group: 'ai',
       keywords: ['forecast', 'proyección', 'futuro'],
     },
@@ -275,7 +275,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       label: theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro',
       description: 'Cambiar tema de la aplicación',
       icon: theme === 'dark' ? Sun : Moon,
-      action: () => { setTheme(theme === 'dark' ? 'light' : 'dark'); },
+      action: () => { setTheme(theme === 'dark' ? 'light' : 'dark') },
       group: 'settings',
       keywords: ['tema', 'apariencia', 'color'],
     },
@@ -284,7 +284,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       label: 'Notificaciones',
       description: 'Configurar alertas',
       icon: Bell,
-      action: () => { /* TODO: Abrir modal de notificaciones */ setOpen(false); },
+      action: () => { /* TODO: Abrir modal de notificaciones */ setOpen(false) },
       group: 'settings',
       keywords: ['alertas', 'avisos'],
     },
@@ -293,7 +293,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       label: 'Ayuda',
       description: 'Centro de ayuda',
       icon: HelpCircle,
-      action: () => { /* TODO: Abrir ayuda */ setOpen(false); },
+      action: () => { /* TODO: Abrir ayuda */ setOpen(false) },
       group: 'settings',
       keywords: ['soporte', 'documentación'],
     },
@@ -303,23 +303,23 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       description: 'Ver todos los atajos',
       icon: Keyboard,
       shortcut: '⌘/',
-      action: () => { /* TODO: Mostrar modal de atajos */ setOpen(false); },
+      action: () => { /* TODO: Mostrar modal de atajos */ setOpen(false) },
       group: 'settings',
       keywords: ['keyboard', 'hotkeys'],
     },
-  ], [setCurrentPanel, theme, setTheme]);
+  ], [setCurrentPanel, theme, setTheme])
 
   // Filtrar comandos por búsqueda
   const filteredCommands = useMemo(() => {
-    if (!search) return commands;
+    if (!search) return commands
     
-    const searchLower = search.toLowerCase();
+    const searchLower = search.toLowerCase()
     return commands.filter(cmd => 
       cmd.label.toLowerCase().includes(searchLower) ||
       cmd.description?.toLowerCase().includes(searchLower) ||
-      cmd.keywords?.some(k => k.toLowerCase().includes(searchLower))
-    );
-  }, [commands, search]);
+      cmd.keywords?.some(k => k.toLowerCase().includes(searchLower)),
+    )
+  }, [commands, search])
 
   // Agrupar comandos
   const groupedCommands = useMemo(() => {
@@ -328,19 +328,19 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
       actions: [],
       ai: [],
       settings: [],
-    };
+    }
 
     filteredCommands.forEach(cmd => {
-      groups[cmd.group].push(cmd);
-    });
+      groups[cmd.group].push(cmd)
+    })
 
-    return groups;
-  }, [filteredCommands]);
+    return groups
+  }, [filteredCommands])
 
   // Ejecutar comando
   const runCommand = useCallback((action: () => void) => {
-    action();
-  }, []);
+    action()
+  }, [])
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
@@ -503,7 +503,7 @@ export function CommandMenu({ onOpenChange }: CommandMenuProps) {
         </div>
       </Command>
     </CommandDialog>
-  );
+  )
 }
 
-export default CommandMenu;
+export default CommandMenu

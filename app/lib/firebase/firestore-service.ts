@@ -25,10 +25,10 @@ import {
   writeBatch,
   increment,
   type Firestore,
-} from "firebase/firestore"
-import { db } from "./config"
-import type { Banco, OrdenCompra, Venta, Distribuidor, Cliente, Producto } from "@/app/types"
-import { logger } from "../utils/logger"
+} from 'firebase/firestore'
+import { db } from './config'
+import type { Banco, OrdenCompra, Venta, Distribuidor, Cliente, Producto } from '@/app/types'
+import { logger } from '../utils/logger'
 
 // ============================================================
 // VERIFICACIÓN DE CONEXIÓN
@@ -61,22 +61,22 @@ const getDb = (): Firestore => {
 // COLECCIONES - Nombres estandarizados (snake_case)
 // ============================================================
 const COLLECTIONS = {
-  BANCOS: "bancos",
-  ORDENES_COMPRA: "ordenes_compra",
-  VENTAS: "ventas",
-  DISTRIBUIDORES: "distribuidores",
-  CLIENTES: "clientes",
-  PRODUCTOS: "almacen_productos",
-  ALMACEN: "almacen",
-  ALMACEN_PRODUCTOS: "almacen_productos",
-  ALMACEN_ENTRADAS: "almacen_entradas",
-  ALMACEN_SALIDAS: "almacen_salidas",
-  MOVIMIENTOS: "movimientos",
-  TRANSFERENCIAS: "transferencias",
-  ABONOS: "abonos",
-  CORTES_BANCARIOS: "cortes_bancarios",
-  INGRESOS: "ingresos",
-  GASTOS: "gastos",
+  BANCOS: 'bancos',
+  ORDENES_COMPRA: 'ordenes_compra',
+  VENTAS: 'ventas',
+  DISTRIBUIDORES: 'distribuidores',
+  CLIENTES: 'clientes',
+  PRODUCTOS: 'almacen_productos',
+  ALMACEN: 'almacen',
+  ALMACEN_PRODUCTOS: 'almacen_productos',
+  ALMACEN_ENTRADAS: 'almacen_entradas',
+  ALMACEN_SALIDAS: 'almacen_salidas',
+  MOVIMIENTOS: 'movimientos',
+  TRANSFERENCIAS: 'transferencias',
+  ABONOS: 'abonos',
+  CORTES_BANCARIOS: 'cortes_bancarios',
+  INGRESOS: 'ingresos',
+  GASTOS: 'gastos',
 } as const
 
 // Tipo para nombres de colecciones
@@ -97,7 +97,7 @@ export const suscribirBancos = (callback: (bancos: Banco[]) => void) => {
   }
   
   try {
-    const q = query(collection(db!, COLLECTIONS.BANCOS), orderBy("createdAt"))
+    const q = query(collection(db!, COLLECTIONS.BANCOS), orderBy('createdAt'))
     return onSnapshot(
       q,
       (snapshot) => {
@@ -108,13 +108,13 @@ export const suscribirBancos = (callback: (bancos: Banco[]) => void) => {
         callback(bancos)
       },
       (error) => {
-        logger.error("Error fetching bancos", error, { context: "FirestoreService" })
+        logger.error('Error fetching bancos', error, { context: 'FirestoreService' })
         // Return empty array on error
         callback([])
       },
     )
   } catch (error) {
-    logger.error("Error subscribing to bancos", error, { context: "FirestoreService" })
+    logger.error('Error subscribing to bancos', error, { context: 'FirestoreService' })
     callback([])
     return () => {} // Return empty unsubscribe function
   }
@@ -130,7 +130,7 @@ export const obtenerBanco = async (bancoId: string): Promise<Banco | null> => {
     const docSnap = await getDoc(docRef)
     return docSnap.exists() ? ({ id: docSnap.id, ...docSnap.data() } as Banco) : null
   } catch (error) {
-    logger.error("Error fetching banco", error, { context: "FirestoreService" })
+    logger.error('Error fetching banco', error, { context: 'FirestoreService' })
     return null
   }
 }
@@ -138,10 +138,10 @@ export const obtenerBanco = async (bancoId: string): Promise<Banco | null> => {
 export const actualizarCapitalBanco = async (
   bancoId: string,
   monto: number,
-  tipo: "ingreso" | "gasto" | "transferencia",
+  tipo: 'ingreso' | 'gasto' | 'transferencia',
 ) => {
   if (!isFirestoreAvailable()) {
-    logger.warn("actualizarCapitalBanco: Firestore no disponible", { context: "FirestoreService" })
+    logger.warn('actualizarCapitalBanco: Firestore no disponible', { context: 'FirestoreService' })
     return
   }
   
@@ -149,13 +149,13 @@ export const actualizarCapitalBanco = async (
     const bancoRef = doc(db!, COLLECTIONS.BANCOS, bancoId)
     const batch = writeBatch(db!)
 
-    if (tipo === "ingreso") {
+    if (tipo === 'ingreso') {
       batch.update(bancoRef, {
         capitalActual: increment(monto),
         historicoIngresos: increment(monto),
         updatedAt: Timestamp.now(),
       })
-    } else if (tipo === "gasto") {
+    } else if (tipo === 'gasto') {
       batch.update(bancoRef, {
         capitalActual: increment(-monto),
         historicoGastos: increment(monto),
@@ -165,7 +165,7 @@ export const actualizarCapitalBanco = async (
 
     await batch.commit()
   } catch (error) {
-    logger.error("Error updating banco capital", error, { context: "FirestoreService" })
+    logger.error('Error updating banco capital', error, { context: 'FirestoreService' })
   }
 }
 
@@ -174,7 +174,7 @@ export const actualizarCapitalBanco = async (
 // ============================================================
 
 // Tipo flexible para crear órdenes - solo requiere campos esenciales
-type CrearOrdenCompraInput = Partial<Omit<OrdenCompra, "id">> & {
+type CrearOrdenCompraInput = Partial<Omit<OrdenCompra, 'id'>> & {
   distribuidor: string
   cantidad: number
   costoTotal?: number
@@ -182,7 +182,7 @@ type CrearOrdenCompraInput = Partial<Omit<OrdenCompra, "id">> & {
 
 export const crearOrdenCompra = async (data: CrearOrdenCompraInput) => {
   if (!isFirestoreAvailable()) {
-    logger.warn("crearOrdenCompra: Firestore no disponible", { context: "FirestoreService" })
+    logger.warn('crearOrdenCompra: Firestore no disponible', { context: 'FirestoreService' })
     return null
   }
   
@@ -198,7 +198,7 @@ export const crearOrdenCompra = async (data: CrearOrdenCompraInput) => {
       stockInicial: data.stockInicial ?? data.cantidad,
       pagoInicial: data.pagoInicial ?? data.pagoDistribuidor ?? 0,
       deuda: data.deuda ?? ((data.costoTotal || 0) - (data.pagoDistribuidor || 0)),
-      estado: data.estado || "pendiente",
+      estado: data.estado || 'pendiente',
     }
 
     // Crear orden de compra
@@ -210,7 +210,7 @@ export const crearOrdenCompra = async (data: CrearOrdenCompraInput) => {
     })
 
     // Crear o actualizar distribuidor
-    const distQuery = query(collection(db!, COLLECTIONS.DISTRIBUIDORES), where("nombre", "==", ordenCompleta.distribuidor))
+    const distQuery = query(collection(db!, COLLECTIONS.DISTRIBUIDORES), where('nombre', '==', ordenCompleta.distribuidor))
     const distSnapshot = await getDocs(distQuery)
 
     let distribuidorId: string
@@ -243,7 +243,7 @@ export const crearOrdenCompra = async (data: CrearOrdenCompraInput) => {
     }
 
     // Actualizar almacén (crear entrada)
-    const prodQuery = query(collection(db!, COLLECTIONS.ALMACEN), where("nombre", "==", ordenCompleta.producto))
+    const prodQuery = query(collection(db!, COLLECTIONS.ALMACEN), where('nombre', '==', ordenCompleta.producto))
     const prodSnapshot = await getDocs(prodQuery)
 
     if (prodSnapshot.empty) {
@@ -262,7 +262,7 @@ export const crearOrdenCompra = async (data: CrearOrdenCompraInput) => {
             fecha: ordenCompleta.fecha,
             cantidad: ordenCompleta.cantidad,
             origen: ordenCompleta.distribuidor,
-            tipo: "entrada",
+            tipo: 'entrada',
           },
         ],
         salidas: [],
@@ -283,7 +283,7 @@ export const crearOrdenCompra = async (data: CrearOrdenCompraInput) => {
             fecha: ordenCompleta.fecha,
             cantidad: ordenCompleta.cantidad,
             origen: ordenCompleta.distribuidor,
-            tipo: "entrada",
+            tipo: 'entrada',
           },
         ],
         updatedAt: Timestamp.now(),
@@ -303,7 +303,7 @@ export const crearOrdenCompra = async (data: CrearOrdenCompraInput) => {
     await batch.commit()
     return ocRef.id
   } catch (error) {
-    logger.error("Error creating orden de compra", error, { context: "FirestoreService" })
+    logger.error('Error creating orden de compra', error, { context: 'FirestoreService' })
     return null
   }
 }
@@ -315,7 +315,7 @@ export const suscribirOrdenesCompra = (callback: (ordenes: OrdenCompra[]) => voi
   }
   
   try {
-    const q = query(collection(db!, COLLECTIONS.ORDENES_COMPRA), orderBy("fecha", "desc"))
+    const q = query(collection(db!, COLLECTIONS.ORDENES_COMPRA), orderBy('fecha', 'desc'))
     return onSnapshot(
       q,
       (snapshot) => {
@@ -326,12 +326,12 @@ export const suscribirOrdenesCompra = (callback: (ordenes: OrdenCompra[]) => voi
         callback(ordenes)
       },
       (error) => {
-        logger.error("Error fetching ordenes compra", error, { context: "FirestoreService" })
+        logger.error('Error fetching ordenes compra', error, { context: 'FirestoreService' })
         callback([])
       },
     )
   } catch (error) {
-    logger.error("Error subscribing to ordenes compra", error, { context: "FirestoreService" })
+    logger.error('Error subscribing to ordenes compra', error, { context: 'FirestoreService' })
     callback([])
     return () => {}
   }
@@ -348,7 +348,7 @@ export const suscribirOrdenesCompra = (callback: (ordenes: OrdenCompra[]) => voi
  * - Flete Sur: Recibe el monto de flete (si aplica)
  * - Utilidades: Recibe la ganancia neta (Venta - Costo - Flete)
  */
-type CrearVentaInput = Partial<Omit<Venta, "id">> & {
+type CrearVentaInput = Partial<Omit<Venta, 'id'>> & {
   cliente: string
   cantidad: number
   precioTotalVenta?: number
@@ -361,7 +361,7 @@ type CrearVentaInput = Partial<Omit<Venta, "id">> & {
 
 export const crearVenta = async (data: CrearVentaInput) => {
   if (!isFirestoreAvailable()) {
-    logger.warn("crearVenta: Firestore no disponible", { context: "FirestoreService" })
+    logger.warn('crearVenta: Firestore no disponible', { context: 'FirestoreService' })
     return null
   }
   
@@ -382,16 +382,16 @@ export const crearVenta = async (data: CrearVentaInput) => {
         if (ocDoc.exists()) {
           const ocData = ocDoc.data()
           costoUnitarioBase = ocData.costoPorUnidad || ocData.costoDistribuidor || 0
-          logger.info(`Costo obtenido de OC ${data.ocRelacionada}: $${costoUnitarioBase}`, { context: "FirestoreService" })
+          logger.info(`Costo obtenido de OC ${data.ocRelacionada}: $${costoUnitarioBase}`, { context: 'FirestoreService' })
         }
       } catch {
-        logger.warn(`No se pudo obtener OC ${data.ocRelacionada}`, { context: "FirestoreService" })
+        logger.warn(`No se pudo obtener OC ${data.ocRelacionada}`, { context: 'FirestoreService' })
       }
     }
     
     // Si hay producto, validar stock y obtener costo alternativo
     if (data.producto) {
-      const prodQuery = query(collection(db!, COLLECTIONS.ALMACEN), where("nombre", "==", data.producto))
+      const prodQuery = query(collection(db!, COLLECTIONS.ALMACEN), where('nombre', '==', data.producto))
       prodSnapshot = await getDocs(prodQuery)
       
       if (!prodSnapshot.empty) {
@@ -423,22 +423,22 @@ export const crearVenta = async (data: CrearVentaInput) => {
     const montoBovedaMonte = costoUnitarioBase * cantidad
     
     // B. Flete Sur recibe el costo de flete
-    const fleteAplica = data.flete === "Aplica" || (data.precioFlete && data.precioFlete > 0) || (data.fleteUtilidad && data.fleteUtilidad > 0)
+    const fleteAplica = data.flete === 'Aplica' || (data.precioFlete && data.precioFlete > 0) || (data.fleteUtilidad && data.fleteUtilidad > 0)
     const montoFlete = data.fleteUtilidad || ((data.precioFlete || 0) * cantidad) || 0
     
     // C. Utilidades = Ganancia Neta (Venta - Costo - Flete)
     const montoUtilidad = totalVenta - montoBovedaMonte - montoFlete
     
     // Log de cálculo para debugging
-    logger.info("Cálculo GYA de venta:", {
-      context: "FirestoreService",
+    logger.info('Cálculo GYA de venta:', {
+      context: 'FirestoreService',
       data: {
         totalVenta,
         costoUnitario: costoUnitarioBase,
         costoTotal: montoBovedaMonte,
         flete: montoFlete,
         utilidad: montoUtilidad,
-      }
+      },
     })
     
     // ═══════════════════════════════════════════════════════════════════════
@@ -448,15 +448,15 @@ export const crearVenta = async (data: CrearVentaInput) => {
     const montoPagado = data.montoPagado || 0
     const montoRestante = totalVenta - montoPagado
     
-    let estadoPago: "completo" | "parcial" | "pendiente" = "pendiente"
-    let estatus: "Pagado" | "Parcial" | "Pendiente" = "Pendiente"
+    let estadoPago: 'completo' | 'parcial' | 'pendiente' = 'pendiente'
+    let estatus: 'Pagado' | 'Parcial' | 'Pendiente' = 'Pendiente'
     
     if (montoPagado >= totalVenta) {
-      estadoPago = "completo"
-      estatus = "Pagado"
+      estadoPago = 'completo'
+      estatus = 'Pagado'
     } else if (montoPagado > 0) {
-      estadoPago = "parcial"
-      estatus = "Parcial"
+      estadoPago = 'parcial'
+      estatus = 'Parcial'
     }
     
     // Proporción pagada (para distribución parcial)
@@ -474,8 +474,8 @@ export const crearVenta = async (data: CrearVentaInput) => {
       id: ventaRef.id,
       clienteId,
       cliente: data.cliente,
-      ocRelacionada: data.ocRelacionada || "",
-      producto: data.producto || "",
+      ocRelacionada: data.ocRelacionada || '',
+      producto: data.producto || '',
       
       // Cantidades y precios
       cantidad,
@@ -486,7 +486,7 @@ export const crearVenta = async (data: CrearVentaInput) => {
       precioTotalVenta: totalVenta,
       
       // Flete
-      flete: fleteAplica ? "Aplica" : "NoAplica",
+      flete: fleteAplica ? 'Aplica' : 'NoAplica',
       fleteUtilidad: montoFlete,
       precioFlete: data.precioFlete || (cantidad > 0 ? montoFlete / cantidad : 0),
       
@@ -516,8 +516,8 @@ export const crearVenta = async (data: CrearVentaInput) => {
       
       // Metadata
       fecha: data.fecha || Timestamp.now(),
-      concepto: data.concepto || "",
-      notas: data.notas || "",
+      concepto: data.concepto || '',
+      notas: data.notas || '',
       keywords: [ventaRef.id, data.cliente?.toLowerCase(), data.producto?.toLowerCase()].filter(Boolean) as string[],
       
       createdAt: Timestamp.now(),
@@ -528,7 +528,7 @@ export const crearVenta = async (data: CrearVentaInput) => {
     // 5. CREAR/ACTUALIZAR CLIENTE
     // ═══════════════════════════════════════════════════════════════════════
     
-    const clienteQuery = query(collection(db!, COLLECTIONS.CLIENTES), where("nombre", "==", data.cliente))
+    const clienteQuery = query(collection(db!, COLLECTIONS.CLIENTES), where('nombre', '==', data.cliente))
     const clienteSnapshot = await getDocs(clienteQuery)
 
     if (clienteSnapshot.empty) {
@@ -543,7 +543,7 @@ export const crearVenta = async (data: CrearVentaInput) => {
         totalPagado: montoPagado,
         ventas: [ventaRef.id],
         historialPagos: [],
-        estado: "activo",
+        estado: 'activo',
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
       })
@@ -578,7 +578,7 @@ export const crearVenta = async (data: CrearVentaInput) => {
             fecha: data.fecha || Timestamp.now(),
             cantidad: cantidad,
             destino: data.cliente,
-            tipo: "salida",
+            tipo: 'salida',
           },
         ],
         updatedAt: Timestamp.now(),
@@ -600,21 +600,21 @@ export const crearVenta = async (data: CrearVentaInput) => {
       if (montoBovedaMonteReal > 0) {
         const movMonteRef = doc(collection(db!, COLLECTIONS.MOVIMIENTOS))
         batch.set(movMonteRef, {
-          tipoMovimiento: "ingreso",
-          tipo: "ingreso_venta",
-          bancoId: "boveda_monte",
+          tipoMovimiento: 'ingreso',
+          tipo: 'ingreso_venta',
+          bancoId: 'boveda_monte',
           monto: montoBovedaMonteReal,
           concepto: `Venta ${ventaRef.id} - ${data.cliente}`,
-          referencia: "Recuperación de costo",
+          referencia: 'Recuperación de costo',
           referenciaId: ventaRef.id,
-          referenciaTipo: "venta",
+          referenciaTipo: 'venta',
           cliente: data.cliente,
           fecha: data.fecha || Timestamp.now(),
           createdAt: Timestamp.now(),
         })
         
         // Actualizar banco
-        const bovedaMonteRef = doc(db!, COLLECTIONS.BANCOS, "boveda_monte")
+        const bovedaMonteRef = doc(db!, COLLECTIONS.BANCOS, 'boveda_monte')
         batch.update(bovedaMonteRef, {
           capitalActual: increment(montoBovedaMonteReal),
           historicoIngresos: increment(montoBovedaMonteReal),
@@ -626,21 +626,21 @@ export const crearVenta = async (data: CrearVentaInput) => {
       if (montoFleteReal > 0) {
         const movFleteRef = doc(collection(db!, COLLECTIONS.MOVIMIENTOS))
         batch.set(movFleteRef, {
-          tipoMovimiento: "ingreso",
-          tipo: "ingreso_venta",
-          bancoId: "flete_sur",
+          tipoMovimiento: 'ingreso',
+          tipo: 'ingreso_venta',
+          bancoId: 'flete_sur',
           monto: montoFleteReal,
           concepto: `Flete Venta ${ventaRef.id}`,
-          referencia: "Recuperación de flete",
+          referencia: 'Recuperación de flete',
           referenciaId: ventaRef.id,
-          referenciaTipo: "venta",
+          referenciaTipo: 'venta',
           cliente: data.cliente,
           fecha: data.fecha || Timestamp.now(),
           createdAt: Timestamp.now(),
         })
         
         // Actualizar banco
-        const fletesRef = doc(db!, COLLECTIONS.BANCOS, "flete_sur")
+        const fletesRef = doc(db!, COLLECTIONS.BANCOS, 'flete_sur')
         batch.update(fletesRef, {
           capitalActual: increment(montoFleteReal),
           historicoIngresos: increment(montoFleteReal),
@@ -652,21 +652,21 @@ export const crearVenta = async (data: CrearVentaInput) => {
       if (montoUtilidadReal > 0) {
         const movUtilRef = doc(collection(db!, COLLECTIONS.MOVIMIENTOS))
         batch.set(movUtilRef, {
-          tipoMovimiento: "ingreso",
-          tipo: "ingreso_venta",
-          bancoId: "utilidades",
+          tipoMovimiento: 'ingreso',
+          tipo: 'ingreso_venta',
+          bancoId: 'utilidades',
           monto: montoUtilidadReal,
           concepto: `Utilidad Venta ${ventaRef.id}`,
-          referencia: "Ganancia neta",
+          referencia: 'Ganancia neta',
           referenciaId: ventaRef.id,
-          referenciaTipo: "venta",
+          referenciaTipo: 'venta',
           cliente: data.cliente,
           fecha: data.fecha || Timestamp.now(),
           createdAt: Timestamp.now(),
         })
         
         // Actualizar banco
-        const utilidadesRef = doc(db!, COLLECTIONS.BANCOS, "utilidades")
+        const utilidadesRef = doc(db!, COLLECTIONS.BANCOS, 'utilidades')
         batch.update(utilidadesRef, {
           capitalActual: increment(montoUtilidadReal),
           historicoIngresos: increment(montoUtilidadReal),
@@ -677,19 +677,19 @@ export const crearVenta = async (data: CrearVentaInput) => {
 
     await batch.commit()
     
-    logger.info("Venta creada con distribución GYA", {
-      context: "FirestoreService",
+    logger.info('Venta creada con distribución GYA', {
+      context: 'FirestoreService',
       data: {
         ventaId: ventaRef.id,
         totalVenta,
         distribucion: { bovedaMonte: montoBovedaMonte, fletes: montoFlete, utilidades: montoUtilidad },
         estadoPago,
-      }
+      },
     })
     
     return ventaRef.id
   } catch (error) {
-    logger.error("Error creating venta con lógica GYA", error, { context: "FirestoreService" })
+    logger.error('Error creating venta con lógica GYA', error, { context: 'FirestoreService' })
     throw error
   }
 }
@@ -701,7 +701,7 @@ export const suscribirVentas = (callback: (ventas: Venta[]) => void) => {
   }
   
   try {
-    const q = query(collection(db!, COLLECTIONS.VENTAS), orderBy("fecha", "desc"))
+    const q = query(collection(db!, COLLECTIONS.VENTAS), orderBy('fecha', 'desc'))
     return onSnapshot(
       q,
       (snapshot) => {
@@ -712,12 +712,12 @@ export const suscribirVentas = (callback: (ventas: Venta[]) => void) => {
         callback(ventas)
       },
       (error) => {
-        logger.error("Error fetching ventas", error, { context: "FirestoreService" })
+        logger.error('Error fetching ventas', error, { context: 'FirestoreService' })
         callback([])
       },
     )
   } catch (error) {
-    logger.error("Error subscribing to ventas", error, { context: "FirestoreService" })
+    logger.error('Error subscribing to ventas', error, { context: 'FirestoreService' })
     callback([])
     return () => {}
   }
@@ -739,7 +739,7 @@ export const crearDistribuidor = async (data: {
   origen?: string
 }) => {
   if (!isFirestoreAvailable()) {
-    logger.warn("crearDistribuidor: Firestore no disponible", { context: "FirestoreService" })
+    logger.warn('crearDistribuidor: Firestore no disponible', { context: 'FirestoreService' })
     return null
   }
   
@@ -749,7 +749,7 @@ export const crearDistribuidor = async (data: {
     // Verificar si el distribuidor ya existe
     const distQuery = query(
       collection(db!, COLLECTIONS.DISTRIBUIDORES),
-      where("nombre", "==", data.nombre)
+      where('nombre', '==', data.nombre),
     )
     const existingDist = await getDocs(distQuery)
 
@@ -771,10 +771,10 @@ export const crearDistribuidor = async (data: {
     })
 
     await batch.commit()
-    logger.info("Distribuidor creado exitosamente", { data: { id: distRef.id, nombre: data.nombre } })
+    logger.info('Distribuidor creado exitosamente', { data: { id: distRef.id, nombre: data.nombre } })
     return distRef.id
   } catch (error) {
-    logger.error("Error creating distribuidor", error, { context: "FirestoreService" })
+    logger.error('Error creating distribuidor', error, { context: 'FirestoreService' })
     throw error
   }
 }
@@ -786,7 +786,7 @@ export const suscribirDistribuidores = (callback: (distribuidores: Distribuidor[
   }
   
   try {
-    const q = query(collection(db!, COLLECTIONS.DISTRIBUIDORES), orderBy("nombre"))
+    const q = query(collection(db!, COLLECTIONS.DISTRIBUIDORES), orderBy('nombre'))
     return onSnapshot(
       q,
       (snapshot) => {
@@ -797,12 +797,12 @@ export const suscribirDistribuidores = (callback: (distribuidores: Distribuidor[
         callback(distribuidores)
       },
       (error) => {
-        logger.error("Error fetching distribuidores", error, { context: "FirestoreService" })
+        logger.error('Error fetching distribuidores', error, { context: 'FirestoreService' })
         callback([])
       },
     )
   } catch (error) {
-    logger.error("Error subscribing to distribuidores", error, { context: "FirestoreService" })
+    logger.error('Error subscribing to distribuidores', error, { context: 'FirestoreService' })
     callback([])
     return () => {}
   }
@@ -815,7 +815,7 @@ export const pagarDistribuidor = async (
   bancoOrigenId: string,
 ) => {
   if (!isFirestoreAvailable()) {
-    logger.warn("pagarDistribuidor: Firestore no disponible", { context: "FirestoreService" })
+    logger.warn('pagarDistribuidor: Firestore no disponible', { context: 'FirestoreService' })
     return
   }
   
@@ -829,7 +829,7 @@ export const pagarDistribuidor = async (
 
     const nuevaDeuda = ocData.deuda - monto
     const nuevoPagado = ocData.pagoDistribuidor + monto
-    const nuevoEstado = nuevaDeuda === 0 ? "pagado" : nuevaDeuda < ocData.costoTotal ? "parcial" : "pendiente"
+    const nuevoEstado = nuevaDeuda === 0 ? 'pagado' : nuevaDeuda < ocData.costoTotal ? 'parcial' : 'pendiente'
 
     batch.update(ocRef, {
       deuda: nuevaDeuda,
@@ -868,7 +868,7 @@ export const pagarDistribuidor = async (
 
     await batch.commit()
   } catch (error) {
-    logger.error("Error paying distribuidor", error, { context: "FirestoreService" })
+    logger.error('Error paying distribuidor', error, { context: 'FirestoreService' })
   }
 }
 
@@ -887,7 +887,7 @@ export const crearCliente = async (data: {
   direccion?: string
 }) => {
   if (!isFirestoreAvailable()) {
-    logger.warn("crearCliente: Firestore no disponible", { context: "FirestoreService" })
+    logger.warn('crearCliente: Firestore no disponible', { context: 'FirestoreService' })
     return null
   }
   
@@ -897,7 +897,7 @@ export const crearCliente = async (data: {
     // Verificar si el cliente ya existe
     const clienteQuery = query(
       collection(db!, COLLECTIONS.CLIENTES),
-      where("nombre", "==", data.nombre)
+      where('nombre', '==', data.nombre),
     )
     const existingCliente = await getDocs(clienteQuery)
 
@@ -919,10 +919,10 @@ export const crearCliente = async (data: {
     })
 
     await batch.commit()
-    logger.info("Cliente creado exitosamente", { data: { id: clienteRef.id, nombre: data.nombre } })
+    logger.info('Cliente creado exitosamente', { data: { id: clienteRef.id, nombre: data.nombre } })
     return clienteRef.id
   } catch (error) {
-    logger.error("Error creating cliente", error, { context: "FirestoreService" })
+    logger.error('Error creating cliente', error, { context: 'FirestoreService' })
     throw error
   }
 }
@@ -934,7 +934,7 @@ export const suscribirClientes = (callback: (clientes: Cliente[]) => void) => {
   }
   
   try {
-    const q = query(collection(db!, COLLECTIONS.CLIENTES), orderBy("nombre"))
+    const q = query(collection(db!, COLLECTIONS.CLIENTES), orderBy('nombre'))
     return onSnapshot(
       q,
       (snapshot) => {
@@ -945,12 +945,12 @@ export const suscribirClientes = (callback: (clientes: Cliente[]) => void) => {
         callback(clientes)
       },
       (error) => {
-        logger.error("Error fetching clientes", error, { context: "FirestoreService" })
+        logger.error('Error fetching clientes', error, { context: 'FirestoreService' })
         callback([])
       },
     )
   } catch (error) {
-    logger.error("Error subscribing to clientes", error, { context: "FirestoreService" })
+    logger.error('Error subscribing to clientes', error, { context: 'FirestoreService' })
     callback([])
     return () => {}
   }
@@ -958,7 +958,7 @@ export const suscribirClientes = (callback: (clientes: Cliente[]) => void) => {
 
 export const cobrarCliente = async (clienteId: string, ventaId: string, monto: number) => {
   if (!isFirestoreAvailable()) {
-    logger.warn("cobrarCliente: Firestore no disponible", { context: "FirestoreService" })
+    logger.warn('cobrarCliente: Firestore no disponible', { context: 'FirestoreService' })
     return
   }
   
@@ -973,7 +973,7 @@ export const cobrarCliente = async (clienteId: string, ventaId: string, monto: n
     const nuevoRestante = ventaData.montoRestante - monto
     const nuevoPagado = ventaData.montoPagado + monto
     const nuevoEstado =
-      nuevoRestante === 0 ? "completo" : nuevoRestante < ventaData.precioTotalVenta ? "parcial" : "pendiente"
+      nuevoRestante === 0 ? 'completo' : nuevoRestante < ventaData.precioTotalVenta ? 'parcial' : 'pendiente'
 
     batch.update(ventaRef, {
       montoRestante: nuevoRestante,
@@ -1004,19 +1004,19 @@ export const cobrarCliente = async (clienteId: string, ventaId: string, monto: n
     // Actualizar bancos (distribución proporcional)
     const proporcion = monto / ventaData.precioTotalVenta
 
-    const bovedaMonteRef = doc(db!, COLLECTIONS.BANCOS, "bovedaMonte")
+    const bovedaMonteRef = doc(db!, COLLECTIONS.BANCOS, 'bovedaMonte')
     batch.update(bovedaMonteRef, {
       capitalActual: increment(ventaData.distribucionBancos.bovedaMonte * proporcion),
       updatedAt: Timestamp.now(),
     })
 
-    const fletesRef = doc(db!, COLLECTIONS.BANCOS, "fletes")
+    const fletesRef = doc(db!, COLLECTIONS.BANCOS, 'fletes')
     batch.update(fletesRef, {
       capitalActual: increment(ventaData.distribucionBancos.fletes * proporcion),
       updatedAt: Timestamp.now(),
     })
 
-    const utilidadesRef = doc(db!, COLLECTIONS.BANCOS, "utilidades")
+    const utilidadesRef = doc(db!, COLLECTIONS.BANCOS, 'utilidades')
     batch.update(utilidadesRef, {
       capitalActual: increment(ventaData.distribucionBancos.utilidades * proporcion),
       updatedAt: Timestamp.now(),
@@ -1024,7 +1024,7 @@ export const cobrarCliente = async (clienteId: string, ventaId: string, monto: n
 
     await batch.commit()
   } catch (error) {
-    logger.error("Error collecting cliente", error, { context: "FirestoreService" })
+    logger.error('Error collecting cliente', error, { context: 'FirestoreService' })
   }
 }
 
@@ -1039,7 +1039,7 @@ export const suscribirAlmacen = (callback: (productos: Producto[]) => void) => {
   }
   
   try {
-    const q = query(collection(db!, COLLECTIONS.ALMACEN), orderBy("nombre"))
+    const q = query(collection(db!, COLLECTIONS.ALMACEN), orderBy('nombre'))
     return onSnapshot(
       q,
       (snapshot) => {
@@ -1050,12 +1050,12 @@ export const suscribirAlmacen = (callback: (productos: Producto[]) => void) => {
         callback(productos)
       },
       (error) => {
-        logger.error("Error fetching almacen", error, { context: "FirestoreService" })
+        logger.error('Error fetching almacen', error, { context: 'FirestoreService' })
         callback([])
       },
     )
   } catch (error) {
-    logger.error("Error subscribing to almacen", error, { context: "FirestoreService" })
+    logger.error('Error subscribing to almacen', error, { context: 'FirestoreService' })
     callback([])
     return () => {}
   }
@@ -1075,7 +1075,7 @@ export const crearProducto = async (data: {
   descripcion?: string
 }) => {
   if (!isFirestoreAvailable()) {
-    logger.warn("crearProducto: Firestore no disponible", { context: "FirestoreService" })
+    logger.warn('crearProducto: Firestore no disponible', { context: 'FirestoreService' })
     return null
   }
   
@@ -1085,7 +1085,7 @@ export const crearProducto = async (data: {
     // Verificar si el producto ya existe
     const prodQuery = query(
       collection(db!, COLLECTIONS.ALMACEN),
-      where("nombre", "==", data.nombre)
+      where('nombre', '==', data.nombre),
     )
     const existingProd = await getDocs(prodQuery)
 
@@ -1097,21 +1097,21 @@ export const crearProducto = async (data: {
     const prodRef = doc(collection(db!, COLLECTIONS.ALMACEN))
     batch.set(prodRef, {
       nombre: data.nombre,
-      categoria: data.categoria || "General",
-      origen: data.origen || "",
-      unidad: data.unidad || "unidades",
+      categoria: data.categoria || 'General',
+      origen: data.origen || '',
+      unidad: data.unidad || 'unidades',
       stockActual: data.stockInicial || 0,
       stockMinimo: data.stockMinimo || 0,
       valorUnitario: data.valorUnitario || 0,
       totalEntradas: data.stockInicial || 0,
       totalSalidas: 0,
-      descripcion: data.descripcion || "",
+      descripcion: data.descripcion || '',
       entradas: data.stockInicial ? [{
         id: `inicial-${Date.now()}`,
         fecha: Timestamp.now(),
         cantidad: data.stockInicial,
-        origen: "Inventario Inicial",
-        tipo: "entrada",
+        origen: 'Inventario Inicial',
+        tipo: 'entrada',
       }] : [],
       salidas: [],
       createdAt: Timestamp.now(),
@@ -1119,10 +1119,10 @@ export const crearProducto = async (data: {
     })
 
     await batch.commit()
-    logger.info("Producto creado exitosamente", { data: { id: prodRef.id, nombre: data.nombre } })
+    logger.info('Producto creado exitosamente', { data: { id: prodRef.id, nombre: data.nombre } })
     return prodRef.id
   } catch (error) {
-    logger.error("Error creating producto", error, { context: "FirestoreService" })
+    logger.error('Error creating producto', error, { context: 'FirestoreService' })
     throw error
   }
 }
@@ -1139,7 +1139,7 @@ export const crearEntradaAlmacen = async (data: {
   notas?: string
 }) => {
   if (!isFirestoreAvailable()) {
-    logger.warn("crearEntradaAlmacen: Firestore no disponible", { context: "FirestoreService" })
+    logger.warn('crearEntradaAlmacen: Firestore no disponible', { context: 'FirestoreService' })
     return null
   }
   
@@ -1151,7 +1151,7 @@ export const crearEntradaAlmacen = async (data: {
     const prodSnap = await getDoc(prodRef)
 
     if (!prodSnap.exists()) {
-      throw new Error("Producto no encontrado")
+      throw new Error('Producto no encontrado')
     }
 
     const prodData = prodSnap.data()
@@ -1171,18 +1171,18 @@ export const crearEntradaAlmacen = async (data: {
           origen: data.origen,
           costoUnitario: data.costoUnitario || 0,
           ordenCompraId: data.ordenCompraId || null,
-          notas: data.notas || "",
-          tipo: "entrada",
+          notas: data.notas || '',
+          tipo: 'entrada',
         },
       ],
       updatedAt: Timestamp.now(),
     })
 
     await batch.commit()
-    logger.info("Entrada de almacén registrada", { data: { productoId: data.productoId, cantidad: data.cantidad } })
+    logger.info('Entrada de almacén registrada', { data: { productoId: data.productoId, cantidad: data.cantidad } })
     return entradaId
   } catch (error) {
-    logger.error("Error creating entrada almacen", error, { context: "FirestoreService" })
+    logger.error('Error creating entrada almacen', error, { context: 'FirestoreService' })
     throw error
   }
 }
@@ -1199,7 +1199,7 @@ export const crearSalidaAlmacen = async (data: {
   notas?: string
 }) => {
   if (!isFirestoreAvailable()) {
-    logger.warn("crearSalidaAlmacen: Firestore no disponible", { context: "FirestoreService" })
+    logger.warn('crearSalidaAlmacen: Firestore no disponible', { context: 'FirestoreService' })
     return null
   }
   
@@ -1211,7 +1211,7 @@ export const crearSalidaAlmacen = async (data: {
     const prodSnap = await getDoc(prodRef)
 
     if (!prodSnap.exists()) {
-      throw new Error("Producto no encontrado")
+      throw new Error('Producto no encontrado')
     }
 
     const prodData = prodSnap.data()
@@ -1235,19 +1235,19 @@ export const crearSalidaAlmacen = async (data: {
           cantidad: data.cantidad,
           destino: data.destino,
           ventaId: data.ventaId || null,
-          motivo: data.motivo || "Salida manual",
-          notas: data.notas || "",
-          tipo: "salida",
+          motivo: data.motivo || 'Salida manual',
+          notas: data.notas || '',
+          tipo: 'salida',
         },
       ],
       updatedAt: Timestamp.now(),
     })
 
     await batch.commit()
-    logger.info("Salida de almacén registrada", { data: { productoId: data.productoId, cantidad: data.cantidad } })
+    logger.info('Salida de almacén registrada', { data: { productoId: data.productoId, cantidad: data.cantidad } })
     return salidaId
   } catch (error) {
-    logger.error("Error creating salida almacen", error, { context: "FirestoreService" })
+    logger.error('Error creating salida almacen', error, { context: 'FirestoreService' })
     throw error
   }
 }
@@ -1268,7 +1268,7 @@ export const crearIngreso = async (data: {
   notas?: string
 }) => {
   if (!isFirestoreAvailable()) {
-    logger.warn("crearIngreso: Firestore no disponible", { context: "FirestoreService" })
+    logger.warn('crearIngreso: Firestore no disponible', { context: 'FirestoreService' })
     return null
   }
   
@@ -1276,15 +1276,15 @@ export const crearIngreso = async (data: {
     const batch = writeBatch(db!)
 
     // Crear documento de ingreso
-    const ingresoRef = doc(collection(db!, "ingresos"))
+    const ingresoRef = doc(collection(db!, 'ingresos'))
     batch.set(ingresoRef, {
       id: ingresoRef.id,
       monto: data.monto,
       concepto: data.concepto,
       bancoDestino: data.bancoDestino,
-      categoria: data.categoria || "General",
-      referencia: data.referencia || "",
-      notas: data.notas || "",
+      categoria: data.categoria || 'General',
+      referencia: data.referencia || '',
+      notas: data.notas || '',
       fecha: Timestamp.now(),
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
@@ -1299,10 +1299,10 @@ export const crearIngreso = async (data: {
     })
 
     await batch.commit()
-    logger.info("Ingreso creado exitosamente", { data: { id: ingresoRef.id, monto: data.monto } })
+    logger.info('Ingreso creado exitosamente', { data: { id: ingresoRef.id, monto: data.monto } })
     return ingresoRef.id
   } catch (error) {
-    logger.error("Error creating ingreso", error, { context: "FirestoreService" })
+    logger.error('Error creating ingreso', error, { context: 'FirestoreService' })
     throw error
   }
 }
@@ -1319,7 +1319,7 @@ export const crearGasto = async (data: {
   notas?: string
 }) => {
   if (!isFirestoreAvailable()) {
-    logger.warn("crearGasto: Firestore no disponible", { context: "FirestoreService" })
+    logger.warn('crearGasto: Firestore no disponible', { context: 'FirestoreService' })
     return null
   }
   
@@ -1327,15 +1327,15 @@ export const crearGasto = async (data: {
     const batch = writeBatch(db!)
 
     // Crear documento de gasto
-    const gastoRef = doc(collection(db!, "gastos"))
+    const gastoRef = doc(collection(db!, 'gastos'))
     batch.set(gastoRef, {
       id: gastoRef.id,
       monto: data.monto,
       concepto: data.concepto,
       bancoOrigen: data.bancoOrigen,
-      categoria: data.categoria || "General",
-      referencia: data.referencia || "",
-      notas: data.notas || "",
+      categoria: data.categoria || 'General',
+      referencia: data.referencia || '',
+      notas: data.notas || '',
       fecha: Timestamp.now(),
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
@@ -1350,10 +1350,10 @@ export const crearGasto = async (data: {
     })
 
     await batch.commit()
-    logger.info("Gasto creado exitosamente", { data: { id: gastoRef.id, monto: data.monto } })
+    logger.info('Gasto creado exitosamente', { data: { id: gastoRef.id, monto: data.monto } })
     return gastoRef.id
   } catch (error) {
-    logger.error("Error creating gasto", error, { context: "FirestoreService" })
+    logger.error('Error creating gasto', error, { context: 'FirestoreService' })
     throw error
   }
 }
@@ -1373,7 +1373,7 @@ export interface TransferenciaData {
 
 export const addTransferencia = async (data: TransferenciaData): Promise<string | null> => {
   if (!isFirestoreAvailable()) {
-    logger.warn("addTransferencia: Firestore no disponible", { context: "FirestoreService" })
+    logger.warn('addTransferencia: Firestore no disponible', { context: 'FirestoreService' })
     return null
   }
   
@@ -1388,8 +1388,8 @@ export const addTransferencia = async (data: TransferenciaData): Promise<string 
       bancoDestinoId: data.bancoDestinoId,
       monto: data.monto,
       concepto: data.concepto,
-      referencia: data.referencia || "",
-      notas: data.notas || "",
+      referencia: data.referencia || '',
+      notas: data.notas || '',
       fecha: Timestamp.now(),
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
@@ -1412,10 +1412,10 @@ export const addTransferencia = async (data: TransferenciaData): Promise<string 
     })
 
     await batch.commit()
-    logger.info("Transferencia creada exitosamente", { data: { id: transRef.id, monto: data.monto } })
+    logger.info('Transferencia creada exitosamente', { data: { id: transRef.id, monto: data.monto } })
     return transRef.id
   } catch (error) {
-    logger.error("Error creating transferencia", error, { context: "FirestoreService" })
+    logger.error('Error creating transferencia', error, { context: 'FirestoreService' })
     throw error
   }
 }
@@ -1435,18 +1435,18 @@ export const crearTransferencia = async (
 // ============================================================
 
 export interface AbonoData {
-  tipo: "distribuidor" | "cliente"
+  tipo: 'distribuidor' | 'cliente'
   entidadId: string
   monto: number
   bancoDestino: string
-  metodo: "efectivo" | "transferencia" | "cheque"
+  metodo: 'efectivo' | 'transferencia' | 'cheque'
   referencia?: string
   notas?: string
 }
 
 export const addAbono = async (data: AbonoData): Promise<string | null> => {
   if (!isFirestoreAvailable()) {
-    logger.warn("addAbono: Firestore no disponible", { context: "FirestoreService" })
+    logger.warn('addAbono: Firestore no disponible', { context: 'FirestoreService' })
     return null
   }
   
@@ -1462,15 +1462,15 @@ export const addAbono = async (data: AbonoData): Promise<string | null> => {
       monto: data.monto,
       bancoDestino: data.bancoDestino,
       metodo: data.metodo,
-      referencia: data.referencia || "",
-      notas: data.notas || "",
+      referencia: data.referencia || '',
+      notas: data.notas || '',
       fecha: Timestamp.now(),
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
     })
 
     // Actualizar entidad (distribuidor o cliente)
-    if (data.tipo === "distribuidor") {
+    if (data.tipo === 'distribuidor') {
       const distRef = doc(db!, COLLECTIONS.DISTRIBUIDORES, data.entidadId)
       const distSnap = await getDoc(distRef)
       if (distSnap.exists()) {
@@ -1520,10 +1520,10 @@ export const addAbono = async (data: AbonoData): Promise<string | null> => {
     })
 
     await batch.commit()
-    logger.info("Abono creado exitosamente", { data: { id: abonoRef.id, monto: data.monto, tipo: data.tipo } })
+    logger.info('Abono creado exitosamente', { data: { id: abonoRef.id, monto: data.monto, tipo: data.tipo } })
     return abonoRef.id
   } catch (error) {
-    logger.error("Error creating abono", error, { context: "FirestoreService" })
+    logger.error('Error creating abono', error, { context: 'FirestoreService' })
     throw error
   }
 }

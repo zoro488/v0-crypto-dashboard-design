@@ -1,13 +1,13 @@
-"use client"
+'use client'
 
-import { useEffect, useRef, useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { User, Building2, Search } from "lucide-react"
+import { useEffect, useRef, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { User, Building2, Search } from 'lucide-react'
 
 interface ClientNode {
   id: string
   name: string
-  type: "cliente" | "distribuidor" | "empresa"
+  type: 'cliente' | 'distribuidor' | 'empresa'
   value: number
   connections: string[]
   x: number
@@ -29,21 +29,21 @@ export function ClientNetworkGraph({
   nodes,
   width = 900,
   height = 700,
-  className = ""
+  className = '',
 }: ClientNetworkGraphProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationFrameRef = useRef<number | null>(null)
   const nodesRef = useRef<ClientNode[]>([])
   const [hoveredNode, setHoveredNode] = useState<string | null>(null)
   const [selectedNode, setSelectedNode] = useState<string | null>(null)
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useState('')
 
   // Generar nodos por defecto
   const generateDefaultNodes = (): ClientNode[] => {
     const colors = {
-      cliente: "#3b82f6",
-      distribuidor: "#10b981",
-      empresa: "#8b5cf6"
+      cliente: '#3b82f6',
+      distribuidor: '#10b981',
+      empresa: '#8b5cf6',
     }
 
     const defaultNodes: ClientNode[] = []
@@ -51,13 +51,13 @@ export function ClientNetworkGraph({
     const centerY = height / 2
 
     for (let i = 0; i < 30; i++) {
-      const type = i < 10 ? "cliente" : i < 20 ? "distribuidor" : "empresa"
+      const type = i < 10 ? 'cliente' : i < 20 ? 'distribuidor' : 'empresa'
       const angle = (i / 30) * Math.PI * 2
       const distance = 150 + Math.random() * 150
 
       defaultNodes.push({
         id: `node-${i}`,
-        name: `${type === "cliente" ? "Cliente" : type === "distribuidor" ? "Distribuidor" : "Empresa"} ${i + 1}`,
+        name: `${type === 'cliente' ? 'Cliente' : type === 'distribuidor' ? 'Distribuidor' : 'Empresa'} ${i + 1}`,
         type: type as any,
         value: Math.random() * 100000 + 10000,
         connections: [],
@@ -66,7 +66,7 @@ export function ClientNetworkGraph({
         vx: (Math.random() - 0.5) * 0.5,
         vy: (Math.random() - 0.5) * 0.5,
         radius: 15 + Math.random() * 15,
-        color: colors[type as keyof typeof colors]
+        color: colors[type as keyof typeof colors],
       })
     }
 
@@ -137,7 +137,7 @@ export function ClientNetworkGraph({
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const ctx = canvas.getContext("2d")
+    const ctx = canvas.getContext('2d')
     if (!ctx) return
 
     let time = 0
@@ -148,8 +148,8 @@ export function ClientNetworkGraph({
 
       // Fondo
       const bgGradient = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, width / 2)
-      bgGradient.addColorStop(0, "rgba(20, 20, 40, 1)")
-      bgGradient.addColorStop(1, "rgba(10, 10, 20, 1)")
+      bgGradient.addColorStop(0, 'rgba(20, 20, 40, 1)')
+      bgGradient.addColorStop(1, 'rgba(10, 10, 20, 1)')
       ctx.fillStyle = bgGradient
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -220,7 +220,7 @@ export function ClientNetworkGraph({
         // Gradiente del nodo
         const nodeGradient = ctx.createRadialGradient(
           node.x - radius * 0.3, node.y - radius * 0.3, 0,
-          node.x, node.y, radius
+          node.x, node.y, radius,
         )
         nodeGradient.addColorStop(0, `${node.color}ff`)
         nodeGradient.addColorStop(1, `${node.color}cc`)
@@ -231,25 +231,25 @@ export function ClientNetworkGraph({
         ctx.fill()
 
         // Borde
-        ctx.strokeStyle = isActive ? "#ffffff" : `${node.color}60`
+        ctx.strokeStyle = isActive ? '#ffffff' : `${node.color}60`
         ctx.lineWidth = isActive ? 3 : 1.5
         ctx.stroke()
 
         ctx.shadowBlur = 0
 
         // Icono
-        const icon = node.type === "cliente" ? "👤" : node.type === "distribuidor" ? "🏢" : "🏭"
+        const icon = node.type === 'cliente' ? '👤' : node.type === 'distribuidor' ? '🏢' : '🏭'
         ctx.font = `${radius * 0.8}px sans-serif`
-        ctx.textAlign = "center"
-        ctx.textBaseline = "middle"
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
         ctx.fillText(icon, node.x, node.y)
 
         // Label si está activo
         if (isActive) {
-          ctx.fillStyle = "#ffffff"
-          ctx.font = "bold 11px sans-serif"
-          ctx.textAlign = "center"
-          ctx.textBaseline = "top"
+          ctx.fillStyle = '#ffffff'
+          ctx.font = 'bold 11px sans-serif'
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'top'
           ctx.fillText(node.name, node.x, node.y + radius + 8)
         }
       })
@@ -316,7 +316,7 @@ export function ClientNetworkGraph({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="rounded-2xl cursor-pointer"
-        style={{ boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)" }}
+        style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)' }}
         onMouseMove={handleMouseMove}
         onClick={handleClick}
       />
@@ -334,7 +334,7 @@ export function ClientNetworkGraph({
               {(() => {
                 const node = nodesRef.current.find(n => n.id === hoveredNode)
                 if (!node) return null
-                const Icon = node.type === "cliente" ? User : Building2
+                const Icon = node.type === 'cliente' ? User : Building2
                 return (
                   <div>
                     <div className="flex items-center gap-3 mb-2">
@@ -373,7 +373,7 @@ export function ClientNetworkGraph({
               <p className="text-white/80 text-xs">Clientes</p>
             </div>
             <p className="text-white text-xs font-bold">
-              {nodesRef.current.filter(n => n.type === "cliente").length}
+              {nodesRef.current.filter(n => n.type === 'cliente').length}
             </p>
           </div>
           <div className="flex items-center justify-between gap-4">
@@ -382,7 +382,7 @@ export function ClientNetworkGraph({
               <p className="text-white/80 text-xs">Distribuidores</p>
             </div>
             <p className="text-white text-xs font-bold">
-              {nodesRef.current.filter(n => n.type === "distribuidor").length}
+              {nodesRef.current.filter(n => n.type === 'distribuidor').length}
             </p>
           </div>
           <div className="flex items-center justify-between gap-4">
@@ -391,7 +391,7 @@ export function ClientNetworkGraph({
               <p className="text-white/80 text-xs">Empresas</p>
             </div>
             <p className="text-white text-xs font-bold">
-              {nodesRef.current.filter(n => n.type === "empresa").length}
+              {nodesRef.current.filter(n => n.type === 'empresa').length}
             </p>
           </div>
         </div>

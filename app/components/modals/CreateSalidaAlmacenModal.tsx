@@ -1,12 +1,12 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { X, PackageMinus, ChevronRight } from "lucide-react"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { useToast } from "@/app/hooks/use-toast"
-import { firestoreService } from "@/app/lib/firebase/firestore-service"
-import { useAlmacenData } from "@/app/lib/firebase/firestore-hooks.service"
-import { logger } from "@/app/lib/utils/logger"
+import { useState } from 'react'
+import { X, PackageMinus, ChevronRight } from 'lucide-react'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { useToast } from '@/app/hooks/use-toast'
+import { firestoreService } from '@/app/lib/firebase/firestore-service'
+import { useAlmacenData } from '@/app/lib/firebase/firestore-hooks.service'
+import { logger } from '@/app/lib/utils/logger'
 
 interface CreateSalidaAlmacenModalProps {
   isOpen: boolean
@@ -24,27 +24,27 @@ export default function CreateSalidaAlmacenModal({ isOpen, onClose }: CreateSali
   const productos = productosFirestore.length > 0 ? productosFirestore : productosStore
 
   const [formData, setFormData] = useState({
-    productoId: "",
+    productoId: '',
     cantidad: 1,
-    destino: "",
-    ventaRef: "",
-    motivo: "",
+    destino: '',
+    ventaRef: '',
+    motivo: '',
   })
 
   const productoSeleccionado = productos.find((p) => (p as Record<string, unknown>).id === formData.productoId) as Record<string, unknown> | undefined
 
   const handleSubmit = async () => {
     if (!formData.productoId || !formData.destino || formData.cantidad <= 0) {
-      toast({ title: "Error", description: "Completa todos los campos requeridos", variant: "destructive" })
+      toast({ title: 'Error', description: 'Completa todos los campos requeridos', variant: 'destructive' })
       return
     }
 
     const stockActual = (productoSeleccionado?.stockActual as number) || 0
     if (formData.cantidad > stockActual) {
       toast({
-        title: "Stock Insuficiente",
+        title: 'Stock Insuficiente',
         description: `Solo hay ${stockActual} unidades disponibles`,
-        variant: "destructive",
+        variant: 'destructive',
       })
       return
     }
@@ -56,17 +56,17 @@ export default function CreateSalidaAlmacenModal({ isOpen, onClose }: CreateSali
         cantidad: formData.cantidad,
         destino: formData.destino,
         ventaId: formData.ventaRef || undefined,
-        motivo: formData.motivo || "Salida manual",
+        motivo: formData.motivo || 'Salida manual',
       })
 
       // Actualizar store local para UI inmediata
       addSalidaAlmacen({
-        tipo: "salida",
+        tipo: 'salida',
         fecha: new Date().toISOString(),
         cantidad: formData.cantidad,
         destino: formData.destino,
         productoId: formData.productoId,
-        productoNombre: (productoSeleccionado?.nombre as string) || "",
+        productoNombre: (productoSeleccionado?.nombre as string) || '',
         ventaRef: formData.ventaRef,
       })
 
@@ -74,25 +74,25 @@ export default function CreateSalidaAlmacenModal({ isOpen, onClose }: CreateSali
       triggerDataRefresh()
 
       toast({
-        title: "✅ Salida Registrada",
+        title: '✅ Salida Registrada',
         description: `${formData.cantidad} unidades de "${(productoSeleccionado?.nombre as string)}" retiradas del inventario`,
       })
       
       // Resetear formulario
       setFormData({
-        productoId: "",
+        productoId: '',
         cantidad: 1,
-        destino: "",
-        ventaRef: "",
-        motivo: "",
+        destino: '',
+        ventaRef: '',
+        motivo: '',
       })
       onClose()
     } catch (error) {
-      logger.error("Error creating salida", error, { context: "CreateSalidaAlmacenModal" })
+      logger.error('Error creating salida', error, { context: 'CreateSalidaAlmacenModal' })
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "No se pudo registrar la salida. Intenta de nuevo.",
-        variant: "destructive",
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'No se pudo registrar la salida. Intenta de nuevo.',
+        variant: 'destructive',
       })
     }
   }
@@ -176,7 +176,7 @@ export default function CreateSalidaAlmacenModal({ isOpen, onClose }: CreateSali
               <div className="flex justify-between items-center mt-2">
                 <span className="text-white/60">Stock Después</span>
                 <span
-                  className={`text-lg font-bold ${(((productoSeleccionado as { stockActual?: number }).stockActual || 0) - formData.cantidad) < 10 ? "text-red-400" : "text-green-400"}`}
+                  className={`text-lg font-bold ${(((productoSeleccionado as { stockActual?: number }).stockActual || 0) - formData.cantidad) < 10 ? 'text-red-400' : 'text-green-400'}`}
                 >
                   {((productoSeleccionado as { stockActual?: number }).stockActual || 0) - formData.cantidad} unidades
                 </span>

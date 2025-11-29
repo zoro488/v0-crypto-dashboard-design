@@ -47,8 +47,8 @@ export interface ProyeccionData {
  * Fórmula: (precioVenta + flete) × cantidad
  */
 export function calcularPrecioTotalVenta(data: VentaData): number {
-  const { cantidad, precioVentaUnidad, precioFlete } = data;
-  return (precioVentaUnidad + precioFlete) * cantidad;
+  const { cantidad, precioVentaUnidad, precioFlete } = data
+  return (precioVentaUnidad + precioFlete) * cantidad
 }
 
 /**
@@ -58,15 +58,15 @@ export function calcularPrecioTotalVenta(data: VentaData): number {
  * - Utilidades: 10% (ganancia neta)
  */
 export function calcularDistribucionVenta(data: VentaData): DistribucionVenta {
-  const { cantidad, precioVentaUnidad, precioCompraUnidad, precioFlete, montoPagado } = data;
+  const { cantidad, precioVentaUnidad, precioCompraUnidad, precioFlete, montoPagado } = data
   
-  const totalVenta = (precioVentaUnidad + precioFlete) * cantidad;
-  const proporcionPagada = montoPagado ? montoPagado / totalVenta : 1;
+  const totalVenta = (precioVentaUnidad + precioFlete) * cantidad
+  const proporcionPagada = montoPagado ? montoPagado / totalVenta : 1
   
   // Cálculos base
-  const costoProducto = precioCompraUnidad * cantidad;
-  const costoFletes = precioFlete * cantidad;
-  const utilidadBruta = (precioVentaUnidad - precioCompraUnidad - precioFlete) * cantidad;
+  const costoProducto = precioCompraUnidad * cantidad
+  const costoFletes = precioFlete * cantidad
+  const utilidadBruta = (precioVentaUnidad - precioCompraUnidad - precioFlete) * cantidad
   
   // Aplicar proporción si es pago parcial
   return {
@@ -74,15 +74,15 @@ export function calcularDistribucionVenta(data: VentaData): DistribucionVenta {
     fletes: costoFletes * proporcionPagada,
     utilidades: utilidadBruta * proporcionPagada,
     total: totalVenta * proporcionPagada,
-  };
+  }
 }
 
 /**
  * Calcular monto restante de venta
  */
 export function calcularMontoRestante(data: VentaData): number {
-  const total = calcularPrecioTotalVenta(data);
-  return Math.max(0, total - (data.montoPagado || 0));
+  const total = calcularPrecioTotalVenta(data)
+  return Math.max(0, total - (data.montoPagado || 0))
 }
 
 /**
@@ -90,11 +90,11 @@ export function calcularMontoRestante(data: VentaData): number {
  */
 export function determinarEstadoPago(
   precioTotal: number, 
-  montoPagado: number
+  montoPagado: number,
 ): 'completo' | 'parcial' | 'pendiente' {
-  if (montoPagado >= precioTotal) return 'completo';
-  if (montoPagado > 0) return 'parcial';
-  return 'pendiente';
+  if (montoPagado >= precioTotal) return 'completo'
+  if (montoPagado > 0) return 'parcial'
+  return 'pendiente'
 }
 
 // ==========================================
@@ -106,24 +106,24 @@ export function determinarEstadoPago(
  * Fórmula: (costoDistribuidor × cantidad) + costoTransporte
  */
 export function calcularCostoTotalOrden(data: OrdenCompraData): number {
-  const { cantidad, costoDistribuidor, costoTransporte } = data;
-  return (costoDistribuidor * cantidad) + costoTransporte;
+  const { cantidad, costoDistribuidor, costoTransporte } = data
+  return (costoDistribuidor * cantidad) + costoTransporte
 }
 
 /**
  * Calcular costo por unidad incluyendo transporte
  */
 export function calcularCostoPorUnidad(data: OrdenCompraData): number {
-  const { cantidad, costoDistribuidor, costoTransporte } = data;
-  return costoDistribuidor + (costoTransporte / cantidad);
+  const { cantidad, costoDistribuidor, costoTransporte } = data
+  return costoDistribuidor + (costoTransporte / cantidad)
 }
 
 /**
  * Calcular deuda de orden de compra
  */
 export function calcularDeudaOrden(data: OrdenCompraData): number {
-  const total = calcularCostoTotalOrden(data);
-  return Math.max(0, total - (data.pagoInicial || 0));
+  const total = calcularCostoTotalOrden(data)
+  return Math.max(0, total - (data.pagoInicial || 0))
 }
 
 // ==========================================
@@ -135,7 +135,7 @@ export function calcularDeudaOrden(data: OrdenCompraData): number {
  * Fórmula: PrecioVenta - CostoProducto
  */
 export function calcularMargenBruto(precioVenta: number, costoProducto: number): number {
-  return precioVenta - costoProducto;
+  return precioVenta - costoProducto
 }
 
 /**
@@ -145,9 +145,9 @@ export function calcularMargenBruto(precioVenta: number, costoProducto: number):
 export function calcularMargenNeto(
   precioVenta: number, 
   costoProducto: number, 
-  flete: number
+  flete: number,
 ): number {
-  return precioVenta - costoProducto - flete;
+  return precioVenta - costoProducto - flete
 }
 
 /**
@@ -155,8 +155,8 @@ export function calcularMargenNeto(
  * Fórmula: (Margen / PrecioVenta) × 100
  */
 export function calcularPorcentajeMargen(margen: number, precioVenta: number): number {
-  if (precioVenta === 0) return 0;
-  return (margen / precioVenta) * 100;
+  if (precioVenta === 0) return 0
+  return (margen / precioVenta) * 100
 }
 
 /**
@@ -164,27 +164,27 @@ export function calcularPorcentajeMargen(margen: number, precioVenta: number): n
  * Fórmula: (Margen / Costo) × 100
  */
 export function calcularRentabilidad(margen: number, costo: number): number {
-  if (costo === 0) return 0;
-  return (margen / costo) * 100;
+  if (costo === 0) return 0
+  return (margen / costo) * 100
 }
 
 /**
  * Calcular análisis completo de márgenes
  */
 export function calcularAnalisisMargen(data: VentaData): MargenCalculo {
-  const { precioVentaUnidad, precioCompraUnidad, precioFlete } = data;
+  const { precioVentaUnidad, precioCompraUnidad, precioFlete } = data
   
-  const margenBruto = calcularMargenBruto(precioVentaUnidad, precioCompraUnidad);
-  const margenNeto = calcularMargenNeto(precioVentaUnidad, precioCompraUnidad, precioFlete);
-  const porcentajeMargen = calcularPorcentajeMargen(margenNeto, precioVentaUnidad);
-  const rentabilidad = calcularRentabilidad(margenNeto, precioCompraUnidad + precioFlete);
+  const margenBruto = calcularMargenBruto(precioVentaUnidad, precioCompraUnidad)
+  const margenNeto = calcularMargenNeto(precioVentaUnidad, precioCompraUnidad, precioFlete)
+  const porcentajeMargen = calcularPorcentajeMargen(margenNeto, precioVentaUnidad)
+  const rentabilidad = calcularRentabilidad(margenNeto, precioCompraUnidad + precioFlete)
   
   return {
     margenBruto,
     margenNeto,
     porcentajeMargen,
     rentabilidad,
-  };
+  }
 }
 
 // ==========================================
@@ -195,9 +195,9 @@ export function calcularAnalisisMargen(data: VentaData): MargenCalculo {
  * Calcular valor total de inventario
  */
 export function calcularValorInventario(
-  productos: Array<{ stockActual: number; valorUnitario: number }>
+  productos: Array<{ stockActual: number; valorUnitario: number }>,
 ): number {
-  return productos.reduce((sum, p) => sum + (p.stockActual * p.valorUnitario), 0);
+  return productos.reduce((sum, p) => sum + (p.stockActual * p.valorUnitario), 0)
 }
 
 /**
@@ -207,11 +207,11 @@ export function calcularValorInventario(
 export function calcularRotacionInventario(
   ventasPeriodo: number,
   inventarioInicial: number,
-  inventarioFinal: number
+  inventarioFinal: number,
 ): number {
-  const inventarioPromedio = (inventarioInicial + inventarioFinal) / 2;
-  if (inventarioPromedio === 0) return 0;
-  return ventasPeriodo / inventarioPromedio;
+  const inventarioPromedio = (inventarioInicial + inventarioFinal) / 2
+  if (inventarioPromedio === 0) return 0
+  return ventasPeriodo / inventarioPromedio
 }
 
 /**
@@ -219,8 +219,8 @@ export function calcularRotacionInventario(
  * Fórmula: 365 / Rotación
  */
 export function calcularDiasInventario(rotacion: number): number {
-  if (rotacion === 0) return 0;
-  return 365 / rotacion;
+  if (rotacion === 0) return 0
+  return 365 / rotacion
 }
 
 /**
@@ -228,9 +228,9 @@ export function calcularDiasInventario(rotacion: number): number {
  */
 export function necesitaReabastecimiento(
   stockActual: number,
-  stockMinimo: number
+  stockMinimo: number,
 ): boolean {
-  return stockActual <= stockMinimo;
+  return stockActual <= stockMinimo
 }
 
 /**
@@ -239,10 +239,10 @@ export function necesitaReabastecimiento(
 export function calcularCantidadReorden(
   stockActual: number,
   stockMinimo: number,
-  stockOptimo: number
+  stockOptimo: number,
 ): number {
-  if (stockActual > stockMinimo) return 0;
-  return Math.max(0, stockOptimo - stockActual);
+  if (stockActual > stockMinimo) return 0
+  return Math.max(0, stockOptimo - stockActual)
 }
 
 // ==========================================
@@ -253,17 +253,17 @@ export function calcularCantidadReorden(
  * Calcular capital total en bancos
  */
 export function calcularCapitalTotal(
-  bancos: Array<{ saldo: number }>
+  bancos: Array<{ saldo: number }>,
 ): number {
-  return bancos.reduce((sum, b) => sum + b.saldo, 0);
+  return bancos.reduce((sum, b) => sum + b.saldo, 0)
 }
 
 /**
  * Calcular porcentaje por banco
  */
 export function calcularPorcentajeBanco(saldoBanco: number, capitalTotal: number): number {
-  if (capitalTotal === 0) return 0;
-  return (saldoBanco / capitalTotal) * 100;
+  if (capitalTotal === 0) return 0
+  return (saldoBanco / capitalTotal) * 100
 }
 
 /**
@@ -271,15 +271,15 @@ export function calcularPorcentajeBanco(saldoBanco: number, capitalTotal: number
  */
 export function validarTransferencia(
   saldoOrigen: number,
-  monto: number
+  monto: number,
 ): { valido: boolean; mensaje: string } {
   if (monto <= 0) {
-    return { valido: false, mensaje: 'El monto debe ser mayor a 0' };
+    return { valido: false, mensaje: 'El monto debe ser mayor a 0' }
   }
   if (saldoOrigen < monto) {
-    return { valido: false, mensaje: 'Saldo insuficiente en banco origen' };
+    return { valido: false, mensaje: 'Saldo insuficiente en banco origen' }
   }
-  return { valido: true, mensaje: 'Transferencia válida' };
+  return { valido: true, mensaje: 'Transferencia válida' }
 }
 
 // ==========================================
@@ -290,31 +290,31 @@ export function validarTransferencia(
  * Calcular promedio móvil simple
  */
 export function calcularPromedioMovil(valores: number[], periodo: number): number {
-  if (valores.length < periodo) return 0;
-  const ultimos = valores.slice(-periodo);
-  return ultimos.reduce((a, b) => a + b, 0) / periodo;
+  if (valores.length < periodo) return 0
+  const ultimos = valores.slice(-periodo)
+  return ultimos.reduce((a, b) => a + b, 0) / periodo
 }
 
 /**
  * Calcular tendencia (regresión lineal simple)
  */
 export function calcularTendencia(valores: number[]): { pendiente: number; intercepto: number } {
-  const n = valores.length;
-  if (n < 2) return { pendiente: 0, intercepto: valores[0] || 0 };
+  const n = valores.length
+  if (n < 2) return { pendiente: 0, intercepto: valores[0] || 0 }
   
-  let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+  let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0
   
   for (let i = 0; i < n; i++) {
-    sumX += i;
-    sumY += valores[i];
-    sumXY += i * valores[i];
-    sumX2 += i * i;
+    sumX += i
+    sumY += valores[i]
+    sumXY += i * valores[i]
+    sumX2 += i * i
   }
   
-  const pendiente = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-  const intercepto = (sumY - pendiente * sumX) / n;
+  const pendiente = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX)
+  const intercepto = (sumY - pendiente * sumX) / n
   
-  return { pendiente, intercepto };
+  return { pendiente, intercepto }
 }
 
 /**
@@ -322,34 +322,34 @@ export function calcularTendencia(valores: number[]): { pendiente: number; inter
  */
 export function proyectarValorFuturo(
   valores: number[],
-  periodosFuturos: number
+  periodosFuturos: number,
 ): number {
-  const { pendiente, intercepto } = calcularTendencia(valores);
-  const x = valores.length + periodosFuturos - 1;
-  return Math.max(0, intercepto + pendiente * x);
+  const { pendiente, intercepto } = calcularTendencia(valores)
+  const x = valores.length + periodosFuturos - 1
+  return Math.max(0, intercepto + pendiente * x)
 }
 
 /**
  * Calcular crecimiento porcentual
  */
 export function calcularCrecimiento(valorAnterior: number, valorActual: number): number {
-  if (valorAnterior === 0) return valorActual > 0 ? 100 : 0;
-  return ((valorActual - valorAnterior) / valorAnterior) * 100;
+  if (valorAnterior === 0) return valorActual > 0 ? 100 : 0
+  return ((valorActual - valorAnterior) / valorAnterior) * 100
 }
 
 /**
  * Proyección de ventas para próximos meses
  */
 export function proyectarVentas(data: ProyeccionData): number[] {
-  const { ventasHistoricas, meses } = data;
-  const proyecciones: number[] = [];
+  const { ventasHistoricas, meses } = data
+  const proyecciones: number[] = []
   
   for (let i = 1; i <= meses; i++) {
-    const proyeccion = proyectarValorFuturo(ventasHistoricas, i);
-    proyecciones.push(Math.round(proyeccion));
+    const proyeccion = proyectarValorFuturo(ventasHistoricas, i)
+    proyecciones.push(Math.round(proyeccion))
   }
   
-  return proyecciones;
+  return proyecciones
 }
 
 // ==========================================
@@ -360,9 +360,9 @@ export function proyectarVentas(data: ProyeccionData): number[] {
  * Calcular deuda total de clientes
  */
 export function calcularDeudaTotalClientes(
-  clientes: Array<{ deudaTotal: number }>
+  clientes: Array<{ deudaTotal: number }>,
 ): number {
-  return clientes.reduce((sum, c) => sum + c.deudaTotal, 0);
+  return clientes.reduce((sum, c) => sum + c.deudaTotal, 0)
 }
 
 /**
@@ -370,19 +370,19 @@ export function calcularDeudaTotalClientes(
  */
 export function clasificarClienteDeuda(
   deuda: number,
-  limites: { bajo: number; medio: number }
+  limites: { bajo: number; medio: number },
 ): 'bajo' | 'medio' | 'alto' {
-  if (deuda <= limites.bajo) return 'bajo';
-  if (deuda <= limites.medio) return 'medio';
-  return 'alto';
+  if (deuda <= limites.bajo) return 'bajo'
+  if (deuda <= limites.medio) return 'medio'
+  return 'alto'
 }
 
 /**
  * Calcular días de mora (aproximado)
  */
 export function calcularDiasMora(fechaVenta: Date, fechaActual: Date = new Date()): number {
-  const diffTime = fechaActual.getTime() - fechaVenta.getTime();
-  return Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+  const diffTime = fechaActual.getTime() - fechaVenta.getTime()
+  return Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)))
 }
 
 // ==========================================
@@ -396,29 +396,29 @@ export function formatearMoneda(valor: number): string {
   return new Intl.NumberFormat('es-MX', {
     style: 'currency',
     currency: 'MXN',
-  }).format(valor);
+  }).format(valor)
 }
 
 /**
  * Formatear porcentaje
  */
 export function formatearPorcentaje(valor: number, decimales: number = 1): string {
-  return `${valor.toFixed(decimales)}%`;
+  return `${valor.toFixed(decimales)}%`
 }
 
 /**
  * Formatear número con separadores
  */
 export function formatearNumero(valor: number): string {
-  return new Intl.NumberFormat('es-MX').format(valor);
+  return new Intl.NumberFormat('es-MX').format(valor)
 }
 
 /**
  * Redondear a 2 decimales
  */
 export function redondear(valor: number, decimales: number = 2): number {
-  const factor = Math.pow(10, decimales);
-  return Math.round(valor * factor) / factor;
+  const factor = Math.pow(10, decimales)
+  return Math.round(valor * factor) / factor
 }
 
 export default {
@@ -469,4 +469,4 @@ export default {
   formatearPorcentaje,
   formatearNumero,
   redondear,
-};
+}

@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * ZeroChatWidget - Widget Conversacional con Avatar 3D Spline
@@ -25,7 +25,7 @@ import {
   VolumeX,
   Trash2,
   Download,
-  Settings
+  Settings,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { ZeroState } from './ZeroAvatar'
@@ -82,7 +82,7 @@ const containerVariants: Variants = {
   hidden: { 
     opacity: 0, 
     scale: 0.95,
-    y: 20 
+    y: 20, 
   },
   visible: { 
     opacity: 1, 
@@ -91,22 +91,22 @@ const containerVariants: Variants = {
     transition: {
       type: 'spring',
       stiffness: 300,
-      damping: 25
-    }
+      damping: 25,
+    },
   },
   exit: { 
     opacity: 0, 
     scale: 0.95,
     y: 20,
-    transition: { duration: 0.2 }
-  }
+    transition: { duration: 0.2 },
+  },
 }
 
 const messageVariants: Variants = {
   hidden: { 
     opacity: 0, 
     x: -20,
-    scale: 0.9
+    scale: 0.9,
   },
   visible: { 
     opacity: 1, 
@@ -115,26 +115,26 @@ const messageVariants: Variants = {
     transition: {
       type: 'spring',
       stiffness: 500,
-      damping: 30
-    }
+      damping: 30,
+    },
   },
   exit: { 
     opacity: 0,
     x: 20,
     scale: 0.9,
-    transition: { duration: 0.15 }
-  }
+    transition: { duration: 0.15 },
+  },
 }
 
 const minimizedVariants: Variants = {
   minimized: {
     height: 60,
-    transition: { duration: 0.3 }
+    transition: { duration: 0.3 },
   },
   expanded: {
     height: 'auto',
-    transition: { duration: 0.3 }
-  }
+    transition: { duration: 0.3 },
+  },
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -173,7 +173,7 @@ function MessageBubble({ message, showTimestamp, showMetadata, state }: MessageB
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('es-ES', { 
       hour: '2-digit', 
-      minute: '2-digit' 
+      minute: '2-digit', 
     })
   }
   
@@ -261,7 +261,7 @@ function ZeroStateIndicator({ state, isListening, isSpeaking }: {
     processing: { color: '#8b5cf6', label: 'PROCESANDO', pulse: true },
     combat: { color: '#ef4444', label: 'ALERTA', pulse: true },
     success: { color: '#22c55e', label: 'COMPLETADO', pulse: false },
-    error: { color: '#f97316', label: 'ERROR', pulse: true }
+    error: { color: '#f97316', label: 'ERROR', pulse: true },
   }), [])
   
   const config = stateConfig[state]
@@ -322,7 +322,7 @@ function InputBar({
   isListening, 
   disabled, 
   placeholder,
-  state 
+  state, 
 }: InputBarProps) {
   const [input, setInput] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
@@ -477,7 +477,7 @@ function SplineAvatarMini({ state, size = 48 }: SplineAvatarMiniProps) {
           0 0 ${20 * glowIntensity}px rgba(239, 68, 68, ${0.3 * glowIntensity}),
           0 4px 12px rgba(0,0,0,0.8),
           inset 0 0 30px rgba(0,0,0,0.9)
-        `
+        `,
       }}
     >
       {/* Contenedor del Spline - SIN FILTROS, modelo original */}
@@ -487,7 +487,7 @@ function SplineAvatarMini({ state, size = 48 }: SplineAvatarMiniProps) {
           opacity: isLoaded ? 1 : 0,
           transition: 'opacity 0.5s ease',
           transform: 'scale(1.3)', // Ajustar escala para que se vea bien
-          transformOrigin: 'center center'
+          transformOrigin: 'center center',
         }}
       >
         <Spline
@@ -496,7 +496,7 @@ function SplineAvatarMini({ state, size = 48 }: SplineAvatarMiniProps) {
           style={{ 
             width: '100%', 
             height: '100%',
-            pointerEvents: 'none'
+            pointerEvents: 'none',
           }}
         />
       </div>
@@ -510,12 +510,12 @@ function SplineAvatarMini({ state, size = 48 }: SplineAvatarMiniProps) {
         <motion.div
           animate={{
             scaleX: state === 'combat' ? [1, 0.6, 1] : state === 'speaking' ? [1, 0.85, 1] : [1, 0.92, 1],
-            opacity: state === 'combat' ? [1, 0.7, 1] : [1, 0.85, 1]
+            opacity: state === 'combat' ? [1, 0.7, 1] : [1, 0.85, 1],
           }}
           transition={{
             duration: state === 'combat' ? 0.2 : state === 'speaking' ? 0.8 : 2.5,
             repeat: Infinity,
-            ease: 'easeInOut'
+            ease: 'easeInOut',
           }}
           className="relative"
           style={{
@@ -528,7 +528,7 @@ function SplineAvatarMini({ state, size = 48 }: SplineAvatarMiniProps) {
               0 0 ${size * 0.3 * glowIntensity}px ${eyeColor},
               0 0 ${size * 0.5 * glowIntensity}px ${eyeColor}60,
               inset 0 0 ${size * 0.05}px rgba(255,255,255,0.8)
-            `
+            `,
           }}
         >
           {/* Efecto de scan Cylon */}
@@ -537,14 +537,14 @@ function SplineAvatarMini({ state, size = 48 }: SplineAvatarMiniProps) {
             transition={{
               duration: state === 'combat' ? 0.8 : 2,
               repeat: Infinity,
-              ease: 'linear'
+              ease: 'linear',
             }}
             className="absolute inset-0 overflow-hidden rounded-full"
           >
             <div 
               className="absolute inset-y-0 w-1/4"
               style={{
-                background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent)`
+                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent)',
               }}
             />
           </motion.div>
@@ -556,7 +556,7 @@ function SplineAvatarMini({ state, size = 48 }: SplineAvatarMiniProps) {
               width: size * 0.08,
               height: size * 0.04,
               background: 'radial-gradient(ellipse, #ffffff 0%, transparent 70%)',
-              borderRadius: '50%'
+              borderRadius: '50%',
             }}
           />
         </motion.div>
@@ -567,17 +567,17 @@ function SplineAvatarMini({ state, size = 48 }: SplineAvatarMiniProps) {
         <motion.div
           animate={{ 
             opacity: [0, 0.3, 0, 0.2, 0],
-            x: [-2, 2, -1, 1, 0]
+            x: [-2, 2, -1, 1, 0],
           }}
           transition={{
             duration: 0.3,
             repeat: Infinity,
-            repeatDelay: 0.5
+            repeatDelay: 0.5,
           }}
           className="absolute inset-0 pointer-events-none"
           style={{
             background: 'linear-gradient(90deg, transparent 30%, rgba(255,0,0,0.1) 50%, transparent 70%)',
-            mixBlendMode: 'screen'
+            mixBlendMode: 'screen',
           }}
         />
       )}
@@ -587,7 +587,7 @@ function SplineAvatarMini({ state, size = 48 }: SplineAvatarMiniProps) {
         className="absolute inset-0 pointer-events-none rounded-xl"
         style={{
           border: `1px solid rgba(239, 68, 68, ${0.2 * glowIntensity})`,
-          boxShadow: `inset 0 0 10px rgba(0,0,0,0.5)`
+          boxShadow: 'inset 0 0 10px rgba(0,0,0,0.5)',
         }}
       />
       
@@ -597,7 +597,7 @@ function SplineAvatarMini({ state, size = 48 }: SplineAvatarMiniProps) {
           <motion.div
             animate={{ 
               scaleX: [0.3, 1, 0.3],
-              opacity: [0.5, 1, 0.5]
+              opacity: [0.5, 1, 0.5],
             }}
             transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
             style={{
@@ -605,7 +605,7 @@ function SplineAvatarMini({ state, size = 48 }: SplineAvatarMiniProps) {
               height: size * 0.05,
               backgroundColor: '#ef4444',
               borderRadius: '100px',
-              boxShadow: '0 0 15px #ef4444, 0 0 30px #ef4444'
+              boxShadow: '0 0 15px #ef4444, 0 0 30px #ef4444',
             }}
           />
         </div>
@@ -637,13 +637,13 @@ function ChatHeader({
   onToggleMinimize,
   onToggleSpeaking,
   onClearChat,
-  onExportChat
+  onExportChat,
 }: ChatHeaderProps) {
   return (
     <div 
       className="flex items-center justify-between p-3 border-b border-slate-700/50"
       style={{
-        background: 'linear-gradient(180deg, #0a0a0a 0%, #111111 100%)'
+        background: 'linear-gradient(180deg, #0a0a0a 0%, #111111 100%)',
       }}
     >
       {/* Info de Zero */}
@@ -658,7 +658,7 @@ function ChatHeader({
             style={{
               background: 'linear-gradient(90deg, #ffffff 0%, #c0c0c0 50%, #808080 100%)',
               WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
+              WebkitTextFillColor: 'transparent',
             }}
           >
             ZERO
@@ -751,7 +751,7 @@ export function ZeroChatWidget({
   maxHeight = '500px',
   showAvatar = true,
   showTimestamps = true,
-  showMetadata = false
+  showMetadata = false,
 }: ZeroChatWidgetProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   
@@ -786,7 +786,7 @@ export function ZeroChatWidget({
           0 25px 50px -12px rgba(0, 0, 0, 0.8),
           0 0 30px rgba(239, 68, 68, 0.1),
           inset 0 1px 0 rgba(255, 255, 255, 0.05)
-        `
+        `,
       }}
     >
       {/* Header */}
@@ -816,7 +816,7 @@ export function ZeroChatWidget({
               className="flex-1 overflow-y-auto p-4 space-y-1"
               style={{ 
                 maxHeight,
-                background: 'linear-gradient(180deg, #050505 0%, #0a0a0a 50%, #111111 100%)'
+                background: 'linear-gradient(180deg, #050505 0%, #0a0a0a 50%, #111111 100%)',
               }}
             >
               {messages.length === 0 ? (
@@ -832,7 +832,7 @@ export function ZeroChatWidget({
                     style={{
                       background: 'linear-gradient(90deg, #c0c0c0 0%, #ffffff 50%, #c0c0c0 100%)',
                       WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent'
+                      WebkitTextFillColor: 'transparent',
                     }}
                   >
                     Inicia una conversación con Zero
@@ -846,7 +846,7 @@ export function ZeroChatWidget({
                     className="mt-4 w-24 h-0.5 rounded-full"
                     style={{
                       background: 'linear-gradient(90deg, transparent, #ef4444, transparent)',
-                      boxShadow: '0 0 10px #ef4444'
+                      boxShadow: '0 0 10px #ef4444',
                     }}
                   />
                 </div>

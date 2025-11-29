@@ -17,9 +17,9 @@ import {
   deleteDoc,
   doc,
   Timestamp,
-  orderBy
-} from 'firebase/firestore';
-import { db, isFirebaseConfigured } from '@/app/lib/firebase/config';
+  orderBy,
+} from 'firebase/firestore'
+import { db, isFirebaseConfigured } from '@/app/lib/firebase/config'
 
 // Interfaces para datos de Firestore
 interface FirestoreVenta {
@@ -152,18 +152,18 @@ const CRON_PATTERNS: Record<string, string> = {
   weekly: '0 8 * * 1',     // Lunes 8am
   monthly: '0 8 1 * *',    // Día 1 de cada mes 8am
   custom: '0 8 * * *',     // Default para custom
-};
+}
 
 export class AIScheduledReportsService {
-  private readonly collectionName = 'scheduled_reports';
-  private readonly historyCollection = 'report_history';
+  private readonly collectionName = 'scheduled_reports'
+  private readonly historyCollection = 'report_history'
 
   /**
    * Crea un reporte programado
    */
   async createScheduledReport(config: Omit<ScheduledReport, 'id' | 'active' | 'createdAt' | 'updatedAt'>): Promise<string> {
-    const cronPattern = config.cronPattern || CRON_PATTERNS[config.recurrence] || CRON_PATTERNS.weekly;
-    const nextRun = this.calculateNextRun(cronPattern);
+    const cronPattern = config.cronPattern || CRON_PATTERNS[config.recurrence] || CRON_PATTERNS.weekly
+    const nextRun = this.calculateNextRun(cronPattern)
 
     const reportData: Omit<ScheduledReport, 'id'> = {
       ...config,
@@ -171,55 +171,55 @@ export class AIScheduledReportsService {
       active: true,
       nextRun,
       createdAt: new Date(),
-      updatedAt: new Date()
-    };
+      updatedAt: new Date(),
+    }
 
-    const collectionRef = collection(db!, this.collectionName);
+    const collectionRef = collection(db!, this.collectionName)
     const docRef = await addDoc(collectionRef, {
       ...reportData,
       nextRun: Timestamp.fromDate(nextRun),
       createdAt: Timestamp.now(),
-      updatedAt: Timestamp.now()
-    });
+      updatedAt: Timestamp.now(),
+    })
 
-    return docRef.id;
+    return docRef.id
   }
 
   /**
    * Lista reportes programados de un usuario
    */
   async listScheduledReports(userId: string): Promise<ScheduledReport[]> {
-    const collectionRef = collection(db!, this.collectionName);
+    const collectionRef = collection(db!, this.collectionName)
     const q = query(
       collectionRef,
       where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
-    );
+      orderBy('createdAt', 'desc'),
+    )
 
-    const snapshot = await getDocs(q);
+    const snapshot = await getDocs(q)
     return snapshot.docs.map(doc => ({
       id: doc.id,
-      ...doc.data()
-    })) as ScheduledReport[];
+      ...doc.data(),
+    })) as ScheduledReport[]
   }
 
   /**
    * Obtiene reportes pendientes de ejecución
    */
   async getPendingReports(): Promise<ScheduledReport[]> {
-    const now = new Date();
-    const collectionRef = collection(db!, this.collectionName);
+    const now = new Date()
+    const collectionRef = collection(db!, this.collectionName)
     const q = query(
       collectionRef,
       where('active', '==', true),
-      where('nextRun', '<=', Timestamp.fromDate(now))
-    );
+      where('nextRun', '<=', Timestamp.fromDate(now)),
+    )
 
-    const snapshot = await getDocs(q);
+    const snapshot = await getDocs(q)
     return snapshot.docs.map(doc => ({
       id: doc.id,
-      ...doc.data()
-    })) as ScheduledReport[];
+      ...doc.data(),
+    })) as ScheduledReport[]
   }
 
   /**
@@ -227,21 +227,21 @@ export class AIScheduledReportsService {
    */
   async executeScheduledReport(reportId: string): Promise<GeneratedReport> {
     // Obtener configuración del reporte
-    const reportRef = doc(db!, this.collectionName, reportId);
-    const reportDoc = await getDocs(query(collection(db!, this.collectionName), where('__name__', '==', reportId)));
+    const reportRef = doc(db!, this.collectionName, reportId)
+    const reportDoc = await getDocs(query(collection(db!, this.collectionName), where('__name__', '==', reportId)))
     
     if (reportDoc.empty) {
-      throw new Error(`Reporte ${reportId} no encontrado`);
+      throw new Error(`Reporte ${reportId} no encontrado`)
     }
 
-    const reportConfig = reportDoc.docs[0].data() as ScheduledReport;
+    const reportConfig = reportDoc.docs[0].data() as ScheduledReport
 
     try {
       // Generar datos del reporte
-      const reportData = await this.generateReportData(reportConfig);
+      const reportData = await this.generateReportData(reportConfig)
       
       // Generar insights
-      const insights = this.generateInsights(reportData, reportConfig.type);
+      const insights = this.generateInsights(reportData, reportConfig.type)
 
       // Crear registro de reporte generado
       const generatedReport: Omit<GeneratedReport, 'id'> = {
@@ -252,43 +252,43 @@ export class AIScheduledReportsService {
         data: reportData,
         insights,
         format: reportConfig.format,
-        status: 'success'
-      };
+        status: 'success',
+      }
 
       // Guardar en historial
-      const historyRef = collection(db!, this.historyCollection);
+      const historyRef = collection(db!, this.historyCollection)
       const historyDoc = await addDoc(historyRef, {
         ...generatedReport,
-        generatedAt: Timestamp.now()
-      });
+        generatedAt: Timestamp.now(),
+      })
 
       // Actualizar próxima ejecución
-      const nextRun = this.calculateNextRun(reportConfig.cronPattern || CRON_PATTERNS.weekly);
+      const nextRun = this.calculateNextRun(reportConfig.cronPattern || CRON_PATTERNS.weekly)
       await updateDoc(reportRef, {
         lastRun: Timestamp.now(),
         nextRun: Timestamp.fromDate(nextRun),
-        updatedAt: Timestamp.now()
-      });
+        updatedAt: Timestamp.now(),
+      })
 
       return {
         id: historyDoc.id,
-        ...generatedReport
-      };
+        ...generatedReport,
+      }
     } catch (error) {
       // Registrar error
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
       
-      const historyRef = collection(db!, this.historyCollection);
+      const historyRef = collection(db!, this.historyCollection)
       const historyDoc = await addDoc(historyRef, {
         scheduledReportId: reportId,
         name: reportConfig.name,
         type: reportConfig.type,
         generatedAt: Timestamp.now(),
         status: 'failed',
-        error: errorMessage
-      });
+        error: errorMessage,
+      })
 
-      throw error;
+      throw error
     }
   }
 
@@ -296,27 +296,27 @@ export class AIScheduledReportsService {
    * Genera los datos del reporte
    */
   private async generateReportData(config: ScheduledReport): Promise<ReportData> {
-    const { type, filters } = config;
+    const { type, filters } = config
 
     switch (type) {
       case 'ventas':
-        return await this.generateVentasReport(filters);
+        return await this.generateVentasReport(filters)
       
       case 'compras':
-        return await this.generateComprasReport(filters);
+        return await this.generateComprasReport(filters)
       
       case 'inventario':
-        return await this.generateInventarioReport(filters);
+        return await this.generateInventarioReport(filters)
       
       case 'financiero':
-        return await this.generateFinancieroReport(filters);
+        return await this.generateFinancieroReport(filters)
       
       case 'clientes':
-        return await this.generateClientesReport(filters);
+        return await this.generateClientesReport(filters)
       
       case 'general':
       default:
-        return await this.generateGeneralReport(filters);
+        return await this.generateGeneralReport(filters)
     }
   }
 
@@ -324,44 +324,44 @@ export class AIScheduledReportsService {
    * Genera reporte de ventas
    */
   private async generateVentasReport(filters?: ReportFilters): Promise<ReportData> {
-    const ventasRef = collection(db!, 'ventas');
-    const snapshot = await getDocs(ventasRef);
+    const ventasRef = collection(db!, 'ventas')
+    const snapshot = await getDocs(ventasRef)
     const ventas: FirestoreVenta[] = snapshot.docs.map(doc => ({ 
       id: doc.id, 
-      ...(doc.data() as Omit<FirestoreVenta, 'id'>) 
-    }));
+      ...(doc.data() as Omit<FirestoreVenta, 'id'>), 
+    }))
 
-    const totalVentas = ventas.reduce((sum, v) => sum + (Number(v.total) || 0), 0);
-    const promedioVenta = ventas.length > 0 ? totalVentas / ventas.length : 0;
+    const totalVentas = ventas.reduce((sum, v) => sum + (Number(v.total) || 0), 0)
+    const promedioVenta = ventas.length > 0 ? totalVentas / ventas.length : 0
 
     // Agrupar por día para gráfico
-    const ventasPorDia: Record<string, number> = {};
+    const ventasPorDia: Record<string, number> = {}
     ventas.forEach(v => {
-      let fechaStr = 'Sin fecha';
+      let fechaStr = 'Sin fecha'
       if (v.fecha) {
         if (typeof v.fecha === 'object' && 'toDate' in v.fecha) {
-          fechaStr = v.fecha.toDate().toISOString().split('T')[0];
+          fechaStr = v.fecha.toDate().toISOString().split('T')[0]
         } else if (v.fecha instanceof Date) {
-          fechaStr = v.fecha.toISOString().split('T')[0];
+          fechaStr = v.fecha.toISOString().split('T')[0]
         }
       }
-      ventasPorDia[fechaStr] = (ventasPorDia[fechaStr] || 0) + (Number(v.total) || 0);
-    });
+      ventasPorDia[fechaStr] = (ventasPorDia[fechaStr] || 0) + (Number(v.total) || 0)
+    })
 
     return {
       summary: {
         totalVentas: ventas.length,
         montoTotal: totalVentas,
         promedioVenta,
-        periodo: 'Último mes'
+        periodo: 'Último mes',
       },
       details: ventas.slice(0, 100),
       charts: [
         {
           type: 'line',
           title: 'Tendencia de Ventas',
-          data: Object.entries(ventasPorDia).map(([date, value]) => ({ date, value }))
-        }
+          data: Object.entries(ventasPorDia).map(([date, value]) => ({ date, value })),
+        },
       ],
       kpis: [
         {
@@ -369,82 +369,82 @@ export class AIScheduledReportsService {
           value: totalVentas,
           format: 'currency',
           trend: 'up',
-          change: 15.3
+          change: 15.3,
         },
         {
           title: 'Número de Ventas',
           value: ventas.length,
-          format: 'number'
+          format: 'number',
         },
         {
           title: 'Ticket Promedio',
           value: promedioVenta,
-          format: 'currency'
-        }
-      ]
-    };
+          format: 'currency',
+        },
+      ],
+    }
   }
 
   /**
    * Genera reporte de compras
    */
   private async generateComprasReport(filters?: ReportFilters): Promise<ReportData> {
-    const comprasRef = collection(db!, 'compras');
-    const snapshot = await getDocs(comprasRef);
+    const comprasRef = collection(db!, 'compras')
+    const snapshot = await getDocs(comprasRef)
     const compras: FirestoreCompra[] = snapshot.docs.map(doc => ({ 
       id: doc.id, 
-      ...(doc.data() as Omit<FirestoreCompra, 'id'>) 
-    }));
+      ...(doc.data() as Omit<FirestoreCompra, 'id'>), 
+    }))
 
-    const totalCompras = compras.reduce((sum, c) => sum + (Number(c.total) || 0), 0);
+    const totalCompras = compras.reduce((sum, c) => sum + (Number(c.total) || 0), 0)
 
     return {
       summary: {
         totalCompras: compras.length,
         montoTotal: totalCompras,
-        periodo: 'Último mes'
+        periodo: 'Último mes',
       },
       details: compras.slice(0, 100),
       kpis: [
         {
           title: 'Total Compras',
           value: totalCompras,
-          format: 'currency'
+          format: 'currency',
         },
         {
           title: 'Órdenes',
           value: compras.length,
-          format: 'number'
-        }
-      ]
-    };
+          format: 'number',
+        },
+      ],
+    }
   }
 
   /**
    * Genera reporte de inventario
    */
   private async generateInventarioReport(filters?: ReportFilters): Promise<ReportData> {
-    const productosRef = collection(db!, 'productos');
-    const snapshot = await getDocs(productosRef);
+    const productosRef = collection(db!, 'productos')
+    const snapshot = await getDocs(productosRef)
     const productos: FirestoreProducto[] = snapshot.docs.map(doc => ({ 
       id: doc.id, 
-      ...(doc.data() as Omit<FirestoreProducto, 'id'>) 
-    }));
+      ...(doc.data() as Omit<FirestoreProducto, 'id'>), 
+    }))
 
     const stockBajo = productos.filter(p => 
-      Number(p.stockActual) <= Number(p.stockMinimo)
-    );
+      Number(p.stockActual) <= Number(p.stockMinimo),
+    )
 
     const valorInventario = productos.reduce((sum, p) => 
-      sum + (Number(p.stockActual) || 0) * (Number(p.costo) || 0), 0
-    );
+      sum + (Number(p.stockActual) || 0) * (Number(p.costo) || 0), 0,
+    )
 
     return {
       summary: {
         totalProductos: productos.length,
         productosStockBajo: stockBajo.length,
         valorInventario,
-        periodo: 'Actual'
+        periodo: 'Actual',
       },
       details: productos.slice(0, 100),
       charts: [
@@ -454,28 +454,28 @@ export class AIScheduledReportsService {
           data: productos
             .sort((a, b) => (Number(b.stockActual) || 0) - (Number(a.stockActual) || 0))
             .slice(0, 10)
-            .map(p => ({ name: p.nombre, value: Number(p.stockActual) || 0 }))
-        }
+            .map(p => ({ name: p.nombre, value: Number(p.stockActual) || 0 })),
+        },
       ],
       kpis: [
         {
           title: 'Valor Inventario',
           value: valorInventario,
-          format: 'currency'
+          format: 'currency',
         },
         {
           title: 'Productos',
           value: productos.length,
-          format: 'number'
+          format: 'number',
         },
         {
           title: 'Stock Bajo',
           value: stockBajo.length,
           format: 'number',
-          trend: stockBajo.length > 5 ? 'down' : 'neutral'
-        }
-      ]
-    };
+          trend: stockBajo.length > 5 ? 'down' : 'neutral',
+        },
+      ],
+    }
   }
 
   /**
@@ -483,22 +483,22 @@ export class AIScheduledReportsService {
    */
   private async generateFinancieroReport(filters?: ReportFilters): Promise<ReportData> {
     // Obtener datos de bancos
-    const bancosRef = collection(db!, 'bancos');
-    const bancosSnapshot = await getDocs(bancosRef);
+    const bancosRef = collection(db!, 'bancos')
+    const bancosSnapshot = await getDocs(bancosRef)
     const bancos: FirestoreBanco[] = bancosSnapshot.docs.map(doc => ({ 
       id: doc.id, 
-      ...(doc.data() as Omit<FirestoreBanco, 'id'>) 
-    }));
+      ...(doc.data() as Omit<FirestoreBanco, 'id'>), 
+    }))
 
     const capitalTotal = bancos.reduce((sum, b) => 
-      sum + (Number(b.capitalActual) || Number(b.saldo) || 0), 0
-    );
+      sum + (Number(b.capitalActual) || Number(b.saldo) || 0), 0,
+    )
 
     return {
       summary: {
         capitalTotal,
         bancosActivos: bancos.length,
-        periodo: 'Actual'
+        periodo: 'Actual',
       },
       details: bancos,
       charts: [
@@ -507,58 +507,58 @@ export class AIScheduledReportsService {
           title: 'Distribución de Capital',
           data: bancos.map(b => ({
             name: b.nombre || b.id,
-            value: Number(b.capitalActual) || Number(b.saldo) || 0
-          }))
-        }
+            value: Number(b.capitalActual) || Number(b.saldo) || 0,
+          })),
+        },
       ],
       kpis: [
         {
           title: 'Capital Total',
           value: capitalTotal,
-          format: 'currency'
+          format: 'currency',
         },
         {
           title: 'Bancos Activos',
           value: bancos.length,
-          format: 'number'
-        }
-      ]
-    };
+          format: 'number',
+        },
+      ],
+    }
   }
 
   /**
    * Genera reporte de clientes
    */
   private async generateClientesReport(filters?: ReportFilters): Promise<ReportData> {
-    const clientesRef = collection(db!, 'clientes');
-    const snapshot = await getDocs(clientesRef);
+    const clientesRef = collection(db!, 'clientes')
+    const snapshot = await getDocs(clientesRef)
     const clientes: FirestoreCliente[] = snapshot.docs.map(doc => ({ 
       id: doc.id, 
-      ...(doc.data() as Omit<FirestoreCliente, 'id'>) 
-    }));
+      ...(doc.data() as Omit<FirestoreCliente, 'id'>), 
+    }))
 
-    const activos = clientes.filter(c => c.estado === 'activo');
+    const activos = clientes.filter(c => c.estado === 'activo')
 
     return {
       summary: {
         totalClientes: clientes.length,
         clientesActivos: activos.length,
-        periodo: 'Actual'
+        periodo: 'Actual',
       },
       details: clientes.slice(0, 100),
       kpis: [
         {
           title: 'Total Clientes',
           value: clientes.length,
-          format: 'number'
+          format: 'number',
         },
         {
           title: 'Clientes Activos',
           value: activos.length,
-          format: 'number'
-        }
-      ]
-    };
+          format: 'number',
+        },
+      ],
+    }
   }
 
   /**
@@ -569,34 +569,34 @@ export class AIScheduledReportsService {
     const [ventasData, inventarioData, financieroData] = await Promise.all([
       this.generateVentasReport(filters),
       this.generateInventarioReport(filters),
-      this.generateFinancieroReport(filters)
-    ]);
+      this.generateFinancieroReport(filters),
+    ])
 
     return {
       summary: {
         ...ventasData.summary,
         ...inventarioData.summary,
-        ...financieroData.summary
+        ...financieroData.summary,
       },
       details: [],
       charts: [
         ...(ventasData.charts || []),
         ...(inventarioData.charts || []),
-        ...(financieroData.charts || [])
+        ...(financieroData.charts || []),
       ],
       kpis: [
         ...(ventasData.kpis || []),
         ...(inventarioData.kpis || []),
-        ...(financieroData.kpis || [])
-      ]
-    };
+        ...(financieroData.kpis || []),
+      ],
+    }
   }
 
   /**
    * Genera insights automáticos basados en los datos
    */
   private generateInsights(data: ReportData, reportType: ReportType): ReportInsight[] {
-    const insights: ReportInsight[] = [];
+    const insights: ReportInsight[] = []
 
     // Analizar KPIs para insights
     if (data.kpis) {
@@ -608,8 +608,8 @@ export class AIScheduledReportsService {
             description: `${kpi.title} ha aumentado ${kpi.change}% respecto al período anterior`,
             metric: kpi.title,
             value: kpi.value,
-            actions: ['Analizar factores de éxito', 'Replicar estrategias']
-          });
+            actions: ['Analizar factores de éxito', 'Replicar estrategias'],
+          })
         }
 
         if (kpi.trend === 'down' && kpi.change && kpi.change < -15) {
@@ -619,16 +619,16 @@ export class AIScheduledReportsService {
             description: `${kpi.title} ha disminuido ${Math.abs(kpi.change)}%`,
             metric: kpi.title,
             value: kpi.value,
-            actions: ['Investigar causas', 'Implementar acciones correctivas']
-          });
+            actions: ['Investigar causas', 'Implementar acciones correctivas'],
+          })
         }
-      });
+      })
     }
 
     // Insights específicos por tipo de reporte
     switch (reportType) {
       case 'inventario':
-        const stockBajo = Number(data.summary.productosStockBajo) || 0;
+        const stockBajo = Number(data.summary.productosStockBajo) || 0
         if (stockBajo > 5) {
           insights.push({
             type: 'critical',
@@ -636,24 +636,24 @@ export class AIScheduledReportsService {
             description: `${stockBajo} productos requieren reabastecimiento urgente`,
             metric: 'Productos bajo stock',
             value: stockBajo,
-            actions: ['Generar órdenes de compra', 'Contactar proveedores']
-          });
+            actions: ['Generar órdenes de compra', 'Contactar proveedores'],
+          })
         }
-        break;
+        break
 
       case 'ventas':
-        const totalVentas = Number(data.summary.montoTotal) || 0;
+        const totalVentas = Number(data.summary.montoTotal) || 0
         if (totalVentas > 100000) {
           insights.push({
             type: 'positive',
             title: 'Meta de ventas superada',
-            description: `Las ventas totales han superado $100,000`,
+            description: 'Las ventas totales han superado $100,000',
             metric: 'Ventas totales',
             value: totalVentas,
-            actions: ['Celebrar logro con el equipo', 'Establecer nueva meta']
-          });
+            actions: ['Celebrar logro con el equipo', 'Establecer nueva meta'],
+          })
         }
-        break;
+        break
     }
 
     // Siempre agregar al menos un insight informativo
@@ -662,97 +662,97 @@ export class AIScheduledReportsService {
         type: 'info',
         title: 'Reporte generado exitosamente',
         description: 'Todos los indicadores se encuentran dentro de los parámetros normales',
-        actions: ['Continuar monitoreando', 'Configurar alertas personalizadas']
-      });
+        actions: ['Continuar monitoreando', 'Configurar alertas personalizadas'],
+      })
     }
 
-    return insights;
+    return insights
   }
 
   /**
    * Calcula la próxima ejecución basada en cron pattern
    */
   private calculateNextRun(cronPattern: string): Date {
-    const now = new Date();
-    const [minute, hour, dayOfMonth, month, dayOfWeek] = cronPattern.split(' ');
+    const now = new Date()
+    const [minute, hour, dayOfMonth, month, dayOfWeek] = cronPattern.split(' ')
 
-    const nextRun = new Date(now);
-    nextRun.setMinutes(parseInt(minute) || 0);
-    nextRun.setHours(parseInt(hour) || 8);
-    nextRun.setSeconds(0);
-    nextRun.setMilliseconds(0);
+    const nextRun = new Date(now)
+    nextRun.setMinutes(parseInt(minute) || 0)
+    nextRun.setHours(parseInt(hour) || 8)
+    nextRun.setSeconds(0)
+    nextRun.setMilliseconds(0)
 
     // Si ya pasó la hora de hoy, programar para mañana
     if (nextRun <= now) {
       if (dayOfWeek !== '*') {
         // Semanal
-        const targetDay = parseInt(dayOfWeek);
-        const currentDay = now.getDay();
+        const targetDay = parseInt(dayOfWeek)
+        const currentDay = now.getDay()
         const daysUntil = targetDay > currentDay 
           ? targetDay - currentDay 
-          : 7 - currentDay + targetDay;
-        nextRun.setDate(now.getDate() + daysUntil);
+          : 7 - currentDay + targetDay
+        nextRun.setDate(now.getDate() + daysUntil)
       } else if (dayOfMonth !== '*') {
         // Mensual
-        const targetDate = parseInt(dayOfMonth);
+        const targetDate = parseInt(dayOfMonth)
         if (targetDate <= now.getDate()) {
-          nextRun.setMonth(now.getMonth() + 1);
+          nextRun.setMonth(now.getMonth() + 1)
         }
-        nextRun.setDate(targetDate);
+        nextRun.setDate(targetDate)
       } else {
         // Diario
-        nextRun.setDate(now.getDate() + 1);
+        nextRun.setDate(now.getDate() + 1)
       }
     }
 
-    return nextRun;
+    return nextRun
   }
 
   /**
    * Actualiza un reporte programado
    */
   async updateScheduledReport(reportId: string, updates: Partial<ScheduledReport>): Promise<void> {
-    const reportRef = doc(db!, this.collectionName, reportId);
+    const reportRef = doc(db!, this.collectionName, reportId)
     await updateDoc(reportRef, {
       ...updates,
-      updatedAt: Timestamp.now()
-    });
+      updatedAt: Timestamp.now(),
+    })
   }
 
   /**
    * Elimina un reporte programado
    */
   async deleteScheduledReport(reportId: string): Promise<void> {
-    const reportRef = doc(db!, this.collectionName, reportId);
-    await deleteDoc(reportRef);
+    const reportRef = doc(db!, this.collectionName, reportId)
+    await deleteDoc(reportRef)
   }
 
   /**
    * Activa/desactiva un reporte
    */
   async toggleReportStatus(reportId: string, active: boolean): Promise<void> {
-    const reportRef = doc(db!, this.collectionName, reportId);
+    const reportRef = doc(db!, this.collectionName, reportId)
     await updateDoc(reportRef, {
       active,
-      updatedAt: Timestamp.now()
-    });
+      updatedAt: Timestamp.now(),
+    })
   }
 
   /**
    * Obtiene historial de reportes generados
    */
   async getReportHistory(scheduledReportId: string, limit = 10): Promise<GeneratedReport[]> {
-    const historyRef = collection(db!, this.historyCollection);
+    const historyRef = collection(db!, this.historyCollection)
     const q = query(
       historyRef,
       where('scheduledReportId', '==', scheduledReportId),
-      orderBy('generatedAt', 'desc')
-    );
+      orderBy('generatedAt', 'desc'),
+    )
 
-    const snapshot = await getDocs(q);
+    const snapshot = await getDocs(q)
     return snapshot.docs.slice(0, limit).map(doc => ({
       id: doc.id,
-      ...doc.data()
-    })) as GeneratedReport[];
+      ...doc.data(),
+    })) as GeneratedReport[]
   }
 }

@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 📊 BENTO REPORTES PREMIUM - Centro de Reportes con Componentes 3D
@@ -12,7 +12,7 @@
  * - Animaciones fluidas con Framer Motion
  */
 
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   FileText, Download, Calendar, Filter, Search, TrendingUp, TrendingDown,
   DollarSign, Users, Package, ShoppingCart, Building2, PieChart as PieChartIcon,
@@ -20,17 +20,17 @@ import {
   FileSpreadsheet, FileType, Printer, Share2, Star, ArrowUpRight, ArrowDownRight,
   Wallet, Receipt, Truck, Scissors, Eye, ChevronRight, Sparkles, Zap,
   Activity, Layers, Archive, CreditCard,
-  type LucideIcon
-} from "lucide-react"
-import { Button } from "@/app/components/ui/button"
-import { Badge } from "@/app/components/ui/badge"
-import { Input } from "@/app/components/ui/input"
-import { useState, useMemo } from "react"
+  type LucideIcon,
+} from 'lucide-react'
+import { Button } from '@/app/components/ui/button'
+import { Badge } from '@/app/components/ui/badge'
+import { Input } from '@/app/components/ui/input'
+import { useState, useMemo } from 'react'
 import { 
   AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, 
   Tooltip, PieChart, Pie, Cell, CartesianGrid, Legend, ComposedChart, Line,
-  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis
-} from "recharts"
+  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+} from 'recharts'
 
 // Componentes 3D Premium
 import { 
@@ -40,8 +40,8 @@ import {
   PulseIndicator,
   MiniChart3D,
   GradientText,
-  VARIANT_COLORS 
-} from "@/app/components/3d/PremiumPanelComponents"
+  VARIANT_COLORS, 
+} from '@/app/components/3d/PremiumPanelComponents'
 
 // ============================================================================
 // TIPOS E INTERFACES
@@ -83,7 +83,7 @@ const REPORTES_INICIALES: ReporteConfig[] = [
     frecuencia: 'Diario',
     favorito: true,
     ultimaGeneracion: 'Hace 2 horas',
-    variant: 'success'
+    variant: 'success',
   },
   {
     id: 'ventas-semanal',
@@ -94,7 +94,7 @@ const REPORTES_INICIALES: ReporteConfig[] = [
     color: 'bg-emerald-500/20',
     frecuencia: 'Semanal',
     favorito: false,
-    variant: 'success'
+    variant: 'success',
   },
   {
     id: 'ventas-mensual',
@@ -105,7 +105,7 @@ const REPORTES_INICIALES: ReporteConfig[] = [
     color: 'bg-emerald-500/20',
     frecuencia: 'Mensual',
     favorito: true,
-    variant: 'success'
+    variant: 'success',
   },
   // Finanzas
   {
@@ -117,7 +117,7 @@ const REPORTES_INICIALES: ReporteConfig[] = [
     color: 'bg-blue-500/20',
     frecuencia: 'Diario',
     favorito: true,
-    variant: 'primary'
+    variant: 'primary',
   },
   {
     id: 'utilidades',
@@ -128,7 +128,7 @@ const REPORTES_INICIALES: ReporteConfig[] = [
     color: 'bg-blue-500/20',
     frecuencia: 'Mensual',
     favorito: false,
-    variant: 'primary'
+    variant: 'primary',
   },
   {
     id: 'bancos',
@@ -139,7 +139,7 @@ const REPORTES_INICIALES: ReporteConfig[] = [
     color: 'bg-blue-500/20',
     frecuencia: 'Diario',
     favorito: true,
-    variant: 'primary'
+    variant: 'primary',
   },
   {
     id: 'cuentas-cobrar',
@@ -150,7 +150,7 @@ const REPORTES_INICIALES: ReporteConfig[] = [
     color: 'bg-amber-500/20',
     frecuencia: 'Semanal',
     favorito: false,
-    variant: 'warning'
+    variant: 'warning',
   },
   // Inventario
   {
@@ -162,7 +162,7 @@ const REPORTES_INICIALES: ReporteConfig[] = [
     color: 'bg-cyan-500/20',
     frecuencia: 'Bajo demanda',
     favorito: true,
-    variant: 'info'
+    variant: 'info',
   },
   {
     id: 'movimientos-almacen',
@@ -173,7 +173,7 @@ const REPORTES_INICIALES: ReporteConfig[] = [
     color: 'bg-cyan-500/20',
     frecuencia: 'Diario',
     favorito: false,
-    variant: 'info'
+    variant: 'info',
   },
   {
     id: 'cortes-rf',
@@ -184,7 +184,7 @@ const REPORTES_INICIALES: ReporteConfig[] = [
     color: 'bg-amber-500/20',
     frecuencia: 'Semanal',
     favorito: false,
-    variant: 'warning'
+    variant: 'warning',
   },
   // Operaciones
   {
@@ -196,7 +196,7 @@ const REPORTES_INICIALES: ReporteConfig[] = [
     color: 'bg-purple-500/20',
     frecuencia: 'Semanal',
     favorito: true,
-    variant: 'secondary'
+    variant: 'secondary',
   },
   {
     id: 'distribuidores',
@@ -207,7 +207,7 @@ const REPORTES_INICIALES: ReporteConfig[] = [
     color: 'bg-purple-500/20',
     frecuencia: 'Mensual',
     favorito: false,
-    variant: 'secondary'
+    variant: 'secondary',
   },
   // Clientes
   {
@@ -219,7 +219,7 @@ const REPORTES_INICIALES: ReporteConfig[] = [
     color: 'bg-rose-500/20',
     frecuencia: 'Mensual',
     favorito: true,
-    variant: 'danger'
+    variant: 'danger',
   },
   {
     id: 'cartera-clientes',
@@ -230,7 +230,7 @@ const REPORTES_INICIALES: ReporteConfig[] = [
     color: 'bg-rose-500/20',
     frecuencia: 'Bajo demanda',
     favorito: false,
-    variant: 'danger'
+    variant: 'danger',
   },
 ]
 
@@ -259,7 +259,7 @@ const SAMPLE_DATA = {
     { subject: 'Finanzas', A: 86, B: 130, fullMark: 150 },
     { subject: 'Operaciones', A: 99, B: 100, fullMark: 150 },
     { subject: 'Clientes', A: 85, B: 90, fullMark: 150 },
-  ]
+  ],
 }
 
 // ============================================================================
@@ -269,7 +269,7 @@ const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('es-MX', { 
     style: 'currency', 
     currency: 'MXN',
-    minimumFractionDigits: 0 
+    minimumFractionDigits: 0, 
   }).format(value)
 }
 
@@ -286,7 +286,7 @@ function StatCardPremium({
   variant = 'primary',
   trend,
   trendValue,
-  miniChartData
+  miniChartData,
 }: { 
   title: string
   value: string | number
@@ -349,7 +349,7 @@ function StatCardPremium({
 function ReporteCardPremium({ 
   reporte, 
   onGenerar, 
-  onToggleFavorito 
+  onToggleFavorito, 
 }: { 
   reporte: ReporteConfig
   onGenerar: () => void
@@ -370,7 +370,7 @@ function ReporteCardPremium({
         <div className="relative">
           {/* Botón favorito */}
           <button
-            onClick={(e) => { e.stopPropagation(); onToggleFavorito(); }}
+            onClick={(e) => { e.stopPropagation(); onToggleFavorito() }}
             className="absolute top-0 right-0 z-10 p-1"
           >
             <Star 
@@ -497,7 +497,7 @@ export function BentoReportesPremium() {
     if (searchTerm) {
       filtered = filtered.filter(r => 
         r.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        r.descripcion.toLowerCase().includes(searchTerm.toLowerCase())
+        r.descripcion.toLowerCase().includes(searchTerm.toLowerCase()),
       )
     }
     
@@ -508,7 +508,7 @@ export function BentoReportesPremium() {
   // Toggle favorito
   const handleToggleFavorito = (id: string) => {
     setReportes(prev => prev.map(r => 
-      r.id === id ? { ...r, favorito: !r.favorito } : r
+      r.id === id ? { ...r, favorito: !r.favorito } : r,
     ))
   }
 
@@ -674,7 +674,7 @@ export function BentoReportesPremium() {
                 return (
                   <Button
                     key={cat.id}
-                    variant={isActive ? "default" : "ghost"}
+                    variant={isActive ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => setCategoriaActiva(cat.id)}
                     className={`
@@ -730,8 +730,8 @@ export function BentoReportesPremium() {
               hidden: { opacity: 0 },
               visible: { 
                 opacity: 1,
-                transition: { staggerChildren: 0.05 }
-              }
+                transition: { staggerChildren: 0.05 },
+              },
             }}
           >
             {reportesFiltrados.map((reporte) => (
@@ -739,7 +739,7 @@ export function BentoReportesPremium() {
                 key={reporte.id}
                 variants={{
                   hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0 }
+                  visible: { opacity: 1, y: 0 },
                 }}
               >
                 <ReporteCardPremium

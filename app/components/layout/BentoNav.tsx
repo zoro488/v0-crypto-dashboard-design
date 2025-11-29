@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import { motion, useScroll, useTransform } from "framer-motion"
-import { useAppStore } from "@/app/lib/store/useAppStore"
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { useAppStore } from '@/app/lib/store/useAppStore'
 import {
   LayoutGrid,
   ShoppingCart,
@@ -19,12 +19,12 @@ import {
   DollarSign,
   ArrowRightLeft,
   FileText,
-} from "lucide-react"
-import { useState, useEffect } from "react"
-import { Button } from "@/app/components/ui/button"
-import { CreateOrdenCompraModalPremium } from "@/app/components/modals/CreateOrdenCompraModalPremium"
-import { CreateVentaModalPremium } from "@/app/components/modals/CreateVentaModalPremium"
-import { CreateTransferenciaModalPremium } from "@/app/components/modals/CreateTransferenciaModalPremium"
+} from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Button } from '@/app/components/ui/button'
+import { CreateOrdenCompraModalPremium } from '@/app/components/modals/CreateOrdenCompraModalPremium'
+import { CreateVentaModalPremium } from '@/app/components/modals/CreateVentaModalPremium'
+import { CreateTransferenciaModalPremium } from '@/app/components/modals/CreateTransferenciaModalPremium'
 
 export default function BentoNav() {
   const { currentPanel, setCurrentPanel } = useAppStore()
@@ -44,46 +44,46 @@ export default function BentoNav() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20)
     }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   const allPanels = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutGrid, color: "from-blue-500 to-cyan-500" },
-    { id: "ventas", label: "Ventas", icon: ShoppingCart, color: "from-green-500 to-emerald-500" },
-    { id: "ordenes", label: "Órdenes", icon: Package, color: "from-purple-500 to-violet-500" },
-    { id: "distribuidores", label: "Distribuidores", icon: Users, color: "from-orange-500 to-red-500" },
-    { id: "clientes", label: "Clientes", icon: UserCheck, color: "from-pink-500 to-rose-500" },
-    { id: "banco", label: "Bancos", icon: Building2, color: "from-blue-600 to-indigo-600" },
-    { id: "almacen", label: "Almacén", icon: Warehouse, color: "from-amber-500 to-yellow-600" },
-    { id: "reportes", label: "Reportes", icon: BarChart3, color: "from-teal-500 to-cyan-600" },
-    { id: "ia", label: "IA", icon: Sparkles, color: "from-violet-500 to-purple-600" },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid, color: 'from-blue-500 to-cyan-500' },
+    { id: 'ventas', label: 'Ventas', icon: ShoppingCart, color: 'from-green-500 to-emerald-500' },
+    { id: 'ordenes', label: 'Órdenes', icon: Package, color: 'from-purple-500 to-violet-500' },
+    { id: 'distribuidores', label: 'Distribuidores', icon: Users, color: 'from-orange-500 to-red-500' },
+    { id: 'clientes', label: 'Clientes', icon: UserCheck, color: 'from-pink-500 to-rose-500' },
+    { id: 'banco', label: 'Bancos', icon: Building2, color: 'from-blue-600 to-indigo-600' },
+    { id: 'almacen', label: 'Almacén', icon: Warehouse, color: 'from-amber-500 to-yellow-600' },
+    { id: 'reportes', label: 'Reportes', icon: BarChart3, color: 'from-teal-500 to-cyan-600' },
+    { id: 'ia', label: 'IA', icon: Sparkles, color: 'from-violet-500 to-purple-600' },
   ]
 
   const quickActions = [
     {
-      label: "Nueva Orden",
+      label: 'Nueva Orden',
       icon: Plus,
       onClick: () => setShowOrdenModal(true),
-      variant: "primary" as const,
+      variant: 'primary' as const,
     },
     {
-      label: "Registrar Venta",
+      label: 'Registrar Venta',
       icon: DollarSign,
       onClick: () => setShowVentaModal(true),
-      variant: "secondary" as const,
+      variant: 'secondary' as const,
     },
     {
-      label: "Transferencia",
+      label: 'Transferencia',
       icon: ArrowRightLeft,
       onClick: () => setShowTransferenciaModal(true),
-      variant: "outline" as const,
+      variant: 'outline' as const,
     },
     {
-      label: "Reporte Rápido",
+      label: 'Reporte Rápido',
       icon: FileText,
-      onClick: () => setCurrentPanel("reportes"),
-      variant: "outline" as const,
+      onClick: () => setCurrentPanel('reportes'),
+      variant: 'outline' as const,
     },
   ]
 
@@ -99,8 +99,8 @@ export default function BentoNav() {
           transition-all duration-500 ease-out
           ${
             isScrolled
-              ? "bg-black/80 backdrop-blur-2xl border-b border-white/10 shadow-2xl shadow-black/50"
-              : "bg-transparent"
+              ? 'bg-black/80 backdrop-blur-2xl border-b border-white/10 shadow-2xl shadow-black/50'
+              : 'bg-transparent'
           }
         `}
       >
@@ -115,7 +115,7 @@ export default function BentoNav() {
             <motion.div
               className="relative w-10 h-10 rounded-2xl overflow-hidden"
               whileHover={{ rotate: 360 }}
-              transition={{ duration: 0.6, ease: "easeInOut" }}
+              transition={{ duration: 0.6, ease: 'easeInOut' }}
             >
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500 opacity-100 group-hover:opacity-80 transition-opacity" />
               <div className="absolute inset-[2px] bg-black rounded-[14px] flex items-center justify-center">
@@ -153,7 +153,7 @@ export default function BentoNav() {
                       layoutId="activePanel"
                       className={`absolute inset-0 bg-gradient-to-r ${panel.color} rounded-full`}
                       transition={{
-                        type: "spring",
+                        type: 'spring',
                         stiffness: 400,
                         damping: 30,
                       }}
@@ -166,10 +166,10 @@ export default function BentoNav() {
 
                   <div className="relative flex items-center gap-2">
                     <Icon
-                      className={`w-4 h-4 transition-colors ${isActive ? "text-white" : "text-white/60 group-hover:text-white"}`}
+                      className={`w-4 h-4 transition-colors ${isActive ? 'text-white' : 'text-white/60 group-hover:text-white'}`}
                     />
                     <span
-                      className={`transition-colors ${isActive ? "text-white" : "text-white/60 group-hover:text-white"}`}
+                      className={`transition-colors ${isActive ? 'text-white' : 'text-white/60 group-hover:text-white'}`}
                     >
                       {panel.label}
                     </span>
@@ -191,11 +191,11 @@ export default function BentoNav() {
                       size="sm"
                       className={`
                         ${
-                          action.variant === "primary"
-                            ? "bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white"
-                            : action.variant === "secondary"
-                              ? "bg-white/10 hover:bg-white/20 text-white border border-white/20"
-                              : "bg-transparent hover:bg-white/5 text-white/60 hover:text-white border border-white/10"
+                          action.variant === 'primary'
+                            ? 'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white'
+                            : action.variant === 'secondary'
+                              ? 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
+                              : 'bg-transparent hover:bg-white/5 text-white/60 hover:text-white border border-white/10'
                         }
                       `}
                     >

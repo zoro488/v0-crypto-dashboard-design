@@ -1,17 +1,17 @@
-'use client';
+'use client'
 
 /**
  * Demo de componentes Glass 3D
  * Para visualizar y probar todos los iconos y botones
  */
 
-import { useState } from 'react';
-import { GlassButton3D, GlassButtonGroup } from './GlassButton3D';
-import { GlassNavIcon, GlassNavBar, CHRONOS_NAV_ITEMS } from './GlassNavIcons';
+import { useState } from 'react'
+import { GlassButton3D, GlassButtonGroup } from './GlassButton3D'
+import { GlassNavIcon, GlassNavBar, CHRONOS_NAV_ITEMS } from './GlassNavIcons'
 
 export function Glass3DDemo() {
-  const [activeNavIndex, setActiveNavIndex] = useState(0);
-  const [activeButtonIndex, setActiveButtonIndex] = useState(0);
+  const [activeNavIndex, setActiveNavIndex] = useState(0)
+  const [activeButtonIndex, setActiveButtonIndex] = useState(0)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 p-8">
@@ -184,7 +184,7 @@ export function Glass3DDemo() {
 
       </div>
     </div>
-  );
+  )
 }
 
-export default Glass3DDemo;
+export default Glass3DDemo

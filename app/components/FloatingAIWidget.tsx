@@ -136,8 +136,8 @@ function useAI() {
       id: '1',
       role: 'assistant',
       content: '¡Hola! Soy Chronos, tu asistente de inteligencia artificial. ¿En qué puedo ayudarte con tus finanzas hoy?',
-      timestamp: new Date()
-    }
+      timestamp: new Date(),
+    },
   ])
 
   const askAgent = useCallback(async (query: string) => {
@@ -149,7 +149,7 @@ function useAI() {
       id: Date.now().toString(),
       role: 'user',
       content: query,
-      timestamp: new Date()
+      timestamp: new Date(),
     }
     setMessages(prev => [...prev, userMessage])
     
@@ -166,14 +166,14 @@ function useAI() {
       `He analizado tu consulta sobre "${query}". Basándome en los datos del sistema, te recomiendo revisar el panel de ventas para más detalles.`,
       `Entiendo. Respecto a "${query}", los indicadores financieros muestran un comportamiento positivo este mes.`,
       `Gracias por tu pregunta. Sobre "${query}", puedo ver en el dashboard que hay oportunidades de mejora en la gestión de inventario.`,
-      `Analizando "${query}"... He encontrado patrones interesantes en tus transacciones recientes que podrían optimizar tus operaciones.`
+      `Analizando "${query}"... He encontrado patrones interesantes en tus transacciones recientes que podrían optimizar tus operaciones.`,
     ]
     
     const aiMessage: Message = {
       id: (Date.now() + 1).toString(),
       role: 'assistant',
       content: responses[Math.floor(Math.random() * responses.length)],
-      timestamp: new Date()
+      timestamp: new Date(),
     }
     
     setMessages(prev => [...prev, aiMessage])
@@ -197,7 +197,7 @@ function StatusIndicator({ status }: { status: AgentStatus }) {
     thinking: { color: 'bg-purple-500', label: 'Procesando...', icon: Brain },
     speaking: { color: 'bg-cyan-500', label: 'Respondiendo...', icon: Zap },
     success: { color: 'bg-green-500', label: 'Completado', icon: Sparkles },
-    error: { color: 'bg-red-500', label: 'Error', icon: X }
+    error: { color: 'bg-red-500', label: 'Error', icon: X },
   }
   
   const config = statusConfig[status]
@@ -214,11 +214,11 @@ function StatusIndicator({ status }: { status: AgentStatus }) {
         className={`w-2 h-2 rounded-full ${config.color}`}
         animate={{ 
           scale: status === 'idle' ? 1 : [1, 1.3, 1],
-          opacity: status === 'idle' ? 1 : [1, 0.7, 1]
+          opacity: status === 'idle' ? 1 : [1, 0.7, 1],
         }}
         transition={{ 
           duration: 1, 
-          repeat: status === 'idle' ? 0 : Infinity 
+          repeat: status === 'idle' ? 0 : Infinity, 
         }}
       />
       <span className="text-xs text-white/50">{config.label}</span>
@@ -308,7 +308,7 @@ export function FloatingAIWidget() {
                 animate={{ 
                   x: [0, 30, 0], 
                   y: [0, -20, 0],
-                  scale: [1, 1.2, 1]
+                  scale: [1, 1.2, 1],
                 }}
                 transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
               />
@@ -317,7 +317,7 @@ export function FloatingAIWidget() {
                 animate={{ 
                   x: [0, -30, 0], 
                   y: [0, 20, 0],
-                  scale: [1, 1.1, 1]
+                  scale: [1, 1.1, 1],
                 }}
                 transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
               />
@@ -448,12 +448,12 @@ export function FloatingAIWidget() {
                             className="w-2.5 h-2.5 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"
                             animate={{ 
                               y: [-3, 3, -3],
-                              opacity: [0.5, 1, 0.5]
+                              opacity: [0.5, 1, 0.5],
                             }}
                             transition={{ 
                               duration: 0.8, 
                               repeat: Infinity,
-                              delay: i * 0.15
+                              delay: i * 0.15,
                             }}
                           />
                         ))}
@@ -569,7 +569,7 @@ export function FloatingAIWidget() {
             left: 0,
             width: '100%',
             height: '100%',
-            pointerEvents: 'none'
+            pointerEvents: 'none',
           }}
         >
           <ambientLight intensity={0.5} />
@@ -591,7 +591,7 @@ export function FloatingAIWidget() {
           className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-purple-500/30 rounded-full blur-3xl -z-10"
           animate={{ 
             scale: isLoading ? [1, 1.3, 1] : [1, 1.1, 1],
-            opacity: isLoading ? [0.4, 0.6, 0.4] : [0.2, 0.3, 0.2]
+            opacity: isLoading ? [0.4, 0.6, 0.4] : [0.2, 0.3, 0.2],
           }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         />

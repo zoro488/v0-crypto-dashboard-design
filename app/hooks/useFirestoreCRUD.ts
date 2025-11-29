@@ -9,7 +9,7 @@
  * - Cleanup automático de listeners
  */
 
-"use client"
+'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { 
@@ -26,7 +26,7 @@ import {
   getDocs,
   serverTimestamp,
   DocumentData,
-  QueryConstraint
+  QueryConstraint,
 } from 'firebase/firestore'
 import { db, isFirebaseConfigured } from '@/app/lib/firebase/config'
 import { useToast } from '@/app/hooks/use-toast'
@@ -62,7 +62,7 @@ interface CRUDResult<T> {
 
 export function useFirestoreCRUD<T extends { id: string }>(
   collectionName: string,
-  options: CRUDOptions = {}
+  options: CRUDOptions = {},
 ): CRUDResult<T> {
   const [data, setData] = useState<T[]>([])
   const [loading, setLoading] = useState(true)
@@ -116,7 +116,7 @@ export function useFirestoreCRUD<T extends { id: string }>(
       
       const items = snapshot.docs.map(doc => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       })) as T[]
       
       setData(items)
@@ -152,7 +152,7 @@ export function useFirestoreCRUD<T extends { id: string }>(
         
         const items = snapshot.docs.map(doc => ({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
         })) as T[]
         
         setData(items)
@@ -169,7 +169,7 @@ export function useFirestoreCRUD<T extends { id: string }>(
         
         // Fallback a fetch único si falla realtime
         fetchData()
-      }
+      },
     )
     
     return unsubscribe
@@ -198,9 +198,9 @@ export function useFirestoreCRUD<T extends { id: string }>(
     // Guard: Verificar que Firestore está disponible
     if (!isFirebaseConfigured || !db) {
       toast({
-        title: "❌ Error",
-        description: "Firebase no está configurado",
-        variant: "destructive"
+        title: '❌ Error',
+        description: 'Firebase no está configurado',
+        variant: 'destructive',
       })
       return null
     }
@@ -209,12 +209,12 @@ export function useFirestoreCRUD<T extends { id: string }>(
       const docRef = await addDoc(collection(db, collectionName), {
         ...item,
         createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       })
       
       toast({
-        title: "✅ Guardado",
-        description: "El registro se creó correctamente"
+        title: '✅ Guardado',
+        description: 'El registro se creó correctamente',
       })
       
       logger.info(`[CRUD] Creado en ${collectionName}: ${docRef.id}`)
@@ -224,9 +224,9 @@ export function useFirestoreCRUD<T extends { id: string }>(
       logger.error(`[CRUD] Error al crear en ${collectionName}: ${errMsg}`)
       
       toast({
-        title: "❌ Error",
+        title: '❌ Error',
         description: errMsg,
-        variant: "destructive"
+        variant: 'destructive',
       })
       
       return null
@@ -238,9 +238,9 @@ export function useFirestoreCRUD<T extends { id: string }>(
     // Guard: Verificar que Firestore está disponible
     if (!isFirebaseConfigured || !db) {
       toast({
-        title: "❌ Error",
-        description: "Firebase no está configurado",
-        variant: "destructive"
+        title: '❌ Error',
+        description: 'Firebase no está configurado',
+        variant: 'destructive',
       })
       return false
     }
@@ -249,12 +249,12 @@ export function useFirestoreCRUD<T extends { id: string }>(
       const docRef = doc(db, collectionName, id)
       await updateDoc(docRef, {
         ...item,
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       })
       
       toast({
-        title: "✅ Actualizado",
-        description: "Los cambios se guardaron correctamente"
+        title: '✅ Actualizado',
+        description: 'Los cambios se guardaron correctamente',
       })
       
       logger.info(`[CRUD] Actualizado en ${collectionName}: ${id}`)
@@ -264,9 +264,9 @@ export function useFirestoreCRUD<T extends { id: string }>(
       logger.error(`[CRUD] Error al actualizar en ${collectionName}: ${errMsg}`)
       
       toast({
-        title: "❌ Error",
+        title: '❌ Error',
         description: errMsg,
-        variant: "destructive"
+        variant: 'destructive',
       })
       
       return false
@@ -276,16 +276,16 @@ export function useFirestoreCRUD<T extends { id: string }>(
   // ELIMINAR
   const remove = useCallback(async (id: string, skipConfirm = false): Promise<boolean> => {
     if (!skipConfirm) {
-      const confirmed = window.confirm("¿Estás seguro de eliminar este registro?")
+      const confirmed = window.confirm('¿Estás seguro de eliminar este registro?')
       if (!confirmed) return false
     }
     
     // Guard: Verificar que Firestore está disponible
     if (!isFirebaseConfigured || !db) {
       toast({
-        title: "❌ Error",
-        description: "Firebase no está configurado",
-        variant: "destructive"
+        title: '❌ Error',
+        description: 'Firebase no está configurado',
+        variant: 'destructive',
       })
       return false
     }
@@ -294,8 +294,8 @@ export function useFirestoreCRUD<T extends { id: string }>(
       await deleteDoc(doc(db, collectionName, id))
       
       toast({
-        title: "🗑️ Eliminado",
-        description: "El registro se eliminó correctamente"
+        title: '🗑️ Eliminado',
+        description: 'El registro se eliminó correctamente',
       })
       
       logger.info(`[CRUD] Eliminado de ${collectionName}: ${id}`)
@@ -305,9 +305,9 @@ export function useFirestoreCRUD<T extends { id: string }>(
       logger.error(`[CRUD] Error al eliminar de ${collectionName}: ${errMsg}`)
       
       toast({
-        title: "❌ Error",
+        title: '❌ Error',
         description: errMsg,
-        variant: "destructive"
+        variant: 'destructive',
       })
       
       return false
@@ -321,7 +321,7 @@ export function useFirestoreCRUD<T extends { id: string }>(
     add,
     update,
     remove,
-    refresh: fetchData
+    refresh: fetchData,
   }
 }
 
@@ -340,7 +340,7 @@ export function useProductos() {
     categoria?: string
   }>('almacen_productos', {
     orderByField: 'nombre',
-    orderDirection: 'asc'
+    orderDirection: 'asc',
   })
 }
 
@@ -353,7 +353,7 @@ export function useClientes() {
     deudaTotal: number
   }>('clientes', {
     orderByField: 'nombre',
-    orderDirection: 'asc'
+    orderDirection: 'asc',
   })
 }
 
@@ -368,7 +368,7 @@ export function useDistribuidores() {
     totalOrdenesCompra: number
   }>('distribuidores', {
     orderByField: 'nombre',
-    orderDirection: 'asc'
+    orderDirection: 'asc',
   })
 }
 
@@ -385,7 +385,7 @@ export function useVentas() {
     estadoPago: string
   }>('ventas', {
     orderByField: 'fecha',
-    orderDirection: 'desc'
+    orderDirection: 'desc',
   })
 }
 
@@ -403,7 +403,7 @@ export function useOrdenesCompra() {
     estado: string
   }>('ordenes_compra', {
     orderByField: 'fecha',
-    orderDirection: 'desc'
+    orderDirection: 'desc',
   })
 }
 
@@ -420,7 +420,7 @@ export function useMovimientos(bancoId?: string) {
     whereField: bancoId ? 'bancoId' : undefined,
     whereValue: bancoId,
     orderByField: 'fecha',
-    orderDirection: 'desc'
+    orderDirection: 'desc',
   })
 }
 

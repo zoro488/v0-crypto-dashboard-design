@@ -1,27 +1,27 @@
-'use client';
+'use client'
 
-import React, { useState, useCallback, useMemo, useRef, ChangeEvent } from 'react';
-import { motion, AnimatePresence, Reorder } from 'framer-motion';
-import { Card } from '@/app/components/ui/card';
-import { Button } from '@/app/components/ui/button';
-import { Badge } from '@/app/components/ui/badge';
-import { Input } from '@/app/components/ui/input';
-import { Label } from '@/app/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/components/ui/tabs';
+import React, { useState, useCallback, useMemo, useRef, ChangeEvent } from 'react'
+import { motion, AnimatePresence, Reorder } from 'framer-motion'
+import { Card } from '@/app/components/ui/card'
+import { Button } from '@/app/components/ui/button'
+import { Badge } from '@/app/components/ui/badge'
+import { Input } from '@/app/components/ui/input'
+import { Label } from '@/app/components/ui/label'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/components/ui/tabs'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/app/components/ui/dialog';
+} from '@/app/components/ui/dialog'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/app/components/ui/select';
+} from '@/app/components/ui/select'
 import {
   Table,
   BarChart3,
@@ -47,9 +47,9 @@ import {
   Layers,
   Type,
   Hash,
-  Image as ImageIcon
-} from 'lucide-react';
-import { logger } from '@/app/lib/utils/logger';
+  Image as ImageIcon,
+} from 'lucide-react'
+import { logger } from '@/app/lib/utils/logger'
 
 // ============================================
 // TIPOS E INTERFACES
@@ -128,7 +128,7 @@ const COMPONENT_TYPES: { type: ComponentType; icon: typeof Table; label: string;
   { type: 'kpi', icon: Hash, label: 'KPI', color: 'bg-amber-500' },
   { type: 'text', icon: Type, label: 'Texto', color: 'bg-slate-500' },
   { type: 'image', icon: ImageIcon, label: 'Imagen', color: 'bg-cyan-500' },
-];
+]
 
 const DATA_SOURCES: DataSource[] = [
   {
@@ -142,7 +142,7 @@ const DATA_SOURCES: DataSource[] = [
       { name: 'precioTotalVenta', type: 'number' },
       { name: 'metodoPago', type: 'string' },
       { name: 'estado', type: 'string' },
-    ]
+    ],
   },
   {
     id: 'ordenes_compra',
@@ -153,7 +153,7 @@ const DATA_SOURCES: DataSource[] = [
       { name: 'proveedor', type: 'string' },
       { name: 'costoTotal', type: 'number' },
       { name: 'estado', type: 'string' },
-    ]
+    ],
   },
   {
     id: 'distribuidores',
@@ -164,7 +164,7 @@ const DATA_SOURCES: DataSource[] = [
       { name: 'creditoTotal', type: 'number' },
       { name: 'creditoDisponible', type: 'number' },
       { name: 'deudaActual', type: 'number' },
-    ]
+    ],
   },
   {
     id: 'clientes',
@@ -175,7 +175,7 @@ const DATA_SOURCES: DataSource[] = [
       { name: 'email', type: 'string' },
       { name: 'telefono', type: 'string' },
       { name: 'totalCompras', type: 'number' },
-    ]
+    ],
   },
   {
     id: 'almacen',
@@ -187,7 +187,7 @@ const DATA_SOURCES: DataSource[] = [
       { name: 'stockMinimo', type: 'number' },
       { name: 'precioVenta', type: 'number' },
       { name: 'precioCompra', type: 'number' },
-    ]
+    ],
   },
   {
     id: 'bancos',
@@ -197,26 +197,26 @@ const DATA_SOURCES: DataSource[] = [
       { name: 'nombre', type: 'string' },
       { name: 'saldoActual', type: 'number' },
       { name: 'tipo', type: 'string' },
-    ]
+    ],
   },
-];
+]
 
 // ============================================
 // COMPONENTE PRINCIPAL
 // ============================================
 export const ReportBuilder = ({ onSave, initialReport }: ReportBuilderProps) => {
-  const [reportName, setReportName] = useState(initialReport?.name || 'Nuevo Reporte');
-  const [reportDescription, setReportDescription] = useState(initialReport?.description || '');
-  const [components, setComponents] = useState<ReportComponent[]>(initialReport?.components || []);
-  const [selectedComponent, setSelectedComponent] = useState<string | null>(null);
-  const [isPreviewMode, setIsPreviewMode] = useState(false);
-  const [showComponentDialog, setShowComponentDialog] = useState(false);
-  const [draggedType, setDraggedType] = useState<ComponentType | null>(null);
+  const [reportName, setReportName] = useState(initialReport?.name || 'Nuevo Reporte')
+  const [reportDescription, setReportDescription] = useState(initialReport?.description || '')
+  const [components, setComponents] = useState<ReportComponent[]>(initialReport?.components || [])
+  const [selectedComponent, setSelectedComponent] = useState<string | null>(null)
+  const [isPreviewMode, setIsPreviewMode] = useState(false)
+  const [showComponentDialog, setShowComponentDialog] = useState(false)
+  const [draggedType, setDraggedType] = useState<ComponentType | null>(null)
 
-  const canvasRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLDivElement>(null)
 
   // Generar ID único
-  const generateId = () => `comp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const generateId = () => `comp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
   // Agregar componente
   const addComponent = useCallback((type: ComponentType) => {
@@ -226,13 +226,13 @@ export const ReportBuilder = ({ onSave, initialReport }: ReportBuilderProps) => 
       title: `${COMPONENT_TYPES.find(c => c.type === type)?.label || 'Componente'} ${components.length + 1}`,
       config: getDefaultConfig(type),
       position: { row: Math.floor(components.length / 2), col: components.length % 2 },
-      size: { width: type === 'table' ? 2 : 1, height: 1 }
-    };
+      size: { width: type === 'table' ? 2 : 1, height: 1 },
+    }
 
-    setComponents(prev => [...prev, newComponent]);
-    setSelectedComponent(newComponent.id);
-    setShowComponentDialog(false);
-  }, [components.length]);
+    setComponents(prev => [...prev, newComponent])
+    setSelectedComponent(newComponent.id)
+    setShowComponentDialog(false)
+  }, [components.length])
 
   // Configuración por defecto según tipo
   const getDefaultConfig = (type: ComponentType): ComponentConfig => {
@@ -240,8 +240,8 @@ export const ReportBuilder = ({ onSave, initialReport }: ReportBuilderProps) => 
       case 'table':
         return {
           dataSource: 'ventas',
-          columns: ['fecha', 'cliente', 'precioTotalVenta', 'estado']
-        };
+          columns: ['fecha', 'cliente', 'precioTotalVenta', 'estado'],
+        }
       case 'bar-chart':
       case 'line-chart':
         return {
@@ -249,17 +249,17 @@ export const ReportBuilder = ({ onSave, initialReport }: ReportBuilderProps) => 
           chartConfig: {
             xAxis: 'fecha',
             yAxis: 'precioTotalVenta',
-            colors: ['#3b82f6', '#8b5cf6']
-          }
-        };
+            colors: ['#3b82f6', '#8b5cf6'],
+          },
+        }
       case 'pie-chart':
         return {
           dataSource: 'ventas',
           chartConfig: {
             series: ['metodoPago'],
-            colors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
-          }
-        };
+            colors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
+          },
+        }
       case 'kpi':
         return {
           dataSource: 'ventas',
@@ -267,41 +267,41 @@ export const ReportBuilder = ({ onSave, initialReport }: ReportBuilderProps) => 
             value: 'precioTotalVenta',
             label: 'Total Ventas',
             format: 'currency',
-            comparison: { type: 'previous-period' }
-          }
-        };
+            comparison: { type: 'previous-period' },
+          },
+        }
       case 'text':
         return {
           textConfig: {
             content: 'Escribe aquí tu texto...',
             fontSize: 'md',
-            alignment: 'left'
-          }
-        };
+            alignment: 'left',
+          },
+        }
       case 'image':
         return {
           imageConfig: {
             src: '',
-            alt: 'Imagen del reporte'
-          }
-        };
+            alt: 'Imagen del reporte',
+          },
+        }
       default:
-        return {};
+        return {}
     }
-  };
+  }
 
   // Eliminar componente
   const removeComponent = useCallback((id: string) => {
-    setComponents(prev => prev.filter(c => c.id !== id));
+    setComponents(prev => prev.filter(c => c.id !== id))
     if (selectedComponent === id) {
-      setSelectedComponent(null);
+      setSelectedComponent(null)
     }
-  }, [selectedComponent]);
+  }, [selectedComponent])
 
   // Duplicar componente
   const duplicateComponent = useCallback((id: string) => {
-    const original = components.find(c => c.id === id);
-    if (!original) return;
+    const original = components.find(c => c.id === id)
+    if (!original) return
 
     const duplicate: ReportComponent = {
       ...original,
@@ -309,20 +309,20 @@ export const ReportBuilder = ({ onSave, initialReport }: ReportBuilderProps) => 
       title: `${original.title} (copia)`,
       position: {
         row: original.position.row,
-        col: (original.position.col + 1) % 2
-      }
-    };
+        col: (original.position.col + 1) % 2,
+      },
+    }
 
-    setComponents(prev => [...prev, duplicate]);
-    setSelectedComponent(duplicate.id);
-  }, [components]);
+    setComponents(prev => [...prev, duplicate])
+    setSelectedComponent(duplicate.id)
+  }, [components])
 
   // Actualizar configuración de componente
   const updateComponentConfig = useCallback((id: string, updates: Partial<ReportComponent>) => {
     setComponents(prev => prev.map(c =>
-      c.id === id ? { ...c, ...updates } : c
-    ));
-  }, []);
+      c.id === id ? { ...c, ...updates } : c,
+    ))
+  }, [])
 
   // Guardar reporte
   const handleSave = useCallback(() => {
@@ -332,18 +332,18 @@ export const ReportBuilder = ({ onSave, initialReport }: ReportBuilderProps) => 
       description: reportDescription,
       components,
       filters: {},
-      updatedAt: new Date()
-    };
+      updatedAt: new Date(),
+    }
 
-    onSave?.(reportData);
-    logger.info('Reporte guardado', { data: { reportName, componentCount: components.length } });
-  }, [reportName, reportDescription, components, initialReport?.id, onSave]);
+    onSave?.(reportData)
+    logger.info('Reporte guardado', { data: { reportName, componentCount: components.length } })
+  }, [reportName, reportDescription, components, initialReport?.id, onSave])
 
   // Componente seleccionado actual
   const currentComponent = useMemo(() =>
     components.find(c => c.id === selectedComponent),
-    [components, selectedComponent]
-  );
+    [components, selectedComponent],
+  )
 
   // ============================================
   // RENDER
@@ -454,7 +454,7 @@ export const ReportBuilder = ({ onSave, initialReport }: ReportBuilderProps) => 
           onDragOver={(e) => e.preventDefault()}
           onDrop={() => {
             if (draggedType) {
-              addComponent(draggedType);
+              addComponent(draggedType)
             }
           }}
         >
@@ -512,8 +512,8 @@ export const ReportBuilder = ({ onSave, initialReport }: ReportBuilderProps) => 
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
 // ============================================
 // COMPONENTE DE TARJETA EN EL CANVAS
@@ -535,10 +535,10 @@ const ReportComponentCard = ({
   onSelect,
   onRemove,
   onDuplicate,
-  onUpdate
+  onUpdate,
 }: ReportComponentCardProps) => {
-  const typeConfig = COMPONENT_TYPES.find(c => c.type === component.type);
-  const Icon = typeConfig?.icon || FileText;
+  const typeConfig = COMPONENT_TYPES.find(c => c.type === component.type)
+  const Icon = typeConfig?.icon || FileText
 
   return (
     <motion.div
@@ -572,7 +572,7 @@ const ReportComponentCard = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={(e: React.MouseEvent) => { e.stopPropagation(); onDuplicate(); }}
+              onClick={(e: React.MouseEvent) => { e.stopPropagation(); onDuplicate() }}
               className="h-7 w-7 p-0 text-slate-500 hover:text-slate-300"
             >
               <Copy className="w-3 h-3" />
@@ -580,7 +580,7 @@ const ReportComponentCard = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={(e: React.MouseEvent) => { e.stopPropagation(); onRemove(); }}
+              onClick={(e: React.MouseEvent) => { e.stopPropagation(); onRemove() }}
               className="h-7 w-7 p-0 text-slate-500 hover:text-red-400"
             >
               <Trash2 className="w-3 h-3" />
@@ -594,8 +594,8 @@ const ReportComponentCard = ({
         <ComponentPreview component={component} />
       </div>
     </motion.div>
-  );
-};
+  )
+}
 
 // ============================================
 // PREVIEW DE COMPONENTE
@@ -618,7 +618,7 @@ const ComponentPreview = ({ component }: { component: ReportComponent }) => {
             </div>
           ))}
         </div>
-      );
+      )
 
     case 'bar-chart':
       return (
@@ -632,7 +632,7 @@ const ComponentPreview = ({ component }: { component: ReportComponent }) => {
             />
           ))}
         </div>
-      );
+      )
 
     case 'line-chart':
       return (
@@ -652,7 +652,7 @@ const ComponentPreview = ({ component }: { component: ReportComponent }) => {
             </defs>
           </svg>
         </div>
-      );
+      )
 
     case 'pie-chart':
       return (
@@ -690,7 +690,7 @@ const ComponentPreview = ({ component }: { component: ReportComponent }) => {
             />
           </svg>
         </div>
-      );
+      )
 
     case 'kpi':
       return (
@@ -706,7 +706,7 @@ const ComponentPreview = ({ component }: { component: ReportComponent }) => {
             <span className="text-slate-500">vs periodo anterior</span>
           </div>
         </div>
-      );
+      )
 
     case 'text':
       return (
@@ -722,7 +722,7 @@ const ComponentPreview = ({ component }: { component: ReportComponent }) => {
         >
           {component.config.textConfig?.content || 'Texto de ejemplo'}
         </div>
-      );
+      )
 
     case 'image':
       return (
@@ -732,12 +732,12 @@ const ComponentPreview = ({ component }: { component: ReportComponent }) => {
             <p className="text-xs text-slate-500">Imagen</p>
           </div>
         </div>
-      );
+      )
 
     default:
-      return null;
+      return null
   }
-};
+}
 
 // ============================================
 // PANEL DE CONFIGURACIÓN
@@ -749,7 +749,7 @@ interface ComponentConfigPanelProps {
 }
 
 const ComponentConfigPanel = ({ component, onUpdate, dataSources }: ComponentConfigPanelProps) => {
-  const selectedSource = dataSources.find(ds => ds.id === component.config.dataSource);
+  const selectedSource = dataSources.find(ds => ds.id === component.config.dataSource)
 
   return (
     <div className="space-y-6">
@@ -770,7 +770,7 @@ const ComponentConfigPanel = ({ component, onUpdate, dataSources }: ComponentCon
           <Select
             value={component.config.dataSource}
             onValueChange={(value: string) => onUpdate({
-              config: { ...component.config, dataSource: value }
+              config: { ...component.config, dataSource: value },
             })}
           >
             <SelectTrigger className="mt-1 bg-slate-800 border-slate-700 text-white">
@@ -801,15 +801,15 @@ const ComponentConfigPanel = ({ component, onUpdate, dataSources }: ComponentCon
                   type="checkbox"
                   checked={component.config.columns?.includes(field.name)}
                   onChange={(e) => {
-                    const columns = component.config.columns || [];
+                    const columns = component.config.columns || []
                     onUpdate({
                       config: {
                         ...component.config,
                         columns: e.target.checked
                           ? [...columns, field.name]
-                          : columns.filter(c => c !== field.name)
-                      }
-                    });
+                          : columns.filter(c => c !== field.name),
+                      },
+                    })
                   }}
                   className="rounded border-slate-600 bg-slate-800 text-blue-500"
                 />
@@ -832,8 +832,8 @@ const ComponentConfigPanel = ({ component, onUpdate, dataSources }: ComponentCon
               onChange={(e: ChangeEvent<HTMLInputElement>) => onUpdate({
                 config: {
                   ...component.config,
-                  kpiConfig: { ...component.config.kpiConfig!, label: e.target.value }
-                }
+                  kpiConfig: { ...component.config.kpiConfig!, label: e.target.value },
+                },
               })}
               className="mt-1 bg-slate-800 border-slate-700 text-white"
             />
@@ -845,8 +845,8 @@ const ComponentConfigPanel = ({ component, onUpdate, dataSources }: ComponentCon
               onValueChange={(value: 'currency' | 'number' | 'percentage') => onUpdate({
                 config: {
                   ...component.config,
-                  kpiConfig: { ...component.config.kpiConfig!, format: value }
-                }
+                  kpiConfig: { ...component.config.kpiConfig!, format: value },
+                },
               })}
             >
               <SelectTrigger className="mt-1 bg-slate-800 border-slate-700 text-white">
@@ -871,8 +871,8 @@ const ComponentConfigPanel = ({ component, onUpdate, dataSources }: ComponentCon
               onChange={(e) => onUpdate({
                 config: {
                   ...component.config,
-                  textConfig: { ...component.config.textConfig!, content: e.target.value }
-                }
+                  textConfig: { ...component.config.textConfig!, content: e.target.value },
+                },
               })}
               className="mt-1 w-full h-24 px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white text-sm resize-none"
             />
@@ -884,8 +884,8 @@ const ComponentConfigPanel = ({ component, onUpdate, dataSources }: ComponentCon
               onValueChange={(value: 'sm' | 'md' | 'lg' | 'xl') => onUpdate({
                 config: {
                   ...component.config,
-                  textConfig: { ...component.config.textConfig!, fontSize: value }
-                }
+                  textConfig: { ...component.config.textConfig!, fontSize: value },
+                },
               })}
             >
               <SelectTrigger className="mt-1 bg-slate-800 border-slate-700 text-white">
@@ -931,7 +931,7 @@ const ComponentConfigPanel = ({ component, onUpdate, dataSources }: ComponentCon
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ReportBuilder;
+export default ReportBuilder

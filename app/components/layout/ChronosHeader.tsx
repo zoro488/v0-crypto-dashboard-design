@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
-import { useAppStore } from "@/app/lib/store/useAppStore"
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
+import { useAppStore } from '@/app/lib/store/useAppStore'
 import {
   LayoutGrid,
   ShoppingCart,
@@ -35,12 +35,12 @@ import {
   Command,
   Home,
   type LucideIcon,
-} from "lucide-react"
-import { useState, useEffect, useRef, useCallback } from "react"
-import { Button } from "@/app/components/ui/button"
-import { CreateOrdenCompraModalPremium } from "@/app/components/modals/CreateOrdenCompraModalPremium"
-import { CreateVentaModalPremium } from "@/app/components/modals/CreateVentaModalPremium"
-import { CreateTransferenciaModalPremium } from "@/app/components/modals/CreateTransferenciaModalPremium"
+} from 'lucide-react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { Button } from '@/app/components/ui/button'
+import { CreateOrdenCompraModalPremium } from '@/app/components/modals/CreateOrdenCompraModalPremium'
+import { CreateVentaModalPremium } from '@/app/components/modals/CreateVentaModalPremium'
+import { CreateTransferenciaModalPremium } from '@/app/components/modals/CreateTransferenciaModalPremium'
 
 // ============================================================
 // TIPOS
@@ -66,37 +66,37 @@ interface DropdownItem {
 // CONFIGURACIÓN DE PANELES
 // ============================================================
 const mainPanels: PanelItem[] = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutGrid, color: "from-blue-500 to-cyan-500", description: "Vista general del sistema" },
-  { id: "ventas", label: "Ventas", icon: ShoppingCart, color: "from-green-500 to-emerald-500", description: "Gestión de ventas" },
-  { id: "ordenes", label: "Órdenes", icon: Package, color: "from-purple-500 to-violet-500", description: "Órdenes de compra" },
-  { id: "almacen", label: "Almacén", icon: Warehouse, color: "from-amber-500 to-yellow-600", description: "Control de inventario" },
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid, color: 'from-blue-500 to-cyan-500', description: 'Vista general del sistema' },
+  { id: 'ventas', label: 'Ventas', icon: ShoppingCart, color: 'from-green-500 to-emerald-500', description: 'Gestión de ventas' },
+  { id: 'ordenes', label: 'Órdenes', icon: Package, color: 'from-purple-500 to-violet-500', description: 'Órdenes de compra' },
+  { id: 'almacen', label: 'Almacén', icon: Warehouse, color: 'from-amber-500 to-yellow-600', description: 'Control de inventario' },
 ]
 
 const bancosItems: PanelItem[] = [
-  { id: "banco", label: "Todos los Bancos", icon: Building2, color: "from-blue-600 to-indigo-600", description: "Vista consolidada" },
-  { id: "boveda_monte", label: "Bóveda Monte", icon: Wallet, color: "from-blue-500 to-cyan-500", description: "Capital principal MXN" },
-  { id: "boveda_usa", label: "Bóveda USA", icon: Globe, color: "from-red-500 to-blue-500", description: "Capital en USD" },
-  { id: "utilidades", label: "Utilidades", icon: TrendingUp, color: "from-green-500 to-emerald-500", description: "Ganancias netas" },
-  { id: "flete_sur", label: "Flete Sur", icon: Package, color: "from-orange-500 to-amber-500", description: "Transporte" },
-  { id: "azteca", label: "Azteca", icon: CreditCard, color: "from-purple-500 to-pink-500", description: "Cuenta externa" },
-  { id: "leftie", label: "Leftie", icon: PiggyBank, color: "from-yellow-500 to-orange-500", description: "Capital secundario" },
-  { id: "profit", label: "Profit", icon: DollarSign, color: "from-indigo-500 to-purple-500", description: "Banco operativo" },
+  { id: 'banco', label: 'Todos los Bancos', icon: Building2, color: 'from-blue-600 to-indigo-600', description: 'Vista consolidada' },
+  { id: 'boveda_monte', label: 'Bóveda Monte', icon: Wallet, color: 'from-blue-500 to-cyan-500', description: 'Capital principal MXN' },
+  { id: 'boveda_usa', label: 'Bóveda USA', icon: Globe, color: 'from-red-500 to-blue-500', description: 'Capital en USD' },
+  { id: 'utilidades', label: 'Utilidades', icon: TrendingUp, color: 'from-green-500 to-emerald-500', description: 'Ganancias netas' },
+  { id: 'flete_sur', label: 'Flete Sur', icon: Package, color: 'from-orange-500 to-amber-500', description: 'Transporte' },
+  { id: 'azteca', label: 'Azteca', icon: CreditCard, color: 'from-purple-500 to-pink-500', description: 'Cuenta externa' },
+  { id: 'leftie', label: 'Leftie', icon: PiggyBank, color: 'from-yellow-500 to-orange-500', description: 'Capital secundario' },
+  { id: 'profit', label: 'Profit', icon: DollarSign, color: 'from-indigo-500 to-purple-500', description: 'Banco operativo' },
 ]
 
 const gestionItems: PanelItem[] = [
-  { id: "distribuidores", label: "Distribuidores", icon: Users, color: "from-orange-500 to-red-500", description: "Proveedores" },
-  { id: "clientes", label: "Clientes", icon: UserCheck, color: "from-pink-500 to-rose-500", description: "Cartera de clientes" },
-  { id: "reportes", label: "Reportes", icon: BarChart3, color: "from-teal-500 to-cyan-600", description: "Análisis y reportes" },
-  { id: "ia", label: "Asistente IA", icon: Sparkles, color: "from-violet-500 to-purple-600", description: "Inteligencia artificial" },
+  { id: 'distribuidores', label: 'Distribuidores', icon: Users, color: 'from-orange-500 to-red-500', description: 'Proveedores' },
+  { id: 'clientes', label: 'Clientes', icon: UserCheck, color: 'from-pink-500 to-rose-500', description: 'Cartera de clientes' },
+  { id: 'reportes', label: 'Reportes', icon: BarChart3, color: 'from-teal-500 to-cyan-600', description: 'Análisis y reportes' },
+  { id: 'ia', label: 'Asistente IA', icon: Sparkles, color: 'from-violet-500 to-purple-600', description: 'Inteligencia artificial' },
 ]
 
 const splineItems: DropdownItem[] = [
-  { id: "3d_dropdown", label: "3D Dropdown Menu", icon: Box, color: "from-cyan-500 to-blue-500" },
-  { id: "glass_buttons", label: "Glass Buttons", icon: Layers, color: "from-purple-500 to-pink-500" },
-  { id: "ai_orb", label: "AI Voice Orb", icon: Sparkles, color: "from-violet-500 to-fuchsia-500" },
-  { id: "fire_portal", label: "Fire Portal", icon: Zap, color: "from-orange-500 to-red-500" },
-  { id: "nexbot", label: "Nexbot Robot", icon: Activity, color: "from-green-500 to-emerald-500" },
-  { id: "particle_nebula", label: "Particle Nebula", icon: Eye, color: "from-indigo-500 to-purple-500" },
+  { id: '3d_dropdown', label: '3D Dropdown Menu', icon: Box, color: 'from-cyan-500 to-blue-500' },
+  { id: 'glass_buttons', label: 'Glass Buttons', icon: Layers, color: 'from-purple-500 to-pink-500' },
+  { id: 'ai_orb', label: 'AI Voice Orb', icon: Sparkles, color: 'from-violet-500 to-fuchsia-500' },
+  { id: 'fire_portal', label: 'Fire Portal', icon: Zap, color: 'from-orange-500 to-red-500' },
+  { id: 'nexbot', label: 'Nexbot Robot', icon: Activity, color: 'from-green-500 to-emerald-500' },
+  { id: 'particle_nebula', label: 'Particle Nebula', icon: Eye, color: 'from-indigo-500 to-purple-500' },
 ]
 
 // ============================================================
@@ -123,7 +123,7 @@ const MegaDropdown = ({
   onClose, 
   onSelect, 
   currentPanel,
-  columns = 2 
+  columns = 2, 
 }: MegaDropdownProps) => {
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -134,9 +134,9 @@ const MegaDropdown = ({
       }
     }
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside)
+      document.addEventListener('mousedown', handleClickOutside)
     }
-    return () => document.removeEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [isOpen, onClose])
 
   return (
@@ -146,8 +146,8 @@ const MegaDropdown = ({
         className={`
           flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all
           ${isOpen 
-            ? "bg-white/10 text-white" 
-            : "text-white/60 hover:text-white hover:bg-white/5"
+            ? 'bg-white/10 text-white' 
+            : 'text-white/60 hover:text-white hover:bg-white/5'
           }
         `}
         whileHover={{ scale: 1.02 }}
@@ -155,7 +155,7 @@ const MegaDropdown = ({
       >
         <Icon className="w-4 h-4" />
         <span className="hidden sm:inline">{title}</span>
-        <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </motion.button>
 
       <AnimatePresence>
@@ -164,7 +164,7 @@ const MegaDropdown = ({
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
             className="absolute top-full left-0 mt-2 z-50"
           >
             <div className="bg-black/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden min-w-[280px]">
@@ -179,7 +179,7 @@ const MegaDropdown = ({
               </div>
 
               {/* Items Grid */}
-              <div className={`p-2 grid gap-1 ${columns > 1 ? `grid-cols-${columns}` : ""}`} style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
+              <div className={`p-2 grid gap-1 ${columns > 1 ? `grid-cols-${columns}` : ''}`} style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
                 {items.map((item) => {
                   const ItemIcon = item.icon
                   const isActive = currentPanel === item.id
@@ -193,8 +193,8 @@ const MegaDropdown = ({
                       className={`
                         flex items-center gap-3 p-3 rounded-xl text-left transition-all w-full
                         ${isActive 
-                          ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30" 
-                          : "hover:bg-white/5 border border-transparent"
+                          ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30' 
+                          : 'hover:bg-white/5 border border-transparent'
                         }
                       `}
                       whileHover={{ scale: 1.02, x: 4 }}
@@ -204,7 +204,7 @@ const MegaDropdown = ({
                         <ItemIcon className="w-4 h-4 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-medium truncate ${isActive ? "text-white" : "text-white/80"}`}>
+                        <p className={`text-sm font-medium truncate ${isActive ? 'text-white' : 'text-white/80'}`}>
                           {item.label}
                         </p>
                         {item.description && (
@@ -245,9 +245,9 @@ const SplineDropdown = ({ isOpen, onToggle, onClose }: SplineDropdownProps) => {
       }
     }
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside)
+      document.addEventListener('mousedown', handleClickOutside)
     }
-    return () => document.removeEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [isOpen, onClose])
 
   return (
@@ -257,14 +257,14 @@ const SplineDropdown = ({ isOpen, onToggle, onClose }: SplineDropdownProps) => {
         className={`
           flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all
           bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20
-          ${isOpen ? "text-white" : "text-purple-300 hover:text-white"}
+          ${isOpen ? 'text-white' : 'text-purple-300 hover:text-white'}
         `}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
         <Box className="w-4 h-4" />
         <span className="hidden md:inline">3D</span>
-        <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </motion.button>
 
       <AnimatePresence>
@@ -273,7 +273,7 @@ const SplineDropdown = ({ isOpen, onToggle, onClose }: SplineDropdownProps) => {
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
             className="absolute top-full right-0 mt-2 z-50"
           >
             <div className="bg-black/90 backdrop-blur-2xl border border-purple-500/20 rounded-2xl shadow-2xl shadow-purple-500/10 overflow-hidden w-64">
@@ -283,7 +283,7 @@ const SplineDropdown = ({ isOpen, onToggle, onClose }: SplineDropdownProps) => {
                   <motion.div 
                     className="p-1.5 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500"
                     animate={{ rotate: [0, 360] }}
-                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
                   >
                     <Box className="w-4 h-4 text-white" />
                   </motion.div>
@@ -370,10 +370,10 @@ const MobileMenu = ({ isOpen, onClose, currentPanel, onPanelSelect, onAction }: 
 
           {/* Menu Panel */}
           <motion.div
-            initial={{ x: "100%" }}
+            initial={{ x: '100%' }}
             animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className="fixed right-0 top-0 bottom-0 w-[85vw] max-w-sm bg-black/95 backdrop-blur-xl border-l border-white/10 z-50 overflow-y-auto"
           >
             {/* Header */}
@@ -401,10 +401,10 @@ const MobileMenu = ({ isOpen, onClose, currentPanel, onPanelSelect, onAction }: 
               <p className="text-xs text-white/40 uppercase tracking-wider mb-3">Acciones Rápidas</p>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { label: "Nueva Venta", icon: DollarSign, action: "venta", color: "from-green-500 to-emerald-500" },
-                  { label: "Nueva Orden", icon: Plus, action: "orden", color: "from-blue-500 to-cyan-500" },
-                  { label: "Transferencia", icon: ArrowRightLeft, action: "transferencia", color: "from-purple-500 to-pink-500" },
-                  { label: "Reporte", icon: FileText, action: "reporte", color: "from-orange-500 to-amber-500" },
+                  { label: 'Nueva Venta', icon: DollarSign, action: 'venta', color: 'from-green-500 to-emerald-500' },
+                  { label: 'Nueva Orden', icon: Plus, action: 'orden', color: 'from-blue-500 to-cyan-500' },
+                  { label: 'Transferencia', icon: ArrowRightLeft, action: 'transferencia', color: 'from-purple-500 to-pink-500' },
+                  { label: 'Reporte', icon: FileText, action: 'reporte', color: 'from-orange-500 to-amber-500' },
                 ].map((item) => {
                   const Icon = item.icon
                   return (
@@ -441,15 +441,15 @@ const MobileMenu = ({ isOpen, onClose, currentPanel, onPanelSelect, onAction }: 
                       }}
                       className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${
                         isActive 
-                          ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30" 
-                          : "hover:bg-white/5"
+                          ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30' 
+                          : 'hover:bg-white/5'
                       }`}
                       whileTap={{ scale: 0.98 }}
                     >
                       <div className={`p-2 rounded-lg bg-gradient-to-br ${panel.color}`}>
                         <Icon className="w-4 h-4 text-white" />
                       </div>
-                      <span className={isActive ? "text-white font-medium" : "text-white/70"}>
+                      <span className={isActive ? 'text-white font-medium' : 'text-white/70'}>
                         {panel.label}
                       </span>
                       {isActive && <div className="ml-auto w-2 h-2 rounded-full bg-blue-500" />}
@@ -469,7 +469,7 @@ const MobileMenu = ({ isOpen, onClose, currentPanel, onPanelSelect, onAction }: 
                     <motion.button
                       key={banco.id}
                       onClick={() => {
-                        onPanelSelect("banco")
+                        onPanelSelect('banco')
                         onClose()
                       }}
                       className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all"
@@ -512,24 +512,24 @@ export default function ChronosHeader() {
   // Scroll detection
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20)
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   // Keyboard shortcut: Cmd+K
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault()
         setShowSearch(true)
       }
-      if (e.key === "Escape") {
+      if (e.key === 'Escape') {
         setShowSearch(false)
         setActiveDropdown(null)
       }
     }
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
   const handleDropdownToggle = useCallback((dropdown: string) => {
@@ -538,17 +538,17 @@ export default function ChronosHeader() {
 
   const handleAction = useCallback((action: string) => {
     switch (action) {
-      case "venta":
+      case 'venta':
         setShowVentaModal(true)
         break
-      case "orden":
+      case 'orden':
         setShowOrdenModal(true)
         break
-      case "transferencia":
+      case 'transferencia':
         setShowTransferenciaModal(true)
         break
-      case "reporte":
-        setCurrentPanel("reportes")
+      case 'reporte':
+        setCurrentPanel('reportes')
         break
     }
   }, [setCurrentPanel])
@@ -561,8 +561,8 @@ export default function ChronosHeader() {
           fixed top-0 left-0 right-0 z-50 
           transition-all duration-500 ease-out
           ${isScrolled
-            ? "bg-black/80 backdrop-blur-2xl border-b border-white/10 shadow-2xl shadow-black/50"
-            : "bg-black/40 backdrop-blur-xl"
+            ? 'bg-black/80 backdrop-blur-2xl border-b border-white/10 shadow-2xl shadow-black/50'
+            : 'bg-black/40 backdrop-blur-xl'
           }
         `}
       >
@@ -572,12 +572,12 @@ export default function ChronosHeader() {
             className="flex items-center gap-2 md:gap-3 cursor-pointer group shrink-0"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => setCurrentPanel("dashboard")}
+            onClick={() => setCurrentPanel('dashboard')}
           >
             <motion.div
               className="relative w-9 h-9 md:w-10 md:h-10 rounded-xl md:rounded-2xl overflow-hidden"
               whileHover={{ rotate: 360 }}
-              transition={{ duration: 0.6, ease: "easeInOut" }}
+              transition={{ duration: 0.6, ease: 'easeInOut' }}
             >
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500" />
               <div className="absolute inset-[2px] bg-black rounded-[10px] md:rounded-[14px] flex items-center justify-center">
@@ -600,12 +600,12 @@ export default function ChronosHeader() {
           <nav className="hidden lg:flex items-center gap-1 bg-white/5 backdrop-blur-xl rounded-xl p-1 border border-white/10">
             {/* Home Button */}
             <motion.button
-              onClick={() => setCurrentPanel("dashboard")}
+              onClick={() => setCurrentPanel('dashboard')}
               className={`
                 flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all
-                ${currentPanel === "dashboard" 
-                  ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg shadow-blue-500/30" 
-                  : "text-white/60 hover:text-white hover:bg-white/5"
+                ${currentPanel === 'dashboard' 
+                  ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg shadow-blue-500/30' 
+                  : 'text-white/60 hover:text-white hover:bg-white/5'
                 }
               `}
               whileHover={{ scale: 1.02 }}
@@ -620,8 +620,8 @@ export default function ChronosHeader() {
               title="Operaciones"
               icon={Zap}
               items={mainPanels}
-              isOpen={activeDropdown === "operaciones"}
-              onToggle={() => handleDropdownToggle("operaciones")}
+              isOpen={activeDropdown === 'operaciones'}
+              onToggle={() => handleDropdownToggle('operaciones')}
               onClose={() => setActiveDropdown(null)}
               onSelect={setCurrentPanel}
               currentPanel={currentPanel}
@@ -633,8 +633,8 @@ export default function ChronosHeader() {
               title="Bancos"
               icon={Building2}
               items={bancosItems}
-              isOpen={activeDropdown === "bancos"}
-              onToggle={() => handleDropdownToggle("bancos")}
+              isOpen={activeDropdown === 'bancos'}
+              onToggle={() => handleDropdownToggle('bancos')}
               onClose={() => setActiveDropdown(null)}
               onSelect={setCurrentPanel}
               currentPanel={currentPanel}
@@ -646,8 +646,8 @@ export default function ChronosHeader() {
               title="Gestión"
               icon={Users}
               items={gestionItems}
-              isOpen={activeDropdown === "gestion"}
-              onToggle={() => handleDropdownToggle("gestion")}
+              isOpen={activeDropdown === 'gestion'}
+              onToggle={() => handleDropdownToggle('gestion')}
               onClose={() => setActiveDropdown(null)}
               onSelect={setCurrentPanel}
               currentPanel={currentPanel}
@@ -656,8 +656,8 @@ export default function ChronosHeader() {
 
             {/* Spline 3D Dropdown */}
             <SplineDropdown
-              isOpen={activeDropdown === "spline"}
-              onToggle={() => handleDropdownToggle("spline")}
+              isOpen={activeDropdown === 'spline'}
+              onToggle={() => handleDropdownToggle('spline')}
               onClose={() => setActiveDropdown(null)}
             />
           </nav>

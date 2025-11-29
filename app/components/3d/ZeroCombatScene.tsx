@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * ZeroCombatScene - Escena 3D de combate táctica para Zero
@@ -20,7 +20,7 @@ import {
   Grid as DreiGrid,
   Sparkles,
   MeshDistortMaterial,
-  GradientTexture
+  GradientTexture,
 } from '@react-three/drei'
 import * as THREE from 'three'
 import { ZeroAvatar, ZeroState } from './ZeroAvatar'
@@ -260,7 +260,7 @@ function DramaticLighting({ state }: { state: ZeroState }) {
     processing: '#7c3aed', // Violeta
     combat: '#dc2626',    // Rojo intenso
     success: '#10b981',   // Verde esmeralda
-    error: '#f97316'      // Naranja
+    error: '#f97316',      // Naranja
   }), [])
   
   useFrame((stateThree) => {
@@ -365,7 +365,7 @@ function EnergyOrb({ state }: { state: ZeroState }) {
     processing: '#8b5cf6',
     combat: '#ef4444',
     success: '#22c55e',
-    error: '#f97316'
+    error: '#f97316',
   }), [])
   
   useFrame((stateThree) => {
@@ -417,7 +417,7 @@ function SceneContent({
   showGrid, 
   showParticles, 
   showStars,
-  enableMouseTracking
+  enableMouseTracking,
 }: Omit<ZeroCombatSceneProps, 'className' | 'cameraPosition' | 'onStateChange'>) {
   
   const gridColor = useMemo(() => {
@@ -530,7 +530,7 @@ export function ZeroCombatScene({
   showStars = true,
   cameraPosition = [0, 0, 6],
   enableMouseTracking = true,
-  className = ''
+  className = '',
 }: ZeroCombatSceneProps) {
   
   return (
@@ -540,14 +540,14 @@ export function ZeroCombatScene({
           position: cameraPosition,
           fov: 50,
           near: 0.1,
-          far: 1000
+          far: 1000,
         }}
         shadows
         dpr={[1, 2]}
         gl={{
           antialias: true,
           alpha: true,
-          powerPreference: 'high-performance'
+          powerPreference: 'high-performance',
         }}
         style={{ background: 'transparent' }}
       >

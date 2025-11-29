@@ -107,7 +107,7 @@ export function addBreadcrumb(
   message: string,
   category: string,
   level: Sentry.SeverityLevel = 'info',
-  data?: Record<string, any>
+  data?: Record<string, any>,
 ) {
   Sentry.addBreadcrumb({
     message,

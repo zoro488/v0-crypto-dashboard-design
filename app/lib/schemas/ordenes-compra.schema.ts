@@ -3,36 +3,36 @@
  * @module schemas/ordenes-compra
  */
 
-import { z } from "zod"
+import { z } from 'zod'
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ESQUEMAS BASE
 // ═══════════════════════════════════════════════════════════════════════════
 
-const MontoSchema = z.number().positive("El monto debe ser mayor a 0")
-const CantidadSchema = z.number().int().positive("La cantidad debe ser mayor a 0")
+const MontoSchema = z.number().positive('El monto debe ser mayor a 0')
+const CantidadSchema = z.number().int().positive('La cantidad debe ser mayor a 0')
 const FechaSchema = z.string().datetime().or(z.date())
 
 /**
  * IDs de bancos válidos
  */
 const BancoIdSchema = z.enum([
-  "boveda_monte",
-  "boveda_usa",
-  "utilidades",
-  "flete_sur",
-  "azteca",
-  "leftie",
-  "profit"
+  'boveda_monte',
+  'boveda_usa',
+  'utilidades',
+  'flete_sur',
+  'azteca',
+  'leftie',
+  'profit',
 ], {
-  errorMap: () => ({ message: "Banco inválido" }),
+  errorMap: () => ({ message: 'Banco inválido' }),
 })
 
 /**
  * Estados posibles de una orden de compra
  */
-export const EstadoOrdenSchema = z.enum(["pendiente", "parcial", "pagado", "cancelado"], {
-  errorMap: () => ({ message: "Estado de orden inválido" }),
+export const EstadoOrdenSchema = z.enum(['pendiente', 'parcial', 'pagado', 'cancelado'], {
+  errorMap: () => ({ message: 'Estado de orden inválido' }),
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -46,17 +46,17 @@ export const CrearOrdenCompraSchema = z.object({
   fecha: FechaSchema.optional().default(() => new Date().toISOString()),
   
   // Distribuidor
-  distribuidorId: z.string().min(1, "El distribuidor es requerido"),
-  distribuidor: z.string().min(1, "El nombre del distribuidor es requerido"),
+  distribuidorId: z.string().min(1, 'El distribuidor es requerido'),
+  distribuidor: z.string().min(1, 'El nombre del distribuidor es requerido'),
   origen: z.string().optional(),
   
   // Producto/Cantidad
-  producto: z.string().min(1, "El producto es requerido").max(100),
+  producto: z.string().min(1, 'El producto es requerido').max(100),
   cantidad: CantidadSchema,
   
   // Costos
   costoDistribuidor: MontoSchema,
-  costoTransporte: z.number().min(0, "El costo de transporte no puede ser negativo").default(0),
+  costoTransporte: z.number().min(0, 'El costo de transporte no puede ser negativo').default(0),
   costoPorUnidad: MontoSchema,
   costoTotal: MontoSchema,
   
@@ -71,7 +71,7 @@ export const CrearOrdenCompraSchema = z.object({
   bancoOrigen: BancoIdSchema.optional(),
   
   // Estado
-  estado: EstadoOrdenSchema.default("pendiente"),
+  estado: EstadoOrdenSchema.default('pendiente'),
   
   // Notas
   notas: z.string().max(500).optional(),
@@ -83,9 +83,9 @@ export const CrearOrdenCompraSchema = z.object({
       return Math.abs(data.costoPorUnidad - costoCalculado) < 0.01
     },
     {
-      message: "El costo por unidad debe ser igual a costo distribuidor + costo transporte",
-      path: ["costoPorUnidad"],
-    }
+      message: 'El costo por unidad debe ser igual a costo distribuidor + costo transporte',
+      path: ['costoPorUnidad'],
+    },
   )
   .refine(
     (data) => {
@@ -94,9 +94,9 @@ export const CrearOrdenCompraSchema = z.object({
       return Math.abs(data.costoTotal - totalCalculado) < 0.01
     },
     {
-      message: "El costo total no coincide con costo por unidad × cantidad",
-      path: ["costoTotal"],
-    }
+      message: 'El costo total no coincide con costo por unidad × cantidad',
+      path: ['costoTotal'],
+    },
   )
   .refine(
     (data) => {
@@ -105,9 +105,9 @@ export const CrearOrdenCompraSchema = z.object({
       return Math.abs(pagoTotal - data.costoTotal) < 0.01
     },
     {
-      message: "La suma de pago inicial y deuda debe igualar el costo total",
-      path: ["deuda"],
-    }
+      message: 'La suma de pago inicial y deuda debe igualar el costo total',
+      path: ['deuda'],
+    },
   )
   .refine(
     (data) => {
@@ -119,9 +119,9 @@ export const CrearOrdenCompraSchema = z.object({
       return true
     },
     {
-      message: "Si hay pago inicial, debe especificar el banco de origen",
-      path: ["bancoOrigen"],
-    }
+      message: 'Si hay pago inicial, debe especificar el banco de origen',
+      path: ['bancoOrigen'],
+    },
   )
 
 /**
@@ -170,7 +170,7 @@ export const OrdenCompraSchema = z.object({
   pagoInicial: z.number().min(0).default(0),
   deuda: z.number().min(0),
   bancoOrigen: BancoIdSchema.optional(),
-  estado: EstadoOrdenSchema.default("pendiente"),
+  estado: EstadoOrdenSchema.default('pendiente'),
   notas: z.string().max(500).optional(),
   keywords: z.array(z.string()).default([]),
   createdAt: z.any().optional(),
@@ -185,8 +185,8 @@ export const OrdenCompraSchema = z.object({
  * Esquema para registrar un pago a distribuidor
  */
 export const PagoDistribuidorSchema = z.object({
-  distribuidorId: z.string().min(1, "El ID del distribuidor es requerido"),
-  ordenCompraId: z.string().min(1, "El ID de la orden de compra es requerido"),
+  distribuidorId: z.string().min(1, 'El ID del distribuidor es requerido'),
+  ordenCompraId: z.string().min(1, 'El ID de la orden de compra es requerido'),
   monto: MontoSchema,
   bancoOrigenId: BancoIdSchema,
   fecha: FechaSchema.optional().default(() => new Date().toISOString()),
@@ -223,7 +223,7 @@ export function validarOrdenCompra(data: unknown): {
   
   return {
     success: false,
-    errors: result.error.errors.map((e) => `${e.path.join(".")}: ${e.message}`),
+    errors: result.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`),
   }
 }
 
@@ -243,7 +243,27 @@ export function validarPagoDistribuidor(data: unknown): {
   
   return {
     success: false,
-    errors: result.error.errors.map((e) => `${e.path.join(".")}: ${e.message}`),
+    errors: result.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`),
+  }
+}
+
+/**
+ * Valida actualización parcial de orden de compra
+ */
+export function validarActualizacionOrdenCompra(data: unknown): {
+  success: boolean
+  data?: ActualizarOrdenCompraInput
+  errors?: string[]
+} {
+  const result = ActualizarOrdenCompraSchema.safeParse(data)
+  
+  if (result.success) {
+    return { success: true, data: result.data }
+  }
+  
+  return {
+    success: false,
+    errors: result.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`),
   }
 }
 
@@ -254,7 +274,7 @@ export function generarKeywordsOrdenCompra(
   id: string,
   distribuidor: string,
   producto: string,
-  origen?: string
+  origen?: string,
 ): string[] {
   const keywords: string[] = []
   

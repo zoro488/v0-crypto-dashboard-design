@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import type React from "react"
-import { useState, useCallback, useMemo } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import type React from 'react'
+import { useState, useCallback, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   X, 
   Users, 
@@ -14,31 +14,31 @@ import {
   Sparkles,
   Mic,
   CheckCircle2,
-  AlertCircle
-} from "lucide-react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
+  AlertCircle,
+} from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogDescription,
-} from "@/app/components/ui/dialog"
-import { cn } from "@/app/lib/utils"
-import { firestoreService } from "@/app/lib/firebase/firestore-service"
-import { useToast } from "@/app/hooks/use-toast"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { logger } from "@/app/lib/utils/logger"
-import { BANCOS } from "@/app/lib/constants"
+} from '@/app/components/ui/dialog'
+import { cn } from '@/app/lib/utils'
+import { firestoreService } from '@/app/lib/firebase/firestore-service'
+import { useToast } from '@/app/hooks/use-toast'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { logger } from '@/app/lib/utils/logger'
+import { BANCOS } from '@/app/lib/constants'
 
 // Schema de validación Zod
 const abonoSchema = z.object({
-  tipo: z.enum(["distribuidor", "cliente"]),
-  entidadId: z.string().min(1, "Selecciona una entidad"),
-  monto: z.number().positive("El monto debe ser mayor a 0"),
-  bancoDestino: z.string().min(1, "Selecciona un banco destino"),
-  metodo: z.enum(["efectivo", "transferencia", "cheque"]),
+  tipo: z.enum(['distribuidor', 'cliente']),
+  entidadId: z.string().min(1, 'Selecciona una entidad'),
+  monto: z.number().positive('El monto debe ser mayor a 0'),
+  bancoDestino: z.string().min(1, 'Selecciona un banco destino'),
+  metodo: z.enum(['efectivo', 'transferencia', 'cheque']),
   referencia: z.string().optional(),
   notas: z.string().optional(),
 })
@@ -52,15 +52,15 @@ interface CreateAbonoModalSmartProps {
 }
 
 const METODO_PAGO_OPTIONS = [
-  { value: "efectivo", label: "Efectivo", icon: "💵" },
-  { value: "transferencia", label: "Transferencia", icon: "📲" },
-  { value: "cheque", label: "Cheque", icon: "📝" },
+  { value: 'efectivo', label: 'Efectivo', icon: '💵' },
+  { value: 'transferencia', label: 'Transferencia', icon: '📲' },
+  { value: 'cheque', label: 'Cheque', icon: '📝' },
 ]
 
 export default function CreateAbonoModalSmart({ 
   isOpen, 
   onClose, 
-  onSubmit 
+  onSubmit, 
 }: CreateAbonoModalSmartProps) {
   const { toast } = useToast()
   const distribuidores = useAppStore((state) => state.distribuidores)
@@ -82,27 +82,27 @@ export default function CreateAbonoModalSmart({
     formState: { errors, isValid },
   } = useForm<AbonoFormData>({
     resolver: zodResolver(abonoSchema),
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
-      tipo: "distribuidor",
-      entidadId: "",
+      tipo: 'distribuidor',
+      entidadId: '',
       monto: 0,
-      bancoDestino: "",
-      metodo: "efectivo",
-      referencia: "",
-      notas: "",
+      bancoDestino: '',
+      metodo: 'efectivo',
+      referencia: '',
+      notas: '',
     },
   })
 
-  const watchedTipo = watch("tipo")
-  const watchedEntidadId = watch("entidadId")
-  const watchedMonto = watch("monto")
-  const watchedBancoDestino = watch("bancoDestino")
-  const watchedMetodo = watch("metodo")
+  const watchedTipo = watch('tipo')
+  const watchedEntidadId = watch('entidadId')
+  const watchedMonto = watch('monto')
+  const watchedBancoDestino = watch('bancoDestino')
+  const watchedMetodo = watch('metodo')
 
   // Obtener entidades según el tipo seleccionado
   const entidades = useMemo(() => {
-    return watchedTipo === "distribuidor" ? distribuidores : clientes
+    return watchedTipo === 'distribuidor' ? distribuidores : clientes
   }, [watchedTipo, distribuidores, clientes])
 
   // Obtener entidad seleccionada
@@ -113,8 +113,8 @@ export default function CreateAbonoModalSmart({
   const handleVoiceFill = useCallback(() => {
     setIsVoiceActive(true)
     toast({
-      title: "Modo Voz Activado",
-      description: "Próximamente: Dicta la información del abono",
+      title: 'Modo Voz Activado',
+      description: 'Próximamente: Dicta la información del abono',
     })
     setTimeout(() => setIsVoiceActive(false), 2000)
   }, [toast])
@@ -130,12 +130,12 @@ export default function CreateAbonoModalSmart({
         monto: data.monto,
         bancoDestino: data.bancoDestino,
         metodo: data.metodo,
-        referencia: data.referencia || "",
-        notas: data.notas || "",
+        referencia: data.referencia || '',
+        notas: data.notas || '',
       })
 
       // Actualizar estado local
-      if (data.tipo === "distribuidor") {
+      if (data.tipo === 'distribuidor') {
         abonarDistribuidor(data.entidadId, data.monto, data.bancoDestino)
       } else {
         abonarCliente(data.entidadId, data.monto)
@@ -149,7 +149,7 @@ export default function CreateAbonoModalSmart({
       }
 
       toast({
-        title: "✅ Abono Registrado",
+        title: '✅ Abono Registrado',
         description: `Se ha registrado el abono de $${data.monto.toLocaleString()} correctamente.`,
       })
 
@@ -158,11 +158,11 @@ export default function CreateAbonoModalSmart({
       setStep(1)
       onClose()
     } catch (error) {
-      logger.error("Error creating abono", error, { context: "CreateAbonoModalSmart" })
+      logger.error('Error creating abono', error, { context: 'CreateAbonoModalSmart' })
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Error al registrar el abono.",
-        variant: "destructive",
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Error al registrar el abono.',
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -182,10 +182,10 @@ export default function CreateAbonoModalSmart({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
         className={cn(
-          "max-w-2xl max-h-[85vh] p-0",
-          "bg-black/95 border-white/10 backdrop-blur-2xl",
-          "text-white overflow-hidden flex flex-col",
-          "shadow-2xl shadow-blue-500/10"
+          'max-w-2xl max-h-[85vh] p-0',
+          'bg-black/95 border-white/10 backdrop-blur-2xl',
+          'text-white overflow-hidden flex flex-col',
+          'shadow-2xl shadow-blue-500/10',
         )}
       >
         <DialogTitle className="sr-only">Registrar Abono</DialogTitle>
@@ -212,8 +212,8 @@ export default function CreateAbonoModalSmart({
                 whileTap={{ scale: 0.95 }}
                 className={`absolute right-16 top-4 sm:right-20 sm:top-6 p-2 rounded-xl transition-all ${
                   isVoiceActive 
-                    ? "bg-blue-500/30 text-blue-300" 
-                    : "hover:bg-white/10 text-gray-400 hover:text-white"
+                    ? 'bg-blue-500/30 text-blue-300' 
+                    : 'hover:bg-white/10 text-gray-400 hover:text-white'
                 }`}
               >
                 <Mic className="w-5 h-5" />
@@ -236,7 +236,7 @@ export default function CreateAbonoModalSmart({
                     <div key={s} className="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: step >= s ? "100%" : "0%" }}
+                        animate={{ width: step >= s ? '100%' : '0%' }}
                         transition={{ duration: 0.3 }}
                         className="h-full bg-gradient-to-r from-blue-500 to-cyan-500"
                       />
@@ -244,9 +244,9 @@ export default function CreateAbonoModalSmart({
                   ))}
                 </div>
                 <div className="flex justify-between mt-2 text-xs text-gray-500">
-                  <span className={step >= 1 ? "text-blue-400" : ""}>Entidad</span>
-                  <span className={step >= 2 ? "text-blue-400" : ""}>Pago</span>
-                  <span className={step >= 3 ? "text-blue-400" : ""}>Detalles</span>
+                  <span className={step >= 1 ? 'text-blue-400' : ''}>Entidad</span>
+                  <span className={step >= 2 ? 'text-blue-400' : ''}>Pago</span>
+                  <span className={step >= 3 ? 'text-blue-400' : ''}>Detalles</span>
                 </div>
               </div>
             </div>
@@ -270,23 +270,23 @@ export default function CreateAbonoModalSmart({
                         Tipo de Entidad
                       </label>
                       <div className="grid grid-cols-2 gap-3">
-                        {["distribuidor", "cliente"].map((tipo) => (
+                        {['distribuidor', 'cliente'].map((tipo) => (
                           <motion.button
                             key={tipo}
                             type="button"
                             onClick={() => {
-                              setValue("tipo", tipo as "distribuidor" | "cliente")
-                              setValue("entidadId", "") // Reset selection when changing type
+                              setValue('tipo', tipo as 'distribuidor' | 'cliente')
+                              setValue('entidadId', '') // Reset selection when changing type
                             }}
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             className={`p-4 rounded-xl border transition-all flex flex-col items-center ${
                               watchedTipo === tipo
-                                ? "bg-blue-500/20 border-blue-500 text-white"
-                                : "bg-white/5 border-white/10 text-gray-400 hover:border-white/20"
+                                ? 'bg-blue-500/20 border-blue-500 text-white'
+                                : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/20'
                             }`}
                           >
-                            {tipo === "distribuidor" ? (
+                            {tipo === 'distribuidor' ? (
                               <Users className="w-6 h-6 mb-2" />
                             ) : (
                               <User className="w-6 h-6 mb-2" />
@@ -304,17 +304,17 @@ export default function CreateAbonoModalSmart({
                         Seleccionar {watchedTipo} *
                       </label>
                       <select
-                        {...register("entidadId")}
+                        {...register('entidadId')}
                         className={`w-full px-5 py-4 bg-white/5 border rounded-xl text-white text-lg focus:outline-none focus:ring-2 transition-all appearance-none ${
                           errors.entidadId 
-                            ? "border-red-500/50 focus:ring-red-500" 
-                            : "border-white/10 focus:ring-blue-500 focus:border-transparent"
+                            ? 'border-red-500/50 focus:ring-red-500' 
+                            : 'border-white/10 focus:ring-blue-500 focus:border-transparent'
                         }`}
                       >
                         <option value="" className="bg-gray-900">Seleccionar...</option>
                         {entidades.map((e) => (
                           <option key={e.id} value={e.id} className="bg-gray-900">
-                            {e.nombre} - Deuda: ${e.deudaTotal?.toFixed(2) || "0.00"}
+                            {e.nombre} - Deuda: ${e.deudaTotal?.toFixed(2) || '0.00'}
                           </option>
                         ))}
                       </select>
@@ -334,13 +334,13 @@ export default function CreateAbonoModalSmart({
                           <div>
                             <p className="text-white font-medium">{selectedEntidad.nombre}</p>
                             <p className="text-sm text-gray-400">
-                              {watchedTipo === "distribuidor" ? "Distribuidor" : "Cliente"}
+                              {watchedTipo === 'distribuidor' ? 'Distribuidor' : 'Cliente'}
                             </p>
                           </div>
                           <div className="text-right">
                             <p className="text-xs text-gray-400">Deuda actual</p>
                             <p className="text-xl font-bold text-red-400">
-                              ${selectedEntidad.deudaTotal?.toLocaleString() || "0.00"}
+                              ${selectedEntidad.deudaTotal?.toLocaleString() || '0.00'}
                             </p>
                           </div>
                         </div>
@@ -383,11 +383,11 @@ export default function CreateAbonoModalSmart({
                         <input
                           type="number"
                           step="0.01"
-                          {...register("monto", { valueAsNumber: true })}
+                          {...register('monto', { valueAsNumber: true })}
                           className={`w-full pl-10 pr-5 py-4 bg-white/5 border rounded-xl text-white text-2xl font-bold focus:outline-none focus:ring-2 transition-all ${
                             errors.monto 
-                              ? "border-red-500/50 focus:ring-red-500" 
-                              : "border-white/10 focus:ring-blue-500 focus:border-transparent"
+                              ? 'border-red-500/50 focus:ring-red-500' 
+                              : 'border-white/10 focus:ring-blue-500 focus:border-transparent'
                           }`}
                           placeholder="0.00"
                         />
@@ -401,14 +401,14 @@ export default function CreateAbonoModalSmart({
                         <div className="flex gap-2 mt-3">
                           <button
                             type="button"
-                            onClick={() => setValue("monto", selectedEntidad.deudaTotal || 0)}
+                            onClick={() => setValue('monto', selectedEntidad.deudaTotal || 0)}
                             className="px-3 py-1.5 text-xs bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-colors"
                           >
                             Pago total (${selectedEntidad.deudaTotal?.toLocaleString()})
                           </button>
                           <button
                             type="button"
-                            onClick={() => setValue("monto", (selectedEntidad.deudaTotal || 0) / 2)}
+                            onClick={() => setValue('monto', (selectedEntidad.deudaTotal || 0) / 2)}
                             className="px-3 py-1.5 text-xs bg-white/10 text-gray-300 rounded-lg hover:bg-white/20 transition-colors"
                           >
                             50%
@@ -424,11 +424,11 @@ export default function CreateAbonoModalSmart({
                         Banco Destino *
                       </label>
                       <select
-                        {...register("bancoDestino")}
+                        {...register('bancoDestino')}
                         className={`w-full px-5 py-4 bg-white/5 border rounded-xl text-white text-lg focus:outline-none focus:ring-2 transition-all appearance-none ${
                           errors.bancoDestino 
-                            ? "border-red-500/50 focus:ring-red-500" 
-                            : "border-white/10 focus:ring-blue-500 focus:border-transparent"
+                            ? 'border-red-500/50 focus:ring-red-500' 
+                            : 'border-white/10 focus:ring-blue-500 focus:border-transparent'
                         }`}
                       >
                         <option value="" className="bg-gray-900">Seleccionar banco...</option>
@@ -454,13 +454,13 @@ export default function CreateAbonoModalSmart({
                           <motion.button
                             key={option.value}
                             type="button"
-                            onClick={() => setValue("metodo", option.value as AbonoFormData["metodo"])}
+                            onClick={() => setValue('metodo', option.value as AbonoFormData['metodo'])}
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             className={`p-3 rounded-xl border text-sm transition-all ${
                               watchedMetodo === option.value
-                                ? "bg-blue-500/20 border-blue-500 text-white"
-                                : "bg-white/5 border-white/10 text-gray-400 hover:border-white/20"
+                                ? 'bg-blue-500/20 border-blue-500 text-white'
+                                : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/20'
                             }`}
                           >
                             <span className="mr-1">{option.icon}</span> {option.label}
@@ -509,13 +509,13 @@ export default function CreateAbonoModalSmart({
                         <div className="flex items-center gap-3">
                           <CheckCircle2 className="w-5 h-5 text-blue-400" />
                           <div>
-                            <p className="text-white font-medium">{selectedEntidad?.nombre || "Entidad"}</p>
+                            <p className="text-white font-medium">{selectedEntidad?.nombre || 'Entidad'}</p>
                             <p className="text-sm text-gray-400 capitalize">{watchedTipo}</p>
                           </div>
                         </div>
                         <div className="text-right">
                           <p className="text-2xl font-bold text-green-400">
-                            ${watchedMonto?.toLocaleString() || "0.00"}
+                            ${watchedMonto?.toLocaleString() || '0.00'}
                           </p>
                           <p className="text-xs text-gray-400">
                             {METODO_PAGO_OPTIONS.find(m => m.value === watchedMetodo)?.label}
@@ -532,7 +532,7 @@ export default function CreateAbonoModalSmart({
                       </label>
                       <input
                         type="text"
-                        {...register("referencia")}
+                        {...register('referencia')}
                         className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                         placeholder="Número de referencia o comprobante"
                       />
@@ -545,7 +545,7 @@ export default function CreateAbonoModalSmart({
                         Notas
                       </label>
                       <textarea
-                        {...register("notas")}
+                        {...register('notas')}
                         className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
                         rows={3}
                         placeholder="Notas adicionales..."
@@ -566,11 +566,11 @@ export default function CreateAbonoModalSmart({
                           </div>
                           <div className="flex justify-between text-sm">
                             <span className="text-gray-400">Abono:</span>
-                            <span className="text-green-400">-${watchedMonto?.toLocaleString() || "0.00"}</span>
+                            <span className="text-green-400">-${watchedMonto?.toLocaleString() || '0.00'}</span>
                           </div>
                           <div className="border-t border-white/10 pt-2 flex justify-between font-medium">
                             <span className="text-gray-300">Nueva deuda:</span>
-                            <span className={`${(selectedEntidad.deudaTotal - (watchedMonto || 0)) <= 0 ? "text-green-400" : "text-yellow-400"}`}>
+                            <span className={`${(selectedEntidad.deudaTotal - (watchedMonto || 0)) <= 0 ? 'text-green-400' : 'text-yellow-400'}`}>
                               ${Math.max(0, selectedEntidad.deudaTotal - (watchedMonto || 0)).toLocaleString()}
                             </span>
                           </div>
@@ -586,8 +586,8 @@ export default function CreateAbonoModalSmart({
                           <p className="text-sm text-emerald-300 font-medium">Sugerencia IA</p>
                           <p className="text-xs text-gray-400 mt-1">
                             {watchedMonto && selectedEntidad?.deudaTotal && watchedMonto >= selectedEntidad.deudaTotal
-                              ? "¡Excelente! Este abono liquidará la deuda completa del " + watchedTipo + "."
-                              : "Considera registrar la referencia del comprobante para mejor seguimiento."}
+                              ? '¡Excelente! Este abono liquidará la deuda completa del ' + watchedTipo + '.'
+                              : 'Considera registrar la referencia del comprobante para mejor seguimiento.'}
                           </p>
                         </div>
                       </div>
@@ -615,13 +615,13 @@ export default function CreateAbonoModalSmart({
                           <span className="flex items-center justify-center gap-2">
                             <motion.div
                               animate={{ rotate: 360 }}
-                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                              transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                               className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
                             />
                             Registrando...
                           </span>
                         ) : (
-                          "Registrar Abono ✓"
+                          'Registrar Abono ✓'
                         )}
                       </motion.button>
                     </div>

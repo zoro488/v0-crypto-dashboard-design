@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 🎨 PREMIUM PANEL COMPONENTS - Componentes 3D Premium para Paneles
@@ -19,7 +19,7 @@ import {
   Float, 
   Sparkles,
   ContactShadows,
-  PerspectiveCamera
+  PerspectiveCamera,
 } from '@react-three/drei'
 import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing'
 import { BlendFunction } from 'postprocessing'
@@ -75,38 +75,38 @@ export const VARIANT_COLORS: Record<OrbVariant, {
     primary: '#10b981',
     secondary: '#34d399',
     glow: 'rgba(16, 185, 129, 0.5)',
-    gradient: 'from-emerald-600/20 to-emerald-900/20'
+    gradient: 'from-emerald-600/20 to-emerald-900/20',
   },
   warning: {
     primary: '#f59e0b',
     secondary: '#fbbf24',
     glow: 'rgba(245, 158, 11, 0.5)',
-    gradient: 'from-amber-600/20 to-amber-900/20'
+    gradient: 'from-amber-600/20 to-amber-900/20',
   },
   danger: {
     primary: '#ef4444',
     secondary: '#f87171',
     glow: 'rgba(239, 68, 68, 0.5)',
-    gradient: 'from-rose-600/20 to-rose-900/20'
+    gradient: 'from-rose-600/20 to-rose-900/20',
   },
   info: {
     primary: '#06b6d4',
     secondary: '#22d3ee',
     glow: 'rgba(6, 182, 212, 0.5)',
-    gradient: 'from-cyan-600/20 to-cyan-900/20'
+    gradient: 'from-cyan-600/20 to-cyan-900/20',
   },
   primary: {
     primary: '#3b82f6',
     secondary: '#60a5fa',
     glow: 'rgba(59, 130, 246, 0.5)',
-    gradient: 'from-blue-600/20 to-blue-900/20'
+    gradient: 'from-blue-600/20 to-blue-900/20',
   },
   secondary: {
     primary: '#8b5cf6',
     secondary: '#a78bfa',
     glow: 'rgba(139, 92, 246, 0.5)',
-    gradient: 'from-purple-600/20 to-purple-900/20'
-  }
+    gradient: 'from-purple-600/20 to-purple-900/20',
+  },
 }
 
 // ============================================================================
@@ -117,7 +117,7 @@ export const VARIANT_COLORS: Record<OrbVariant, {
 function InnerSphere({ 
   color, 
   audioLevel = 0,
-  scale = 1 
+  scale = 1, 
 }: { 
   color: typeof VARIANT_COLORS.success
   audioLevel?: number
@@ -164,7 +164,7 @@ function InnerSphere({
 function OuterSphere({ 
   color, 
   scale = 1,
-  isHovered = false 
+  isHovered = false, 
 }: { 
   color: typeof VARIANT_COLORS.success
   scale?: number
@@ -178,7 +178,7 @@ function OuterSphere({
     const targetScale = scale * (isHovered ? 1.05 : 1)
     meshRef.current.scale.lerp(
       new THREE.Vector3(targetScale, targetScale, targetScale),
-      0.1
+      0.1,
     )
     meshRef.current.rotation.y -= 0.002
   })
@@ -244,7 +244,7 @@ function OrbitalRings({ color, isActive }: { color: typeof VARIANT_COLORS.succes
 function OrbScene({ 
   color, 
   isHovered,
-  showParticles 
+  showParticles, 
 }: { 
   color: typeof VARIANT_COLORS.success
   isHovered: boolean
@@ -306,7 +306,7 @@ export function StatOrb3D({
   animated = true,
   trend,
   trendValue,
-  onClick
+  onClick,
 }: StatOrb3DProps) {
   const [isHovered, setIsHovered] = useState(false)
   const colors = VARIANT_COLORS[variant]
@@ -343,7 +343,7 @@ export function StatOrb3D({
           style={{ backgroundColor: colors.glow }}
           animate={{ 
             scale: isHovered ? [1, 1.2, 1] : [1, 1.1, 1], 
-            opacity: [0.3, 0.5, 0.3] 
+            opacity: [0.3, 0.5, 0.3], 
           }}
           transition={{ duration: 2, repeat: Infinity }}
         />
@@ -381,7 +381,7 @@ export function GlassCard3D({
   size = 'md',
   interactive = true,
   glowIntensity = 0.5,
-  onClick
+  onClick,
 }: GlassCard3DProps) {
   const colors = VARIANT_COLORS[variant]
   const containerRef = useRef<HTMLDivElement>(null)
@@ -412,7 +412,7 @@ export function GlassCard3D({
     sm: 'p-4',
     md: 'p-5',
     lg: 'p-6',
-    xl: 'p-8'
+    xl: 'p-8',
   }
 
   return (
@@ -435,7 +435,7 @@ export function GlassCard3D({
           0 0 ${20 * glowIntensity}px ${colors.glow},
           inset 0 1px 0 rgba(255,255,255,0.1),
           0 20px 40px -10px rgba(0,0,0,0.3)
-        `
+        `,
       }}
       whileHover={interactive ? { scale: 1.02, y: -5 } : undefined}
       whileTap={interactive ? { scale: 0.98 } : undefined}
@@ -447,7 +447,7 @@ export function GlassCard3D({
       <div 
         className="absolute inset-x-0 top-0 h-px"
         style={{
-          background: `linear-gradient(90deg, transparent, ${colors.secondary}50, transparent)`
+          background: `linear-gradient(90deg, transparent, ${colors.secondary}50, transparent)`,
         }}
       />
       
@@ -455,7 +455,7 @@ export function GlassCard3D({
       <motion.div
         className="absolute -inset-px rounded-2xl opacity-0 transition-opacity duration-300"
         style={{
-          background: `radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${colors.glow}, transparent 40%)`
+          background: `radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${colors.glow}, transparent 40%)`,
         }}
         whileHover={{ opacity: glowIntensity }}
       />
@@ -469,7 +469,7 @@ export function GlassCard3D({
       <div 
         className="absolute inset-0 pointer-events-none rounded-2xl"
         style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, transparent 100%)'
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, transparent 100%)',
         }}
       />
     </motion.div>
@@ -482,7 +482,7 @@ export function GlassCard3D({
 export function ParticleBackground({
   variant = 'primary',
   intensity = 'medium',
-  interactive = true
+  interactive = true,
 }: ParticleBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const colors = VARIANT_COLORS[variant]
@@ -490,7 +490,7 @@ export function ParticleBackground({
   const config = useMemo(() => ({
     low: { count: 20, speed: 0.3, size: 2 },
     medium: { count: 40, speed: 0.5, size: 3 },
-    high: { count: 60, speed: 0.8, size: 4 }
+    high: { count: 60, speed: 0.8, size: 4 },
   })[intensity], [intensity])
 
   return (
@@ -502,7 +502,7 @@ export function ParticleBackground({
           background: `
             radial-gradient(ellipse at 20% 20%, ${colors.glow} 0%, transparent 50%),
             radial-gradient(ellipse at 80% 80%, ${colors.secondary}20 0%, transparent 50%)
-          `
+          `,
         }}
       />
       
@@ -518,18 +518,18 @@ export function ParticleBackground({
               backgroundColor: colors.primary,
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              opacity: Math.random() * 0.5 + 0.2
+              opacity: Math.random() * 0.5 + 0.2,
             }}
             animate={{
               y: [0, -20, 0],
               x: [0, Math.random() * 10 - 5, 0],
-              opacity: [0.2, 0.5, 0.2]
+              opacity: [0.2, 0.5, 0.2],
             }}
             transition={{
               duration: 3 + Math.random() * 2,
               repeat: Infinity,
               delay: Math.random() * 2,
-              ease: 'easeInOut'
+              ease: 'easeInOut',
             }}
           />
         ))}
@@ -539,7 +539,7 @@ export function ParticleBackground({
       <div 
         className="absolute inset-0 opacity-[0.02]"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`
+          backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.8\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")',
         }}
       />
     </div>
@@ -552,7 +552,7 @@ export function ParticleBackground({
 export function PulseIndicator({ 
   variant = 'success',
   size = 12,
-  label
+  label,
 }: { 
   variant?: OrbVariant
   size?: number
@@ -575,12 +575,12 @@ export function PulseIndicator({
           style={{ backgroundColor: colors.primary }}
           animate={{
             scale: [1, 2, 1],
-            opacity: [0.8, 0, 0.8]
+            opacity: [0.8, 0, 0.8],
           }}
           transition={{
             duration: 2,
             repeat: Infinity,
-            ease: 'easeOut'
+            ease: 'easeOut',
           }}
         />
         
@@ -590,13 +590,13 @@ export function PulseIndicator({
           style={{ backgroundColor: colors.primary }}
           animate={{
             scale: [1, 1.5, 1],
-            opacity: [0.5, 0, 0.5]
+            opacity: [0.5, 0, 0.5],
           }}
           transition={{
             duration: 2,
             repeat: Infinity,
             ease: 'easeOut',
-            delay: 0.5
+            delay: 0.5,
           }}
         />
       </div>
@@ -614,7 +614,7 @@ export function PulseIndicator({
 export function MiniChart3D({
   data,
   variant = 'primary',
-  height = 60
+  height = 60,
 }: {
   data: number[]
   variant?: OrbVariant
@@ -636,18 +636,18 @@ export function MiniChart3D({
             className="flex-1 rounded-t"
             style={{
               background: `linear-gradient(to top, ${colors.primary}, ${colors.secondary})`,
-              boxShadow: `0 0 10px ${colors.glow}`
+              boxShadow: `0 0 10px ${colors.glow}`,
             }}
             initial={{ height: 0 }}
             animate={{ height: `${barHeight}%` }}
             transition={{ 
               delay: i * 0.05, 
               duration: 0.5, 
-              ease: 'easeOut' 
+              ease: 'easeOut', 
             }}
             whileHover={{ 
               scale: 1.1,
-              boxShadow: `0 0 20px ${colors.glow}`
+              boxShadow: `0 0 20px ${colors.glow}`,
             }}
           />
         )
@@ -662,7 +662,7 @@ export function MiniChart3D({
 export function GradientText({
   children,
   variant = 'primary',
-  className = ''
+  className = '',
 }: {
   children: React.ReactNode
   variant?: OrbVariant
@@ -674,7 +674,7 @@ export function GradientText({
     <span 
       className={`bg-clip-text text-transparent ${className}`}
       style={{
-        backgroundImage: `linear-gradient(135deg, ${colors.secondary}, ${colors.primary})`
+        backgroundImage: `linear-gradient(135deg, ${colors.secondary}, ${colors.primary})`,
       }}
     >
       {children}
@@ -689,5 +689,5 @@ export default {
   PulseIndicator,
   MiniChart3D,
   GradientText,
-  VARIANT_COLORS
+  VARIANT_COLORS,
 }

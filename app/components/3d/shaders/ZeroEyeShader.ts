@@ -9,9 +9,9 @@
  * - Cambio de color según estado
  */
 
-import * as THREE from 'three';
-import { extend } from '@react-three/fiber';
-import { shaderMaterial } from '@react-three/drei';
+import * as THREE from 'three'
+import { extend } from '@react-three/fiber'
+import { shaderMaterial } from '@react-three/drei'
 
 /**
  * Material del Ojo de Zero con GLSL personalizado
@@ -202,14 +202,14 @@ const ZeroEyeMaterial = shaderMaterial(
       
       gl_FragColor = vec4(finalColor, alpha);
     }
-  `
-);
+  `,
+)
 
 // Registrar el material en React Three Fiber
-extend({ ZeroEyeMaterial });
+extend({ ZeroEyeMaterial })
 
 // Exportar para uso en componentes
-export { ZeroEyeMaterial };
+export { ZeroEyeMaterial }
 
 // Declaración de tipos para TypeScript
 declare global {

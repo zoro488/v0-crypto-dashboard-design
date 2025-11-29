@@ -1,4 +1,28 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+/**
+ * 🧪 TESTS UNITARIOS - STORE
+ * 
+ * Tests para el store Zustand de la aplicación
+ * Con mocks para Firebase
+ */
+
+// Mock Firebase antes de importar el store
+jest.mock('@/app/lib/firebase/config', () => ({
+  db: null,
+  auth: null,
+  isFirebaseConfigured: false,
+  isFirestoreAvailable: () => false,
+  getFirestoreInstance: () => null,
+}))
+
+jest.mock('@/app/lib/firebase/firestore-service', () => ({
+  firestoreService: {
+    crearTransferencia: jest.fn().mockResolvedValue(true),
+    getClientes: jest.fn().mockResolvedValue([]),
+    getVentas: jest.fn().mockResolvedValue([]),
+    getBancos: jest.fn().mockResolvedValue([]),
+  },
+}))
+
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import '@testing-library/jest-dom'
 

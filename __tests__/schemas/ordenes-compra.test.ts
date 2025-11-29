@@ -16,13 +16,18 @@ describe('Órdenes de Compra Schema - Validaciones', () => {
     it('✅ debe validar orden de compra válida con fórmulas correctas', () => {
       const ordenValida = {
         distribuidorId: 'dist_123',
-        fecha: new Date(),
+        distribuidor: 'Distribuidor Test',
+        producto: 'Producto Test',
+        fecha: new Date().toISOString(),
         cantidad: 100,
         costoDistribuidor: 6300,
         costoTransporte: 500,
         costoPorUnidad: 6800, // = 6300 + 500
         costoTotal: 680000,   // = 6800 * 100
-        estadoPago: 'completo' as const,
+        pagoInicial: 680000,
+        deuda: 0,
+        estado: 'pagado' as const,
+        bancoOrigen: 'boveda_monte' as const,
       }
       
       const result = validarOrdenCompra(ordenValida)
@@ -37,33 +42,43 @@ describe('Órdenes de Compra Schema - Validaciones', () => {
     it('❌ debe rechazar costoPorUnidad incorrecto', () => {
       const ordenInvalida = {
         distribuidorId: 'dist_123',
-        fecha: new Date(),
+        distribuidor: 'Distribuidor Test',
+        producto: 'Producto Test',
+        fecha: new Date().toISOString(),
         cantidad: 100,
         costoDistribuidor: 6300,
         costoTransporte: 500,
         costoPorUnidad: 7000, // Incorrecto (debería ser 6800)
         costoTotal: 680000,
-        estadoPago: 'completo' as const,
+        pagoInicial: 680000,
+        deuda: 0,
+        estado: 'pagado' as const,
+        bancoOrigen: 'boveda_monte' as const,
       }
       
       const result = validarOrdenCompra(ordenInvalida)
       
       expect(result.success).toBe(false)
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain('costoPorUnidad')
+        expect(result.errors?.some(e => e.includes('costoPorUnidad'))).toBe(true)
       }
     })
     
     it('❌ debe rechazar costoTotal incorrecto', () => {
       const ordenInvalida = {
         distribuidorId: 'dist_123',
-        fecha: new Date(),
+        distribuidor: 'Distribuidor Test',
+        producto: 'Producto Test',
+        fecha: new Date().toISOString(),
         cantidad: 100,
         costoDistribuidor: 6300,
         costoTransporte: 500,
         costoPorUnidad: 6800,
         costoTotal: 700000, // Incorrecto (debería ser 680000)
-        estadoPago: 'completo' as const,
+        pagoInicial: 700000,
+        deuda: 0,
+        estado: 'pagado' as const,
+        bancoOrigen: 'boveda_monte' as const,
       }
       
       const result = validarOrdenCompra(ordenInvalida)
@@ -74,13 +89,17 @@ describe('Órdenes de Compra Schema - Validaciones', () => {
     it('❌ debe rechazar cantidad = 0', () => {
       const ordenInvalida = {
         distribuidorId: 'dist_123',
-        fecha: new Date(),
+        distribuidor: 'Distribuidor Test',
+        producto: 'Producto Test',
+        fecha: new Date().toISOString(),
         cantidad: 0,
         costoDistribuidor: 6300,
         costoTransporte: 500,
         costoPorUnidad: 6800,
         costoTotal: 0,
-        estadoPago: 'completo' as const,
+        pagoInicial: 0,
+        deuda: 0,
+        estado: 'pagado' as const,
       }
       
       const result = validarOrdenCompra(ordenInvalida)
@@ -91,13 +110,17 @@ describe('Órdenes de Compra Schema - Validaciones', () => {
     it('❌ debe rechazar costos negativos', () => {
       const ordenInvalida = {
         distribuidorId: 'dist_123',
-        fecha: new Date(),
+        distribuidor: 'Distribuidor Test',
+        producto: 'Producto Test',
+        fecha: new Date().toISOString(),
         cantidad: 100,
         costoDistribuidor: -6300,
         costoTransporte: 500,
         costoPorUnidad: -5800,
         costoTotal: -580000,
-        estadoPago: 'completo' as const,
+        pagoInicial: 0,
+        deuda: -580000,
+        estado: 'pendiente' as const,
       }
       
       const result = validarOrdenCompra(ordenInvalida)
@@ -108,7 +131,9 @@ describe('Órdenes de Compra Schema - Validaciones', () => {
     it('✅ debe validar con deuda y pagoInicial correctos', () => {
       const orden = {
         distribuidorId: 'dist_123',
-        fecha: new Date(),
+        distribuidor: 'Distribuidor Test',
+        producto: 'Producto Test',
+        fecha: new Date().toISOString(),
         cantidad: 100,
         costoDistribuidor: 6300,
         costoTransporte: 500,
@@ -116,7 +141,8 @@ describe('Órdenes de Compra Schema - Validaciones', () => {
         costoTotal: 680000,
         pagoInicial: 400000,
         deuda: 280000, // = 680000 - 400000
-        estadoPago: 'parcial' as const,
+        estado: 'parcial' as const,
+        bancoOrigen: 'boveda_monte' as const,
       }
       
       const result = validarOrdenCompra(orden)
@@ -127,7 +153,9 @@ describe('Órdenes de Compra Schema - Validaciones', () => {
     it('❌ debe rechazar si pagoInicial + deuda ≠ costoTotal', () => {
       const ordenInvalida = {
         distribuidorId: 'dist_123',
-        fecha: new Date(),
+        distribuidor: 'Distribuidor Test',
+        producto: 'Producto Test',
+        fecha: new Date().toISOString(),
         cantidad: 100,
         costoDistribuidor: 6300,
         costoTransporte: 500,
@@ -135,7 +163,8 @@ describe('Órdenes de Compra Schema - Validaciones', () => {
         costoTotal: 680000,
         pagoInicial: 400000,
         deuda: 300000, // Incorrecto (debería ser 280000)
-        estadoPago: 'parcial' as const,
+        estado: 'parcial' as const,
+        bancoOrigen: 'boveda_monte' as const,
       }
       
       const result = validarOrdenCompra(ordenInvalida)
@@ -146,13 +175,17 @@ describe('Órdenes de Compra Schema - Validaciones', () => {
     it('✅ debe validar orden pendiente sin pagos', () => {
       const orden = {
         distribuidorId: 'dist_123',
-        fecha: new Date(),
+        distribuidor: 'Distribuidor Test',
+        producto: 'Producto Test',
+        fecha: new Date().toISOString(),
         cantidad: 50,
         costoDistribuidor: 6300,
         costoTransporte: 500,
         costoPorUnidad: 6800,
         costoTotal: 340000,
-        estadoPago: 'pendiente' as const,
+        pagoInicial: 0,
+        deuda: 340000,
+        estado: 'pendiente' as const,
       }
       
       const result = validarOrdenCompra(orden)
@@ -163,9 +196,10 @@ describe('Órdenes de Compra Schema - Validaciones', () => {
   
   describe('validarActualizacionOrdenCompra', () => {
     
-    it('✅ debe validar actualización de estadoPago', () => {
+    it('✅ debe validar actualización de estado', () => {
       const actualizacion = {
-        estadoPago: 'completo' as const,
+        id: 'orden_123',
+        estado: 'pagado' as const,
       }
       
       const result = validarActualizacionOrdenCompra(actualizacion)
@@ -175,6 +209,7 @@ describe('Órdenes de Compra Schema - Validaciones', () => {
     
     it('✅ debe validar actualización de deuda', () => {
       const actualizacion = {
+        id: 'orden_123',
         deuda: 150000,
       }
       
@@ -185,6 +220,7 @@ describe('Órdenes de Compra Schema - Validaciones', () => {
     
     it('❌ debe rechazar deuda negativa', () => {
       const actualizacion = {
+        id: 'orden_123',
         deuda: -1000,
       }
       

@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 🌟 CHRONOS PARTICLE SPLASH SCREEN
@@ -12,18 +12,18 @@
  * - Interactividad con mouse
  */
 
-import { useRef, useMemo, useEffect, useState, useCallback } from "react"
-import { Canvas, useFrame, useThree } from "@react-three/fiber"
+import { useRef, useMemo, useEffect, useState, useCallback } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { logger } from '@/app/lib/utils/logger'
 import { 
   EffectComposer, 
   Bloom, 
   ChromaticAberration,
-  Vignette 
-} from "@react-three/postprocessing"
-import { BlendFunction } from "postprocessing"
-import * as THREE from "three"
-import { motion, AnimatePresence } from "framer-motion"
+  Vignette, 
+} from '@react-three/postprocessing'
+import { BlendFunction } from 'postprocessing'
+import * as THREE from 'three'
+import { motion, AnimatePresence } from 'framer-motion'
 
 // ============================================
 // CONFIGURACIÓN
@@ -36,10 +36,10 @@ const CONFIG = {
   
   // Colores (gradiente cyan-gold premium estilo Chronos)
   colors: {
-    primary: new THREE.Color("#00f5ff"),    // Cyan brillante
-    secondary: new THREE.Color("#fbbf24"),   // Oro/Amber
-    accent: new THREE.Color("#8b5cf6"),      // Violeta
-    background: "#000000",
+    primary: new THREE.Color('#00f5ff'),    // Cyan brillante
+    secondary: new THREE.Color('#fbbf24'),   // Oro/Amber
+    accent: new THREE.Color('#8b5cf6'),      // Violeta
+    background: '#000000',
   },
   
   // Física
@@ -48,7 +48,7 @@ const CONFIG = {
   noiseSpeed: 0.4,
   
   // Texto
-  text: "CHRONOS",
+  text: 'CHRONOS',
   fontSize: 1.4,
 }
 
@@ -232,22 +232,22 @@ function generateTextPositions(text: string, particleCount: number): Float32Arra
   const positions = new Float32Array(particleCount * 3)
   
   // Crear canvas para renderizar texto
-  const canvas = document.createElement("canvas")
-  const ctx = canvas.getContext("2d")!
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')!
   
   canvas.width = 2048
   canvas.height = 512
   
   // Configurar texto
-  ctx.fillStyle = "#000000"
+  ctx.fillStyle = '#000000'
   ctx.fillRect(0, 0, canvas.width, canvas.height)
   
   // Usar fuente más bold y grande para mejor definición
   ctx.font = "bold 320px 'Arial Black', Arial, sans-serif"
-  ctx.fillStyle = "#ffffff"
-  ctx.textAlign = "center"
-  ctx.textBaseline = "middle"
-  ctx.letterSpacing = "0.1em"
+  ctx.fillStyle = '#ffffff'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.letterSpacing = '0.1em'
   ctx.fillText(text, canvas.width / 2, canvas.height / 2)
   
   // Obtener datos de imagen
@@ -333,10 +333,10 @@ function ParticleSystem({ onComplete }: { onComplete: () => void }) {
     }
     
     const geo = new THREE.BufferGeometry()
-    geo.setAttribute("position", new THREE.BufferAttribute(initialPositions, 3))
-    geo.setAttribute("initialPosition", new THREE.BufferAttribute(initialPositions.slice(), 3))
-    geo.setAttribute("targetPosition", new THREE.BufferAttribute(targetPositions, 3))
-    geo.setAttribute("randomOffset", new THREE.BufferAttribute(randomOffsets, 1))
+    geo.setAttribute('position', new THREE.BufferAttribute(initialPositions, 3))
+    geo.setAttribute('initialPosition', new THREE.BufferAttribute(initialPositions.slice(), 3))
+    geo.setAttribute('targetPosition', new THREE.BufferAttribute(targetPositions, 3))
+    geo.setAttribute('randomOffset', new THREE.BufferAttribute(randomOffsets, 1))
     
     const unis = {
       uTime: { value: 0 },
@@ -352,15 +352,15 @@ function ParticleSystem({ onComplete }: { onComplete: () => void }) {
   
   // Generar posiciones de texto después del mount (requiere canvas)
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       const textPositions = generateTextPositions(CONFIG.text, CONFIG.particleCount)
-      geometry.setAttribute("targetPosition", new THREE.BufferAttribute(textPositions, 3))
+      geometry.setAttribute('targetPosition', new THREE.BufferAttribute(textPositions, 3))
     }
   }, [geometry])
   
   // Animación de entrada
   useEffect(() => {
-    let startTime = Date.now()
+    const startTime = Date.now()
     const duration = 3000 // 3 segundos para morphing
     const holdTime = 2000 // 2 segundos mostrando texto
     
@@ -396,7 +396,7 @@ function ParticleSystem({ onComplete }: { onComplete: () => void }) {
       materialRef.current.uniforms.uMorphProgress.value = morphProgress
       materialRef.current.uniforms.uMouse.value.set(
         (mouse.x * viewport.width) / 2,
-        (mouse.y * viewport.height) / 2
+        (mouse.y * viewport.height) / 2,
       )
     }
   })
@@ -427,7 +427,7 @@ interface ChronosParticlesProps {
 
 export default function ChronosParticles({ 
   onComplete = () => {}, 
-  duration = 5500 
+  duration = 5500, 
 }: ChronosParticlesProps) {
   const [isVisible, setIsVisible] = useState(true)
   
@@ -451,7 +451,7 @@ export default function ChronosParticles({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
           className="fixed inset-0 z-[9999] bg-black"
-          style={{ touchAction: "none" }}
+          style={{ touchAction: 'none' }}
         >
           <Canvas
             camera={{ position: [0, 0, 4], fov: 60 }}
@@ -459,8 +459,8 @@ export default function ChronosParticles({
             gl={{ 
               antialias: true,
               alpha: false,
-              powerPreference: "high-performance",
-              failIfMajorPerformanceCaveat: false
+              powerPreference: 'high-performance',
+              failIfMajorPerformanceCaveat: false,
             }}
             onCreated={({ gl }) => {
               // Manejar pérdida de contexto WebGL
@@ -472,7 +472,7 @@ export default function ChronosParticles({
               }, false)
             }}
           >
-            <color attach="background" args={["#000000"]} />
+            <color attach="background" args={['#000000']} />
             
             <ParticleSystem onComplete={handleComplete} />
             
@@ -517,8 +517,8 @@ export default function ChronosParticles({
             <div className="flex items-center gap-3 text-white/30 text-xs">
               <div className="flex gap-1">
                 <div className="w-1.5 h-1.5 rounded-full bg-cyan-400/80 animate-pulse" />
-                <div className="w-1.5 h-1.5 rounded-full bg-amber-400/80 animate-pulse" style={{ animationDelay: "0.15s" }} />
-                <div className="w-1.5 h-1.5 rounded-full bg-violet-400/80 animate-pulse" style={{ animationDelay: "0.3s" }} />
+                <div className="w-1.5 h-1.5 rounded-full bg-amber-400/80 animate-pulse" style={{ animationDelay: '0.15s' }} />
+                <div className="w-1.5 h-1.5 rounded-full bg-violet-400/80 animate-pulse" style={{ animationDelay: '0.3s' }} />
               </div>
               <span className="tracking-[0.3em] uppercase">Loading</span>
             </div>

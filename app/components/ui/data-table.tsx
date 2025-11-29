@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import * as React from "react"
+import * as React from 'react'
 import {
   ColumnDef,
   flexRender,
@@ -11,17 +11,17 @@ import {
   SortingState,
   ColumnFiltersState,
   useReactTable,
-} from "@tanstack/react-table"
-import { ArrowUpDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Search } from "lucide-react"
-import { Button } from "@/app/components/ui/button"
-import { Input } from "@/app/components/ui/input"
+} from '@tanstack/react-table'
+import { ArrowUpDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Search } from 'lucide-react'
+import { Button } from '@/app/components/ui/button'
+import { Input } from '@/app/components/ui/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/app/components/ui/select"
+} from '@/app/components/ui/select'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -35,12 +35,12 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   searchKey,
-  searchPlaceholder = "Buscar...",
+  searchPlaceholder = 'Buscar...',
   onRowClick,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [globalFilter, setGlobalFilter] = React.useState("")
+  const [globalFilter, setGlobalFilter] = React.useState('')
 
   const table = useReactTable({
     data,
@@ -73,7 +73,7 @@ export function DataTable<TData, TValue>({
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder={searchPlaceholder}
-              value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
+              value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ''}
               onChange={(event) =>
                 table.getColumn(searchKey)?.setFilterValue(event.target.value)
               }
@@ -99,7 +99,7 @@ export function DataTable<TData, TValue>({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </th>
                   ))}
@@ -113,14 +113,14 @@ export function DataTable<TData, TValue>({
                     key={row.id}
                     onClick={() => onRowClick?.(row.original)}
                     className={`border-b transition-colors hover:bg-muted/50 ${
-                      onRowClick ? "cursor-pointer" : ""
+                      onRowClick ? 'cursor-pointer' : ''
                     }`}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <td key={cell.id} className="p-4 align-middle">
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext()
+                          cell.getContext(),
                         )}
                       </td>
                     ))}
@@ -146,7 +146,7 @@ export function DataTable<TData, TValue>({
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length > 0 && (
             <span>
-              {table.getFilteredSelectedRowModel().rows.length} de{" "}
+              {table.getFilteredSelectedRowModel().rows.length} de{' '}
               {table.getFilteredRowModel().rows.length} fila(s) seleccionada(s).
             </span>
           )}
@@ -173,7 +173,7 @@ export function DataTable<TData, TValue>({
             </Select>
           </div>
           <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-            Página {table.getState().pagination.pageIndex + 1} de{" "}
+            Página {table.getState().pagination.pageIndex + 1} de{' '}
             {table.getPageCount()}
           </div>
           <div className="flex items-center space-x-2">
@@ -223,7 +223,7 @@ export function DataTable<TData, TValue>({
 // Helper para crear columnas sortables
 interface SortableColumn {
   toggleSorting: (asc: boolean) => void
-  getIsSorted: () => "asc" | "desc" | false
+  getIsSorted: () => 'asc' | 'desc' | false
 }
 
 export function createSortableHeader(title: string) {
@@ -231,7 +231,7 @@ export function createSortableHeader(title: string) {
     return (
       <Button
         variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         className="-ml-4"
       >
         {title}

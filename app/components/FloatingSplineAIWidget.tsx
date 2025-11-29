@@ -1,23 +1,23 @@
-"use client"
+'use client'
 
-import { motion, AnimatePresence } from "framer-motion"
-import { Mic, MicOff, Send, Maximize2, Sparkles, X, Bot } from "lucide-react"
-import { useState, useRef, useEffect, Suspense, useCallback, Component, type ReactNode } from "react"
-import dynamic from "next/dynamic"
-import type { Application } from "@splinetool/runtime"
-import { useAppStore } from "@/app/lib/store/useAppStore"
+import { motion, AnimatePresence } from 'framer-motion'
+import { Mic, MicOff, Send, Maximize2, Sparkles, X, Bot } from 'lucide-react'
+import { useState, useRef, useEffect, Suspense, useCallback, Component, type ReactNode } from 'react'
+import dynamic from 'next/dynamic'
+import type { Application } from '@splinetool/runtime'
+import { useAppStore } from '@/app/lib/store/useAppStore'
 
 // Carga dinámica de Spline con SSR desactivado para evitar errores de hidratación
-const Spline = dynamic(() => import("@splinetool/react-spline"), {
+const Spline = dynamic(() => import('@splinetool/react-spline'), {
   ssr: false,
-  loading: () => <SplineFallback />
+  loading: () => <SplineFallback />,
 })
 
 // Tipos
 interface DisplayMessage {
   id: string
   text: string
-  sender: "user" | "ai"
+  sender: 'user' | 'ai'
   timestamp: Date
   suggestions?: string[]
 }
@@ -36,7 +36,7 @@ interface SplineErrorBoundaryProps {
 class SplineErrorBoundary extends Component<SplineErrorBoundaryProps, SplineErrorBoundaryState> {
   constructor(props: SplineErrorBoundaryProps) {
     super(props)
-    this.state = { hasError: false, errorMessage: "" }
+    this.state = { hasError: false, errorMessage: '' }
   }
 
   static getDerivedStateFromError(error: Error): SplineErrorBoundaryState {
@@ -45,8 +45,8 @@ class SplineErrorBoundary extends Component<SplineErrorBoundaryProps, SplineErro
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     // Silenciamos errores de Spline en producción
-    if (process.env.NODE_ENV === "development") {
-      console.debug("[SplineErrorBoundary] Error capturado:", error.message)
+    if (process.env.NODE_ENV === 'development') {
+      console.debug('[SplineErrorBoundary] Error capturado:', error.message)
     }
   }
 
@@ -59,11 +59,11 @@ class SplineErrorBoundary extends Component<SplineErrorBoundaryProps, SplineErro
 }
 
 // Fallback elegante cuando Spline no carga o tiene errores
-function SplineFallback({ size = "default" }: { size?: "small" | "default" | "large" }) {
+function SplineFallback({ size = 'default' }: { size?: 'small' | 'default' | 'large' }) {
   const sizeClasses = {
-    small: "w-8 h-8",
-    default: "w-12 h-12",
-    large: "w-20 h-20"
+    small: 'w-8 h-8',
+    default: 'w-12 h-12',
+    large: 'w-20 h-20',
   }
   
   return (
@@ -77,7 +77,7 @@ function SplineFallback({ size = "default" }: { size?: "small" | "default" | "la
         transition={{
           duration: 3,
           repeat: Number.POSITIVE_INFINITY,
-          ease: "easeInOut",
+          ease: 'easeInOut',
         }}
       >
         <Bot className="w-1/2 h-1/2 text-white" />
@@ -87,7 +87,7 @@ function SplineFallback({ size = "default" }: { size?: "small" | "default" | "la
 }
 
 // URL del Spline Widget (orb con ojos)
-const SPLINE_WIDGET_URL = "https://prod.spline.design/EMUFQmxEYeuyK46H/scene.splinecode"
+const SPLINE_WIDGET_URL = 'https://prod.spline.design/EMUFQmxEYeuyK46H/scene.splinecode'
 
 // Spline habilitado - usa la escena del directorio untitled
 const SPLINE_ENABLED = true
@@ -114,7 +114,7 @@ const getAIResponse = (message: string, store: ReturnType<typeof useAppStore.get
   const lowerMessage = message.toLowerCase()
   
   // Análisis de ventas
-  if (lowerMessage.includes("venta") || lowerMessage.includes("ventas")) {
+  if (lowerMessage.includes('venta') || lowerMessage.includes('ventas')) {
     const totalVentas = store.ventas.reduce((sum, v) => sum + v.precioTotalVenta, 0)
     const ventasHoy = store.ventas.filter(v => {
       const fecha = new Date(v.fecha)
@@ -125,86 +125,86 @@ const getAIResponse = (message: string, store: ReturnType<typeof useAppStore.get
     
     return {
       text: `📊 Resumen de ventas:\n\n• Total histórico: $${totalVentas.toLocaleString()}\n• Ventas hoy: ${ventasHoy.length} operaciones\n• Total hoy: $${totalHoy.toLocaleString()}\n• Ticket promedio: $${ventasHoy.length > 0 ? (totalHoy / ventasHoy.length).toLocaleString() : 0}`,
-      suggestions: ["Top clientes", "Productos más vendidos", "Comparar con ayer"]
+      suggestions: ['Top clientes', 'Productos más vendidos', 'Comparar con ayer'],
     }
   }
   
   // Stock e inventario
-  if (lowerMessage.includes("stock") || lowerMessage.includes("inventario") || lowerMessage.includes("producto")) {
+  if (lowerMessage.includes('stock') || lowerMessage.includes('inventario') || lowerMessage.includes('producto')) {
     const productosStockBajo = store.productos.filter(p => p.stockActual < 10)
     const valorTotal = store.productos.reduce((sum, p) => sum + (p.stockActual * p.valorUnitario), 0)
     
     return {
-      text: `📦 Estado del inventario:\n\n• Total productos: ${store.productos.length}\n• Valor total: $${valorTotal.toLocaleString()}\n• Productos con stock bajo (<10): ${productosStockBajo.length}\n${productosStockBajo.length > 0 ? `\n⚠️ Reabastecer: ${productosStockBajo.map(p => p.nombre).join(", ")}` : ""}`,
-      suggestions: ["Ver detalle productos", "Crear orden de compra", "Historial de movimientos"]
+      text: `📦 Estado del inventario:\n\n• Total productos: ${store.productos.length}\n• Valor total: $${valorTotal.toLocaleString()}\n• Productos con stock bajo (<10): ${productosStockBajo.length}\n${productosStockBajo.length > 0 ? `\n⚠️ Reabastecer: ${productosStockBajo.map(p => p.nombre).join(', ')}` : ''}`,
+      suggestions: ['Ver detalle productos', 'Crear orden de compra', 'Historial de movimientos'],
     }
   }
   
   // Bancos y finanzas
-  if (lowerMessage.includes("banco") || lowerMessage.includes("capital") || lowerMessage.includes("finanz") || lowerMessage.includes("saldo")) {
+  if (lowerMessage.includes('banco') || lowerMessage.includes('capital') || lowerMessage.includes('finanz') || lowerMessage.includes('saldo')) {
     const totalCapital = store.bancos.reduce((sum, b) => sum + b.saldo, 0)
-    const bancosResumen = store.bancos.map(b => `• ${b.nombre}: $${b.saldo.toLocaleString()}`).join("\n")
+    const bancosResumen = store.bancos.map(b => `• ${b.nombre}: $${b.saldo.toLocaleString()}`).join('\n')
     
     return {
       text: `🏦 Estado financiero:\n\n${bancosResumen}\n\n💰 Capital total: $${totalCapital.toLocaleString()}`,
-      suggestions: ["Hacer transferencia", "Ver movimientos", "Registrar gasto"]
+      suggestions: ['Hacer transferencia', 'Ver movimientos', 'Registrar gasto'],
     }
   }
   
   // Clientes
-  if (lowerMessage.includes("cliente")) {
+  if (lowerMessage.includes('cliente')) {
     const totalClientes = store.clientes.length
     const deudaTotal = store.clientes.reduce((sum, c) => sum + c.deudaTotal, 0)
     const clientesConDeuda = store.clientes.filter(c => c.deudaTotal > 0)
     
     return {
       text: `👥 Resumen de clientes:\n\n• Total clientes: ${totalClientes}\n• Clientes con deuda: ${clientesConDeuda.length}\n• Deuda total por cobrar: $${deudaTotal.toLocaleString()}`,
-      suggestions: ["Ver clientes morosos", "Registrar abono", "Nuevo cliente"]
+      suggestions: ['Ver clientes morosos', 'Registrar abono', 'Nuevo cliente'],
     }
   }
   
   // Distribuidores
-  if (lowerMessage.includes("distribuidor") || lowerMessage.includes("proveedor")) {
+  if (lowerMessage.includes('distribuidor') || lowerMessage.includes('proveedor')) {
     const totalDist = store.distribuidores.length
     const deudaTotal = store.distribuidores.reduce((sum, d) => sum + d.deudaTotal, 0)
     
     return {
       text: `🚚 Resumen de distribuidores:\n\n• Total distribuidores: ${totalDist}\n• Deuda total a pagar: $${deudaTotal.toLocaleString()}`,
-      suggestions: ["Ver órdenes pendientes", "Registrar pago", "Nueva orden de compra"]
+      suggestions: ['Ver órdenes pendientes', 'Registrar pago', 'Nueva orden de compra'],
     }
   }
   
   // Saludo o inicio
-  if (lowerMessage.includes("hola") || lowerMessage.includes("inicio") || lowerMessage.includes("ayuda")) {
+  if (lowerMessage.includes('hola') || lowerMessage.includes('inicio') || lowerMessage.includes('ayuda')) {
     return {
-      text: "¡Hola! 👋 Soy Chronos, tu asistente de IA. Puedo ayudarte con:\n\n• 📊 Análisis de ventas\n• 📦 Estado del inventario\n• 🏦 Resumen financiero\n• 👥 Gestión de clientes\n• 🚚 Control de distribuidores\n\n¿Qué te gustaría consultar?",
-      suggestions: ["Resumen del día", "Ventas de hoy", "Estado de bancos"]
+      text: '¡Hola! 👋 Soy Chronos, tu asistente de IA. Puedo ayudarte con:\n\n• 📊 Análisis de ventas\n• 📦 Estado del inventario\n• 🏦 Resumen financiero\n• 👥 Gestión de clientes\n• 🚚 Control de distribuidores\n\n¿Qué te gustaría consultar?',
+      suggestions: ['Resumen del día', 'Ventas de hoy', 'Estado de bancos'],
     }
   }
   
   // Resumen general
-  if (lowerMessage.includes("resumen") || lowerMessage.includes("general") || lowerMessage.includes("dashboard")) {
+  if (lowerMessage.includes('resumen') || lowerMessage.includes('general') || lowerMessage.includes('dashboard')) {
     const totalCapital = store.bancos.reduce((sum, b) => sum + b.saldo, 0)
     const totalVentas = store.ventas.reduce((sum, v) => sum + v.precioTotalVenta, 0)
     const deudaClientes = store.clientes.reduce((sum, c) => sum + c.deudaTotal, 0)
     
     return {
       text: `📈 Resumen General del Sistema:\n\n💰 Capital disponible: $${totalCapital.toLocaleString()}\n📊 Ventas totales: $${totalVentas.toLocaleString()}\n💳 Por cobrar: $${deudaClientes.toLocaleString()}\n📦 Productos en stock: ${store.productos.length}\n👥 Clientes activos: ${store.clientes.length}`,
-      suggestions: ["Ver detalles", "Exportar reporte", "Análisis profundo"]
+      suggestions: ['Ver detalles', 'Exportar reporte', 'Análisis profundo'],
     }
   }
   
   // Respuesta por defecto
   return {
-    text: "Entiendo tu consulta. Para darte información más precisa, puedes preguntarme sobre:\n\n• Ventas y facturación\n• Inventario y productos\n• Estado de bancos\n• Clientes y cobranza\n• Distribuidores y pagos",
-    suggestions: ["Ver ventas", "Estado financiero", "Revisar inventario"]
+    text: 'Entiendo tu consulta. Para darte información más precisa, puedes preguntarme sobre:\n\n• Ventas y facturación\n• Inventario y productos\n• Estado de bancos\n• Clientes y cobranza\n• Distribuidores y pagos',
+    suggestions: ['Ver ventas', 'Estado financiero', 'Revisar inventario'],
   }
 }
 
 export function FloatingSplineAIWidget() {
-  const [widgetState, setWidgetState] = useState<"minimized" | "chat">("minimized")
+  const [widgetState, setWidgetState] = useState<'minimized' | 'chat'>('minimized')
   const [messages, setMessages] = useState<DisplayMessage[]>([])
-  const [inputText, setInputText] = useState("")
+  const [inputText, setInputText] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const [splineApp, setSplineApp] = useState<Application | null>(null)
   const [notificationCount, setNotificationCount] = useState(2)
@@ -217,7 +217,7 @@ export function FloatingSplineAIWidget() {
 
   // Scroll automático
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
   // Manejar carga del Spline
@@ -227,8 +227,8 @@ export function FloatingSplineAIWidget() {
 
   // Ir al panel IA
   const goToIAPanel = () => {
-    setCurrentPanel("ia")
-    setWidgetState("minimized")
+    setCurrentPanel('ia')
+    setWidgetState('minimized')
   }
 
   // Enviar mensaje
@@ -238,15 +238,15 @@ export function FloatingSplineAIWidget() {
     const userMessage: DisplayMessage = {
       id: Date.now().toString(),
       text: inputText,
-      sender: "user",
+      sender: 'user',
       timestamp: new Date(),
     }
 
     setMessages((prev) => [...prev, userMessage])
     const messageToSend = inputText
-    setInputText("")
+    setInputText('')
     setIsTyping(true)
-    setVoiceAgentStatus("thinking")
+    setVoiceAgentStatus('thinking')
 
     // Simular delay de respuesta IA
     setTimeout(() => {
@@ -255,14 +255,14 @@ export function FloatingSplineAIWidget() {
       const aiMessage: DisplayMessage = {
         id: (Date.now() + 1).toString(),
         text: response.text,
-        sender: "ai",
+        sender: 'ai',
         timestamp: new Date(),
-        suggestions: response.suggestions
+        suggestions: response.suggestions,
       }
       
       setMessages((prev) => [...prev, aiMessage])
       setIsTyping(false)
-      setVoiceAgentStatus("idle")
+      setVoiceAgentStatus('idle')
       setNotificationCount(0)
     }, 800)
   }, [inputText, isTyping, store, setVoiceAgentStatus])
@@ -271,19 +271,19 @@ export function FloatingSplineAIWidget() {
   const toggleListening = () => {
     setIsListening(!isListening)
     if (!isListening) {
-      setVoiceAgentStatus("listening")
+      setVoiceAgentStatus('listening')
       // Simular que deja de escuchar después de 3 segundos
       setTimeout(() => {
         setIsListening(false)
-        setVoiceAgentStatus("idle")
+        setVoiceAgentStatus('idle')
       }, 3000)
     } else {
-      setVoiceAgentStatus("idle")
+      setVoiceAgentStatus('idle')
     }
   }
 
   // Estado minimizado - Solo el orb Spline
-  if (widgetState === "minimized") {
+  if (widgetState === 'minimized') {
     return (
       <motion.div
         initial={{ scale: 0, opacity: 0 }}
@@ -295,7 +295,7 @@ export function FloatingSplineAIWidget() {
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
           className="relative w-20 h-20 rounded-full cursor-pointer group"
-          onClick={() => setWidgetState("chat")}
+          onClick={() => setWidgetState('chat')}
         >
           {/* Glow exterior animado */}
           <motion.div
@@ -307,7 +307,7 @@ export function FloatingSplineAIWidget() {
             transition={{
               duration: 3,
               repeat: Number.POSITIVE_INFINITY,
-              ease: "easeInOut",
+              ease: 'easeInOut',
             }}
           />
 
@@ -331,7 +331,7 @@ export function FloatingSplineAIWidget() {
                 <motion.div
                   className="w-8 h-8 rounded-full border-2 border-blue-500 border-t-transparent"
                   animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                  transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: 'linear' }}
                 />
               </div>
             }>
@@ -367,12 +367,12 @@ export function FloatingSplineAIWidget() {
           {/* Indicador de estado */}
           <motion.div
             className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-slate-900 ${
-              voiceAgentStatus === "listening" ? "bg-green-500" :
-              voiceAgentStatus === "speaking" ? "bg-blue-500" :
-              voiceAgentStatus === "thinking" ? "bg-purple-500" :
-              "bg-green-500"
+              voiceAgentStatus === 'listening' ? 'bg-green-500' :
+              voiceAgentStatus === 'speaking' ? 'bg-blue-500' :
+              voiceAgentStatus === 'thinking' ? 'bg-purple-500' :
+              'bg-green-500'
             }`}
-            animate={voiceAgentStatus !== "idle" ? {
+            animate={voiceAgentStatus !== 'idle' ? {
               scale: [1, 1.3, 1],
             } : {}}
             transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY }}
@@ -407,9 +407,9 @@ export function FloatingSplineAIWidget() {
                   />
                 </Suspense>
                 <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-slate-900 ${
-                  isListening ? "bg-green-500 animate-pulse" :
-                  isTyping ? "bg-blue-500 animate-pulse" :
-                  "bg-green-500"
+                  isListening ? 'bg-green-500 animate-pulse' :
+                  isTyping ? 'bg-blue-500 animate-pulse' :
+                  'bg-green-500'
                 }`} />
               </div>
               <div>
@@ -419,12 +419,12 @@ export function FloatingSplineAIWidget() {
                 </h3>
                 <div className="flex items-center gap-1">
                   <div className={`w-1.5 h-1.5 rounded-full ${
-                    isListening ? "bg-green-500" :
-                    isTyping ? "bg-blue-500" :
-                    "bg-green-500"
+                    isListening ? 'bg-green-500' :
+                    isTyping ? 'bg-blue-500' :
+                    'bg-green-500'
                   } animate-pulse`} />
                   <span className="text-white/60 text-xs">
-                    {isListening ? "Escuchando..." : isTyping ? "Pensando..." : "Online"}
+                    {isListening ? 'Escuchando...' : isTyping ? 'Pensando...' : 'Online'}
                   </span>
                 </div>
               </div>
@@ -444,7 +444,7 @@ export function FloatingSplineAIWidget() {
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                onClick={() => setWidgetState("minimized")}
+                onClick={() => setWidgetState('minimized')}
                 className="p-2 hover:bg-white/10 rounded-lg transition-colors"
               >
                 <X className="w-4 h-4 text-white/60" />
@@ -464,7 +464,7 @@ export function FloatingSplineAIWidget() {
                     <motion.div
                       className="w-10 h-10 rounded-full border-2 border-blue-500 border-t-transparent"
                       animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                      transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: 'linear' }}
                     />
                   </div>
                 }>
@@ -479,7 +479,7 @@ export function FloatingSplineAIWidget() {
               
               {/* Quick actions */}
               <div className="flex flex-wrap gap-2 justify-center">
-                {["Resumen del día", "Ver ventas", "Estado financiero"].map((action) => (
+                {['Resumen del día', 'Ver ventas', 'Estado financiero'].map((action) => (
                   <motion.button
                     key={action}
                     whileHover={{ scale: 1.05 }}
@@ -499,14 +499,14 @@ export function FloatingSplineAIWidget() {
                   key={message.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
+                  className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
                     className={`
                       max-w-[85%] px-4 py-2.5 rounded-2xl text-sm whitespace-pre-line
-                      ${message.sender === "user" 
-                        ? "bg-gradient-to-br from-blue-600 to-purple-600 text-white" 
-                        : "bg-white/10 text-white"}
+                      ${message.sender === 'user' 
+                        ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white' 
+                        : 'bg-white/10 text-white'}
                     `}
                   >
                     {message.text}
@@ -567,8 +567,8 @@ export function FloatingSplineAIWidget() {
               disabled={isTyping}
               className={`
                 p-2.5 rounded-xl transition-all
-                ${isListening ? "bg-red-500" : "bg-white/10 hover:bg-white/15"}
-                ${isTyping ? "opacity-50 cursor-not-allowed" : ""}
+                ${isListening ? 'bg-red-500' : 'bg-white/10 hover:bg-white/15'}
+                ${isTyping ? 'opacity-50 cursor-not-allowed' : ''}
               `}
             >
               {isListening ? <MicOff className="w-4 h-4 text-white" /> : <Mic className="w-4 h-4 text-white" />}
@@ -578,7 +578,7 @@ export function FloatingSplineAIWidget() {
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
               placeholder="Escribe tu mensaje..."
               disabled={isTyping}
               className="flex-1 bg-white/5 text-white px-4 py-2.5 rounded-xl border border-white/10 focus:outline-none focus:border-blue-500 text-sm placeholder:text-white/40 disabled:opacity-50"

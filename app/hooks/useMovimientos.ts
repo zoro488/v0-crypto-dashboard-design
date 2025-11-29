@@ -9,10 +9,10 @@
  * - Movimientos recientes
  */
 
-"use client"
+'use client'
 
-import { useState, useEffect, useCallback, useRef } from "react"
-import type { Movimiento, BancoId, TipoMovimiento } from "@/app/types"
+import { useState, useEffect, useCallback, useRef } from 'react'
+import type { Movimiento, BancoId, TipoMovimiento } from '@/app/types'
 import { 
   suscribirMovimientosBanco, 
   suscribirMovimientosPorTipo,
@@ -20,10 +20,10 @@ import {
   calcularTotalesBanco,
   obtenerMovimientosRecientes,
   crearMovimiento,
-  type NuevoMovimientoInput 
-} from "@/app/lib/firebase/movimientos.service"
-import { ALL_BANCO_IDS } from "@/app/lib/config/collections.config"
-import { logger } from "@/app/lib/utils/logger"
+  type NuevoMovimientoInput, 
+} from '@/app/lib/firebase/movimientos.service'
+import { ALL_BANCO_IDS } from '@/app/lib/config/collections.config'
+import { logger } from '@/app/lib/utils/logger'
 
 // ============================================================
 // TIPOS
@@ -112,10 +112,10 @@ export function useMovimientosBanco(bancoId: BancoId): UseMovimientosBancoResult
   }, [bancoId, cargarTotales])
 
   // Filtrar por tipo
-  const ingresos = movimientos.filter(m => m.tipoMovimiento === "ingreso" || m.tipoMovimiento === "abono_cliente")
-  const gastos = movimientos.filter(m => m.tipoMovimiento === "gasto" || m.tipoMovimiento === "pago_distribuidor")
+  const ingresos = movimientos.filter(m => m.tipoMovimiento === 'ingreso' || m.tipoMovimiento === 'abono_cliente')
+  const gastos = movimientos.filter(m => m.tipoMovimiento === 'gasto' || m.tipoMovimiento === 'pago_distribuidor')
   const transferencias = movimientos.filter(m => 
-    m.tipoMovimiento === "transferencia_entrada" || m.tipoMovimiento === "transferencia_salida"
+    m.tipoMovimiento === 'transferencia_entrada' || m.tipoMovimiento === 'transferencia_salida',
   )
 
   return {
@@ -139,7 +139,7 @@ export function useMovimientosBanco(bancoId: BancoId): UseMovimientosBancoResult
  */
 export function useMovimientosPorTipo(
   bancoId: BancoId, 
-  tipo: TipoMovimiento
+  tipo: TipoMovimiento,
 ): UseMovimientosResult {
   const [movimientos, setMovimientos] = useState<Movimiento[]>([])
   const [loading, setLoading] = useState(true)
@@ -215,7 +215,7 @@ export function useTodosMovimientos(maxResults = 100): UseTodosMovimientosResult
       const id = await crearMovimiento(input)
       return id
     } catch (err) {
-      logger.error("Error creando movimiento", err)
+      logger.error('Error creando movimiento', err)
       return null
     }
   }, [])
@@ -249,8 +249,8 @@ export function useMovimientosRecientes(cantidad = 20): UseMovimientosResult {
       setMovimientos(result)
       setError(null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error cargando movimientos")
-      logger.error("Error cargando movimientos recientes", err)
+      setError(err instanceof Error ? err.message : 'Error cargando movimientos')
+      logger.error('Error cargando movimientos recientes', err)
     } finally {
       setLoading(false)
     }
@@ -273,7 +273,7 @@ export function useMovimientosRecientes(cantidad = 20): UseMovimientosResult {
 // ============================================================
 
 export function useIngresosBanco(bancoId: BancoId) {
-  return useMovimientosPorTipo(bancoId, "ingreso")
+  return useMovimientosPorTipo(bancoId, 'ingreso')
 }
 
 // ============================================================
@@ -281,7 +281,7 @@ export function useIngresosBanco(bancoId: BancoId) {
 // ============================================================
 
 export function useGastosBanco(bancoId: BancoId) {
-  return useMovimientosPorTipo(bancoId, "gasto")
+  return useMovimientosPorTipo(bancoId, 'gasto')
 }
 
 // ============================================================

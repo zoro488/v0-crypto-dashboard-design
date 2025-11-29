@@ -1,7 +1,7 @@
-import { Timestamp } from "firebase/firestore"
+import { Timestamp } from 'firebase/firestore'
 
 // Re-exportar tipos del sistema inmersivo 3D
-export * from "./immersive"
+export * from './immersive'
 
 // ===================================================================
 // 🏛️ TIPOS BASE - CHRONOS SYSTEM
@@ -18,20 +18,20 @@ export * from "./immersive"
 export type FirestoreTimestamp = Timestamp | Date | string
 
 // Monedas soportadas
-export type Moneda = "MXN" | "USD" | "USDT"
+export type Moneda = 'MXN' | 'USD' | 'USDT'
 
 // Métodos de pago
-export type MetodoPago = "efectivo" | "transferencia" | "crypto" | "cheque" | "credito"
+export type MetodoPago = 'efectivo' | 'transferencia' | 'crypto' | 'cheque' | 'credito'
 
 // IDs de bancos del sistema (7 entidades - snake_case estandarizado)
 export type BancoId = 
-  | "boveda_monte"   // Bóveda principal (69 movimientos)
-  | "boveda_usa"     // Bóveda USD (17 movimientos)
-  | "profit"         // Banco operativo (55 movimientos)
-  | "leftie"         // Banco operativo (11 movimientos)
-  | "azteca"         // Banco operativo (6 movimientos)
-  | "flete_sur"      // Gastos de flete (101 movimientos)
-  | "utilidades"     // Ganancias (51 movimientos)
+  | 'boveda_monte'   // Bóveda principal (69 movimientos)
+  | 'boveda_usa'     // Bóveda USD (17 movimientos)
+  | 'profit'         // Banco operativo (55 movimientos)
+  | 'leftie'         // Banco operativo (11 movimientos)
+  | 'azteca'         // Banco operativo (6 movimientos)
+  | 'flete_sur'      // Gastos de flete (101 movimientos)
+  | 'utilidades'     // Ganancias (51 movimientos)
 
 // ===================================================================
 // BANCOS / BÓVEDAS
@@ -41,7 +41,7 @@ export interface Banco {
   nombre: string
   icon: string
   color: string
-  tipo: "boveda" | "operativo" | "gastos" | "utilidades"
+  tipo: 'boveda' | 'operativo' | 'gastos' | 'utilidades'
   descripcion: string
   moneda: Moneda
   capitalActual: number
@@ -49,7 +49,7 @@ export interface Banco {
   historicoIngresos: number
   historicoGastos: number
   historicoTransferencias: number
-  estado: "activo" | "inactivo" | "negativo"
+  estado: 'activo' | 'inactivo' | 'negativo'
   createdAt: FirestoreTimestamp
   updatedAt: FirestoreTimestamp
 }
@@ -80,7 +80,7 @@ export interface Cliente {
   // Keywords para búsqueda
   keywords: string[]
   // Estado
-  estado: "activo" | "inactivo"
+  estado: 'activo' | 'inactivo'
   observaciones?: string
   createdAt: FirestoreTimestamp
   updatedAt?: FirestoreTimestamp
@@ -114,7 +114,7 @@ export interface Distribuidor {
   // Keywords para búsqueda
   keywords: string[]
   // Estado
-  estado: "activo" | "inactivo" | "suspendido"
+  estado: 'activo' | 'inactivo' | 'suspendido'
   createdAt: FirestoreTimestamp
   updatedAt?: FirestoreTimestamp
 }
@@ -147,7 +147,7 @@ export interface OrdenCompra {
   deuda: number                // costoTotal - pagoDistribuidor
   bancoOrigen?: BancoId        // De dónde salió el pago
   // Estado
-  estado: "pendiente" | "parcial" | "pagado" | "cancelado"
+  estado: 'pendiente' | 'parcial' | 'pagado' | 'cancelado'
   // Keywords para búsqueda
   keywords: string[]
   notas?: string
@@ -193,7 +193,7 @@ export interface Venta {
   totalVenta: number           // Alias de ingreso
   precioTotalVenta: number     // Alias de ingreso
   // Flete
-  flete: "Aplica" | "NoAplica"
+  flete: 'Aplica' | 'NoAplica'
   fleteUtilidad: number        // Monto del flete
   precioFlete: number          // Alias
   // Utilidad/Ganancia
@@ -203,8 +203,8 @@ export interface Venta {
   bovedaMonte: number          // Monto que va a bóveda monte
   distribucionBancos: DistribucionBancos
   // Estado de pago
-  estatus: "Pagado" | "Pendiente" | "Parcial"
-  estadoPago: "completo" | "parcial" | "pendiente"
+  estatus: 'Pagado' | 'Pendiente' | 'Parcial'
+  estadoPago: 'completo' | 'parcial' | 'pendiente'
   montoPagado: number
   montoRestante: number
   adeudo: number               // Alias de montoRestante
@@ -226,12 +226,12 @@ export interface Venta {
 // Reemplaza las 7 colecciones de *_ingresos
 // ===================================================================
 export type TipoMovimiento = 
-  | "ingreso" 
-  | "gasto" 
-  | "transferencia_entrada" 
-  | "transferencia_salida"
-  | "abono_cliente"
-  | "pago_distribuidor"
+  | 'ingreso' 
+  | 'gasto' 
+  | 'transferencia_entrada' 
+  | 'transferencia_salida'
+  | 'abono_cliente'
+  | 'pago_distribuidor'
 
 export interface Movimiento {
   id: string
@@ -250,7 +250,7 @@ export interface Movimiento {
   dolares?: number
   // Referencias
   referenciaId?: string        // ID de venta, OC, etc.
-  referenciaTipo?: "venta" | "orden_compra" | "abono" | "transferencia" | "manual"
+  referenciaTipo?: 'venta' | 'orden_compra' | 'abono' | 'transferencia' | 'manual'
   // Balance
   saldoAnterior?: number
   saldoNuevo?: number
@@ -295,7 +295,7 @@ export interface Producto {
 
 export interface MovimientoAlmacen {
   id: string
-  tipo: "entrada" | "salida" | "ajuste"
+  tipo: 'entrada' | 'salida' | 'ajuste'
   fecha: FirestoreTimestamp
   productoId: string
   productoNombre: string       // Snapshot
@@ -308,7 +308,7 @@ export interface MovimientoAlmacen {
   valorTotal?: number
   // Referencia
   referenciaId?: string        // ID de venta u OC
-  referenciaTipo?: "venta" | "orden_compra" | "ajuste_manual"
+  referenciaTipo?: 'venta' | 'orden_compra' | 'ajuste_manual'
   origen?: string
   destino?: string
   motivo?: string
@@ -323,7 +323,7 @@ export interface MovimientoAlmacen {
 export interface GastoAbono {
   id: string
   fecha: string | FirestoreTimestamp
-  tipo: "gasto" | "abono"
+  tipo: 'gasto' | 'abono'
   origen: string               // Cliente o fuente
   valor: number                // Monto
   monto: number                // Alias
@@ -335,7 +335,7 @@ export interface GastoAbono {
   observaciones?: string
   // Referencias
   entidadId?: string           // ID de cliente o distribuidor
-  entidadTipo?: "cliente" | "distribuidor"
+  entidadTipo?: 'cliente' | 'distribuidor'
   createdAt: FirestoreTimestamp
 }
 
@@ -345,7 +345,7 @@ export interface GastoAbono {
 export interface CorteBancario {
   id: string
   bancoId: BancoId
-  periodo: "diario" | "semanal" | "mensual" | "trimestral" | "anual"
+  periodo: 'diario' | 'semanal' | 'mensual' | 'trimestral' | 'anual'
   fechaInicio: string | FirestoreTimestamp
   fechaFin: string | FirestoreTimestamp
   capitalInicial: number
@@ -355,7 +355,7 @@ export interface CorteBancario {
   diferencia: number
   variacionPorcentaje: number
   numeroTransacciones: number
-  estado: "positivo" | "negativo" | "neutro"
+  estado: 'positivo' | 'negativo' | 'neutro'
   createdAt: FirestoreTimestamp
 }
 
@@ -363,7 +363,7 @@ export interface CorteBancario {
 // DASHBOARD STATS (Agregadores)
 // ===================================================================
 export interface DashboardStats {
-  id: "dashboard_main"
+  id: 'dashboard_main'
   // Ventas
   ventasHoy: number
   ventasSemana: number
@@ -392,7 +392,7 @@ export interface DashboardStats {
 export interface AuditLog {
   id: string
   fecha: FirestoreTimestamp
-  accion: "create" | "update" | "delete" | "login" | "error"
+  accion: 'create' | 'update' | 'delete' | 'login' | 'error'
   entidad: string
   entidadId?: string
   descripcion: string
@@ -422,7 +422,7 @@ export interface ComboboxOption {
   metadata?: Record<string, unknown>
 }
 
-export type FormMode = "create" | "edit" | "view"
+export type FormMode = 'create' | 'edit' | 'view'
 
 // Input types para crear registros
 export interface NuevaVentaInput {
@@ -430,7 +430,7 @@ export interface NuevaVentaInput {
   ocRelacionada: string
   cantidad: number
   precioVenta: number
-  flete: "Aplica" | "NoAplica"
+  flete: 'Aplica' | 'NoAplica'
   metodoPago: MetodoPago
   montoPagado: number
   bancoDestino?: BancoId
@@ -448,7 +448,7 @@ export interface NuevaOrdenCompraInput {
 }
 
 export interface NuevoAbonoInput {
-  tipo: "cliente" | "distribuidor"
+  tipo: 'cliente' | 'distribuidor'
   entidadId: string
   monto: number
   bancoDestino: BancoId
@@ -504,7 +504,7 @@ export interface BancoConfig {
   colorHex: string
   gradientFrom: string
   gradientTo: string
-  tipo: "boveda" | "operativo" | "gastos" | "utilidades"
+  tipo: 'boveda' | 'operativo' | 'gastos' | 'utilidades'
   moneda: Moneda
   descripcion: string
   recibePagosVentas: boolean
@@ -528,7 +528,7 @@ export interface TotalesDashboard {
 
 export interface AlertaDashboard {
   id: string
-  tipo: "warning" | "error" | "info" | "success"
+  tipo: 'warning' | 'error' | 'info' | 'success'
   titulo: string
   mensaje: string
   bancoId?: BancoId
@@ -540,7 +540,7 @@ export interface AlertaDashboard {
 // TIPOS PARA REPORTES
 // ===================================================================
 
-export type PeriodoReporte = "diario" | "semanal" | "mensual" | "trimestral" | "anual" | "personalizado"
+export type PeriodoReporte = 'diario' | 'semanal' | 'mensual' | 'trimestral' | 'anual' | 'personalizado'
 
 export interface FiltrosReporte {
   periodo: PeriodoReporte
@@ -585,16 +585,16 @@ export interface ReporteFinanciero {
 // ===================================================================
 
 export type PanelId = 
-  | "dashboard"
-  | "bancos"
-  | "ventas"
-  | "ordenes"
-  | "clientes"
-  | "distribuidores"
-  | "almacen"
-  | "reportes"
-  | "ia"
-  | "configuracion"
+  | 'dashboard'
+  | 'bancos'
+  | 'ventas'
+  | 'ordenes'
+  | 'clientes'
+  | 'distribuidores'
+  | 'almacen'
+  | 'reportes'
+  | 'ia'
+  | 'configuracion'
 
 export interface PanelConfig {
   id: PanelId
@@ -608,7 +608,7 @@ export interface PanelConfig {
 
 export interface NotificacionUI {
   id: string
-  tipo: "success" | "error" | "warning" | "info"
+  tipo: 'success' | 'error' | 'warning' | 'info'
   titulo: string
   mensaje: string
   duracion?: number
@@ -628,7 +628,7 @@ export interface FiltrosBusqueda {
   fechaFin?: string | Date
   estado?: string
   ordenarPor?: string
-  ordenDireccion?: "asc" | "desc"
+  ordenDireccion?: 'asc' | 'desc'
   limite?: number
   offset?: number
 }
@@ -645,7 +645,7 @@ export interface ResultadoBusqueda<T> {
 // TIPOS PARA EXPORTACIÓN
 // ===================================================================
 
-export type FormatoExportacion = "csv" | "xlsx" | "pdf" | "json"
+export type FormatoExportacion = 'csv' | 'xlsx' | 'pdf' | 'json'
 
 export interface ConfigExportacion {
   formato: FormatoExportacion
@@ -662,7 +662,7 @@ export interface ConfigExportacion {
 /** @deprecated Usar Movimiento */
 export interface Operacion {
   id: string
-  tipo: "ingreso" | "gasto" | "transferencia_entrada" | "transferencia_salida"
+  tipo: 'ingreso' | 'gasto' | 'transferencia_entrada' | 'transferencia_salida'
   fecha: FirestoreTimestamp
   monto: number
   concepto: string
@@ -674,13 +674,13 @@ export interface Operacion {
 export interface Transferencia {
   id: string
   fecha: string
-  tipo: "entrada" | "salida"
+  tipo: 'entrada' | 'salida'
   monto: number
   bancoOrigen: BancoId
   bancoDestino: BancoId
   concepto: string
   referencia?: string
-  estado: "completada" | "pendiente"
+  estado: 'completada' | 'pendiente'
   createdAt: FirestoreTimestamp
 }
 

@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import type React from "react"
-import { useState, useCallback, useMemo } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import type React from 'react'
+import { useState, useCallback, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   X, 
   ArrowRightLeft, 
@@ -13,35 +13,35 @@ import {
   Mic,
   AlertTriangle,
   ArrowRight,
-  CheckCircle2
-} from "lucide-react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
+  CheckCircle2,
+} from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogDescription,
-} from "@/app/components/ui/dialog"
-import { cn } from "@/app/lib/utils"
-import { firestoreService } from "@/app/lib/firebase/firestore-service"
-import { useToast } from "@/app/hooks/use-toast"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { logger } from "@/app/lib/utils/logger"
-import { BANCOS } from "@/app/lib/constants"
+} from '@/app/components/ui/dialog'
+import { cn } from '@/app/lib/utils'
+import { firestoreService } from '@/app/lib/firebase/firestore-service'
+import { useToast } from '@/app/hooks/use-toast'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { logger } from '@/app/lib/utils/logger'
+import { BANCOS } from '@/app/lib/constants'
 
 // Schema de validación Zod
 const transferenciaSchema = z.object({
-  bancoOrigen: z.string().min(1, "Selecciona un banco de origen"),
-  bancoDestino: z.string().min(1, "Selecciona un banco de destino"),
-  monto: z.number().positive("El monto debe ser mayor a 0"),
+  bancoOrigen: z.string().min(1, 'Selecciona un banco de origen'),
+  bancoDestino: z.string().min(1, 'Selecciona un banco de destino'),
+  monto: z.number().positive('El monto debe ser mayor a 0'),
   concepto: z.string().optional(),
   referencia: z.string().optional(),
   notas: z.string().optional(),
 }).refine((data) => data.bancoOrigen !== data.bancoDestino, {
-  message: "Los bancos de origen y destino deben ser diferentes",
-  path: ["bancoDestino"],
+  message: 'Los bancos de origen y destino deben ser diferentes',
+  path: ['bancoDestino'],
 })
 
 type TransferenciaFormData = z.infer<typeof transferenciaSchema>
@@ -55,7 +55,7 @@ interface CreateTransferenciaModalSmartProps {
 export default function CreateTransferenciaModalSmart({ 
   isOpen, 
   onClose, 
-  onSubmit 
+  onSubmit, 
 }: CreateTransferenciaModalSmartProps) {
   const { toast } = useToast()
   const bancos = useAppStore((state) => state.bancos)
@@ -75,20 +75,20 @@ export default function CreateTransferenciaModalSmart({
     formState: { errors, isValid },
   } = useForm<TransferenciaFormData>({
     resolver: zodResolver(transferenciaSchema),
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
-      bancoOrigen: "",
-      bancoDestino: "",
+      bancoOrigen: '',
+      bancoDestino: '',
       monto: 0,
-      concepto: "",
-      referencia: "",
-      notas: "",
+      concepto: '',
+      referencia: '',
+      notas: '',
     },
   })
 
-  const watchedBancoOrigen = watch("bancoOrigen")
-  const watchedBancoDestino = watch("bancoDestino")
-  const watchedMonto = watch("monto")
+  const watchedBancoOrigen = watch('bancoOrigen')
+  const watchedBancoDestino = watch('bancoDestino')
+  const watchedMonto = watch('monto')
 
   // Obtener bancos seleccionados
   const selectedBancoOrigen = useMemo(() => {
@@ -113,8 +113,8 @@ export default function CreateTransferenciaModalSmart({
   const handleVoiceFill = useCallback(() => {
     setIsVoiceActive(true)
     toast({
-      title: "Modo Voz Activado",
-      description: "Próximamente: Dicta la información de la transferencia",
+      title: 'Modo Voz Activado',
+      description: 'Próximamente: Dicta la información de la transferencia',
     })
     setTimeout(() => setIsVoiceActive(false), 2000)
   }, [toast])
@@ -122,9 +122,9 @@ export default function CreateTransferenciaModalSmart({
   const onFormSubmit = async (data: TransferenciaFormData) => {
     if (!hasSufficientFunds) {
       toast({
-        title: "Saldo Insuficiente",
-        description: "El banco de origen no tiene suficiente saldo para esta transferencia.",
-        variant: "destructive",
+        title: 'Saldo Insuficiente',
+        description: 'El banco de origen no tiene suficiente saldo para esta transferencia.',
+        variant: 'destructive',
       })
       return
     }
@@ -137,9 +137,9 @@ export default function CreateTransferenciaModalSmart({
         bancoOrigenId: data.bancoOrigen,
         bancoDestinoId: data.bancoDestino,
         monto: data.monto,
-        concepto: data.concepto || "Transferencia entre bancos",
-        referencia: data.referencia || "",
-        notas: data.notas || "",
+        concepto: data.concepto || 'Transferencia entre bancos',
+        referencia: data.referencia || '',
+        notas: data.notas || '',
       })
 
       // Actualizar estado local
@@ -153,7 +153,7 @@ export default function CreateTransferenciaModalSmart({
       }
 
       toast({
-        title: "✅ Transferencia Exitosa",
+        title: '✅ Transferencia Exitosa',
         description: `Se transfirieron $${data.monto.toLocaleString()} correctamente.`,
       })
 
@@ -162,11 +162,11 @@ export default function CreateTransferenciaModalSmart({
       setStep(1)
       onClose()
     } catch (error) {
-      logger.error("Error creating transferencia", error, { context: "CreateTransferenciaModalSmart" })
+      logger.error('Error creating transferencia', error, { context: 'CreateTransferenciaModalSmart' })
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Error al crear la transferencia.",
-        variant: "destructive",
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Error al crear la transferencia.',
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -188,10 +188,10 @@ export default function CreateTransferenciaModalSmart({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
         className={cn(
-          "max-w-2xl max-h-[85vh] p-0",
-          "bg-black/95 border-white/10 backdrop-blur-2xl",
-          "text-white overflow-hidden flex flex-col",
-          "shadow-2xl shadow-indigo-500/10"
+          'max-w-2xl max-h-[85vh] p-0',
+          'bg-black/95 border-white/10 backdrop-blur-2xl',
+          'text-white overflow-hidden flex flex-col',
+          'shadow-2xl shadow-indigo-500/10',
         )}
       >
         <DialogTitle className="sr-only">Nueva Transferencia</DialogTitle>
@@ -218,8 +218,8 @@ export default function CreateTransferenciaModalSmart({
                 whileTap={{ scale: 0.95 }}
                 className={`absolute right-16 top-4 sm:right-20 sm:top-6 p-2 rounded-xl transition-all ${
                   isVoiceActive 
-                    ? "bg-indigo-500/30 text-indigo-300" 
-                    : "hover:bg-white/10 text-gray-400 hover:text-white"
+                    ? 'bg-indigo-500/30 text-indigo-300' 
+                    : 'hover:bg-white/10 text-gray-400 hover:text-white'
                 }`}
               >
                 <Mic className="w-5 h-5" />
@@ -242,7 +242,7 @@ export default function CreateTransferenciaModalSmart({
                     <div key={s} className="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: step >= s ? "100%" : "0%" }}
+                        animate={{ width: step >= s ? '100%' : '0%' }}
                         transition={{ duration: 0.3 }}
                         className="h-full bg-gradient-to-r from-indigo-500 to-violet-500"
                       />
@@ -250,8 +250,8 @@ export default function CreateTransferenciaModalSmart({
                   ))}
                 </div>
                 <div className="flex justify-between mt-2 text-xs text-gray-500">
-                  <span className={step >= 1 ? "text-indigo-400" : ""}>Bancos</span>
-                  <span className={step >= 2 ? "text-indigo-400" : ""}>Monto y Detalles</span>
+                  <span className={step >= 1 ? 'text-indigo-400' : ''}>Bancos</span>
+                  <span className={step >= 2 ? 'text-indigo-400' : ''}>Monto y Detalles</span>
                 </div>
               </div>
             </div>
@@ -275,18 +275,18 @@ export default function CreateTransferenciaModalSmart({
                         Banco Origen *
                       </label>
                       <select
-                        {...register("bancoOrigen")}
+                        {...register('bancoOrigen')}
                         onChange={(e) => {
-                          setValue("bancoOrigen", e.target.value)
+                          setValue('bancoOrigen', e.target.value)
                           // Reset destino si es igual al nuevo origen
                           if (watchedBancoDestino === e.target.value) {
-                            setValue("bancoDestino", "")
+                            setValue('bancoDestino', '')
                           }
                         }}
                         className={`w-full px-5 py-4 bg-white/5 border rounded-xl text-white text-lg focus:outline-none focus:ring-2 transition-all appearance-none ${
                           errors.bancoOrigen 
-                            ? "border-red-500/50 focus:ring-red-500" 
-                            : "border-white/10 focus:ring-indigo-500 focus:border-transparent"
+                            ? 'border-red-500/50 focus:ring-red-500' 
+                            : 'border-white/10 focus:ring-indigo-500 focus:border-transparent'
                         }`}
                       >
                         <option value="" className="bg-gray-900">Seleccionar banco origen...</option>
@@ -341,11 +341,11 @@ export default function CreateTransferenciaModalSmart({
                         Banco Destino *
                       </label>
                       <select
-                        {...register("bancoDestino")}
+                        {...register('bancoDestino')}
                         className={`w-full px-5 py-4 bg-white/5 border rounded-xl text-white text-lg focus:outline-none focus:ring-2 transition-all appearance-none ${
                           errors.bancoDestino 
-                            ? "border-red-500/50 focus:ring-red-500" 
-                            : "border-white/10 focus:ring-indigo-500 focus:border-transparent"
+                            ? 'border-red-500/50 focus:ring-red-500' 
+                            : 'border-white/10 focus:ring-indigo-500 focus:border-transparent'
                         }`}
                       >
                         <option value="" className="bg-gray-900">Seleccionar banco destino...</option>
@@ -445,11 +445,11 @@ export default function CreateTransferenciaModalSmart({
                         <input
                           type="number"
                           step="0.01"
-                          {...register("monto", { valueAsNumber: true })}
+                          {...register('monto', { valueAsNumber: true })}
                           className={`w-full pl-10 pr-5 py-4 bg-white/5 border rounded-xl text-white text-2xl font-bold focus:outline-none focus:ring-2 transition-all ${
                             errors.monto || !hasSufficientFunds
-                              ? "border-red-500/50 focus:ring-red-500" 
-                              : "border-white/10 focus:ring-indigo-500 focus:border-transparent"
+                              ? 'border-red-500/50 focus:ring-red-500' 
+                              : 'border-white/10 focus:ring-indigo-500 focus:border-transparent'
                           }`}
                           placeholder="0.00"
                         />
@@ -475,21 +475,21 @@ export default function CreateTransferenciaModalSmart({
                         <div className="flex gap-2 mt-3 flex-wrap">
                           <button
                             type="button"
-                            onClick={() => setValue("monto", selectedBancoOrigen.saldo ?? 0)}
+                            onClick={() => setValue('monto', selectedBancoOrigen.saldo ?? 0)}
                             className="px-3 py-1.5 text-xs bg-indigo-500/20 text-indigo-300 rounded-lg hover:bg-indigo-500/30 transition-colors"
                           >
                             100% (${(selectedBancoOrigen.saldo ?? 0).toLocaleString()})
                           </button>
                           <button
                             type="button"
-                            onClick={() => setValue("monto", (selectedBancoOrigen.saldo ?? 0) / 2)}
+                            onClick={() => setValue('monto', (selectedBancoOrigen.saldo ?? 0) / 2)}
                             className="px-3 py-1.5 text-xs bg-white/10 text-gray-300 rounded-lg hover:bg-white/20 transition-colors"
                           >
                             50%
                           </button>
                           <button
                             type="button"
-                            onClick={() => setValue("monto", (selectedBancoOrigen.saldo ?? 0) / 4)}
+                            onClick={() => setValue('monto', (selectedBancoOrigen.saldo ?? 0) / 4)}
                             className="px-3 py-1.5 text-xs bg-white/10 text-gray-300 rounded-lg hover:bg-white/20 transition-colors"
                           >
                             25%
@@ -506,7 +506,7 @@ export default function CreateTransferenciaModalSmart({
                       </label>
                       <input
                         type="text"
-                        {...register("concepto")}
+                        {...register('concepto')}
                         className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                         placeholder="Motivo de la transferencia"
                       />
@@ -520,7 +520,7 @@ export default function CreateTransferenciaModalSmart({
                       </label>
                       <input
                         type="text"
-                        {...register("referencia")}
+                        {...register('referencia')}
                         className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                         placeholder="Número de referencia"
                       />
@@ -592,7 +592,7 @@ export default function CreateTransferenciaModalSmart({
                           <span className="flex items-center justify-center gap-2">
                             <motion.div
                               animate={{ rotate: 360 }}
-                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                              transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                               className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
                             />
                             Transfiriendo...

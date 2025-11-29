@@ -13,13 +13,13 @@
 // COMPONENTES UI REUTILIZABLES
 // ============================================
 
-export { HybridCombobox } from "@/app/components/ui/hybrid-combobox"
+export { HybridCombobox } from '@/app/components/ui/hybrid-combobox'
 
 // ============================================
 // MODALES SMART
 // ============================================
 
 // Los modales Smart se exportan desde sus ubicaciones originales
-export { default as CreateVentaModalSmart } from "../CreateVentaModalSmart"
-export { default as CreateOrdenCompraModalSmart } from "../CreateOrdenCompraModalSmart"
-export { default as CreateProductoModalSmart } from "../CreateProductoModalSmart"
+export { default as CreateVentaModalSmart } from '../CreateVentaModalSmart'
+export { default as CreateOrdenCompraModalSmart } from '../CreateOrdenCompraModalSmart'
+export { default as CreateProductoModalSmart } from '../CreateProductoModalSmart'

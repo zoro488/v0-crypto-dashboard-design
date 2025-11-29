@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 📦 CREATE ORDEN COMPRA MODAL - Smart Form
@@ -11,19 +11,19 @@
  * 5. Glassmorphism futurista
  */
 
-import * as React from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import * as React from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from "@/app/components/ui/dialog"
-import { Button } from "@/app/components/ui/button"
-import { Input } from "@/app/components/ui/input"
-import { Label } from "@/app/components/ui/label"
-import { Badge } from "@/app/components/ui/badge"
-import { Textarea } from "@/app/components/ui/textarea"
+} from '@/app/components/ui/dialog'
+import { Button } from '@/app/components/ui/button'
+import { Input } from '@/app/components/ui/input'
+import { Label } from '@/app/components/ui/label'
+import { Badge } from '@/app/components/ui/badge'
+import { Textarea } from '@/app/components/ui/textarea'
 import {
   Truck,
   Package,
@@ -42,21 +42,21 @@ import {
   Wallet,
   CreditCard,
   AlertTriangle,
-} from "lucide-react"
-import { cn } from "@/app/lib/utils"
-import { HybridCombobox } from "@/app/components/ui/hybrid-combobox"
-import { useToast } from "@/app/hooks/use-toast"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { logger } from "@/app/lib/utils/logger"
-import { formatearMonto, generarKeywords } from "@/app/lib/validations/smart-forms-schemas"
+} from 'lucide-react'
+import { cn } from '@/app/lib/utils'
+import { HybridCombobox } from '@/app/components/ui/hybrid-combobox'
+import { useToast } from '@/app/hooks/use-toast'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { logger } from '@/app/lib/utils/logger'
+import { formatearMonto, generarKeywords } from '@/app/lib/validations/smart-forms-schemas'
 import {
   collection,
   doc,
   runTransaction,
   Timestamp,
   increment,
-} from "firebase/firestore"
-import { db, isFirebaseConfigured } from "@/app/lib/firebase/config"
+} from 'firebase/firestore'
+import { db, isFirebaseConfigured } from '@/app/lib/firebase/config'
 
 // ============================================
 // TIPOS
@@ -85,22 +85,22 @@ interface ItemOrden {
   subtotal: number
 }
 
-type EstadoPago = "completo" | "parcial" | "pendiente"
+type EstadoPago = 'completo' | 'parcial' | 'pendiente'
 
 // Pasos del wizard
 const STEPS = [
-  { id: 1, title: "Proveedor", icon: Building2, description: "¿A quién le compramos?" },
-  { id: 2, title: "Productos", icon: Package, description: "¿Qué pedimos?" },
-  { id: 3, title: "Costos", icon: DollarSign, description: "¿Cuánto pagamos?" },
+  { id: 1, title: 'Proveedor', icon: Building2, description: '¿A quién le compramos?' },
+  { id: 2, title: 'Productos', icon: Package, description: '¿Qué pedimos?' },
+  { id: 3, title: 'Costos', icon: DollarSign, description: '¿Cuánto pagamos?' },
 ]
 
 // Bancos disponibles para pago
 const BANCOS = [
-  { id: "boveda_monte", nombre: "Bóveda Monte", color: "blue" },
-  { id: "boveda_usa", nombre: "Bóveda USA", color: "green" },
-  { id: "profit", nombre: "Profit", color: "purple" },
-  { id: "leftie", nombre: "Leftie", color: "orange" },
-  { id: "azteca", nombre: "Azteca", color: "red" },
+  { id: 'boveda_monte', nombre: 'Bóveda Monte', color: 'blue' },
+  { id: 'boveda_usa', nombre: 'Bóveda USA', color: 'green' },
+  { id: 'profit', nombre: 'Profit', color: 'purple' },
+  { id: 'leftie', nombre: 'Leftie', color: 'orange' },
+  { id: 'azteca', nombre: 'Azteca', color: 'red' },
 ]
 
 // Variantes de animación
@@ -139,10 +139,10 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
   const [items, setItems] = React.useState<ItemOrden[]>([])
   const [costoEnvio, setCostoEnvio] = React.useState(0)
   const [otrosCostos, setOtrosCostos] = React.useState(0)
-  const [estadoPago, setEstadoPago] = React.useState<EstadoPago>("pendiente")
+  const [estadoPago, setEstadoPago] = React.useState<EstadoPago>('pendiente')
   const [montoPagado, setMontoPagado] = React.useState(0)
-  const [bancoOrigen, setBancoOrigen] = React.useState("boveda_monte")
-  const [notas, setNotas] = React.useState("")
+  const [bancoOrigen, setBancoOrigen] = React.useState('boveda_monte')
+  const [notas, setNotas] = React.useState('')
 
   // Cálculos
   const totales = React.useMemo(() => {
@@ -161,8 +161,8 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
 
   // Monto real pagado
   const montoRealPagado = React.useMemo(() => {
-    if (estadoPago === "completo") return totales.total
-    if (estadoPago === "parcial") return Math.min(montoPagado, totales.total)
+    if (estadoPago === 'completo') return totales.total
+    if (estadoPago === 'parcial') return Math.min(montoPagado, totales.total)
     return 0
   }, [estadoPago, montoPagado, totales.total])
 
@@ -176,7 +176,7 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
       case 2:
         return items.length > 0
       case 3:
-        return estadoPago !== "parcial" || (montoPagado > 0 && montoPagado < totales.total)
+        return estadoPago !== 'parcial' || (montoPagado > 0 && montoPagado < totales.total)
       default:
         return false
     }
@@ -226,7 +226,7 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
                 cantidad: item.cantidad + 1,
                 subtotal: (item.cantidad + 1) * item.costoUnitario,
               }
-            : item
+            : item,
         )
       }
       
@@ -244,7 +244,7 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
     
     toast({
       title: `📦 ${producto.nombre}`,
-      description: "Agregado a la orden",
+      description: 'Agregado a la orden',
     })
   }
 
@@ -259,7 +259,7 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
           cantidad: nuevaCantidad,
           subtotal: nuevaCantidad * item.costoUnitario,
         }
-      })
+      }),
     )
   }
 
@@ -273,7 +273,7 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
           costoUnitario: Math.max(0, nuevoCosto),
           subtotal: item.cantidad * Math.max(0, nuevoCosto),
         }
-      })
+      }),
     )
   }
 
@@ -286,9 +286,9 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
   const handleSubmit = async () => {
     if (!distribuidor || items.length === 0) {
       toast({
-        title: "Error",
-        description: "Completa todos los campos requeridos",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Completa todos los campos requeridos',
+        variant: 'destructive',
       })
       return
     }
@@ -298,9 +298,9 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
     // Verificar que Firestore está disponible
     if (!isFirebaseConfigured || !db) {
       toast({
-        title: "Error de conexión",
-        description: "Firebase no está configurado. Por favor verifica tu conexión.",
-        variant: "destructive",
+        title: 'Error de conexión',
+        description: 'Firebase no está configurado. Por favor verifica tu conexión.',
+        variant: 'destructive',
       })
       setIsSubmitting(false)
       return
@@ -312,7 +312,7 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
     try {
       await runTransaction(firestore, async (transaction) => {
         // 1. Crear la orden de compra
-        const ordenRef = doc(collection(firestore, "ordenes_compra"))
+        const ordenRef = doc(collection(firestore, 'ordenes_compra'))
         
         const ordenData = {
           // Identificadores
@@ -342,16 +342,16 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
           costoTotal: totales.total,
           
           // Pago
-          estadoPago: estadoPago === "completo" ? "pagado" : estadoPago,
+          estadoPago: estadoPago === 'completo' ? 'pagado' : estadoPago,
           montoPagado: montoRealPagado,
           deuda: deudaGenerada,
           bancoOrigen: montoRealPagado > 0 ? bancoOrigen : null,
           
           // Metadata
-          moneda: "MXN",
+          moneda: 'MXN',
           notas: notas || null,
           keywords: generarKeywords(distribuidor.nombre),
-          estado: "pendiente", // pendiente de recibir mercancía
+          estado: 'pendiente', // pendiente de recibir mercancía
           createdAt: Timestamp.now(),
           updatedAt: Timestamp.now(),
         }
@@ -360,7 +360,7 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
 
         // 2. Actualizar deuda del distribuidor
         if (deudaGenerada > 0) {
-          const distribuidorRef = doc(firestore, "distribuidores", distribuidor.id)
+          const distribuidorRef = doc(firestore, 'distribuidores', distribuidor.id)
           transaction.update(distribuidorRef, {
             deudaTotal: increment(deudaGenerada),
             totalOrdenesCompra: increment(totales.total),
@@ -371,21 +371,21 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
 
         // 3. Crear egreso bancario si hay pago
         if (montoRealPagado > 0) {
-          const movimientoRef = doc(collection(firestore, "movimientos"))
+          const movimientoRef = doc(collection(firestore, 'movimientos'))
           transaction.set(movimientoRef, {
-            tipo: "egreso",
+            tipo: 'egreso',
             bancoOrigenId: bancoOrigen,
             monto: montoRealPagado,
-            moneda: "MXN",
-            categoria: "compra",
+            moneda: 'MXN',
+            categoria: 'compra',
             referenciaId: ordenRef.id,
-            referenciaTipo: "ordenCompra",
+            referenciaTipo: 'ordenCompra',
             concepto: `Orden de compra a ${distribuidor.nombre}`,
             createdAt: Timestamp.now(),
           })
 
           // 4. Actualizar saldo del banco
-          const bancoRef = doc(firestore, "bancos", bancoOrigen)
+          const bancoRef = doc(firestore, 'bancos', bancoOrigen)
           transaction.update(bancoRef, {
             saldo: increment(-montoRealPagado),
             updatedAt: Timestamp.now(),
@@ -394,8 +394,8 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
       })
 
       toast({
-        title: "✅ Orden Creada",
-        description: `Total: ${formatearMonto(totales.total)}${deudaGenerada > 0 ? ` | Deuda: ${formatearMonto(deudaGenerada)}` : ""}`,
+        title: '✅ Orden Creada',
+        description: `Total: ${formatearMonto(totales.total)}${deudaGenerada > 0 ? ` | Deuda: ${formatearMonto(deudaGenerada)}` : ''}`,
       })
 
       resetForm()
@@ -406,11 +406,11 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
       useAppStore.getState().triggerDataRefresh()
 
     } catch (error) {
-      logger.error("Error creando orden de compra", error)
+      logger.error('Error creando orden de compra', error)
       toast({
-        title: "Error",
-        description: "No se pudo crear la orden",
-        variant: "destructive",
+        title: 'Error',
+        description: 'No se pudo crear la orden',
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -425,10 +425,10 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
     setItems([])
     setCostoEnvio(0)
     setOtrosCostos(0)
-    setEstadoPago("pendiente")
+    setEstadoPago('pendiente')
     setMontoPagado(0)
-    setBancoOrigen("boveda_monte")
-    setNotas("")
+    setBancoOrigen('boveda_monte')
+    setNotas('')
   }
 
   const handleClose = () => {
@@ -440,10 +440,10 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
         className={cn(
-          "max-w-3xl h-[90vh] max-h-[700px] p-0",
-          "bg-black/95 border-white/10 backdrop-blur-2xl",
-          "text-white overflow-hidden flex flex-col",
-          "shadow-[0_0_100px_rgba(0,0,0,0.8)]"
+          'max-w-3xl h-[90vh] max-h-[700px] p-0',
+          'bg-black/95 border-white/10 backdrop-blur-2xl',
+          'text-white overflow-hidden flex flex-col',
+          'shadow-[0_0_100px_rgba(0,0,0,0.8)]',
         )}
       >
         <DialogTitle className="sr-only">Nueva Orden de Compra</DialogTitle>
@@ -483,7 +483,7 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/5">
             <motion.div
               className="h-full bg-gradient-to-r from-blue-500 to-indigo-400"
-              initial={{ width: "33%" }}
+              initial={{ width: '33%' }}
               animate={{ width: `${(step / 3) * 100}%` }}
               transition={{ duration: 0.3 }}
             />
@@ -504,24 +504,24 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
                     {index < STEPS.length - 1 && (
                       <div
                         className={cn(
-                          "absolute left-5 top-12 w-0.5 h-8",
-                          isCompleted ? "bg-blue-500" : "bg-white/10"
+                          'absolute left-5 top-12 w-0.5 h-8',
+                          isCompleted ? 'bg-blue-500' : 'bg-white/10',
                         )}
                       />
                     )}
                     
                     <div className={cn(
-                      "flex items-center gap-3 p-2 rounded-lg transition-all",
-                      isCurrent && "bg-white/5"
+                      'flex items-center gap-3 p-2 rounded-lg transition-all',
+                      isCurrent && 'bg-white/5',
                     )}>
                       <div
                         className={cn(
-                          "w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all",
+                          'w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all',
                           isCompleted
-                            ? "bg-blue-500 border-blue-500 text-white"
+                            ? 'bg-blue-500 border-blue-500 text-white'
                             : isCurrent
-                            ? "bg-white/10 border-blue-500 text-blue-400"
-                            : "bg-white/5 border-white/20 text-gray-500"
+                            ? 'bg-white/10 border-blue-500 text-blue-400'
+                            : 'bg-white/5 border-white/20 text-gray-500',
                         )}
                       >
                         {isCompleted ? (
@@ -532,8 +532,8 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
                       </div>
                       <span
                         className={cn(
-                          "text-sm font-medium",
-                          isCurrent ? "text-white" : isCompleted ? "text-blue-400" : "text-gray-500"
+                          'text-sm font-medium',
+                          isCurrent ? 'text-white' : isCompleted ? 'text-blue-400' : 'text-gray-500',
                         )}
                       >
                         {s.title}
@@ -608,8 +608,8 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
                         className="mt-6 max-w-md mx-auto w-full"
                       >
                         <div className={cn(
-                          "p-4 rounded-xl border",
-                          "bg-blue-500/10 border-blue-500/30"
+                          'p-4 rounded-xl border',
+                          'bg-blue-500/10 border-blue-500/30',
                         )}>
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
@@ -654,8 +654,8 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
                     <Badge 
                       variant="outline" 
                       className={cn(
-                        "border-blue-500/50 text-blue-400",
-                        items.length > 0 && "bg-blue-500/10"
+                        'border-blue-500/50 text-blue-400',
+                        items.length > 0 && 'bg-blue-500/10',
                       )}
                     >
                       {items.length} productos
@@ -695,9 +695,9 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
                             exit={{ opacity: 0, x: -100 }}
                             transition={{ delay: index * 0.05 }}
                             className={cn(
-                              "p-4 rounded-xl border transition-all",
-                              "bg-white/5 border-white/10",
-                              "hover:bg-white/10 hover:border-white/20"
+                              'p-4 rounded-xl border transition-all',
+                              'bg-white/5 border-white/10',
+                              'hover:bg-white/10 hover:border-white/20',
                             )}
                           >
                             <div className="flex items-start justify-between gap-4">
@@ -740,8 +740,8 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
                                   value={item.costoUnitario}
                                   onChange={(e) => actualizarCosto(item.id, Number(e.target.value))}
                                   className={cn(
-                                    "w-24 h-8 text-right text-sm",
-                                    "bg-black/50 border-white/10"
+                                    'w-24 h-8 text-right text-sm',
+                                    'bg-black/50 border-white/10',
                                   )}
                                 />
                                 <p className="text-xs text-blue-400 mt-1">
@@ -819,9 +819,9 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
 
                   {/* Total */}
                   <div className={cn(
-                    "p-4 rounded-xl border text-center",
-                    "bg-gradient-to-br from-blue-500/10 to-purple-500/10",
-                    "border-blue-500/30"
+                    'p-4 rounded-xl border text-center',
+                    'bg-gradient-to-br from-blue-500/10 to-purple-500/10',
+                    'border-blue-500/30',
                   )}>
                     <p className="text-sm text-gray-400">Costo Total de la Orden</p>
                     <motion.p
@@ -839,28 +839,28 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
                     <Label className="text-sm text-gray-400">Estado del Pago</Label>
                     <div className="grid grid-cols-3 gap-3">
                       {[
-                        { id: "completo" as EstadoPago, label: "Pagado", desc: "100%", color: "green" },
-                        { id: "parcial" as EstadoPago, label: "Parcial", desc: "Anticipo", color: "yellow" },
-                        { id: "pendiente" as EstadoPago, label: "Crédito", desc: "0%", color: "orange" },
+                        { id: 'completo' as EstadoPago, label: 'Pagado', desc: '100%', color: 'green' },
+                        { id: 'parcial' as EstadoPago, label: 'Parcial', desc: 'Anticipo', color: 'yellow' },
+                        { id: 'pendiente' as EstadoPago, label: 'Crédito', desc: '0%', color: 'orange' },
                       ].map((estado) => (
                         <button
                           key={estado.id}
                           type="button"
                           onClick={() => setEstadoPago(estado.id)}
                           className={cn(
-                            "p-3 rounded-xl border transition-all",
+                            'p-3 rounded-xl border transition-all',
                             estadoPago === estado.id
-                              ? estado.color === "green"
-                                ? "bg-green-500/20 border-green-500"
-                                : estado.color === "yellow"
-                                ? "bg-yellow-500/20 border-yellow-500"
-                                : "bg-orange-500/20 border-orange-500"
-                              : "bg-white/5 border-white/10 hover:bg-white/10"
+                              ? estado.color === 'green'
+                                ? 'bg-green-500/20 border-green-500'
+                                : estado.color === 'yellow'
+                                ? 'bg-yellow-500/20 border-yellow-500'
+                                : 'bg-orange-500/20 border-orange-500'
+                              : 'bg-white/5 border-white/10 hover:bg-white/10',
                           )}
                         >
                           <p className={cn(
-                            "font-medium",
-                            estadoPago === estado.id ? "text-white" : "text-gray-400"
+                            'font-medium',
+                            estadoPago === estado.id ? 'text-white' : 'text-gray-400',
                           )}>
                             {estado.label}
                           </p>
@@ -872,14 +872,14 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
 
                   {/* Monto y banco (si hay pago) */}
                   <AnimatePresence>
-                    {estadoPago !== "pendiente" && (
+                    {estadoPago !== 'pendiente' && (
                       <motion.div
                         initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
+                        animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         className="space-y-4 overflow-hidden"
                       >
-                        {estadoPago === "parcial" && (
+                        {estadoPago === 'parcial' && (
                           <div className="space-y-2">
                             <Label className="text-sm text-gray-400">Monto del Anticipo</Label>
                             <Input
@@ -903,10 +903,10 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
                                 type="button"
                                 onClick={() => setBancoOrigen(banco.id)}
                                 className={cn(
-                                  "p-3 rounded-xl border text-center transition-all",
+                                  'p-3 rounded-xl border text-center transition-all',
                                   bancoOrigen === banco.id
-                                    ? "bg-blue-500/20 border-blue-500"
-                                    : "bg-white/5 border-white/10 hover:bg-white/10"
+                                    ? 'bg-blue-500/20 border-blue-500'
+                                    : 'bg-white/5 border-white/10 hover:bg-white/10',
                                 )}
                               >
                                 <p className="text-sm font-medium text-white">
@@ -933,9 +933,9 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
 
                   {/* Resumen final */}
                   <div className={cn(
-                    "p-4 rounded-xl border mt-auto",
-                    "bg-gradient-to-br from-white/5 to-transparent",
-                    "border-white/10"
+                    'p-4 rounded-xl border mt-auto',
+                    'bg-gradient-to-br from-white/5 to-transparent',
+                    'border-white/10',
                   )}>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
@@ -971,9 +971,9 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
 
         {/* ===== FOOTER ===== */}
         <div className={cn(
-          "h-20 border-t border-white/10",
-          "bg-gradient-to-r from-black/50 via-white/5 to-black/50",
-          "px-6 flex items-center justify-between"
+          'h-20 border-t border-white/10',
+          'bg-gradient-to-r from-black/50 via-white/5 to-black/50',
+          'px-6 flex items-center justify-between',
         )}>
           <Button
             type="button"
@@ -983,7 +983,7 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
             className="text-gray-400 hover:text-white hover:bg-white/10"
           >
             {step === 1 ? (
-              "Cancelar"
+              'Cancelar'
             ) : (
               <>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -998,9 +998,9 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
               onClick={nextStep}
               disabled={!canProceed}
               className={cn(
-                "min-w-[140px]",
-                "bg-white text-black hover:bg-gray-200",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
+                'min-w-[140px]',
+                'bg-white text-black hover:bg-gray-200',
+                'disabled:opacity-50 disabled:cursor-not-allowed',
               )}
             >
               Siguiente
@@ -1012,12 +1012,12 @@ export function CreateOrdenCompraModal({ open, onClose, onSuccess }: CreateOrden
               onClick={handleSubmit}
               disabled={isSubmitting || !canProceed}
               className={cn(
-                "min-w-[180px]",
-                "bg-gradient-to-r from-blue-600 to-indigo-600",
-                "hover:from-blue-500 hover:to-indigo-500",
-                "text-white font-bold",
-                "shadow-[0_0_30px_rgba(59,130,246,0.4)]",
-                "transition-all duration-300"
+                'min-w-[180px]',
+                'bg-gradient-to-r from-blue-600 to-indigo-600',
+                'hover:from-blue-500 hover:to-indigo-500',
+                'text-white font-bold',
+                'shadow-[0_0_30px_rgba(59,130,246,0.4)]',
+                'transition-all duration-300',
               )}
             >
               {isSubmitting ? (

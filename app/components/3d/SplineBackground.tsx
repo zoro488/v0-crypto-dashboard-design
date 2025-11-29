@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 🌌 SPLINE BACKGROUND - Fondo 3D Inmersivo Premium
@@ -11,11 +11,11 @@
  * - Optimizado para performance
  */
 
-import { Suspense, useRef, useMemo, useCallback, useState, useEffect } from "react"
-import Spline from "@splinetool/react-spline"
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion"
-import { Canvas, useFrame, useThree, extend } from "@react-three/fiber"
-import * as THREE from "three"
+import { Suspense, useRef, useMemo, useCallback, useState, useEffect } from 'react'
+import Spline from '@splinetool/react-spline'
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
+import { Canvas, useFrame, useThree, extend } from '@react-three/fiber'
+import * as THREE from 'three'
 
 // ============================================================================
 // TIPOS
@@ -109,8 +109,8 @@ function GridLine({ geometry, color, intensity }: { geometry: THREE.BufferGeomet
           color, 
           transparent: true, 
           opacity: 0.15 * intensity,
-          blending: THREE.AdditiveBlending
-        })
+          blending: THREE.AdditiveBlending,
+        }),
       )}
       ref={ref}
     />
@@ -130,14 +130,14 @@ function AnimatedGrid({ color = '#3b82f6', intensity = 1 }) {
       // Líneas horizontales
       const hGeo = new THREE.BufferGeometry()
       hGeo.setAttribute('position', new THREE.BufferAttribute(
-        new Float32Array([-size / 2, 0, i, size / 2, 0, i]), 3
+        new Float32Array([-size / 2, 0, i, size / 2, 0, i]), 3,
       ))
       result.push(hGeo)
       
       // Líneas verticales
       const vGeo = new THREE.BufferGeometry()
       vGeo.setAttribute('position', new THREE.BufferAttribute(
-        new Float32Array([i, 0, -size / 2, i, 0, size / 2]), 3
+        new Float32Array([i, 0, -size / 2, i, 0, size / 2]), 3,
       ))
       result.push(vGeo)
     }
@@ -214,10 +214,10 @@ function Nebula({ color = '#3b82f6', intensity = 1 }) {
       position: [
         (Math.random() - 0.5) * 30,
         (Math.random() - 0.5) * 20,
-        -20 - Math.random() * 20
+        -20 - Math.random() * 20,
       ] as [number, number, number],
       scale: 5 + Math.random() * 10,
-      color: i % 2 === 0 ? color : '#a855f7'
+      color: i % 2 === 0 ? color : '#a855f7',
     }))
   }, [color])
   
@@ -319,7 +319,7 @@ function LoadingFallback() {
       <motion.div
         className="relative w-20 h-20"
         animate={{ rotate: 360 }}
-        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+        transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
       >
         <div className="absolute inset-0 border-4 border-blue-500/20 rounded-full" />
         <div className="absolute inset-0 border-4 border-transparent border-t-blue-500 rounded-full" />
@@ -342,8 +342,8 @@ export default function SplineBackground({
   intensity = 1,
   color = '#3b82f6',
   interactive = true,
-  splineUrl = "https://prod.spline.design/EMUFQmxEYeuyK46H/scene.splinecode",
-  className = ''
+  splineUrl = 'https://prod.spline.design/EMUFQmxEYeuyK46H/scene.splinecode',
+  className = '',
 }: SplineBackgroundProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [splineError, setSplineError] = useState(false)
@@ -382,8 +382,8 @@ export default function SplineBackground({
         className="absolute inset-0 bg-black"
         style={{
           background: useMotionValue(
-            `radial-gradient(ellipse at 50% 50%, rgba(59, 130, 246, 0.08) 0%, rgba(0, 0, 0, 1) 70%)`
-          )
+            'radial-gradient(ellipse at 50% 50%, rgba(59, 130, 246, 0.08) 0%, rgba(0, 0, 0, 1) 70%)',
+          ),
         }}
       />
       
@@ -393,7 +393,7 @@ export default function SplineBackground({
         animate={{ 
           x: [0, 50, 0], 
           y: [0, -30, 0],
-          scale: [1, 1.2, 1]
+          scale: [1, 1.2, 1],
         }}
         transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
       />
@@ -402,7 +402,7 @@ export default function SplineBackground({
         animate={{ 
           x: [0, -50, 0], 
           y: [0, 30, 0],
-          scale: [1, 1.1, 1]
+          scale: [1, 1.1, 1],
         }}
         transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
       />
@@ -421,7 +421,7 @@ export default function SplineBackground({
             gl={{
               alpha: true,
               antialias: true,
-              powerPreference: 'high-performance'
+              powerPreference: 'high-performance',
             }}
             camera={{ position: [0, 0, 10], fov: 60 }}
             dpr={[1, 1.5]}
@@ -441,7 +441,7 @@ export default function SplineBackground({
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.7) 100%)'
+          background: 'radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.7) 100%)',
         }}
       />
       
@@ -449,8 +449,8 @@ export default function SplineBackground({
       <div 
         className="absolute inset-0 pointer-events-none opacity-[0.025]"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-          backgroundRepeat: 'repeat'
+          backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
+          backgroundRepeat: 'repeat',
         }}
       />
       

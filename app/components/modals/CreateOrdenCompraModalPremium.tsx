@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 💎 CREATE ORDEN COMPRA MODAL PREMIUM - Gestión de Compras a Distribuidores
@@ -16,22 +16,22 @@
  * 5. Validación con Zod
  */
 
-import * as React from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
+import * as React from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from "@/app/components/ui/dialog"
-import { Button } from "@/app/components/ui/button"
-import { Input } from "@/app/components/ui/input"
-import { Label } from "@/app/components/ui/label"
-import { Badge } from "@/app/components/ui/badge"
-import { Textarea } from "@/app/components/ui/textarea"
+} from '@/app/components/ui/dialog'
+import { Button } from '@/app/components/ui/button'
+import { Input } from '@/app/components/ui/input'
+import { Label } from '@/app/components/ui/label'
+import { Badge } from '@/app/components/ui/badge'
+import { Textarea } from '@/app/components/ui/textarea'
 import {
   Package,
   Truck,
@@ -56,12 +56,12 @@ import {
   Minus,
   CircleDollarSign,
   Banknote,
-} from "lucide-react"
-import { cn } from "@/app/lib/utils"
-import { useToast } from "@/app/hooks/use-toast"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { logger } from "@/app/lib/utils/logger"
-import { formatearMonto } from "@/app/lib/validations/smart-forms-schemas"
+} from 'lucide-react'
+import { cn } from '@/app/lib/utils'
+import { useToast } from '@/app/hooks/use-toast'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { logger } from '@/app/lib/utils/logger'
+import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
 
 // ============================================
 // SCHEMA ZOD - Basado en ordenes_compra.csv
@@ -69,10 +69,10 @@ import { formatearMonto } from "@/app/lib/validations/smart-forms-schemas"
 
 const ordenCompraSchema = z.object({
   // ID se genera automáticamente (OC0001, OC0002, etc.)
-  fecha: z.string().min(1, "La fecha es requerida"),
-  origen: z.string().min(1, "Selecciona un distribuidor"),
-  cantidad: z.number().min(1, "La cantidad debe ser mayor a 0"),
-  costoDistribuidor: z.number().min(0, "El costo debe ser mayor o igual a 0"),
+  fecha: z.string().min(1, 'La fecha es requerida'),
+  origen: z.string().min(1, 'Selecciona un distribuidor'),
+  cantidad: z.number().min(1, 'La cantidad debe ser mayor a 0'),
+  costoDistribuidor: z.number().min(0, 'El costo debe ser mayor o igual a 0'),
   costoTransporte: z.number().min(0),
   // costoPorUnidad se calcula: costoDistribuidor + costoTransporte
   // costoTotal se calcula: costoPorUnidad × cantidad
@@ -97,12 +97,12 @@ interface CreateOrdenCompraModalProps {
 
 // Distribuidores del CSV
 const DISTRIBUIDORES = [
-  { id: "Q-MAYA", nombre: "Q-MAYA", icono: "🌴", color: "emerald" },
-  { id: "Q-MAYA-MP", nombre: "Q-MAYA-MP", icono: "🌴", color: "emerald" },
-  { id: "PACMAN", nombre: "PACMAN", icono: "🎮", color: "yellow" },
-  { id: "CH-MONTE", nombre: "CH-MONTE", icono: "⛰️", color: "blue" },
-  { id: "VALLE-MONTE", nombre: "VALLE-MONTE", icono: "🏔️", color: "purple" },
-  { id: "A/X🌶️🦀", nombre: "A/X 🌶️🦀", icono: "🦀", color: "red" },
+  { id: 'Q-MAYA', nombre: 'Q-MAYA', icono: '🌴', color: 'emerald' },
+  { id: 'Q-MAYA-MP', nombre: 'Q-MAYA-MP', icono: '🌴', color: 'emerald' },
+  { id: 'PACMAN', nombre: 'PACMAN', icono: '🎮', color: 'yellow' },
+  { id: 'CH-MONTE', nombre: 'CH-MONTE', icono: '⛰️', color: 'blue' },
+  { id: 'VALLE-MONTE', nombre: 'VALLE-MONTE', icono: '🏔️', color: 'purple' },
+  { id: 'A/X🌶️🦀', nombre: 'A/X 🌶️🦀', icono: '🦀', color: 'red' },
 ]
 
 // Variantes de animación
@@ -115,7 +115,7 @@ const containerVariants = {
     transition: {
       duration: 0.4,
       staggerChildren: 0.05,
-    }
+    },
   },
 }
 
@@ -128,8 +128,8 @@ const pulseVariants = {
   initial: { scale: 1 },
   pulse: { 
     scale: [1, 1.02, 1],
-    transition: { duration: 2, repeat: Infinity }
-  }
+    transition: { duration: 2, repeat: Infinity },
+  },
 }
 
 // ============================================
@@ -140,11 +140,11 @@ export function CreateOrdenCompraModalPremium({
   open, 
   onClose, 
   onSuccess,
-  editData 
+  editData, 
 }: CreateOrdenCompraModalProps) {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
-  const [nextId, setNextId] = React.useState("OC0010") // TODO: Obtener de Firestore
+  const [nextId, setNextId] = React.useState('OC0010') // TODO: Obtener de Firestore
   
   const isEdit = !!editData?.id
 
@@ -152,23 +152,23 @@ export function CreateOrdenCompraModalPremium({
     resolver: zodResolver(ordenCompraSchema),
     defaultValues: {
       fecha: editData?.fecha || new Date().toISOString().split('T')[0],
-      origen: editData?.origen || "",
+      origen: editData?.origen || '',
       cantidad: editData?.cantidad || 100,
       costoDistribuidor: editData?.costoDistribuidor || 6100,
       costoTransporte: editData?.costoTransporte || 200,
       pagoDistribuidor: editData?.pagoDistribuidor || 0,
-      notas: editData?.notas || "",
+      notas: editData?.notas || '',
     },
   })
 
   const { watch, setValue, handleSubmit, reset, formState: { errors } } = form
   
   // Watch valores para cálculos
-  const cantidad = watch("cantidad")
-  const costoDistribuidor = watch("costoDistribuidor")
-  const costoTransporte = watch("costoTransporte")
-  const pagoDistribuidor = watch("pagoDistribuidor")
-  const origen = watch("origen")
+  const cantidad = watch('cantidad')
+  const costoDistribuidor = watch('costoDistribuidor')
+  const costoTransporte = watch('costoTransporte')
+  const pagoDistribuidor = watch('pagoDistribuidor')
+  const origen = watch('origen')
 
   // Cálculos automáticos basados en CSV
   const calculos = React.useMemo(() => {
@@ -191,19 +191,19 @@ export function CreateOrdenCompraModalPremium({
     if (open && !editData) {
       reset({
         fecha: new Date().toISOString().split('T')[0],
-        origen: "",
+        origen: '',
         cantidad: 100,
         costoDistribuidor: 6100,
         costoTransporte: 200,
         pagoDistribuidor: 0,
-        notas: "",
+        notas: '',
       })
     }
   }, [open, editData, reset])
 
   // Quick set de cantidad
   const setQuickCantidad = (value: number) => {
-    setValue("cantidad", value)
+    setValue('cantidad', value)
   }
 
   // Submit
@@ -220,13 +220,13 @@ export function CreateOrdenCompraModalPremium({
         deuda: calculos.deuda,
       }
 
-      logger.info("Orden de Compra creada/actualizada", { 
+      logger.info('Orden de Compra creada/actualizada', { 
         data: ordenData,
-        context: "CreateOrdenCompraModalPremium"
+        context: 'CreateOrdenCompraModalPremium',
       })
 
       toast({
-        title: isEdit ? "✅ Orden Actualizada" : "✅ Orden Creada",
+        title: isEdit ? '✅ Orden Actualizada' : '✅ Orden Creada',
         description: `${ordenData.id} - ${data.cantidad} unidades de ${data.origen}`,
       })
 
@@ -235,11 +235,11 @@ export function CreateOrdenCompraModalPremium({
       useAppStore.getState().triggerDataRefresh()
 
     } catch (error) {
-      logger.error("Error al guardar orden", error)
+      logger.error('Error al guardar orden', error)
       toast({
-        title: "Error",
-        description: "No se pudo guardar la orden",
-        variant: "destructive",
+        title: 'Error',
+        description: 'No se pudo guardar la orden',
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -252,15 +252,15 @@ export function CreateOrdenCompraModalPremium({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
         className={cn(
-          "max-w-3xl max-h-[90vh] p-0 overflow-hidden",
-          "bg-black/60 backdrop-blur-2xl",
-          "border border-white/10",
-          "text-white",
-          "shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(16,185,129,0.15)]"
+          'max-w-3xl max-h-[90vh] p-0 overflow-hidden',
+          'bg-black/60 backdrop-blur-2xl',
+          'border border-white/10',
+          'text-white',
+          'shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(16,185,129,0.15)]',
         )}
       >
         <DialogTitle className="sr-only">
-          {isEdit ? "Editar Orden de Compra" : "Nueva Orden de Compra"}
+          {isEdit ? 'Editar Orden de Compra' : 'Nueva Orden de Compra'}
         </DialogTitle>
         <DialogDescription className="sr-only">
           Formulario para registrar compras a distribuidores
@@ -296,7 +296,7 @@ export function CreateOrdenCompraModalPremium({
                 <div>
                   <div className="flex items-center gap-3">
                     <h2 className="text-2xl font-bold text-white">
-                      {isEdit ? "Editar Orden" : "Nueva Orden de Compra"}
+                      {isEdit ? 'Editar Orden' : 'Nueva Orden de Compra'}
                     </h2>
                     <Badge variant="outline" className="border-emerald-500/50 text-emerald-400 font-mono">
                       {isEdit ? editData?.id : nextId}
@@ -346,11 +346,11 @@ export function CreateOrdenCompraModalPremium({
                   </Label>
                   <Input
                     type="date"
-                    {...form.register("fecha")}
+                    {...form.register('fecha')}
                     className={cn(
-                      "h-12 bg-white/5 border-white/10 text-white",
-                      "[color-scheme:dark]",
-                      errors.fecha && "border-red-500/50"
+                      'h-12 bg-white/5 border-white/10 text-white',
+                      '[color-scheme:dark]',
+                      errors.fecha && 'border-red-500/50',
                     )}
                   />
                 </div>
@@ -365,10 +365,10 @@ export function CreateOrdenCompraModalPremium({
                     <div className="relative flex-1">
                       <Input
                         type="number"
-                        {...form.register("cantidad", { valueAsNumber: true })}
+                        {...form.register('cantidad', { valueAsNumber: true })}
                         className={cn(
-                          "h-12 bg-white/5 border-white/10 text-white text-lg font-bold",
-                          errors.cantidad && "border-red-500/50"
+                          'h-12 bg-white/5 border-white/10 text-white text-lg font-bold',
+                          errors.cantidad && 'border-red-500/50',
                         )}
                       />
                     </div>
@@ -381,8 +381,8 @@ export function CreateOrdenCompraModalPremium({
                           size="sm"
                           onClick={() => setQuickCantidad(val)}
                           className={cn(
-                            "h-12 px-3 border-white/10 hover:bg-white/10",
-                            cantidad === val && "bg-emerald-500/20 border-emerald-500/50 text-emerald-400"
+                            'h-12 px-3 border-white/10 hover:bg-white/10',
+                            cantidad === val && 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400',
                           )}
                         >
                           {val}
@@ -404,30 +404,30 @@ export function CreateOrdenCompraModalPremium({
                     <motion.button
                       key={dist.id}
                       type="button"
-                      onClick={() => setValue("origen", dist.id)}
+                      onClick={() => setValue('origen', dist.id)}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       className={cn(
-                        "p-4 rounded-xl border text-left transition-all",
+                        'p-4 rounded-xl border text-left transition-all',
                         origen === dist.id
-                          ? dist.color === "emerald" 
-                            ? "bg-emerald-500/20 border-emerald-500 shadow-lg shadow-emerald-500/20"
-                            : dist.color === "yellow"
-                            ? "bg-yellow-500/20 border-yellow-500 shadow-lg shadow-yellow-500/20"
-                            : dist.color === "blue"
-                            ? "bg-blue-500/20 border-blue-500 shadow-lg shadow-blue-500/20"
-                            : dist.color === "purple"
-                            ? "bg-purple-500/20 border-purple-500 shadow-lg shadow-purple-500/20"
-                            : "bg-red-500/20 border-red-500 shadow-lg shadow-red-500/20"
-                          : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
+                          ? dist.color === 'emerald' 
+                            ? 'bg-emerald-500/20 border-emerald-500 shadow-lg shadow-emerald-500/20'
+                            : dist.color === 'yellow'
+                            ? 'bg-yellow-500/20 border-yellow-500 shadow-lg shadow-yellow-500/20'
+                            : dist.color === 'blue'
+                            ? 'bg-blue-500/20 border-blue-500 shadow-lg shadow-blue-500/20'
+                            : dist.color === 'purple'
+                            ? 'bg-purple-500/20 border-purple-500 shadow-lg shadow-purple-500/20'
+                            : 'bg-red-500/20 border-red-500 shadow-lg shadow-red-500/20'
+                          : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20',
                       )}
                     >
                       <div className="flex items-center gap-3">
                         <span className="text-2xl">{dist.icono}</span>
                         <div>
                           <p className={cn(
-                            "font-bold",
-                            origen === dist.id ? "text-white" : "text-gray-300"
+                            'font-bold',
+                            origen === dist.id ? 'text-white' : 'text-gray-300',
                           )}>
                             {dist.nombre}
                           </p>
@@ -464,9 +464,9 @@ export function CreateOrdenCompraModalPremium({
               </div>
 
               <div className={cn(
-                "p-5 rounded-2xl border",
-                "bg-gradient-to-br from-white/5 to-transparent",
-                "border-white/10"
+                'p-5 rounded-2xl border',
+                'bg-gradient-to-br from-white/5 to-transparent',
+                'border-white/10',
               )}>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   {/* Costo Distribuidor */}
@@ -479,7 +479,7 @@ export function CreateOrdenCompraModalPremium({
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                       <Input
                         type="number"
-                        {...form.register("costoDistribuidor", { valueAsNumber: true })}
+                        {...form.register('costoDistribuidor', { valueAsNumber: true })}
                         className="pl-7 h-12 bg-blue-500/5 border-blue-500/20 text-blue-300 text-lg font-bold"
                       />
                     </div>
@@ -496,7 +496,7 @@ export function CreateOrdenCompraModalPremium({
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                       <Input
                         type="number"
-                        {...form.register("costoTransporte", { valueAsNumber: true })}
+                        {...form.register('costoTransporte', { valueAsNumber: true })}
                         className="pl-7 h-12 bg-orange-500/5 border-orange-500/20 text-orange-300 text-lg font-bold"
                       />
                     </div>
@@ -575,9 +575,9 @@ export function CreateOrdenCompraModalPremium({
               </div>
 
               <div className={cn(
-                "p-5 rounded-2xl border",
-                "bg-gradient-to-br from-white/5 to-transparent",
-                "border-white/10"
+                'p-5 rounded-2xl border',
+                'bg-gradient-to-br from-white/5 to-transparent',
+                'border-white/10',
               )}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Pago Realizado */}
@@ -587,7 +587,7 @@ export function CreateOrdenCompraModalPremium({
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                       <Input
                         type="number"
-                        {...form.register("pagoDistribuidor", { valueAsNumber: true })}
+                        {...form.register('pagoDistribuidor', { valueAsNumber: true })}
                         className="pl-7 h-14 bg-green-500/5 border-green-500/20 text-green-300 text-xl font-bold"
                       />
                     </div>
@@ -596,7 +596,7 @@ export function CreateOrdenCompraModalPremium({
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => setValue("pagoDistribuidor", 0)}
+                        onClick={() => setValue('pagoDistribuidor', 0)}
                         className="flex-1 border-white/10 hover:bg-white/10"
                       >
                         Sin Pago
@@ -605,7 +605,7 @@ export function CreateOrdenCompraModalPremium({
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => setValue("pagoDistribuidor", calculos.costoTotal)}
+                        onClick={() => setValue('pagoDistribuidor', calculos.costoTotal)}
                         className="flex-1 border-green-500/30 text-green-400 hover:bg-green-500/10"
                       >
                         Pago Total
@@ -618,20 +618,20 @@ export function CreateOrdenCompraModalPremium({
                     <Label className="text-sm text-gray-400">Deuda con Distribuidor</Label>
                     <motion.div 
                       className={cn(
-                        "h-14 flex items-center justify-center rounded-lg border",
+                        'h-14 flex items-center justify-center rounded-lg border',
                         calculos.deuda > 0 
-                          ? "bg-red-500/10 border-red-500/30" 
-                          : "bg-emerald-500/10 border-emerald-500/30"
+                          ? 'bg-red-500/10 border-red-500/30' 
+                          : 'bg-emerald-500/10 border-emerald-500/30',
                       )}
                       key={calculos.deuda}
                       initial={{ scale: 0.95 }}
                       animate={{ scale: 1 }}
                     >
                       <span className={cn(
-                        "text-2xl font-bold",
-                        calculos.deuda > 0 ? "text-red-400" : "text-emerald-400"
+                        'text-2xl font-bold',
+                        calculos.deuda > 0 ? 'text-red-400' : 'text-emerald-400',
                       )}>
-                        {calculos.deuda < 0 ? "-" : ""}{formatearMonto(Math.abs(calculos.deuda))}
+                        {calculos.deuda < 0 ? '-' : ''}{formatearMonto(Math.abs(calculos.deuda))}
                       </span>
                     </motion.div>
                     <p className="text-xs text-gray-500 text-center">
@@ -645,9 +645,9 @@ export function CreateOrdenCompraModalPremium({
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm text-gray-400">Progreso de Pago</span>
                     <span className={cn(
-                      "text-sm font-bold",
-                      calculos.porcentajePagado >= 100 ? "text-emerald-400" :
-                      calculos.porcentajePagado >= 50 ? "text-yellow-400" : "text-red-400"
+                      'text-sm font-bold',
+                      calculos.porcentajePagado >= 100 ? 'text-emerald-400' :
+                      calculos.porcentajePagado >= 50 ? 'text-yellow-400' : 'text-red-400',
                     )}>
                       {calculos.porcentajePagado.toFixed(1)}%
                     </span>
@@ -655,14 +655,14 @@ export function CreateOrdenCompraModalPremium({
                   <div className="h-3 rounded-full bg-white/10 overflow-hidden">
                     <motion.div
                       className={cn(
-                        "h-full",
-                        calculos.porcentajePagado >= 100 ? "bg-gradient-to-r from-emerald-500 to-teal-500" :
-                        calculos.porcentajePagado >= 50 ? "bg-gradient-to-r from-yellow-500 to-orange-500" : 
-                        "bg-gradient-to-r from-red-500 to-orange-500"
+                        'h-full',
+                        calculos.porcentajePagado >= 100 ? 'bg-gradient-to-r from-emerald-500 to-teal-500' :
+                        calculos.porcentajePagado >= 50 ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : 
+                        'bg-gradient-to-r from-red-500 to-orange-500',
                       )}
                       initial={{ width: 0 }}
                       animate={{ width: `${Math.min(100, calculos.porcentajePagado)}%` }}
-                      transition={{ duration: 0.8, ease: "easeOut" }}
+                      transition={{ duration: 0.8, ease: 'easeOut' }}
                     />
                   </div>
                   
@@ -686,7 +686,7 @@ export function CreateOrdenCompraModalPremium({
             <motion.div variants={itemVariants} className="space-y-2">
               <Label className="text-sm text-gray-400">Notas (opcional)</Label>
               <Textarea
-                {...form.register("notas")}
+                {...form.register('notas')}
                 placeholder="Observaciones adicionales sobre esta orden..."
                 rows={2}
                 className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 resize-none"
@@ -696,9 +696,9 @@ export function CreateOrdenCompraModalPremium({
 
           {/* ===== FOOTER ===== */}
           <div className={cn(
-            "h-20 border-t border-white/10",
-            "bg-gradient-to-r from-black/50 via-white/5 to-black/50",
-            "px-6 flex items-center justify-between"
+            'h-20 border-t border-white/10',
+            'bg-gradient-to-r from-black/50 via-white/5 to-black/50',
+            'px-6 flex items-center justify-between',
           )}>
             <div className="flex items-center gap-4">
               {selectedDistribuidor && (
@@ -724,11 +724,11 @@ export function CreateOrdenCompraModalPremium({
                 type="submit"
                 disabled={isSubmitting}
                 className={cn(
-                  "min-w-[180px]",
-                  "bg-gradient-to-r from-emerald-600 to-teal-600",
-                  "hover:from-emerald-500 hover:to-teal-500",
-                  "text-white font-bold",
-                  "shadow-[0_0_30px_rgba(16,185,129,0.4)]"
+                  'min-w-[180px]',
+                  'bg-gradient-to-r from-emerald-600 to-teal-600',
+                  'hover:from-emerald-500 hover:to-teal-500',
+                  'text-white font-bold',
+                  'shadow-[0_0_30px_rgba(16,185,129,0.4)]',
                 )}
               >
                 {isSubmitting ? (
@@ -739,7 +739,7 @@ export function CreateOrdenCompraModalPremium({
                 ) : (
                   <>
                     <Zap className="w-4 h-4 mr-2" />
-                    {isEdit ? "Actualizar Orden" : "Crear Orden"}
+                    {isEdit ? 'Actualizar Orden' : 'Crear Orden'}
                   </>
                 )}
               </Button>

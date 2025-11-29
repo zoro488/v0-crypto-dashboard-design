@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { useRef, useCallback, useState, useEffect } from "react"
-import { useFrame, useThree } from "@react-three/fiber"
-import * as THREE from "three"
+import { useRef, useCallback, useState, useEffect } from 'react'
+import { useFrame, useThree } from '@react-three/fiber'
+import * as THREE from 'three'
 
 /**
  * Hook para rastrear la posición del mouse en coordenadas 3D normalizadas
@@ -14,7 +14,7 @@ export function useMousePosition() {
   useFrame(() => {
     mouseRef.current.set(
       pointer.x * viewport.width * 0.5,
-      pointer.y * viewport.height * 0.5
+      pointer.y * viewport.height * 0.5,
     )
   })
   
@@ -27,7 +27,7 @@ export function useMousePosition() {
 export function useHoverScale(
   baseScale = 1,
   hoverScale = 1.2,
-  lerpFactor = 0.1
+  lerpFactor = 0.1,
 ) {
   const [isHovered, setIsHovered] = useState(false)
   const scaleRef = useRef(baseScale)
@@ -37,7 +37,7 @@ export function useHoverScale(
     scaleRef.current = THREE.MathUtils.lerp(
       scaleRef.current,
       targetScale,
-      lerpFactor
+      lerpFactor,
     )
   })
   
@@ -54,7 +54,7 @@ export function useHoverScale(
  */
 export function useMouseLookAt(
   intensity = 0.3,
-  smoothing = 0.1
+  smoothing = 0.1,
 ) {
   const rotationRef = useRef(new THREE.Euler(0, 0, 0))
   const { pointer } = useThree()
@@ -66,12 +66,12 @@ export function useMouseLookAt(
     rotationRef.current.x = THREE.MathUtils.lerp(
       rotationRef.current.x,
       targetX,
-      smoothing
+      smoothing,
     )
     rotationRef.current.y = THREE.MathUtils.lerp(
       rotationRef.current.y,
       targetY,
-      smoothing
+      smoothing,
     )
   })
   
@@ -84,7 +84,7 @@ export function useMouseLookAt(
 export function useFloatingAnimation(
   amplitude = 0.1,
   frequency = 1,
-  phase = 0
+  phase = 0,
 ) {
   const positionRef = useRef(new THREE.Vector3(0, 0, 0))
   
@@ -103,7 +103,7 @@ export function useFloatingAnimation(
 export function usePressAnimation(
   normalScale = 1,
   pressedScale = 0.95,
-  lerpFactor = 0.2
+  lerpFactor = 0.2,
 ) {
   const [isPressed, setIsPressed] = useState(false)
   const scaleRef = useRef(normalScale)
@@ -129,7 +129,7 @@ export function useParticleRepulsion(
   particleCount: number,
   repulsionRadius = 2,
   repulsionStrength = 0.5,
-  elasticity = 0.05
+  elasticity = 0.05,
 ) {
   const positionsRef = useRef<Float32Array>(new Float32Array(particleCount * 3))
   const targetPositionsRef = useRef<Float32Array>(new Float32Array(particleCount * 3))
@@ -175,7 +175,7 @@ export function useParticleRepulsion(
 export function usePulseAnimation(
   minScale = 0.95,
   maxScale = 1.05,
-  frequency = 2
+  frequency = 2,
 ) {
   const scaleRef = useRef(1)
   

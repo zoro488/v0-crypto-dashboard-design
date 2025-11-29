@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import type React from "react"
-import { useState, useCallback, useMemo } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import type React from 'react'
+import { useState, useCallback, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   X, 
   Receipt, 
@@ -12,28 +12,28 @@ import {
   Sparkles,
   Mic,
   AlertTriangle,
-  TrendingDown
-} from "lucide-react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
+  TrendingDown,
+} from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogDescription,
-} from "@/app/components/ui/dialog"
-import { cn } from "@/app/lib/utils"
-import { firestoreService } from "@/app/lib/firebase/firestore-service"
-import { useToast } from "@/app/hooks/use-toast"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { logger } from "@/app/lib/utils/logger"
+} from '@/app/components/ui/dialog'
+import { cn } from '@/app/lib/utils'
+import { firestoreService } from '@/app/lib/firebase/firestore-service'
+import { useToast } from '@/app/hooks/use-toast'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { logger } from '@/app/lib/utils/logger'
 
 // Schema de validación Zod
 const gastoSchema = z.object({
-  bancoId: z.string().min(1, "Selecciona un banco"),
-  concepto: z.string().min(2, "El concepto es requerido"),
-  monto: z.number().positive("El monto debe ser mayor a 0"),
+  bancoId: z.string().min(1, 'Selecciona un banco'),
+  concepto: z.string().min(2, 'El concepto es requerido'),
+  monto: z.number().positive('El monto debe ser mayor a 0'),
   descripcion: z.string().optional(),
   categoria: z.string().optional(),
 })
@@ -47,18 +47,18 @@ interface CreateGastoModalSmartProps {
 }
 
 const CATEGORIA_OPTIONS = [
-  { value: "operativo", label: "Operativo", icon: "⚙️" },
-  { value: "nomina", label: "Nómina", icon: "👥" },
-  { value: "servicios", label: "Servicios", icon: "💡" },
-  { value: "insumos", label: "Insumos", icon: "📦" },
-  { value: "transporte", label: "Transporte", icon: "🚚" },
-  { value: "otros", label: "Otros", icon: "📋" },
+  { value: 'operativo', label: 'Operativo', icon: '⚙️' },
+  { value: 'nomina', label: 'Nómina', icon: '👥' },
+  { value: 'servicios', label: 'Servicios', icon: '💡' },
+  { value: 'insumos', label: 'Insumos', icon: '📦' },
+  { value: 'transporte', label: 'Transporte', icon: '🚚' },
+  { value: 'otros', label: 'Otros', icon: '📋' },
 ]
 
 export default function CreateGastoModalSmart({ 
   isOpen, 
   onClose, 
-  onSubmit 
+  onSubmit, 
 }: CreateGastoModalSmartProps) {
   const { toast } = useToast()
   const bancos = useAppStore((state) => state.bancos)
@@ -77,20 +77,20 @@ export default function CreateGastoModalSmart({
     formState: { errors, isValid },
   } = useForm<GastoFormData>({
     resolver: zodResolver(gastoSchema),
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
-      bancoId: "",
-      concepto: "",
+      bancoId: '',
+      concepto: '',
       monto: 0,
-      descripcion: "",
-      categoria: "",
+      descripcion: '',
+      categoria: '',
     },
   })
 
-  const watchedBancoId = watch("bancoId")
-  const watchedMonto = watch("monto")
-  const watchedConcepto = watch("concepto")
-  const watchedCategoria = watch("categoria")
+  const watchedBancoId = watch('bancoId')
+  const watchedMonto = watch('monto')
+  const watchedConcepto = watch('concepto')
+  const watchedCategoria = watch('categoria')
 
   // Obtener banco seleccionado
   const selectedBanco = useMemo(() => {
@@ -106,8 +106,8 @@ export default function CreateGastoModalSmart({
   const handleVoiceFill = useCallback(() => {
     setIsVoiceActive(true)
     toast({
-      title: "Modo Voz Activado",
-      description: "Próximamente: Dicta la información del gasto",
+      title: 'Modo Voz Activado',
+      description: 'Próximamente: Dicta la información del gasto',
     })
     setTimeout(() => setIsVoiceActive(false), 2000)
   }, [toast])
@@ -115,9 +115,9 @@ export default function CreateGastoModalSmart({
   const onFormSubmit = async (data: GastoFormData) => {
     if (!hasSufficientFunds) {
       toast({
-        title: "Saldo Insuficiente",
-        description: "El banco seleccionado no tiene suficiente saldo para este gasto.",
-        variant: "destructive",
+        title: 'Saldo Insuficiente',
+        description: 'El banco seleccionado no tiene suficiente saldo para este gasto.',
+        variant: 'destructive',
       })
       return
     }
@@ -129,7 +129,7 @@ export default function CreateGastoModalSmart({
         monto: data.monto,
         concepto: data.concepto,
         bancoOrigen: data.bancoId,
-        notas: data.descripcion || "",
+        notas: data.descripcion || '',
       })
 
       // Trigger para actualizar hooks de datos
@@ -140,7 +140,7 @@ export default function CreateGastoModalSmart({
       }
 
       toast({
-        title: "✅ Gasto Registrado",
+        title: '✅ Gasto Registrado',
         description: `Se ha registrado el gasto de $${data.monto.toLocaleString()} correctamente.`,
       })
 
@@ -149,11 +149,11 @@ export default function CreateGastoModalSmart({
       setStep(1)
       onClose()
     } catch (error) {
-      logger.error("Error creating gasto", error, { context: "CreateGastoModalSmart" })
+      logger.error('Error creating gasto', error, { context: 'CreateGastoModalSmart' })
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Error al registrar el gasto.",
-        variant: "destructive",
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Error al registrar el gasto.',
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -173,10 +173,10 @@ export default function CreateGastoModalSmart({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
         className={cn(
-          "max-w-2xl max-h-[85vh] p-0",
-          "bg-black/95 border-white/10 backdrop-blur-2xl",
-          "text-white overflow-hidden flex flex-col",
-          "shadow-2xl shadow-red-500/10"
+          'max-w-2xl max-h-[85vh] p-0',
+          'bg-black/95 border-white/10 backdrop-blur-2xl',
+          'text-white overflow-hidden flex flex-col',
+          'shadow-2xl shadow-red-500/10',
         )}
       >
         <DialogTitle className="sr-only">Registrar Gasto</DialogTitle>
@@ -203,8 +203,8 @@ export default function CreateGastoModalSmart({
                 whileTap={{ scale: 0.95 }}
                 className={`absolute right-16 top-4 sm:right-20 sm:top-6 p-2 rounded-xl transition-all ${
                   isVoiceActive 
-                    ? "bg-red-500/30 text-red-300" 
-                    : "hover:bg-white/10 text-gray-400 hover:text-white"
+                    ? 'bg-red-500/30 text-red-300' 
+                    : 'hover:bg-white/10 text-gray-400 hover:text-white'
                 }`}
               >
                 <Mic className="w-5 h-5" />
@@ -227,7 +227,7 @@ export default function CreateGastoModalSmart({
                     <div key={s} className="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: step >= s ? "100%" : "0%" }}
+                        animate={{ width: step >= s ? '100%' : '0%' }}
                         transition={{ duration: 0.3 }}
                         className="h-full bg-gradient-to-r from-red-500 to-orange-500"
                       />
@@ -235,8 +235,8 @@ export default function CreateGastoModalSmart({
                   ))}
                 </div>
                 <div className="flex justify-between mt-2 text-xs text-gray-500">
-                  <span className={step >= 1 ? "text-red-400" : ""}>Banco</span>
-                  <span className={step >= 2 ? "text-red-400" : ""}>Detalles</span>
+                  <span className={step >= 1 ? 'text-red-400' : ''}>Banco</span>
+                  <span className={step >= 2 ? 'text-red-400' : ''}>Detalles</span>
                 </div>
               </div>
             </div>
@@ -260,11 +260,11 @@ export default function CreateGastoModalSmart({
                         Banco Origen *
                       </label>
                       <select
-                        {...register("bancoId")}
+                        {...register('bancoId')}
                         className={`w-full px-5 py-4 bg-white/5 border rounded-xl text-white text-lg focus:outline-none focus:ring-2 transition-all appearance-none ${
                           errors.bancoId 
-                            ? "border-red-500/50 focus:ring-red-500" 
-                            : "border-white/10 focus:ring-red-500 focus:border-transparent"
+                            ? 'border-red-500/50 focus:ring-red-500' 
+                            : 'border-white/10 focus:ring-red-500 focus:border-transparent'
                         }`}
                       >
                         <option value="" className="bg-gray-900">Seleccionar banco...</option>
@@ -311,13 +311,13 @@ export default function CreateGastoModalSmart({
                           <motion.button
                             key={option.value}
                             type="button"
-                            onClick={() => setValue("categoria", option.value)}
+                            onClick={() => setValue('categoria', option.value)}
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             className={`p-3 rounded-xl border text-xs transition-all ${
                               watchedCategoria === option.value
-                                ? "bg-red-500/20 border-red-500 text-white"
-                                : "bg-white/5 border-white/10 text-gray-400 hover:border-white/20"
+                                ? 'bg-red-500/20 border-red-500 text-white'
+                                : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/20'
                             }`}
                           >
                             <span className="mr-1">{option.icon}</span> {option.label}
@@ -372,11 +372,11 @@ export default function CreateGastoModalSmart({
                       </label>
                       <input
                         type="text"
-                        {...register("concepto")}
+                        {...register('concepto')}
                         className={`w-full px-5 py-4 bg-white/5 border rounded-xl text-white text-lg focus:outline-none focus:ring-2 transition-all ${
                           errors.concepto 
-                            ? "border-red-500/50 focus:ring-red-500" 
-                            : "border-white/10 focus:ring-red-500 focus:border-transparent"
+                            ? 'border-red-500/50 focus:ring-red-500' 
+                            : 'border-white/10 focus:ring-red-500 focus:border-transparent'
                         }`}
                         placeholder="Ej: Pago de servicios"
                       />
@@ -396,11 +396,11 @@ export default function CreateGastoModalSmart({
                         <input
                           type="number"
                           step="0.01"
-                          {...register("monto", { valueAsNumber: true })}
+                          {...register('monto', { valueAsNumber: true })}
                           className={`w-full pl-10 pr-5 py-4 bg-white/5 border rounded-xl text-white text-2xl font-bold focus:outline-none focus:ring-2 transition-all ${
                             errors.monto || !hasSufficientFunds
-                              ? "border-red-500/50 focus:ring-red-500" 
-                              : "border-white/10 focus:ring-red-500 focus:border-transparent"
+                              ? 'border-red-500/50 focus:ring-red-500' 
+                              : 'border-white/10 focus:ring-red-500 focus:border-transparent'
                           }`}
                           placeholder="0.00"
                         />
@@ -429,7 +429,7 @@ export default function CreateGastoModalSmart({
                         Descripción (Opcional)
                       </label>
                       <textarea
-                        {...register("descripcion")}
+                        {...register('descripcion')}
                         className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all resize-none"
                         rows={3}
                         placeholder="Detalles adicionales..."
@@ -450,7 +450,7 @@ export default function CreateGastoModalSmart({
                           </div>
                           <div className="flex justify-between text-sm">
                             <span className="text-gray-400">Gasto:</span>
-                            <span className="text-red-400">-${watchedMonto?.toLocaleString() || "0.00"}</span>
+                            <span className="text-red-400">-${watchedMonto?.toLocaleString() || '0.00'}</span>
                           </div>
                           <div className="border-t border-white/10 pt-2 flex justify-between font-medium">
                             <span className="text-gray-300">Nuevo capital:</span>
@@ -471,7 +471,7 @@ export default function CreateGastoModalSmart({
                           <p className="text-xs text-gray-400 mt-1">
                             {watchedCategoria 
                               ? `Los gastos de tipo "${CATEGORIA_OPTIONS.find(c => c.value === watchedCategoria)?.label}" suelen ser recurrentes. Considera programar alertas.`
-                              : "Categorizar tus gastos te ayudará a obtener mejores reportes de análisis financiero."}
+                              : 'Categorizar tus gastos te ayudará a obtener mejores reportes de análisis financiero.'}
                           </p>
                         </div>
                       </div>
@@ -499,13 +499,13 @@ export default function CreateGastoModalSmart({
                           <span className="flex items-center justify-center gap-2">
                             <motion.div
                               animate={{ rotate: 360 }}
-                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                              transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                               className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
                             />
                             Registrando...
                           </span>
                         ) : (
-                          "Registrar Gasto ✓"
+                          'Registrar Gasto ✓'
                         )}
                       </motion.button>
                     </div>

@@ -1,13 +1,13 @@
-"use client"
+'use client'
 
-import { motion, AnimatePresence } from "framer-motion"
-import { Search, Bell, User, ChevronDown, TrendingUp, Package, DollarSign, LogOut } from "lucide-react"
-import { useState, useEffect } from "react"
-import { useAppStore } from "@/app/lib/store/useAppStore"
+import { motion, AnimatePresence } from 'framer-motion'
+import { Search, Bell, User, ChevronDown, TrendingUp, Package, DollarSign, LogOut } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { useAppStore } from '@/app/lib/store/useAppStore'
 
 export default function UltraModernHeader() {
   const { currentPanel, setCurrentPanel } = useAppStore()
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState('')
   const [showSearchResults, setShowSearchResults] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
@@ -17,47 +17,47 @@ export default function UltraModernHeader() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50)
     }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   const quickActions = [
     {
-      id: "new-sale",
+      id: 'new-sale',
       icon: <DollarSign className="w-5 h-5" />,
-      label: "Nueva Venta",
-      color: "from-emerald-500 to-green-600",
-      shortcut: "Ctrl+N",
+      label: 'Nueva Venta',
+      color: 'from-emerald-500 to-green-600',
+      shortcut: 'Ctrl+N',
     },
     {
-      id: "new-purchase",
+      id: 'new-purchase',
       icon: <Package className="w-5 h-5" />,
-      label: "Nueva OC",
-      color: "from-blue-500 to-blue-600",
-      shortcut: "Ctrl+O",
+      label: 'Nueva OC',
+      color: 'from-blue-500 to-blue-600',
+      shortcut: 'Ctrl+O',
     },
     {
-      id: "transfer",
+      id: 'transfer',
       icon: <TrendingUp className="w-5 h-5" />,
-      label: "Transferencia",
-      color: "from-purple-500 to-purple-600",
-      shortcut: "Ctrl+T",
+      label: 'Transferencia',
+      color: 'from-purple-500 to-purple-600',
+      shortcut: 'Ctrl+T',
     },
   ]
 
   const notifications = [
     {
-      type: "critical",
-      title: "Stock Agotado",
-      message: "3 productos sin existencia",
-      time: "2 min ago",
+      type: 'critical',
+      title: 'Stock Agotado',
+      message: '3 productos sin existencia',
+      time: '2 min ago',
       unread: true,
     },
     {
-      type: "warning",
-      title: "Capital Bajo en Fletes",
-      message: "Capital: $5,000 (10% del promedio)",
-      time: "15 min ago",
+      type: 'warning',
+      title: 'Capital Bajo en Fletes',
+      message: 'Capital: $5,000 (10% del promedio)',
+      time: '15 min ago',
       unread: true,
     },
   ]
@@ -66,12 +66,12 @@ export default function UltraModernHeader() {
     <motion.header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled
-          ? "h-16 bg-black/90 backdrop-blur-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.4)]"
-          : "h-18 bg-black/70 backdrop-blur-2xl shadow-[0_4px_24px_0_rgba(0,0,0,0.2)]"
+          ? 'h-16 bg-black/90 backdrop-blur-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.4)]'
+          : 'h-18 bg-black/70 backdrop-blur-2xl shadow-[0_4px_24px_0_rgba(0,0,0,0.2)]'
       } border-b border-white/10`}
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ type: "spring", stiffness: 120, damping: 25 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 25 }}
     >
       <div className="h-full px-6 flex items-center justify-between gap-6">
         {/* Logo & Breadcrumb */}
@@ -80,7 +80,7 @@ export default function UltraModernHeader() {
             className="flex items-center gap-3 cursor-pointer group"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => setCurrentPanel("dashboard")}
+            onClick={() => setCurrentPanel('dashboard')}
           >
             <div className="relative">
               <motion.div 
@@ -92,7 +92,7 @@ export default function UltraModernHeader() {
                 transition={{
                   duration: 3,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: 'easeInOut',
                 }}
               />
               <div className="relative w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-2xl font-bold text-white shadow-lg group-hover:shadow-blue-500/50 transition-shadow duration-300">
@@ -216,7 +216,7 @@ export default function UltraModernHeader() {
                 transition={{
                   duration: 2,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: 'easeInOut',
                 }}
               >
                 {notifications.filter((n) => n.unread).length}
@@ -240,12 +240,12 @@ export default function UltraModernHeader() {
                       <div
                         key={i}
                         className={`p-4 border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors ${
-                          notif.unread ? "bg-blue-500/5" : ""
+                          notif.unread ? 'bg-blue-500/5' : ''
                         }`}
                       >
                         <div className="flex items-start gap-3">
                           <div
-                            className={`w-2 h-2 rounded-full mt-2 ${notif.type === "critical" ? "bg-red-500" : "bg-yellow-500"}`}
+                            className={`w-2 h-2 rounded-full mt-2 ${notif.type === 'critical' ? 'bg-red-500' : 'bg-yellow-500'}`}
                           />
                           <div className="flex-1">
                             <div className="text-sm font-medium text-white">{notif.title}</div>

@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 💎 CREATE VENTA MODAL PREMIUM - Sistema de Ventas Completo
@@ -11,22 +11,22 @@
  * 5. Validación con Zod
  */
 
-import * as React from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
+import * as React from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from "@/app/components/ui/dialog"
-import { Button } from "@/app/components/ui/button"
-import { Input } from "@/app/components/ui/input"
-import { Label } from "@/app/components/ui/label"
-import { Badge } from "@/app/components/ui/badge"
-import { Textarea } from "@/app/components/ui/textarea"
+} from '@/app/components/ui/dialog'
+import { Button } from '@/app/components/ui/button'
+import { Input } from '@/app/components/ui/input'
+import { Label } from '@/app/components/ui/label'
+import { Badge } from '@/app/components/ui/badge'
+import { Textarea } from '@/app/components/ui/textarea'
 import {
   ShoppingCart,
   User,
@@ -50,12 +50,12 @@ import {
   Truck,
   TrendingUp,
   Calculator,
-} from "lucide-react"
-import { cn } from "@/app/lib/utils"
-import { useToast } from "@/app/hooks/use-toast"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { logger } from "@/app/lib/utils/logger"
-import { formatearMonto } from "@/app/lib/validations/smart-forms-schemas"
+} from 'lucide-react'
+import { cn } from '@/app/lib/utils'
+import { useToast } from '@/app/hooks/use-toast'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { logger } from '@/app/lib/utils/logger'
+import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
 
 // ============================================
 // SCHEMA ZOD
@@ -71,11 +71,11 @@ const ventaItemSchema = z.object({
 })
 
 const ventaPremiumSchema = z.object({
-  clienteId: z.string().min(1, "Selecciona un cliente"),
+  clienteId: z.string().min(1, 'Selecciona un cliente'),
   clienteNombre: z.string(),
-  items: z.array(ventaItemSchema).min(1, "Agrega al menos un producto"),
-  metodoPago: z.enum(["efectivo", "transferencia", "deposito", "mixto"]),
-  estadoPago: z.enum(["completo", "parcial", "pendiente"]),
+  items: z.array(ventaItemSchema).min(1, 'Agrega al menos un producto'),
+  metodoPago: z.enum(['efectivo', 'transferencia', 'deposito', 'mixto']),
+  estadoPago: z.enum(['completo', 'parcial', 'pendiente']),
   montoPagado: z.number().min(0),
   ocRelacionada: z.string().optional(),
   notas: z.string().optional(),
@@ -107,40 +107,40 @@ interface CarritoItem {
 
 // Clientes del CSV
 const CLIENTES_MOCK = [
-  { id: "bodega-mp", nombre: "Bódega M-P", telefono: "555-0001", deuda: 945000 },
-  { id: "valle", nombre: "Valle", telefono: "555-0002", deuda: 378000 },
-  { id: "ax", nombre: "Ax", telefono: "555-0003", deuda: 0 },
-  { id: "negrito", nombre: "Negrito", telefono: "555-0004", deuda: 0 },
-  { id: "wero-benavides", nombre: "Wero Benavides", telefono: "555-0005", deuda: 126000 },
-  { id: "lamas", nombre: "Lamas", telefono: "555-0006", deuda: 485100 },
-  { id: "tramite-chucho", nombre: "Trámite Chucho", telefono: "555-0007", deuda: 302400 },
-  { id: "galvan", nombre: "Galvan", telefono: "555-0008", deuda: 0 },
-  { id: "valle-local", nombre: "Valle Local", telefono: "555-0009", deuda: 0 },
-  { id: "tocayo", nombre: "Tocayo", telefono: "555-0010", deuda: 0 },
-  { id: "sierra47", nombre: "Sierra47", telefono: "555-0011", deuda: 0 },
-  { id: "chucho", nombre: "Chucho", telefono: "555-0012", deuda: 0 },
-  { id: "tio-tocayo", nombre: "Tio Tocayo", telefono: "555-0013", deuda: 315000 },
-  { id: "470", nombre: "470", telefono: "555-0014", deuda: 0 },
+  { id: 'bodega-mp', nombre: 'Bódega M-P', telefono: '555-0001', deuda: 945000 },
+  { id: 'valle', nombre: 'Valle', telefono: '555-0002', deuda: 378000 },
+  { id: 'ax', nombre: 'Ax', telefono: '555-0003', deuda: 0 },
+  { id: 'negrito', nombre: 'Negrito', telefono: '555-0004', deuda: 0 },
+  { id: 'wero-benavides', nombre: 'Wero Benavides', telefono: '555-0005', deuda: 126000 },
+  { id: 'lamas', nombre: 'Lamas', telefono: '555-0006', deuda: 485100 },
+  { id: 'tramite-chucho', nombre: 'Trámite Chucho', telefono: '555-0007', deuda: 302400 },
+  { id: 'galvan', nombre: 'Galvan', telefono: '555-0008', deuda: 0 },
+  { id: 'valle-local', nombre: 'Valle Local', telefono: '555-0009', deuda: 0 },
+  { id: 'tocayo', nombre: 'Tocayo', telefono: '555-0010', deuda: 0 },
+  { id: 'sierra47', nombre: 'Sierra47', telefono: '555-0011', deuda: 0 },
+  { id: 'chucho', nombre: 'Chucho', telefono: '555-0012', deuda: 0 },
+  { id: 'tio-tocayo', nombre: 'Tio Tocayo', telefono: '555-0013', deuda: 315000 },
+  { id: '470', nombre: '470', telefono: '555-0014', deuda: 0 },
 ]
 
 // OCs relacionadas del CSV
 const OCS_DISPONIBLES = [
-  { id: "OC0001", distribuidor: "Q-MAYA", cantidad: 423, stockActual: 0 },
-  { id: "OC0002", distribuidor: "Q-MAYA", cantidad: 32, stockActual: 0 },
-  { id: "OC0003", distribuidor: "A/X🌶️🦀", cantidad: 33, stockActual: 0 },
-  { id: "OC0004", distribuidor: "PACMAN", cantidad: 487, stockActual: 150 },
-  { id: "OC0005", distribuidor: "Q-MAYA", cantidad: 513, stockActual: 200 },
-  { id: "OC0006", distribuidor: "CH-MONTE", cantidad: 100, stockActual: 50 },
-  { id: "OC0007", distribuidor: "VALLE-MONTE", cantidad: 20, stockActual: 20 },
-  { id: "OC0008", distribuidor: "PACMAN", cantidad: 488, stockActual: 300 },
-  { id: "OC0009", distribuidor: "Q-MAYA-MP", cantidad: 200, stockActual: 150 },
+  { id: 'OC0001', distribuidor: 'Q-MAYA', cantidad: 423, stockActual: 0 },
+  { id: 'OC0002', distribuidor: 'Q-MAYA', cantidad: 32, stockActual: 0 },
+  { id: 'OC0003', distribuidor: 'A/X🌶️🦀', cantidad: 33, stockActual: 0 },
+  { id: 'OC0004', distribuidor: 'PACMAN', cantidad: 487, stockActual: 150 },
+  { id: 'OC0005', distribuidor: 'Q-MAYA', cantidad: 513, stockActual: 200 },
+  { id: 'OC0006', distribuidor: 'CH-MONTE', cantidad: 100, stockActual: 50 },
+  { id: 'OC0007', distribuidor: 'VALLE-MONTE', cantidad: 20, stockActual: 20 },
+  { id: 'OC0008', distribuidor: 'PACMAN', cantidad: 488, stockActual: 300 },
+  { id: 'OC0009', distribuidor: 'Q-MAYA-MP', cantidad: 200, stockActual: 150 },
 ]
 
 // Pasos del wizard
 const STEPS = [
-  { id: 1, title: "Cliente", icon: User, description: "¿Quién compra?" },
-  { id: 2, title: "Productos", icon: Package, description: "¿Qué lleva?" },
-  { id: 3, title: "Pago", icon: DollarSign, description: "¿Cómo paga?" },
+  { id: 1, title: 'Cliente', icon: User, description: '¿Quién compra?' },
+  { id: 2, title: 'Productos', icon: Package, description: '¿Qué lleva?' },
+  { id: 3, title: 'Pago', icon: DollarSign, description: '¿Cómo paga?' },
 ]
 
 const containerVariants = {
@@ -148,7 +148,7 @@ const containerVariants = {
   visible: { 
     opacity: 1, 
     scale: 1,
-    transition: { staggerChildren: 0.03 }
+    transition: { staggerChildren: 0.03 },
   },
 }
 
@@ -164,7 +164,7 @@ const itemVariants = {
 export function CreateVentaModalPremium({ 
   open, 
   onClose, 
-  onSuccess 
+  onSuccess, 
 }: CreateVentaModalPremiumProps) {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
@@ -173,14 +173,14 @@ export function CreateVentaModalPremium({
   
   // Estado del formulario
   const [clienteSeleccionado, setClienteSeleccionado] = React.useState<typeof CLIENTES_MOCK[0] | null>(null)
-  const [clienteSearch, setClienteSearch] = React.useState("")
+  const [clienteSearch, setClienteSearch] = React.useState('')
   const [carrito, setCarrito] = React.useState<CarritoItem[]>([])
-  const [ocSeleccionada, setOcSeleccionada] = React.useState<string>("")
-  const [metodoPago, setMetodoPago] = React.useState<"efectivo" | "transferencia">("efectivo")
-  const [estadoPago, setEstadoPago] = React.useState<"completo" | "parcial" | "pendiente">("completo")
+  const [ocSeleccionada, setOcSeleccionada] = React.useState<string>('')
+  const [metodoPago, setMetodoPago] = React.useState<'efectivo' | 'transferencia'>('efectivo')
+  const [estadoPago, setEstadoPago] = React.useState<'completo' | 'parcial' | 'pendiente'>('completo')
   const [montoPagado, setMontoPagado] = React.useState(0)
   const [aplicaFlete, setAplicaFlete] = React.useState(true)
-  const [notas, setNotas] = React.useState("")
+  const [notas, setNotas] = React.useState('')
 
   // Precios base del sistema
   const PRECIO_COMPRA_DEFAULT = 6300 // Costo distribuidor
@@ -193,7 +193,7 @@ export function CreateVentaModalPremium({
     const q = clienteSearch.toLowerCase()
     return CLIENTES_MOCK.filter(c => 
       c.nombre.toLowerCase().includes(q) ||
-      c.telefono.includes(q)
+      c.telefono.includes(q),
     )
   }, [clienteSearch])
 
@@ -231,14 +231,14 @@ export function CreateVentaModalPremium({
       },
       margenPorcentaje: totalIngreso > 0 
         ? (totalUtilidades / totalIngreso) * 100 
-        : 0
+        : 0,
     }
   }, [carrito, aplicaFlete])
 
   // Monto real según estado de pago
   const montoRealPagado = React.useMemo(() => {
-    if (estadoPago === "completo") return totales.totalIngreso
-    if (estadoPago === "parcial") return Math.min(montoPagado, totales.totalIngreso)
+    if (estadoPago === 'completo') return totales.totalIngreso
+    if (estadoPago === 'parcial') return Math.min(montoPagado, totales.totalIngreso)
     return 0
   }, [estadoPago, montoPagado, totales.totalIngreso])
 
@@ -249,7 +249,7 @@ export function CreateVentaModalPremium({
     switch (step) {
       case 1: return clienteSeleccionado !== null
       case 2: return carrito.length > 0
-      case 3: return estadoPago !== "parcial" || (montoPagado > 0 && montoPagado < totales.totalIngreso)
+      case 3: return estadoPago !== 'parcial' || (montoPagado > 0 && montoPagado < totales.totalIngreso)
       default: return false
     }
   }, [step, clienteSeleccionado, carrito, estadoPago, montoPagado, totales.totalIngreso])
@@ -286,7 +286,7 @@ export function CreateVentaModalPremium({
   // Actualizar item del carrito
   const actualizarItem = (id: string, campo: keyof CarritoItem, valor: number | string) => {
     setCarrito(prev => prev.map(item => 
-      item.id === id ? { ...item, [campo]: valor } : item
+      item.id === id ? { ...item, [campo]: valor } : item,
     ))
   }
 
@@ -301,14 +301,14 @@ export function CreateVentaModalPremium({
       setStep(1)
       setDirection(1)
       setClienteSeleccionado(null)
-      setClienteSearch("")
+      setClienteSearch('')
       setCarrito([])
-      setOcSeleccionada("")
-      setMetodoPago("efectivo")
-      setEstadoPago("completo")
+      setOcSeleccionada('')
+      setMetodoPago('efectivo')
+      setEstadoPago('completo')
       setMontoPagado(0)
       setAplicaFlete(true)
-      setNotas("")
+      setNotas('')
     }
   }, [open])
 
@@ -316,9 +316,9 @@ export function CreateVentaModalPremium({
   const handleSubmit = async () => {
     if (!clienteSeleccionado || carrito.length === 0) {
       toast({
-        title: "Error",
-        description: "Completa todos los campos requeridos",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Completa todos los campos requeridos',
+        variant: 'destructive',
       })
       return
     }
@@ -355,13 +355,13 @@ export function CreateVentaModalPremium({
         timestamp: new Date().toISOString(),
       }
 
-      logger.info("Venta registrada", { 
+      logger.info('Venta registrada', { 
         data: ventaData,
-        context: "CreateVentaModalPremium"
+        context: 'CreateVentaModalPremium',
       })
 
       toast({
-        title: "✅ Venta Registrada",
+        title: '✅ Venta Registrada',
         description: `${formatearMonto(totales.totalIngreso)} - ${clienteSeleccionado.nombre}`,
       })
 
@@ -370,11 +370,11 @@ export function CreateVentaModalPremium({
       useAppStore.getState().triggerDataRefresh()
 
     } catch (error) {
-      logger.error("Error al registrar venta", error)
+      logger.error('Error al registrar venta', error)
       toast({
-        title: "Error",
-        description: "No se pudo registrar la venta",
-        variant: "destructive",
+        title: 'Error',
+        description: 'No se pudo registrar la venta',
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -385,11 +385,11 @@ export function CreateVentaModalPremium({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
         className={cn(
-          "max-w-4xl max-h-[95vh] p-0 overflow-hidden",
-          "bg-black/60 backdrop-blur-2xl",
-          "border border-white/10",
-          "text-white",
-          "shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(16,185,129,0.15)]"
+          'max-w-4xl max-h-[95vh] p-0 overflow-hidden',
+          'bg-black/60 backdrop-blur-2xl',
+          'border border-white/10',
+          'text-white',
+          'shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(16,185,129,0.15)]',
         )}
       >
         <DialogTitle className="sr-only">Nueva Venta</DialogTitle>
@@ -437,19 +437,19 @@ export function CreateVentaModalPremium({
                 {STEPS.map((s, i) => (
                   <React.Fragment key={s.id}>
                     <div className={cn(
-                      "w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all",
+                      'w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all',
                       step > s.id
-                        ? "bg-green-500 border-green-500 text-white"
+                        ? 'bg-green-500 border-green-500 text-white'
                         : step === s.id
-                        ? "bg-white/10 border-green-500 text-green-400"
-                        : "bg-white/5 border-white/20 text-gray-500"
+                        ? 'bg-white/10 border-green-500 text-green-400'
+                        : 'bg-white/5 border-white/20 text-gray-500',
                     )}>
                       {step > s.id ? <Check className="w-5 h-5" /> : <s.icon className="w-5 h-5" />}
                     </div>
                     {i < STEPS.length - 1 && (
                       <div className={cn(
-                        "w-8 h-0.5",
-                        step > s.id ? "bg-green-500" : "bg-white/10"
+                        'w-8 h-0.5',
+                        step > s.id ? 'bg-green-500' : 'bg-white/10',
                       )} />
                     )}
                   </React.Fragment>
@@ -471,7 +471,7 @@ export function CreateVentaModalPremium({
             <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/5">
               <motion.div
                 className="h-full bg-gradient-to-r from-green-500 to-emerald-400"
-                initial={{ width: "33%" }}
+                initial={{ width: '33%' }}
                 animate={{ width: `${(step / 3) * 100}%` }}
                 transition={{ duration: 0.3 }}
               />
@@ -521,18 +521,18 @@ export function CreateVentaModalPremium({
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         className={cn(
-                          "relative p-4 rounded-xl border text-left transition-all",
+                          'relative p-4 rounded-xl border text-left transition-all',
                           clienteSeleccionado?.id === cliente.id
-                            ? "bg-green-500/20 border-green-500 shadow-lg shadow-green-500/20"
-                            : "bg-white/5 border-white/10 hover:bg-white/10"
+                            ? 'bg-green-500/20 border-green-500 shadow-lg shadow-green-500/20'
+                            : 'bg-white/5 border-white/10 hover:bg-white/10',
                         )}
                       >
                         <div className="flex items-center gap-3">
                           <div className={cn(
-                            "w-10 h-10 rounded-full flex items-center justify-center",
+                            'w-10 h-10 rounded-full flex items-center justify-center',
                             clienteSeleccionado?.id === cliente.id
-                              ? "bg-green-500 text-white"
-                              : "bg-white/10 text-gray-400"
+                              ? 'bg-green-500 text-white'
+                              : 'bg-white/10 text-gray-400',
                           )}>
                             <User className="w-5 h-5" />
                           </div>
@@ -590,12 +590,12 @@ export function CreateVentaModalPremium({
                         <button
                           key={oc.id}
                           type="button"
-                          onClick={() => setOcSeleccionada(oc.id === ocSeleccionada ? "" : oc.id)}
+                          onClick={() => setOcSeleccionada(oc.id === ocSeleccionada ? '' : oc.id)}
                           className={cn(
-                            "px-3 py-2 rounded-lg text-sm transition-all",
+                            'px-3 py-2 rounded-lg text-sm transition-all',
                             ocSeleccionada === oc.id
-                              ? "bg-blue-500/20 border border-blue-500 text-blue-400"
-                              : "bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10"
+                              ? 'bg-blue-500/20 border border-blue-500 text-blue-400'
+                              : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10',
                           )}
                         >
                           {oc.id} • {oc.distribuidor} • Stock: {oc.stockActual}
@@ -627,7 +627,7 @@ export function CreateVentaModalPremium({
                               <Input
                                 type="number"
                                 value={item.cantidad}
-                                onChange={(e) => actualizarItem(item.id, "cantidad", Number(e.target.value))}
+                                onChange={(e) => actualizarItem(item.id, 'cantidad', Number(e.target.value))}
                                 min={1}
                                 className="h-12 text-center text-lg font-bold bg-white/5 border-white/10"
                               />
@@ -637,7 +637,7 @@ export function CreateVentaModalPremium({
                               <Input
                                 type="number"
                                 value={item.precioVenta}
-                                onChange={(e) => actualizarItem(item.id, "precioVenta", Number(e.target.value))}
+                                onChange={(e) => actualizarItem(item.id, 'precioVenta', Number(e.target.value))}
                                 className="h-12 bg-green-500/10 border-green-500/30 text-green-300"
                               />
                             </div>
@@ -646,7 +646,7 @@ export function CreateVentaModalPremium({
                               <Input
                                 type="number"
                                 value={item.precioCompra}
-                                onChange={(e) => actualizarItem(item.id, "precioCompra", Number(e.target.value))}
+                                onChange={(e) => actualizarItem(item.id, 'precioCompra', Number(e.target.value))}
                                 className="h-12 bg-blue-500/10 border-blue-500/30 text-blue-300"
                               />
                             </div>
@@ -655,13 +655,13 @@ export function CreateVentaModalPremium({
                               <Input
                                 type="number"
                                 value={item.precioFlete}
-                                onChange={(e) => actualizarItem(item.id, "precioFlete", Number(e.target.value))}
+                                onChange={(e) => actualizarItem(item.id, 'precioFlete', Number(e.target.value))}
                                 disabled={!aplicaFlete}
                                 className={cn(
-                                  "h-12",
+                                  'h-12',
                                   aplicaFlete 
-                                    ? "bg-orange-500/10 border-orange-500/30 text-orange-300"
-                                    : "bg-white/5 border-white/10 text-gray-500 opacity-50"
+                                    ? 'bg-orange-500/10 border-orange-500/30 text-orange-300'
+                                    : 'bg-white/5 border-white/10 text-gray-500 opacity-50',
                                 )}
                               />
                             </div>
@@ -702,7 +702,7 @@ export function CreateVentaModalPremium({
                               <p className="text-xs text-green-400">→ Utilidad</p>
                               <p className="text-lg font-bold text-green-400">
                                 {formatearMonto(
-                                  (item.precioVenta - item.precioCompra - (aplicaFlete ? item.precioFlete : 0)) * item.cantidad
+                                  (item.precioVenta - item.precioCompra - (aplicaFlete ? item.precioFlete : 0)) * item.cantidad,
                                 )}
                               </p>
                             </div>
@@ -718,23 +718,23 @@ export function CreateVentaModalPremium({
                       type="button"
                       onClick={() => setAplicaFlete(!aplicaFlete)}
                       className={cn(
-                        "w-12 h-6 rounded-full transition-all relative",
-                        aplicaFlete ? "bg-orange-500" : "bg-white/20"
+                        'w-12 h-6 rounded-full transition-all relative',
+                        aplicaFlete ? 'bg-orange-500' : 'bg-white/20',
                       )}
                     >
                       <div className={cn(
-                        "absolute top-1 w-4 h-4 rounded-full bg-white transition-all",
-                        aplicaFlete ? "right-1" : "left-1"
+                        'absolute top-1 w-4 h-4 rounded-full bg-white transition-all',
+                        aplicaFlete ? 'right-1' : 'left-1',
                       )} />
                     </button>
                     <div>
                       <p className="font-medium text-white">
-                        {aplicaFlete ? "Aplica Flete" : "No Aplica Flete"}
+                        {aplicaFlete ? 'Aplica Flete' : 'No Aplica Flete'}
                       </p>
                       <p className="text-xs text-gray-500">
                         {aplicaFlete 
-                          ? "Se cobrará flete y se distribuirá a Flete Sur"
-                          : "Venta sin flete (ej: trámites, entregas locales)"
+                          ? 'Se cobrará flete y se distribuirá a Flete Sur'
+                          : 'Venta sin flete (ej: trámites, entregas locales)'
                         }
                       </p>
                     </div>
@@ -816,7 +816,7 @@ export function CreateVentaModalPremium({
                       className="text-5xl font-bold text-white"
                       initial={{ scale: 0.5, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
-                      transition={{ type: "spring", stiffness: 200 }}
+                      transition={{ type: 'spring', stiffness: 200 }}
                     >
                       {formatearMonto(totales.totalIngreso)}
                     </motion.p>
@@ -830,18 +830,18 @@ export function CreateVentaModalPremium({
                     <Label className="text-sm text-gray-400">Método de Pago</Label>
                     <div className="grid grid-cols-2 gap-3">
                       {[
-                        { id: "efectivo" as const, icon: Wallet, label: "Efectivo" },
-                        { id: "transferencia" as const, icon: CreditCard, label: "Transferencia" },
+                        { id: 'efectivo' as const, icon: Wallet, label: 'Efectivo' },
+                        { id: 'transferencia' as const, icon: CreditCard, label: 'Transferencia' },
                       ].map((m) => (
                         <button
                           key={m.id}
                           type="button"
                           onClick={() => setMetodoPago(m.id)}
                           className={cn(
-                            "p-4 rounded-xl border text-center transition-all",
+                            'p-4 rounded-xl border text-center transition-all',
                             metodoPago === m.id
-                              ? "bg-green-500/20 border-green-500 text-green-400"
-                              : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+                              ? 'bg-green-500/20 border-green-500 text-green-400'
+                              : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10',
                           )}
                         >
                           <m.icon className="w-6 h-6 mx-auto mb-2" />
@@ -856,23 +856,23 @@ export function CreateVentaModalPremium({
                     <Label className="text-sm text-gray-400">Estado del Pago</Label>
                     <div className="grid grid-cols-3 gap-3">
                       {[
-                        { id: "completo" as const, label: "Pagado", desc: "100%", color: "green" },
-                        { id: "parcial" as const, label: "Parcial", desc: "Abono", color: "yellow" },
-                        { id: "pendiente" as const, label: "Pendiente", desc: "Crédito", color: "orange" },
+                        { id: 'completo' as const, label: 'Pagado', desc: '100%', color: 'green' },
+                        { id: 'parcial' as const, label: 'Parcial', desc: 'Abono', color: 'yellow' },
+                        { id: 'pendiente' as const, label: 'Pendiente', desc: 'Crédito', color: 'orange' },
                       ].map((e) => (
                         <button
                           key={e.id}
                           type="button"
                           onClick={() => setEstadoPago(e.id)}
                           className={cn(
-                            "p-3 rounded-xl border transition-all",
+                            'p-3 rounded-xl border transition-all',
                             estadoPago === e.id
-                              ? e.color === "green"
-                                ? "bg-green-500/20 border-green-500"
-                                : e.color === "yellow"
-                                ? "bg-yellow-500/20 border-yellow-500"
-                                : "bg-orange-500/20 border-orange-500"
-                              : "bg-white/5 border-white/10 hover:bg-white/10"
+                              ? e.color === 'green'
+                                ? 'bg-green-500/20 border-green-500'
+                                : e.color === 'yellow'
+                                ? 'bg-yellow-500/20 border-yellow-500'
+                                : 'bg-orange-500/20 border-orange-500'
+                              : 'bg-white/5 border-white/10 hover:bg-white/10',
                           )}
                         >
                           <p className="font-medium text-white">{e.label}</p>
@@ -883,10 +883,10 @@ export function CreateVentaModalPremium({
                   </div>
 
                   {/* Monto parcial */}
-                  {estadoPago === "parcial" && (
+                  {estadoPago === 'parcial' && (
                     <motion.div
                       initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
+                      animate={{ height: 'auto', opacity: 1 }}
                       className="space-y-2"
                     >
                       <Label className="text-sm text-gray-400">Monto del Abono</Label>
@@ -981,9 +981,9 @@ export function CreateVentaModalPremium({
 
           {/* ===== FOOTER ===== */}
           <div className={cn(
-            "h-20 border-t border-white/10",
-            "bg-gradient-to-r from-black/50 via-white/5 to-black/50",
-            "px-6 flex items-center justify-between"
+            'h-20 border-t border-white/10',
+            'bg-gradient-to-r from-black/50 via-white/5 to-black/50',
+            'px-6 flex items-center justify-between',
           )}>
             <Button
               type="button"
@@ -992,7 +992,7 @@ export function CreateVentaModalPremium({
               disabled={isSubmitting}
               className="text-gray-400 hover:text-white"
             >
-              {step === 1 ? "Cancelar" : (
+              {step === 1 ? 'Cancelar' : (
                 <>
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Atrás
@@ -1016,11 +1016,11 @@ export function CreateVentaModalPremium({
                 onClick={handleSubmit}
                 disabled={isSubmitting || !canProceed}
                 className={cn(
-                  "min-w-[180px]",
-                  "bg-gradient-to-r from-green-600 to-emerald-600",
-                  "hover:from-green-500 hover:to-emerald-500",
-                  "text-white font-bold",
-                  "shadow-[0_0_30px_rgba(34,197,94,0.4)]"
+                  'min-w-[180px]',
+                  'bg-gradient-to-r from-green-600 to-emerald-600',
+                  'hover:from-green-500 hover:to-emerald-500',
+                  'text-white font-bold',
+                  'shadow-[0_0_30px_rgba(34,197,94,0.4)]',
                 )}
               >
                 {isSubmitting ? (

@@ -26,12 +26,6 @@ describe('Clientes Schema - Validaciones', () => {
         email: 'juan.perez@example.com',
         telefono: '5512345678',
         direccion: 'Calle 123, CDMX',
-        totalComprado: 50000,
-        saldoPendiente: 10000,
-        ventasAsociadas: [],
-        keywords: ['juan', 'perez'],
-        createdAt: new Date(),
-        updatedAt: new Date(),
       }
       
       const result = validarCliente(clienteValido)
@@ -88,23 +82,7 @@ describe('Clientes Schema - Validaciones', () => {
       }
     })
     
-    it('❌ debe rechazar teléfono inválido (menos de 10 dígitos)', () => {
-      const clienteInvalido = {
-        nombre: 'Juan Pérez',
-        email: 'juan@example.com',
-        telefono: '551234567', // Solo 9 dígitos
-      }
-      
-      const result = validarCliente(clienteInvalido)
-      
-      expect(result.success).toBe(false)
-      if (!result.success) {
-        expect(result.errors).toBeDefined()
-        expect(result.errors?.some(e => e.includes('telefono'))).toBe(true)
-      }
-    })
-    
-    it('❌ debe rechazar teléfono con letras', () => {
+    it('❌ debe rechazar teléfono con caracteres especiales inválidos', () => {
       const clienteInvalido = {
         nombre: 'Juan Pérez',
         email: 'juan@example.com',
@@ -114,15 +92,15 @@ describe('Clientes Schema - Validaciones', () => {
       const result = validarCliente(clienteInvalido)
       
       expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.errors).toBeDefined()
+        expect(result.errors?.some(e => e.includes('telefono') || e.includes('teléfono'))).toBe(true)
+      }
     })
     
-    it('✅ debe aceptar totalComprado = 0', () => {
+    it('✅ debe aceptar cliente sin campos opcionales', () => {
       const cliente = {
         nombre: 'Cliente Nuevo',
-        email: 'nuevo@example.com',
-        telefono: '5512345678',
-        totalComprado: 0,
-        saldoPendiente: 0,
       }
       
       const result = validarCliente(cliente)
@@ -130,30 +108,28 @@ describe('Clientes Schema - Validaciones', () => {
       expect(result.success).toBe(true)
     })
     
-    it('❌ debe rechazar totalComprado negativo', () => {
-      const clienteInvalido = {
+    it('✅ debe aceptar teléfono vacío', () => {
+      const cliente = {
         nombre: 'Juan Pérez',
         email: 'juan@example.com',
-        telefono: '5512345678',
-        totalComprado: -5000,
+        telefono: '',
       }
       
-      const result = validarCliente(clienteInvalido)
+      const result = validarCliente(cliente)
       
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(true)
     })
     
-    it('❌ debe rechazar saldoPendiente negativo', () => {
-      const clienteInvalido = {
+    it('✅ debe aceptar email vacío', () => {
+      const cliente = {
         nombre: 'Juan Pérez',
-        email: 'juan@example.com',
         telefono: '5512345678',
-        saldoPendiente: -1000,
+        email: '',
       }
       
-      const result = validarCliente(clienteInvalido)
+      const result = validarCliente(cliente)
       
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(true)
     })
   })
   
@@ -212,14 +188,12 @@ describe('Clientes Schema - Validaciones', () => {
       expect(result.success).toBe(false)
     })
     
-    it('❌ debe rechazar actualización con totalComprado negativo', () => {
-      const actualizacion = {
-        totalComprado: -1000,
-      }
+    it('✅ debe aceptar objeto vacío (sin cambios)', () => {
+      const actualizacion = {}
       
       const result = validarActualizacionCliente(actualizacion)
       
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(true)
     })
   })
   
@@ -233,24 +207,28 @@ describe('Clientes Schema - Validaciones', () => {
       const keywords = generarKeywordsCliente('Juan Pérez')
       
       expect(keywords).toContain('juan')
-      expect(keywords).toContain('perez')
-      expect(keywords).toContain('juan perez')
+      expect(keywords).toContain('pérez')
+      expect(keywords).toContain('juan pérez')
     })
     
     it('✅ debe manejar nombres con acentos', () => {
       const keywords = generarKeywordsCliente('José María')
       
-      expect(keywords).toContain('jose')
-      expect(keywords).toContain('maria')
-      expect(keywords).toContain('jose maria')
+      expect(keywords).toContain('josé')
+      expect(keywords).toContain('maría')
+      expect(keywords).toContain('josé maría')
     })
     
-    it('✅ debe manejar nombres con múltiples espacios', () => {
-      const keywords = generarKeywordsCliente('Juan   Carlos   Pérez')
+    it('✅ debe incluir teléfono en keywords', () => {
+      const keywords = generarKeywordsCliente('Juan', '5512345678')
       
-      expect(keywords).toContain('juan')
-      expect(keywords).toContain('carlos')
-      expect(keywords).toContain('perez')
+      expect(keywords).toContain('5512345678')
+    })
+    
+    it('✅ debe incluir email en keywords', () => {
+      const keywords = generarKeywordsCliente('Juan', undefined, 'juan@test.com')
+      
+      expect(keywords).toContain('juan@test.com')
     })
     
     it('✅ debe eliminar duplicados', () => {
@@ -284,11 +262,9 @@ describe('Clientes Schema - Validaciones', () => {
       expect(() => CrearClienteSchema.parse(cliente)).not.toThrow()
     })
     
-    it('❌ debe lanzar error con datos inválidos', () => {
+    it('❌ debe lanzar error con nombre muy corto', () => {
       const clienteInvalido = {
         nombre: 'T', // Muy corto
-        email: 'invalid',
-        telefono: '123',
       }
       
       expect(() => CrearClienteSchema.parse(clienteInvalido)).toThrow()

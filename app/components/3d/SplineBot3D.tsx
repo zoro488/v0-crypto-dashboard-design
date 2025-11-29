@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { Suspense, useEffect, useRef, useState } from "react"
-import Spline from "@splinetool/react-spline"
-import type { Application, SplineEvent } from "@splinetool/runtime"
-import { motion, AnimatePresence } from "framer-motion"
-import { Loader2 } from "lucide-react"
+import { Suspense, useEffect, useRef, useState } from 'react'
+import Spline from '@splinetool/react-spline'
+import type { Application, SplineEvent } from '@splinetool/runtime'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Loader2 } from 'lucide-react'
 
 type BotState = 'idle' | 'listening' | 'speaking' | 'thinking'
 
@@ -21,16 +21,16 @@ export function SplineBot3D({
   state = 'idle',
   isListening = false, 
   isSpeaking = false, 
-  className = "",
+  className = '',
   onLoad,
-  onInteraction
+  onInteraction,
 }: SplineBot3DProps) {
   const splineRef = useRef<Application | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
   const [currentState, setCurrentState] = useState<BotState>(state)
 
   // URL de la escena Spline del bot 3D (R_4_X_Bot)
-  const sceneUrl = "https://prod.spline.design/cZAGZ7v6TaqZrhFN/scene.splinecode"
+  const sceneUrl = 'https://prod.spline.design/cZAGZ7v6TaqZrhFN/scene.splinecode'
 
   useEffect(() => {
     // Determinar estado basado en props

@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import type React from "react"
-import { useState, useCallback, useMemo } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import type React from 'react'
+import { useState, useCallback, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   X, 
   TrendingUp, 
@@ -12,28 +12,28 @@ import {
   Sparkles,
   Mic,
   CheckCircle2,
-  ArrowUpRight
-} from "lucide-react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
+  ArrowUpRight,
+} from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogDescription,
-} from "@/app/components/ui/dialog"
-import { cn } from "@/app/lib/utils"
-import { firestoreService } from "@/app/lib/firebase/firestore-service"
-import { useToast } from "@/app/hooks/use-toast"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { logger } from "@/app/lib/utils/logger"
+} from '@/app/components/ui/dialog'
+import { cn } from '@/app/lib/utils'
+import { firestoreService } from '@/app/lib/firebase/firestore-service'
+import { useToast } from '@/app/hooks/use-toast'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { logger } from '@/app/lib/utils/logger'
 
 // Schema de validación Zod
 const ingresoSchema = z.object({
-  bancoId: z.string().min(1, "Selecciona un banco"),
-  concepto: z.string().min(2, "El concepto es requerido"),
-  monto: z.number().positive("El monto debe ser mayor a 0"),
+  bancoId: z.string().min(1, 'Selecciona un banco'),
+  concepto: z.string().min(2, 'El concepto es requerido'),
+  monto: z.number().positive('El monto debe ser mayor a 0'),
   referencia: z.string().optional(),
   descripcion: z.string().optional(),
   categoria: z.string().optional(),
@@ -48,18 +48,18 @@ interface CreateIngresoModalSmartProps {
 }
 
 const CATEGORIA_OPTIONS = [
-  { value: "venta", label: "Venta", icon: "🛍️" },
-  { value: "abono", label: "Abono", icon: "💰" },
-  { value: "comision", label: "Comisión", icon: "📊" },
-  { value: "transferencia", label: "Transferencia", icon: "📲" },
-  { value: "inversion", label: "Inversión", icon: "📈" },
-  { value: "otros", label: "Otros", icon: "📋" },
+  { value: 'venta', label: 'Venta', icon: '🛍️' },
+  { value: 'abono', label: 'Abono', icon: '💰' },
+  { value: 'comision', label: 'Comisión', icon: '📊' },
+  { value: 'transferencia', label: 'Transferencia', icon: '📲' },
+  { value: 'inversion', label: 'Inversión', icon: '📈' },
+  { value: 'otros', label: 'Otros', icon: '📋' },
 ]
 
 export default function CreateIngresoModalSmart({ 
   isOpen, 
   onClose, 
-  onSubmit 
+  onSubmit, 
 }: CreateIngresoModalSmartProps) {
   const { toast } = useToast()
   const bancos = useAppStore((state) => state.bancos)
@@ -78,21 +78,21 @@ export default function CreateIngresoModalSmart({
     formState: { errors, isValid },
   } = useForm<IngresoFormData>({
     resolver: zodResolver(ingresoSchema),
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
-      bancoId: "",
-      concepto: "",
+      bancoId: '',
+      concepto: '',
       monto: 0,
-      referencia: "",
-      descripcion: "",
-      categoria: "",
+      referencia: '',
+      descripcion: '',
+      categoria: '',
     },
   })
 
-  const watchedBancoId = watch("bancoId")
-  const watchedMonto = watch("monto")
-  const watchedConcepto = watch("concepto")
-  const watchedCategoria = watch("categoria")
+  const watchedBancoId = watch('bancoId')
+  const watchedMonto = watch('monto')
+  const watchedConcepto = watch('concepto')
+  const watchedCategoria = watch('categoria')
 
   // Obtener banco seleccionado
   const selectedBanco = useMemo(() => {
@@ -102,8 +102,8 @@ export default function CreateIngresoModalSmart({
   const handleVoiceFill = useCallback(() => {
     setIsVoiceActive(true)
     toast({
-      title: "Modo Voz Activado",
-      description: "Próximamente: Dicta la información del ingreso",
+      title: 'Modo Voz Activado',
+      description: 'Próximamente: Dicta la información del ingreso',
     })
     setTimeout(() => setIsVoiceActive(false), 2000)
   }, [toast])
@@ -116,8 +116,8 @@ export default function CreateIngresoModalSmart({
         monto: data.monto,
         concepto: data.concepto,
         bancoDestino: data.bancoId,
-        referencia: data.referencia || "",
-        notas: data.descripcion || "",
+        referencia: data.referencia || '',
+        notas: data.descripcion || '',
       })
 
       // Trigger para actualizar hooks de datos
@@ -128,7 +128,7 @@ export default function CreateIngresoModalSmart({
       }
 
       toast({
-        title: "✅ Ingreso Registrado",
+        title: '✅ Ingreso Registrado',
         description: `Se ha registrado el ingreso de $${data.monto.toLocaleString()} correctamente.`,
       })
 
@@ -137,11 +137,11 @@ export default function CreateIngresoModalSmart({
       setStep(1)
       onClose()
     } catch (error) {
-      logger.error("Error creating ingreso", error, { context: "CreateIngresoModalSmart" })
+      logger.error('Error creating ingreso', error, { context: 'CreateIngresoModalSmart' })
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Error al registrar el ingreso.",
-        variant: "destructive",
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Error al registrar el ingreso.',
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -161,10 +161,10 @@ export default function CreateIngresoModalSmart({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
         className={cn(
-          "max-w-2xl max-h-[85vh] p-0",
-          "bg-black/95 border-white/10 backdrop-blur-2xl",
-          "text-white overflow-hidden flex flex-col",
-          "shadow-2xl shadow-emerald-500/10"
+          'max-w-2xl max-h-[85vh] p-0',
+          'bg-black/95 border-white/10 backdrop-blur-2xl',
+          'text-white overflow-hidden flex flex-col',
+          'shadow-2xl shadow-emerald-500/10',
         )}
       >
         <DialogTitle className="sr-only">Registrar Ingreso</DialogTitle>
@@ -191,8 +191,8 @@ export default function CreateIngresoModalSmart({
                 whileTap={{ scale: 0.95 }}
                 className={`absolute right-16 top-4 sm:right-20 sm:top-6 p-2 rounded-xl transition-all ${
                   isVoiceActive 
-                    ? "bg-emerald-500/30 text-emerald-300" 
-                    : "hover:bg-white/10 text-gray-400 hover:text-white"
+                    ? 'bg-emerald-500/30 text-emerald-300' 
+                    : 'hover:bg-white/10 text-gray-400 hover:text-white'
                 }`}
               >
                 <Mic className="w-5 h-5" />
@@ -215,7 +215,7 @@ export default function CreateIngresoModalSmart({
                     <div key={s} className="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: step >= s ? "100%" : "0%" }}
+                        animate={{ width: step >= s ? '100%' : '0%' }}
                         transition={{ duration: 0.3 }}
                         className="h-full bg-gradient-to-r from-emerald-500 to-green-500"
                       />
@@ -223,8 +223,8 @@ export default function CreateIngresoModalSmart({
                   ))}
                 </div>
                 <div className="flex justify-between mt-2 text-xs text-gray-500">
-                  <span className={step >= 1 ? "text-emerald-400" : ""}>Banco</span>
-                  <span className={step >= 2 ? "text-emerald-400" : ""}>Detalles</span>
+                  <span className={step >= 1 ? 'text-emerald-400' : ''}>Banco</span>
+                  <span className={step >= 2 ? 'text-emerald-400' : ''}>Detalles</span>
                 </div>
               </div>
             </div>
@@ -248,11 +248,11 @@ export default function CreateIngresoModalSmart({
                         Banco Destino *
                       </label>
                       <select
-                        {...register("bancoId")}
+                        {...register('bancoId')}
                         className={`w-full px-5 py-4 bg-white/5 border rounded-xl text-white text-lg focus:outline-none focus:ring-2 transition-all appearance-none ${
                           errors.bancoId 
-                            ? "border-red-500/50 focus:ring-red-500" 
-                            : "border-white/10 focus:ring-emerald-500 focus:border-transparent"
+                            ? 'border-red-500/50 focus:ring-red-500' 
+                            : 'border-white/10 focus:ring-emerald-500 focus:border-transparent'
                         }`}
                       >
                         <option value="" className="bg-gray-900">Seleccionar banco...</option>
@@ -299,13 +299,13 @@ export default function CreateIngresoModalSmart({
                           <motion.button
                             key={option.value}
                             type="button"
-                            onClick={() => setValue("categoria", option.value)}
+                            onClick={() => setValue('categoria', option.value)}
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             className={`p-3 rounded-xl border text-xs transition-all ${
                               watchedCategoria === option.value
-                                ? "bg-emerald-500/20 border-emerald-500 text-white"
-                                : "bg-white/5 border-white/10 text-gray-400 hover:border-white/20"
+                                ? 'bg-emerald-500/20 border-emerald-500 text-white'
+                                : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/20'
                             }`}
                           >
                             <span className="mr-1">{option.icon}</span> {option.label}
@@ -360,11 +360,11 @@ export default function CreateIngresoModalSmart({
                       </label>
                       <input
                         type="text"
-                        {...register("concepto")}
+                        {...register('concepto')}
                         className={`w-full px-5 py-4 bg-white/5 border rounded-xl text-white text-lg focus:outline-none focus:ring-2 transition-all ${
                           errors.concepto 
-                            ? "border-red-500/50 focus:ring-red-500" 
-                            : "border-white/10 focus:ring-emerald-500 focus:border-transparent"
+                            ? 'border-red-500/50 focus:ring-red-500' 
+                            : 'border-white/10 focus:ring-emerald-500 focus:border-transparent'
                         }`}
                         placeholder="Ej: Venta de productos"
                       />
@@ -384,11 +384,11 @@ export default function CreateIngresoModalSmart({
                         <input
                           type="number"
                           step="0.01"
-                          {...register("monto", { valueAsNumber: true })}
+                          {...register('monto', { valueAsNumber: true })}
                           className={`w-full pl-10 pr-5 py-4 bg-white/5 border rounded-xl text-white text-2xl font-bold focus:outline-none focus:ring-2 transition-all ${
                             errors.monto
-                              ? "border-red-500/50 focus:ring-red-500" 
-                              : "border-white/10 focus:ring-emerald-500 focus:border-transparent"
+                              ? 'border-red-500/50 focus:ring-red-500' 
+                              : 'border-white/10 focus:ring-emerald-500 focus:border-transparent'
                           }`}
                           placeholder="0.00"
                         />
@@ -406,7 +406,7 @@ export default function CreateIngresoModalSmart({
                       </label>
                       <input
                         type="text"
-                        {...register("referencia")}
+                        {...register('referencia')}
                         className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                         placeholder="Número de referencia"
                       />
@@ -419,7 +419,7 @@ export default function CreateIngresoModalSmart({
                         Descripción (Opcional)
                       </label>
                       <textarea
-                        {...register("descripcion")}
+                        {...register('descripcion')}
                         className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all resize-none"
                         rows={3}
                         placeholder="Detalles adicionales..."
@@ -440,7 +440,7 @@ export default function CreateIngresoModalSmart({
                           </div>
                           <div className="flex justify-between text-sm">
                             <span className="text-gray-400">Ingreso:</span>
-                            <span className="text-emerald-400">+${watchedMonto?.toLocaleString() || "0.00"}</span>
+                            <span className="text-emerald-400">+${watchedMonto?.toLocaleString() || '0.00'}</span>
                           </div>
                           <div className="border-t border-white/10 pt-2 flex justify-between font-medium">
                             <span className="text-gray-300">Nuevo capital:</span>
@@ -459,9 +459,9 @@ export default function CreateIngresoModalSmart({
                         <div>
                           <p className="text-sm text-emerald-300 font-medium">Sugerencia IA</p>
                           <p className="text-xs text-gray-400 mt-1">
-                            {watchedCategoria === "venta"
-                              ? "Para ingresos por venta, considera vincular este ingreso con la venta correspondiente para mejor trazabilidad."
-                              : "Agregar una referencia ayuda a identificar este ingreso en reportes futuros."}
+                            {watchedCategoria === 'venta'
+                              ? 'Para ingresos por venta, considera vincular este ingreso con la venta correspondiente para mejor trazabilidad.'
+                              : 'Agregar una referencia ayuda a identificar este ingreso en reportes futuros.'}
                           </p>
                         </div>
                       </div>
@@ -489,13 +489,13 @@ export default function CreateIngresoModalSmart({
                           <span className="flex items-center justify-center gap-2">
                             <motion.div
                               animate={{ rotate: 360 }}
-                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                              transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                               className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
                             />
                             Registrando...
                           </span>
                         ) : (
-                          "Registrar Ingreso ✓"
+                          'Registrar Ingreso ✓'
                         )}
                       </motion.button>
                     </div>

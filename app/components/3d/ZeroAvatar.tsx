@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 /**
  * ZeroAvatar - Avatar 3D de Zero Force usando Spline + Ojos Rojos Procedurales
@@ -12,17 +12,17 @@
  * - Reacción a voz y estados emocionales
  */
 
-import { useRef, useMemo, useEffect, useState, Suspense } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
-import { Float, Html } from '@react-three/drei';
-import * as THREE from 'three';
-import dynamic from 'next/dynamic';
+import { useRef, useMemo, useEffect, useState, Suspense } from 'react'
+import { useFrame, useThree } from '@react-three/fiber'
+import { Float, Html } from '@react-three/drei'
+import * as THREE from 'three'
+import dynamic from 'next/dynamic'
 
 // Importar Spline dinámicamente (solo cliente)
-const Spline = dynamic(() => import('@splinetool/react-spline'), { ssr: false });
+const Spline = dynamic(() => import('@splinetool/react-spline'), { ssr: false })
 
 // Importar el shader para los ojos
-import '@/app/components/3d/shaders/ZeroEyeShader';
+import '@/app/components/3d/shaders/ZeroEyeShader'
 
 // ============================================
 // TIPOS
@@ -49,14 +49,14 @@ export interface ZeroAvatarProps {
 // ============================================
 
 // URL del modelo Spline principal para el AVATAR (Panel IA)
-const SPLINE_AVATAR_URL = 'https://prod.spline.design/vHxa0bsc1kY1H3nh/scene.splinecode';
+const SPLINE_AVATAR_URL = 'https://prod.spline.design/vHxa0bsc1kY1H3nh/scene.splinecode'
 
 // URLs alternativas
 const SPLINE_URLS = {
   avatar: 'https://prod.spline.design/vHxa0bsc1kY1H3nh/scene.splinecode',  // Avatar principal
   widget: 'https://prod.spline.design/xdhWZ6ngBTNQdXGg/scene.splinecode',  // Widget flotante
-  secondary: 'https://prod.spline.design/rDqZ3vhiRfKgffI2/scene.splinecode' // Secundario
-};
+  secondary: 'https://prod.spline.design/rDqZ3vhiRfKgffI2/scene.splinecode', // Secundario
+}
 
 // Colores por estado para los ojos
 const STATE_COLORS = {
@@ -67,7 +67,7 @@ const STATE_COLORS = {
   combat: new THREE.Color(3.0, 0.0, 0.0),    // Rojo intenso combate
   success: new THREE.Color(0.0, 2.0, 0.0),   // Verde éxito
   error: new THREE.Color(3.0, 0.0, 0.0),     // Rojo error
-} as const;
+} as const
 
 // ============================================
 // COMPONENTE PRINCIPAL
@@ -85,68 +85,68 @@ export function ZeroAvatar({
   position = [0, 0, 0],
   onReady,
 }: ZeroAvatarProps) {
-  const groupRef = useRef<THREE.Group>(null);
-  const eyeMaterialRef = useRef<THREE.ShaderMaterial>(null);
-  const laserRef = useRef<THREE.Mesh>(null);
-  const innerGlowRef = useRef<THREE.PointLight>(null);
+  const groupRef = useRef<THREE.Group>(null)
+  const eyeMaterialRef = useRef<THREE.ShaderMaterial>(null)
+  const laserRef = useRef<THREE.Mesh>(null)
+  const innerGlowRef = useRef<THREE.PointLight>(null)
   
-  const [isReady, setIsReady] = useState(false);
-  const { pointer } = useThree();
+  const [isReady, setIsReady] = useState(false)
+  const { pointer } = useThree()
 
   // Determinar estado efectivo
   const effectiveState = useMemo((): ZeroState => {
-    if (isSpeaking) return 'speaking';
-    if (isListening) return 'listening';
-    return state;
-  }, [state, isSpeaking, isListening]);
+    if (isSpeaking) return 'speaking'
+    if (isListening) return 'listening'
+    return state
+  }, [state, isSpeaking, isListening])
 
   // Color actual
   const currentColor = useMemo(() => {
-    return STATE_COLORS[effectiveState] || STATE_COLORS.idle;
-  }, [effectiveState]);
+    return STATE_COLORS[effectiveState] || STATE_COLORS.idle
+  }, [effectiveState])
 
   // Notificar cuando esté listo
   useEffect(() => {
     if (!isReady) {
-      setIsReady(true);
-      onReady?.();
+      setIsReady(true)
+      onReady?.()
     }
-  }, [isReady, onReady]);
+  }, [isReady, onReady])
 
   // Frame loop principal
   useFrame((state, delta) => {
-    if (!groupRef.current) return;
+    if (!groupRef.current) return
     
-    const time = state.clock.elapsedTime;
+    const time = state.clock.elapsedTime
 
     // ========================================
     // 1. ACTUALIZAR SHADER DEL OJO
     // ========================================
     if (eyeMaterialRef.current) {
-      const mat = eyeMaterialRef.current;
+      const mat = eyeMaterialRef.current
       
       // Tiempo
-      mat.uniforms.uTime.value = time;
+      mat.uniforms.uTime.value = time
       
       // Color según estado
-      mat.uniforms.uColor.value.lerp(currentColor, delta * 3);
+      mat.uniforms.uColor.value.lerp(currentColor, delta * 3)
       
       // Intensidad de habla
-      const targetSpeech = isSpeaking ? Math.max(speechAmplitude, 0.5) : 0;
-      mat.uniforms.uSpeech.value += (targetSpeech - mat.uniforms.uSpeech.value) * delta * 8;
+      const targetSpeech = isSpeaking ? Math.max(speechAmplitude, 0.5) : 0
+      mat.uniforms.uSpeech.value += (targetSpeech - mat.uniforms.uSpeech.value) * delta * 8
       
       // Modo combate/angry
-      const targetAngry = effectiveState === 'combat' || effectiveState === 'error' ? 1.0 : 0.0;
-      mat.uniforms.uAngry.value += (targetAngry - mat.uniforms.uAngry.value) * delta * 5;
+      const targetAngry = effectiveState === 'combat' || effectiveState === 'error' ? 1.0 : 0.0
+      mat.uniforms.uAngry.value += (targetAngry - mat.uniforms.uAngry.value) * delta * 5
       
       // Glitch en procesamiento o error
       const targetGlitch = effectiveState === 'processing' ? 0.3 : 
-                           effectiveState === 'error' ? 0.6 : 0.0;
-      mat.uniforms.uGlitchIntensity.value += (targetGlitch - mat.uniforms.uGlitchIntensity.value) * delta * 4;
+                           effectiveState === 'error' ? 0.6 : 0.0
+      mat.uniforms.uGlitchIntensity.value += (targetGlitch - mat.uniforms.uGlitchIntensity.value) * delta * 4
       
       // Velocidad de escaneo según estado
       mat.uniforms.uScanSpeed.value = effectiveState === 'combat' ? 8.0 :
-                                       effectiveState === 'processing' ? 5.0 : 3.0;
+                                       effectiveState === 'processing' ? 5.0 : 3.0
     }
 
     // ========================================
@@ -154,28 +154,28 @@ export function ZeroAvatar({
     // ========================================
     // Flotación base
     const floatSpeed = effectiveState === 'combat' ? 15 : 
-                       effectiveState === 'processing' ? 8 : 2;
+                       effectiveState === 'processing' ? 8 : 2
     const floatIntensity = effectiveState === 'combat' ? 0.05 : 
-                           effectiveState === 'processing' ? 0.03 : 0.1;
+                           effectiveState === 'processing' ? 0.03 : 0.1
     
-    groupRef.current.position.y = position[1] + Math.sin(time * floatSpeed) * floatIntensity;
+    groupRef.current.position.y = position[1] + Math.sin(time * floatSpeed) * floatIntensity
     
     // Vibración en combate
     if (effectiveState === 'combat') {
-      groupRef.current.position.x = position[0] + Math.sin(time * 30) * 0.02;
-      groupRef.current.position.z = position[2] + Math.cos(time * 25) * 0.02;
+      groupRef.current.position.x = position[0] + Math.sin(time * 30) * 0.02
+      groupRef.current.position.z = position[2] + Math.cos(time * 25) * 0.02
     }
 
     // ========================================
     // 3. SEGUIMIENTO DEL MOUSE (TORRETA)
     // ========================================
     if (lookAtMouse) {
-      const targetRotationY = pointer.x * 0.5;
-      const targetRotationX = -pointer.y * 0.3;
+      const targetRotationY = pointer.x * 0.5
+      const targetRotationX = -pointer.y * 0.3
       
       // Lerp suave
-      groupRef.current.rotation.y += (targetRotationY - groupRef.current.rotation.y) * delta * 3;
-      groupRef.current.rotation.x += (targetRotationX - groupRef.current.rotation.x) * delta * 3;
+      groupRef.current.rotation.y += (targetRotationY - groupRef.current.rotation.y) * delta * 3
+      groupRef.current.rotation.x += (targetRotationX - groupRef.current.rotation.x) * delta * 3
     }
 
     // ========================================
@@ -185,25 +185,25 @@ export function ZeroAvatar({
       // Intensidad pulsante
       const pulseIntensity = effectiveState === 'speaking' ? 8 + Math.sin(time * 10) * 4 :
                              effectiveState === 'combat' ? 10 + Math.sin(time * 15) * 5 :
-                             4 + Math.sin(time * 2) * 1;
+                             4 + Math.sin(time * 2) * 1
       
-      innerGlowRef.current.intensity = pulseIntensity;
-      innerGlowRef.current.color = currentColor;
+      innerGlowRef.current.intensity = pulseIntensity
+      innerGlowRef.current.color = currentColor
     }
 
     // ========================================
     // 5. LÁSER TÁCTICO
     // ========================================
     if (laserRef.current) {
-      laserRef.current.visible = showLaser;
+      laserRef.current.visible = showLaser
       
       if (showLaser) {
         // Pulso del láser
-        const laserPulse = 1 + Math.sin(time * 30) * 0.3;
-        laserRef.current.scale.set(laserPulse, 1, laserPulse);
+        const laserPulse = 1 + Math.sin(time * 30) * 0.3
+        laserRef.current.scale.set(laserPulse, 1, laserPulse)
       }
     }
-  });
+  })
 
   return (
     <Float 
@@ -373,7 +373,7 @@ export function ZeroAvatar({
         </Html>
       </group>
     </Float>
-  );
+  )
 }
 
-export default ZeroAvatar;
+export default ZeroAvatar

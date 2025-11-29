@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 /**
  * HoldCalculator - Calculadora de Simulación "Hold vs Sell"
@@ -9,8 +9,8 @@
  * - Comparar ganancia potencial
  */
 
-import React, { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   X,
   Calculator,
@@ -22,13 +22,13 @@ import {
   Sparkles,
   AlertTriangle,
   CheckCircle2,
-  Info
-} from 'lucide-react';
-import { cn } from '@/app/lib/utils';
-import { Button } from '@/app/components/ui/button';
-import { Badge } from '@/app/components/ui/badge';
-import { Slider } from '@/app/components/ui/slider';
-import type { StrategyMode } from '@/app/lib/profit-engine/types/profit-engine.types';
+  Info,
+} from 'lucide-react'
+import { cn } from '@/app/lib/utils'
+import { Button } from '@/app/components/ui/button'
+import { Badge } from '@/app/components/ui/badge'
+import { Slider } from '@/app/components/ui/slider'
+import type { StrategyMode } from '@/app/lib/profit-engine/types/profit-engine.types'
 
 // ============================================
 // TIPOS
@@ -63,14 +63,14 @@ const HOLD_PERIODS = [
   { days: 30, label: '1 Mes' },
   { days: 60, label: '2 Meses' },
   { days: 90, label: '3 Meses' },
-];
+]
 
 // Proyecciones basadas en análisis macro (simplificado)
 const TREND_PROJECTIONS = {
   bullish: { weeklyChange: 0.015, volatility: 0.02 },  // +1.5% semanal
   bearish: { weeklyChange: -0.01, volatility: 0.025 }, // -1% semanal
   neutral: { weeklyChange: 0.003, volatility: 0.015 }, // +0.3% semanal
-};
+}
 
 // ============================================
 // FUNCIONES DE CÁLCULO
@@ -82,24 +82,24 @@ const TREND_PROJECTIONS = {
 function projectPrice(
   currentPrice: number,
   days: number,
-  trend: 'bullish' | 'bearish' | 'neutral'
+  trend: 'bullish' | 'bearish' | 'neutral',
 ): { projected: number; low: number; high: number } {
-  const { weeklyChange, volatility } = TREND_PROJECTIONS[trend];
-  const weeks = days / 7;
+  const { weeklyChange, volatility } = TREND_PROJECTIONS[trend]
+  const weeks = days / 7
   
   // Proyección base usando interés compuesto
-  const projected = currentPrice * Math.pow(1 + weeklyChange, weeks);
+  const projected = currentPrice * Math.pow(1 + weeklyChange, weeks)
   
   // Rango de confianza basado en volatilidad
-  const volatilityFactor = volatility * Math.sqrt(weeks);
-  const low = projected * (1 - volatilityFactor);
-  const high = projected * (1 + volatilityFactor);
+  const volatilityFactor = volatility * Math.sqrt(weeks)
+  const low = projected * (1 - volatilityFactor)
+  const high = projected * (1 + volatilityFactor)
   
   return {
     projected: Math.round(projected * 100) / 100,
     low: Math.round(low * 100) / 100,
     high: Math.round(high * 100) / 100,
-  };
+  }
 }
 
 /**
@@ -108,10 +108,10 @@ function projectPrice(
 function calculateOpportunityCost(
   amountUsd: number,
   days: number,
-  annualRate: number = 0.05 // 5% anual aproximado
+  annualRate: number = 0.05, // 5% anual aproximado
 ): number {
-  const dailyRate = annualRate / 365;
-  return amountUsd * dailyRate * days;
+  const dailyRate = annualRate / 365
+  return amountUsd * dailyRate * days
 }
 
 // ============================================
@@ -126,15 +126,15 @@ export const HoldCalculator: React.FC<HoldCalculatorProps> = ({
   projectedTrend = 'neutral',
   volatilityPercent = 2,
 }) => {
-  const [usdAmount, setUsdAmount] = useState(10000);
-  const [holdDays, setHoldDays] = useState(30);
+  const [usdAmount, setUsdAmount] = useState(10000)
+  const [holdDays, setHoldDays] = useState(30)
 
   // Determinar tendencia basada en estrategia
   const effectiveTrend = useMemo((): 'bullish' | 'bearish' | 'neutral' => {
-    if (strategyMode === 'LONG_USD_DURATION') return 'bullish';
-    if (strategyMode === 'HIGH_VELOCITY_SALES') return 'bearish';
-    return projectedTrend;
-  }, [strategyMode, projectedTrend]);
+    if (strategyMode === 'LONG_USD_DURATION') return 'bullish'
+    if (strategyMode === 'HIGH_VELOCITY_SALES') return 'bearish'
+    return projectedTrend
+  }, [strategyMode, projectedTrend])
 
   // Calcular escenarios
   const scenarios = useMemo((): {
@@ -143,9 +143,9 @@ export const HoldCalculator: React.FC<HoldCalculatorProps> = ({
     holdOptimistic: ScenarioResult;
     holdPessimistic: ScenarioResult;
   } => {
-    const todayTotal = usdAmount * currentPrice;
-    const projection = projectPrice(currentPrice, holdDays, effectiveTrend);
-    const opportunityCost = calculateOpportunityCost(usdAmount, holdDays);
+    const todayTotal = usdAmount * currentPrice
+    const projection = projectPrice(currentPrice, holdDays, effectiveTrend)
+    const opportunityCost = calculateOpportunityCost(usdAmount, holdDays)
 
     // Escenario: Vender hoy
     const sellToday: ScenarioResult = {
@@ -156,11 +156,11 @@ export const HoldCalculator: React.FC<HoldCalculatorProps> = ({
       differencePercent: 0,
       recommendation: strategyMode === 'HIGH_VELOCITY_SALES' ? 'recommended' : 'neutral',
       reason: 'Liquidez inmediata, sin riesgo de mercado',
-    };
+    }
 
     // Escenario: Hold proyectado
-    const projectedTotal = usdAmount * projection.projected;
-    const projectedDiff = projectedTotal - todayTotal - opportunityCost;
+    const projectedTotal = usdAmount * projection.projected
+    const projectedDiff = projectedTotal - todayTotal - opportunityCost
     const holdProjected: ScenarioResult = {
       label: `Mantener ${holdDays} días`,
       price: projection.projected,
@@ -169,11 +169,11 @@ export const HoldCalculator: React.FC<HoldCalculatorProps> = ({
       differencePercent: (projectedDiff / todayTotal) * 100,
       recommendation: projectedDiff > todayTotal * 0.01 ? 'recommended' : 'neutral',
       reason: `Proyección media basada en tendencia ${effectiveTrend}`,
-    };
+    }
 
     // Escenario optimista
-    const optimisticTotal = usdAmount * projection.high;
-    const optimisticDiff = optimisticTotal - todayTotal;
+    const optimisticTotal = usdAmount * projection.high
+    const optimisticDiff = optimisticTotal - todayTotal
     const holdOptimistic: ScenarioResult = {
       label: 'Escenario Optimista',
       price: projection.high,
@@ -182,11 +182,11 @@ export const HoldCalculator: React.FC<HoldCalculatorProps> = ({
       differencePercent: (optimisticDiff / todayTotal) * 100,
       recommendation: 'neutral',
       reason: 'Mejor caso con volatilidad favorable',
-    };
+    }
 
     // Escenario pesimista
-    const pessimisticTotal = usdAmount * projection.low;
-    const pessimisticDiff = pessimisticTotal - todayTotal;
+    const pessimisticTotal = usdAmount * projection.low
+    const pessimisticDiff = pessimisticTotal - todayTotal
     const holdPessimistic: ScenarioResult = {
       label: 'Escenario Pesimista',
       price: projection.low,
@@ -195,28 +195,28 @@ export const HoldCalculator: React.FC<HoldCalculatorProps> = ({
       differencePercent: (pessimisticDiff / todayTotal) * 100,
       recommendation: pessimisticDiff < -todayTotal * 0.02 ? 'caution' : 'neutral',
       reason: 'Peor caso con volatilidad adversa',
-    };
+    }
 
     return {
       sellToday,
       holdProjected,
       holdOptimistic,
       holdPessimistic,
-    };
-  }, [usdAmount, currentPrice, holdDays, effectiveTrend, strategyMode]);
+    }
+  }, [usdAmount, currentPrice, holdDays, effectiveTrend, strategyMode])
 
   // Determinar la mejor opción
   const bestOption = useMemo(() => {
     if (scenarios.holdProjected.difference > scenarios.sellToday.totalMxn * 0.015) {
-      return 'hold';
+      return 'hold'
     }
     if (scenarios.holdPessimistic.difference < -scenarios.sellToday.totalMxn * 0.02) {
-      return 'sell';
+      return 'sell'
     }
-    return 'neutral';
-  }, [scenarios]);
+    return 'neutral'
+  }, [scenarios])
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   return (
     <AnimatePresence>
@@ -301,7 +301,7 @@ export const HoldCalculator: React.FC<HoldCalculatorProps> = ({
                         'px-2 py-1 rounded transition-colors',
                         holdDays === period.days
                           ? 'bg-emerald-500/20 text-emerald-400'
-                          : 'hover:bg-zinc-800'
+                          : 'hover:bg-zinc-800',
                       )}
                     >
                       {period.label}
@@ -316,7 +316,7 @@ export const HoldCalculator: React.FC<HoldCalculatorProps> = ({
               'flex items-center gap-3 p-3 rounded-lg border',
               effectiveTrend === 'bullish' && 'bg-emerald-500/10 border-emerald-500/30',
               effectiveTrend === 'bearish' && 'bg-red-500/10 border-red-500/30',
-              effectiveTrend === 'neutral' && 'bg-zinc-500/10 border-zinc-500/30'
+              effectiveTrend === 'neutral' && 'bg-zinc-500/10 border-zinc-500/30',
             )}>
               {effectiveTrend === 'bullish' && <TrendingUp className="h-5 w-5 text-emerald-400" />}
               {effectiveTrend === 'bearish' && <TrendingDown className="h-5 w-5 text-red-400" />}
@@ -360,7 +360,7 @@ export const HoldCalculator: React.FC<HoldCalculatorProps> = ({
                 'p-4 rounded-lg border',
                 bestOption === 'hold' && 'bg-emerald-500/10 border-emerald-500/30',
                 bestOption === 'sell' && 'bg-blue-500/10 border-blue-500/30',
-                bestOption === 'neutral' && 'bg-zinc-500/10 border-zinc-500/30'
+                bestOption === 'neutral' && 'bg-zinc-500/10 border-zinc-500/30',
               )}
             >
               <div className="flex items-start gap-3">
@@ -425,8 +425,8 @@ export const HoldCalculator: React.FC<HoldCalculatorProps> = ({
         </motion.div>
       </motion.div>
     </AnimatePresence>
-  );
-};
+  )
+}
 
 // ============================================
 // SUBCOMPONENTES
@@ -450,13 +450,13 @@ const ScenarioCard: React.FC<ScenarioCardProps> = ({
       'p-4 rounded-lg border transition-all',
       isRecommended
         ? 'bg-emerald-500/10 border-emerald-500/30 shadow-lg shadow-emerald-500/10'
-        : 'bg-zinc-800/50 border-zinc-700'
+        : 'bg-zinc-800/50 border-zinc-700',
     )}>
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <div className={cn(
             'p-1.5 rounded',
-            isRecommended ? 'bg-emerald-500/20' : 'bg-zinc-700'
+            isRecommended ? 'bg-emerald-500/20' : 'bg-zinc-700',
           )}>
             {icon}
           </div>
@@ -484,7 +484,7 @@ const ScenarioCard: React.FC<ScenarioCardProps> = ({
         {scenario.difference !== 0 && (
           <div className={cn(
             'text-sm font-medium',
-            scenario.difference > 0 ? 'text-emerald-400' : 'text-red-400'
+            scenario.difference > 0 ? 'text-emerald-400' : 'text-red-400',
           )}>
             {scenario.difference > 0 ? '+' : ''}
             ${Math.abs(scenario.difference).toLocaleString('es-MX', { maximumFractionDigits: 0 })} 
@@ -499,7 +499,7 @@ const ScenarioCard: React.FC<ScenarioCardProps> = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default HoldCalculator;
+export default HoldCalculator

@@ -9,7 +9,7 @@ export { ReportBuilder } from './ReportBuilder'
 export type { 
   ReportComponent, 
   ReportConfig, 
-  ReportBuilderProps 
+  ReportBuilderProps, 
 } from './ReportBuilder'
 
 // Reportes programados / automatizados

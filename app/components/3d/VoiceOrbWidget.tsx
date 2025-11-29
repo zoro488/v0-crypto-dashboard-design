@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 🎙️ VOICE ORB WIDGET - Orbe de Asistencia de Voz con Spline
@@ -21,7 +21,7 @@ import { logger } from '@/app/lib/utils/logger'
 const Spline = lazy(() => import('@splinetool/react-spline'))
 
 // URL del Orbe de Voz Spline
-const VOICE_ORB_SCENE = "https://prod.spline.design/ai-voice-orb/scene.splinecode"
+const VOICE_ORB_SCENE = 'https://prod.spline.design/ai-voice-orb/scene.splinecode'
 
 // Estados del orbe
 type OrbState = 'idle' | 'listening' | 'processing' | 'speaking' | 'success' | 'error'
@@ -33,7 +33,7 @@ const STATE_COLORS: Record<OrbState, { primary: string; glow: string; bg: string
   processing: { primary: '#8b5cf6', glow: 'rgba(139, 92, 246, 0.5)', bg: 'from-purple-500/20 to-pink-500/20' },
   speaking: { primary: '#06b6d4', glow: 'rgba(6, 182, 212, 0.5)', bg: 'from-cyan-500/20 to-blue-500/20' },
   success: { primary: '#22c55e', glow: 'rgba(34, 197, 94, 0.5)', bg: 'from-green-500/20 to-teal-500/20' },
-  error: { primary: '#ef4444', glow: 'rgba(239, 68, 68, 0.5)', bg: 'from-red-500/20 to-orange-500/20' }
+  error: { primary: '#ef4444', glow: 'rgba(239, 68, 68, 0.5)', bg: 'from-red-500/20 to-orange-500/20' },
 }
 
 // ============================================================================
@@ -73,7 +73,7 @@ function ParticleRing({ active = false, color = '#3b82f6' }: { active?: boolean;
               duration: 3,
               delay,
               repeat: active ? Infinity : 0,
-              ease: 'easeInOut'
+              ease: 'easeInOut',
             }}
           />
         )
@@ -98,13 +98,13 @@ function PulseWaves({ active = false, color = '#3b82f6' }: { active?: boolean; c
           initial={{ scale: 1, opacity: 0.6 }}
           animate={{ 
             scale: [1, 2, 2.5],
-            opacity: [0.6, 0.3, 0]
+            opacity: [0.6, 0.3, 0],
           }}
           transition={{
             duration: 2,
             delay: i * 0.5,
             repeat: Infinity,
-            ease: 'easeOut'
+            ease: 'easeOut',
           }}
         />
       ))}
@@ -131,7 +131,7 @@ function OrbCore({ state, onClick }: { state: OrbState; onClick: () => void }) {
       transition={{
         duration: state === 'listening' ? 0.8 : 2,
         repeat: Infinity,
-        ease: 'easeInOut'
+        ease: 'easeInOut',
       }}
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
@@ -174,7 +174,7 @@ function OrbCore({ state, onClick }: { state: OrbState; onClick: () => void }) {
         transition={{
           duration: 1.5,
           repeat: Infinity,
-          ease: 'easeInOut'
+          ease: 'easeInOut',
         }}
       />
     </motion.div>
@@ -195,7 +195,7 @@ function MiniChatPanel({
   messages, 
   onClose,
   onSend,
-  isProcessing 
+  isProcessing, 
 }: { 
   messages: Message[]
   onClose: () => void
@@ -378,7 +378,7 @@ export function VoiceOrbWidget() {
       id: Date.now().toString(),
       text,
       sender: 'user',
-      timestamp: new Date()
+      timestamp: new Date(),
     }
     setMessages(prev => [...prev, userMsg])
     setOrbState('processing')
@@ -389,14 +389,14 @@ export function VoiceOrbWidget() {
         '📊 Analizando datos del sistema...',
         '✅ He procesado tu solicitud correctamente',
         '💡 Basado en los datos, te recomiendo revisar el panel de ventas',
-        '🔍 Encontré información relevante para tu consulta'
+        '🔍 Encontré información relevante para tu consulta',
       ]
       
       const aiMsg: Message = {
         id: (Date.now() + 1).toString(),
         text: responses[Math.floor(Math.random() * responses.length)],
         sender: 'ai',
-        timestamp: new Date()
+        timestamp: new Date(),
       }
       setMessages(prev => [...prev, aiMsg])
       setOrbState('speaking')
@@ -453,7 +453,7 @@ export function VoiceOrbWidget() {
           transition={{
             duration: orbState === 'listening' ? 1 : 2,
             repeat: Infinity,
-            ease: 'easeInOut'
+            ease: 'easeInOut',
           }}
         />
         

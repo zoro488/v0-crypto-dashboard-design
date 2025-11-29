@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
-import { BANCOS } from "@/app/lib/constants"
-import type { Banco, OrdenCompra, Venta, Distribuidor, Cliente, Producto } from "@/app/types"
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
+import { BANCOS } from '@/app/lib/constants'
+import type { Banco, OrdenCompra, Venta, Distribuidor, Cliente, Producto } from '@/app/types'
 
 interface AppContextType {
   bancos: Banco[]
@@ -37,12 +37,12 @@ const AppContext = createContext<AppContextType>({
 })
 
 // Add displayName for React DevTools
-AppContext.displayName = "AppContext"
+AppContext.displayName = 'AppContext'
 
 export const useApp = () => {
   const context = useContext(AppContext)
   if (!context) {
-    throw new Error("useApp must be used within an AppProvider")
+    throw new Error('useApp must be used within an AppProvider')
   }
   return context
 }
@@ -60,17 +60,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const initBancos: Banco[] = BANCOS.map((banco) => ({
       id: banco.id,
       nombre: banco.nombre,
-      icon: banco.icon || "DollarSign",
+      icon: banco.icon || 'DollarSign',
       color: banco.color,
-      tipo: banco.tipo || "operativo",
-      descripcion: banco.descripcion || "",
-      moneda: banco.moneda || "MXN",
+      tipo: banco.tipo || 'operativo',
+      descripcion: banco.descripcion || '',
+      moneda: banco.moneda || 'MXN',
       capitalActual: banco.capitalActual || 0,
       capitalInicial: banco.capitalInicial || 0,
       historicoIngresos: banco.historicoIngresos || 0,
       historicoGastos: banco.historicoGastos || 0,
       historicoTransferencias: banco.historicoTransferencias || 0,
-      estado: banco.estado || "activo",
+      estado: banco.estado || 'activo',
       createdAt: banco.createdAt || new Date(),
       updatedAt: banco.updatedAt || new Date(),
     }))

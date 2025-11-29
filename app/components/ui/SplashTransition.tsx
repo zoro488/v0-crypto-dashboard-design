@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import { useRef, useMemo, useState, useEffect, useCallback } from "react"
-import { Canvas, useFrame } from "@react-three/fiber"
-import { motion, AnimatePresence } from "framer-motion"
-import * as THREE from "three"
+import { useRef, useMemo, useState, useEffect, useCallback } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { motion, AnimatePresence } from 'framer-motion'
+import * as THREE from 'three'
 
 // Constantes de configuración
 const STAR_COUNT = 2000
@@ -169,7 +169,7 @@ function WarpFlash({ active }: { active: boolean }) {
     material.opacity = Math.sin(state.clock.elapsedTime * 10) * 0.3 + 0.5
     
     meshRef.current.scale.setScalar(
-      1 + Math.sin(state.clock.elapsedTime * 5) * 0.2
+      1 + Math.sin(state.clock.elapsedTime * 5) * 0.2,
     )
   })
   
@@ -228,7 +228,7 @@ function HyperdriveScene({
   return (
     <>
       {/* Fondo degradado */}
-      <color attach="background" args={["#000000"]} />
+      <color attach="background" args={['#000000']} />
       
       {/* Campo de estrellas */}
       <StarfieldTunnel speed={speed} isWarping={isWarping} />
@@ -249,8 +249,8 @@ export function SplashTransition({
   duration = TRANSITION_DURATION,
   skipOnClick = true,
   showProgress = true,
-  brandText = "CHRONOS",
-  tagline = "Sistema de Gestión Financiera",
+  brandText = 'CHRONOS',
+  tagline = 'Sistema de Gestión Financiera',
 }: SplashTransitionProps) {
   const [progress, setProgress] = useState(0)
   const [speed, setSpeed] = useState(INITIAL_SPEED)
@@ -261,7 +261,7 @@ export function SplashTransition({
   // Efecto de progreso y transición
   useEffect(() => {
     let animationFrame: number
-    let startTime = Date.now()
+    const startTime = Date.now()
     
     const animate = () => {
       const elapsed = Date.now() - startTime
@@ -328,7 +328,7 @@ export function SplashTransition({
             camera={{ position: [0, 0, 5], fov: 75 }}
             gl={{
               antialias: true,
-              powerPreference: "high-performance",
+              powerPreference: 'high-performance',
             }}
           >
             <HyperdriveScene speed={speed} isWarping={isWarping} />
@@ -361,14 +361,14 @@ export function SplashTransition({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ 
                   opacity: isWarping ? 0 : 1, 
-                  y: isWarping ? 20 : 0 
+                  y: isWarping ? 20 : 0, 
                 }}
                 className="w-64"
               >
                 <div className="h-1 bg-white/10 rounded-full overflow-hidden">
                   <motion.div
                     className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
-                    initial={{ width: "0%" }}
+                    initial={{ width: '0%' }}
                     animate={{ width: `${progress * 100}%` }}
                     transition={{ duration: 0.1 }}
                   />
@@ -420,7 +420,7 @@ export function SplashTransition({
           <div 
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: "radial-gradient(circle, transparent 30%, rgba(0,0,0,0.8) 100%)",
+              background: 'radial-gradient(circle, transparent 30%, rgba(0,0,0,0.8) 100%)',
             }}
           />
           
@@ -445,11 +445,11 @@ export function SplashTransition({
                   transition={{
                     duration: 0.5,
                     delay: i * 0.02,
-                    ease: "easeIn",
+                    ease: 'easeIn',
                   }}
                   className="absolute w-1 h-[2px] bg-gradient-to-r from-transparent via-white to-transparent"
                   style={{
-                    transformOrigin: "center",
+                    transformOrigin: 'center',
                   }}
                 />
               ))}

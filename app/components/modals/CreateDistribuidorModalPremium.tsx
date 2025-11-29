@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 💎 CREATE DISTRIBUIDOR MODAL PREMIUM
@@ -8,22 +8,22 @@
  * - Q-MAYA, PACMAN, CH-MONTE, VALLE-MONTE, A/X🌶️🦀, Q-MAYA-MP
  */
 
-import * as React from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
+import * as React from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from "@/app/components/ui/dialog"
-import { Button } from "@/app/components/ui/button"
-import { Input } from "@/app/components/ui/input"
-import { Label } from "@/app/components/ui/label"
-import { Textarea } from "@/app/components/ui/textarea"
-import { Badge } from "@/app/components/ui/badge"
+} from '@/app/components/ui/dialog'
+import { Button } from '@/app/components/ui/button'
+import { Input } from '@/app/components/ui/input'
+import { Label } from '@/app/components/ui/label'
+import { Textarea } from '@/app/components/ui/textarea'
+import { Badge } from '@/app/components/ui/badge'
 import {
   Building2,
   Phone,
@@ -38,12 +38,12 @@ import {
   DollarSign,
   Truck,
   Package,
-} from "lucide-react"
-import { cn } from "@/app/lib/utils"
-import { useToast } from "@/app/hooks/use-toast"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { logger } from "@/app/lib/utils/logger"
-import { crearDistribuidor } from "@/app/lib/firebase/firestore-service"
+} from 'lucide-react'
+import { cn } from '@/app/lib/utils'
+import { useToast } from '@/app/hooks/use-toast'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { logger } from '@/app/lib/utils/logger'
+import { crearDistribuidor } from '@/app/lib/firebase/firestore-service'
 
 // ============================================
 // SCHEMA ZOD
@@ -51,16 +51,16 @@ import { crearDistribuidor } from "@/app/lib/firebase/firestore-service"
 
 const distribuidorPremiumSchema = z.object({
   nombre: z.string()
-    .min(2, "El nombre debe tener al menos 2 caracteres")
-    .max(100, "El nombre no puede exceder 100 caracteres"),
+    .min(2, 'El nombre debe tener al menos 2 caracteres')
+    .max(100, 'El nombre no puede exceder 100 caracteres'),
   contacto: z.string().optional(),
   telefono: z.string().optional(),
-  email: z.string().email("Email inválido").optional().or(z.literal("")),
+  email: z.string().email('Email inválido').optional().or(z.literal('')),
   direccion: z.string().optional(),
   ciudad: z.string().optional(),
   estado: z.string().optional(),
-  precioBase: z.number().min(0, "El precio debe ser positivo"),
-  precioTransporte: z.number().min(0, "El precio debe ser positivo"),
+  precioBase: z.number().min(0, 'El precio debe ser positivo'),
+  precioTransporte: z.number().min(0, 'El precio debe ser positivo'),
   notas: z.string().optional(),
   activo: z.boolean(),
 })
@@ -79,22 +79,22 @@ interface CreateDistribuidorModalPremiumProps {
 
 // Distribuidores existentes del CSV
 const DISTRIBUIDORES_EXISTENTES = [
-  { id: "q-maya", nombre: "Q-MAYA", ordenes: 3, total: 6098400 },
-  { id: "pacman", nombre: "PACMAN", ordenes: 2, total: 6142500 },
-  { id: "ch-monte", nombre: "CH-MONTE", ordenes: 1, total: 630000 },
-  { id: "valle-monte", nombre: "VALLE-MONTE", ordenes: 1, total: 140000 },
-  { id: "ax", nombre: "A/X🌶️🦀", ordenes: 1, total: 207900 },
-  { id: "q-maya-mp", nombre: "Q-MAYA-MP", ordenes: 1, total: 1260000 },
+  { id: 'q-maya', nombre: 'Q-MAYA', ordenes: 3, total: 6098400 },
+  { id: 'pacman', nombre: 'PACMAN', ordenes: 2, total: 6142500 },
+  { id: 'ch-monte', nombre: 'CH-MONTE', ordenes: 1, total: 630000 },
+  { id: 'valle-monte', nombre: 'VALLE-MONTE', ordenes: 1, total: 140000 },
+  { id: 'ax', nombre: 'A/X🌶️🦀', ordenes: 1, total: 207900 },
+  { id: 'q-maya-mp', nombre: 'Q-MAYA-MP', ordenes: 1, total: 1260000 },
 ]
 
 // Estados de México
 const ESTADOS_MEXICO = [
-  "Aguascalientes", "Baja California", "Baja California Sur", "Campeche",
-  "Chiapas", "Chihuahua", "Ciudad de México", "Coahuila", "Colima",
-  "Durango", "Estado de México", "Guanajuato", "Guerrero", "Hidalgo",
-  "Jalisco", "Michoacán", "Morelos", "Nayarit", "Nuevo León", "Oaxaca",
-  "Puebla", "Querétaro", "Quintana Roo", "San Luis Potosí", "Sinaloa",
-  "Sonora", "Tabasco", "Tamaulipas", "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas"
+  'Aguascalientes', 'Baja California', 'Baja California Sur', 'Campeche',
+  'Chiapas', 'Chihuahua', 'Ciudad de México', 'Coahuila', 'Colima',
+  'Durango', 'Estado de México', 'Guanajuato', 'Guerrero', 'Hidalgo',
+  'Jalisco', 'Michoacán', 'Morelos', 'Nayarit', 'Nuevo León', 'Oaxaca',
+  'Puebla', 'Querétaro', 'Quintana Roo', 'San Luis Potosí', 'Sinaloa',
+  'Sonora', 'Tabasco', 'Tamaulipas', 'Tlaxcala', 'Veracruz', 'Yucatán', 'Zacatecas',
 ]
 
 const containerVariants = {
@@ -102,7 +102,7 @@ const containerVariants = {
   visible: { 
     opacity: 1, 
     scale: 1,
-    transition: { staggerChildren: 0.03 }
+    transition: { staggerChildren: 0.03 },
   },
 }
 
@@ -118,7 +118,7 @@ const itemVariants = {
 export function CreateDistribuidorModalPremium({ 
   open, 
   onClose, 
-  onSuccess 
+  onSuccess, 
 }: CreateDistribuidorModalPremiumProps) {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
@@ -133,25 +133,25 @@ export function CreateDistribuidorModalPremium({
     formState: { errors, isValid },
   } = useForm<DistribuidorPremiumInput>({
     resolver: zodResolver(distribuidorPremiumSchema),
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
-      nombre: "",
-      contacto: "",
-      telefono: "",
-      email: "",
-      direccion: "",
-      ciudad: "",
-      estado: "",
+      nombre: '',
+      contacto: '',
+      telefono: '',
+      email: '',
+      direccion: '',
+      ciudad: '',
+      estado: '',
       precioBase: 6100, // Precio base según CSV
       precioTransporte: 200, // Transporte según CSV
-      notas: "",
+      notas: '',
       activo: true,
     },
   })
 
-  const watchedNombre = watch("nombre")
-  const watchedPrecioBase = watch("precioBase")
-  const watchedPrecioTransporte = watch("precioTransporte")
+  const watchedNombre = watch('nombre')
+  const watchedPrecioBase = watch('precioBase')
+  const watchedPrecioTransporte = watch('precioTransporte')
 
   // Precio total por unidad
   const precioTotal = (watchedPrecioBase || 0) + (watchedPrecioTransporte || 0)
@@ -180,16 +180,16 @@ export function CreateDistribuidorModalPremium({
 
       const docId = await crearDistribuidor(distribuidorData)
 
-      logger.info("Distribuidor creado exitosamente", {
-        context: "CreateDistribuidorModalPremium",
-        data: { id: docId, nombre: data.nombre }
+      logger.info('Distribuidor creado exitosamente', {
+        context: 'CreateDistribuidorModalPremium',
+        data: { id: docId, nombre: data.nombre },
       })
 
       setShowSuccess(true)
 
       setTimeout(() => {
         toast({
-          title: "✅ Distribuidor Creado",
+          title: '✅ Distribuidor Creado',
           description: `${data.nombre.toUpperCase()} agregado al sistema`,
         })
         onClose()
@@ -198,13 +198,13 @@ export function CreateDistribuidorModalPremium({
       }, 1500)
 
     } catch (error) {
-      logger.error("Error al crear distribuidor", error, {
-        context: "CreateDistribuidorModalPremium"
+      logger.error('Error al crear distribuidor', error, {
+        context: 'CreateDistribuidorModalPremium',
       })
       toast({
-        title: "Error",
-        description: "No se pudo crear el distribuidor",
-        variant: "destructive",
+        title: 'Error',
+        description: 'No se pudo crear el distribuidor',
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -215,11 +215,11 @@ export function CreateDistribuidorModalPremium({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
         className={cn(
-          "max-w-2xl max-h-[90vh] p-0 overflow-hidden",
-          "bg-black/60 backdrop-blur-2xl",
-          "border border-white/10",
-          "text-white",
-          "shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(168,85,247,0.15)]"
+          'max-w-2xl max-h-[90vh] p-0 overflow-hidden',
+          'bg-black/60 backdrop-blur-2xl',
+          'border border-white/10',
+          'text-white',
+          'shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(168,85,247,0.15)]',
         )}
       >
         <DialogTitle className="sr-only">Nuevo Distribuidor</DialogTitle>
@@ -254,7 +254,7 @@ export function CreateDistribuidorModalPremium({
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
+                transition={{ type: 'spring', stiffness: 200, delay: 0.1 }}
                 className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-6 shadow-lg shadow-purple-500/30"
               >
                 <CheckCircle2 className="w-12 h-12 text-white" />
@@ -341,11 +341,11 @@ export function CreateDistribuidorModalPremium({
                     Nombre del Distribuidor *
                   </Label>
                   <Input
-                    {...register("nombre")}
+                    {...register('nombre')}
                     placeholder="Ej: NUEVO-PROVEEDOR"
                     className={cn(
-                      "h-12 text-lg bg-white/5 border-white/10 text-white uppercase",
-                      errors.nombre && "border-red-500"
+                      'h-12 text-lg bg-white/5 border-white/10 text-white uppercase',
+                      errors.nombre && 'border-red-500',
                     )}
                   />
                   {errors.nombre && (
@@ -365,7 +365,7 @@ export function CreateDistribuidorModalPremium({
                       <Label className="text-xs text-blue-400">Precio Base</Label>
                       <Input
                         type="number"
-                        {...register("precioBase", { valueAsNumber: true })}
+                        {...register('precioBase', { valueAsNumber: true })}
                         className="h-12 bg-blue-500/10 border-blue-500/30 text-blue-300"
                       />
                     </div>
@@ -374,7 +374,7 @@ export function CreateDistribuidorModalPremium({
                       <Label className="text-xs text-orange-400">Transporte</Label>
                       <Input
                         type="number"
-                        {...register("precioTransporte", { valueAsNumber: true })}
+                        {...register('precioTransporte', { valueAsNumber: true })}
                         className="h-12 bg-orange-500/10 border-orange-500/30 text-orange-300"
                       />
                     </div>
@@ -398,7 +398,7 @@ export function CreateDistribuidorModalPremium({
                       Contacto
                     </Label>
                     <Input
-                      {...register("contacto")}
+                      {...register('contacto')}
                       placeholder="Nombre del contacto"
                       className="h-11 bg-white/5 border-white/10 text-white"
                     />
@@ -409,7 +409,7 @@ export function CreateDistribuidorModalPremium({
                       Teléfono
                     </Label>
                     <Input
-                      {...register("telefono")}
+                      {...register('telefono')}
                       placeholder="555-123-4567"
                       className="h-11 bg-white/5 border-white/10 text-white"
                     />
@@ -424,11 +424,11 @@ export function CreateDistribuidorModalPremium({
                   </Label>
                   <Input
                     type="email"
-                    {...register("email")}
+                    {...register('email')}
                     placeholder="contacto@distribuidor.com"
                     className={cn(
-                      "h-11 bg-white/5 border-white/10 text-white",
-                      errors.email && "border-red-500"
+                      'h-11 bg-white/5 border-white/10 text-white',
+                      errors.email && 'border-red-500',
                     )}
                   />
                   {errors.email && (
@@ -445,18 +445,18 @@ export function CreateDistribuidorModalPremium({
                   <div className="grid grid-cols-3 gap-4">
                     <div className="col-span-2 space-y-2">
                       <Input
-                        {...register("ciudad")}
+                        {...register('ciudad')}
                         placeholder="Ciudad"
                         className="h-11 bg-white/5 border-white/10 text-white"
                       />
                     </div>
                     <div className="space-y-2">
                       <select
-                        {...register("estado")}
+                        {...register('estado')}
                         className={cn(
-                          "h-11 w-full rounded-md px-3",
-                          "bg-white/5 border border-white/10 text-white",
-                          "focus:outline-none focus:border-purple-500"
+                          'h-11 w-full rounded-md px-3',
+                          'bg-white/5 border border-white/10 text-white',
+                          'focus:outline-none focus:border-purple-500',
                         )}
                       >
                         <option value="" className="bg-zinc-900">Estado</option>
@@ -469,7 +469,7 @@ export function CreateDistribuidorModalPremium({
                     </div>
                     <div className="col-span-3 space-y-2">
                       <Input
-                        {...register("direccion")}
+                        {...register('direccion')}
                         placeholder="Dirección completa"
                         className="h-11 bg-white/5 border-white/10 text-white"
                       />
@@ -484,7 +484,7 @@ export function CreateDistribuidorModalPremium({
                     Notas (opcional)
                   </Label>
                   <Textarea
-                    {...register("notas")}
+                    {...register('notas')}
                     placeholder="Observaciones adicionales..."
                     rows={2}
                     className="bg-white/5 border-white/10 text-white resize-none"
@@ -500,15 +500,15 @@ export function CreateDistribuidorModalPremium({
                     </div>
                     <button
                       type="button"
-                      onClick={() => setValue("activo", !watch("activo"))}
+                      onClick={() => setValue('activo', !watch('activo'))}
                       className={cn(
-                        "w-14 h-7 rounded-full transition-all relative",
-                        watch("activo") ? "bg-green-500" : "bg-white/20"
+                        'w-14 h-7 rounded-full transition-all relative',
+                        watch('activo') ? 'bg-green-500' : 'bg-white/20',
                       )}
                     >
                       <div className={cn(
-                        "absolute top-1 w-5 h-5 rounded-full bg-white transition-all",
-                        watch("activo") ? "right-1" : "left-1"
+                        'absolute top-1 w-5 h-5 rounded-full bg-white transition-all',
+                        watch('activo') ? 'right-1' : 'left-1',
                       )} />
                     </button>
                   </div>
@@ -538,13 +538,13 @@ export function CreateDistribuidorModalPremium({
                       <Badge 
                         variant="outline" 
                         className={cn(
-                          "ml-auto",
-                          watch("activo") 
-                            ? "border-green-500/50 text-green-400 bg-green-500/10"
-                            : "border-red-500/50 text-red-400 bg-red-500/10"
+                          'ml-auto',
+                          watch('activo') 
+                            ? 'border-green-500/50 text-green-400 bg-green-500/10'
+                            : 'border-red-500/50 text-red-400 bg-red-500/10',
                         )}
                       >
-                        {watch("activo") ? "Activo" : "Inactivo"}
+                        {watch('activo') ? 'Activo' : 'Inactivo'}
                       </Badge>
                     </div>
                   </motion.div>
@@ -553,9 +553,9 @@ export function CreateDistribuidorModalPremium({
 
               {/* Footer */}
               <div className={cn(
-                "h-20 border-t border-white/10",
-                "bg-gradient-to-r from-black/50 via-white/5 to-black/50",
-                "px-6 flex items-center justify-between"
+                'h-20 border-t border-white/10',
+                'bg-gradient-to-r from-black/50 via-white/5 to-black/50',
+                'px-6 flex items-center justify-between',
               )}>
                 <Button
                   type="button"
@@ -571,12 +571,12 @@ export function CreateDistribuidorModalPremium({
                   type="submit"
                   disabled={isSubmitting || !isValid}
                   className={cn(
-                    "min-w-[180px]",
-                    "bg-gradient-to-r from-purple-600 to-pink-600",
-                    "hover:from-purple-500 hover:to-pink-500",
-                    "text-white font-bold",
-                    "shadow-[0_0_30px_rgba(168,85,247,0.4)]",
-                    "disabled:opacity-50"
+                    'min-w-[180px]',
+                    'bg-gradient-to-r from-purple-600 to-pink-600',
+                    'hover:from-purple-500 hover:to-pink-500',
+                    'text-white font-bold',
+                    'shadow-[0_0_30px_rgba(168,85,247,0.4)]',
+                    'disabled:opacity-50',
                   )}
                 >
                   {isSubmitting ? (

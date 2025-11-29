@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 🏭 BENTO ALMACÉN PREMIUM - Panel de Almacén con Componentes 3D
@@ -12,25 +12,25 @@
  * - 4 Tabs: Entradas, Stock, Salidas, RF Actual (Cortes)
  */
 
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Package, TrendingUp, TrendingDown, Archive, Scissors, Plus, Box, Activity, 
   BarChart3, Zap, RefreshCw, Search, Filter, Calendar, Download, Eye,
   ArrowUpRight, ArrowDownRight, Layers, AlertTriangle, CheckCircle2,
-  Sparkles, ChevronRight, type LucideIcon
-} from "lucide-react"
-import { useState, useMemo, Suspense } from "react"
-import { useProductos, useEntradasAlmacen, useSalidasAlmacen } from "@/app/lib/firebase/firestore-hooks.service"
-import { Skeleton } from "@/app/components/ui/skeleton"
-import { Button } from "@/app/components/ui/button"
-import { Badge } from "@/app/components/ui/badge"
-import { Input } from "@/app/components/ui/input"
-import CreateEntradaAlmacenModal from "@/app/components/modals/CreateEntradaAlmacenModal"
-import CreateSalidaAlmacenModal from "@/app/components/modals/CreateSalidaAlmacenModal"
+  Sparkles, ChevronRight, type LucideIcon,
+} from 'lucide-react'
+import { useState, useMemo, Suspense } from 'react'
+import { useProductos, useEntradasAlmacen, useSalidasAlmacen } from '@/app/lib/firebase/firestore-hooks.service'
+import { Skeleton } from '@/app/components/ui/skeleton'
+import { Button } from '@/app/components/ui/button'
+import { Badge } from '@/app/components/ui/badge'
+import { Input } from '@/app/components/ui/input'
+import CreateEntradaAlmacenModal from '@/app/components/modals/CreateEntradaAlmacenModal'
+import CreateSalidaAlmacenModal from '@/app/components/modals/CreateSalidaAlmacenModal'
 import { 
   AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, 
-  Tooltip, PieChart, Pie, Cell, CartesianGrid, Legend, ComposedChart, Line
-} from "recharts"
+  Tooltip, PieChart, Pie, Cell, CartesianGrid, Legend, ComposedChart, Line,
+} from 'recharts'
 
 // Componentes 3D Premium
 import { 
@@ -40,8 +40,8 @@ import {
   PulseIndicator,
   MiniChart3D,
   GradientText,
-  VARIANT_COLORS 
-} from "@/app/components/3d/PremiumPanelComponents"
+  VARIANT_COLORS, 
+} from '@/app/components/3d/PremiumPanelComponents'
 
 // ============================================================================
 // INTERFACES
@@ -82,10 +82,10 @@ interface ProductoAlmacen {
 // CONSTANTES
 // ============================================================================
 const TABS = [
-  { id: "entradas", label: "Entradas", icon: TrendingUp, color: "text-emerald-400", variant: "success" as const },
-  { id: "stock", label: "Stock Actual", icon: Archive, color: "text-cyan-400", variant: "info" as const },
-  { id: "salidas", label: "Salidas", icon: TrendingDown, color: "text-rose-400", variant: "danger" as const },
-  { id: "rf", label: "RF Actual (Cortes)", icon: Scissors, color: "text-amber-400", variant: "warning" as const },
+  { id: 'entradas', label: 'Entradas', icon: TrendingUp, color: 'text-emerald-400', variant: 'success' as const },
+  { id: 'stock', label: 'Stock Actual', icon: Archive, color: 'text-cyan-400', variant: 'info' as const },
+  { id: 'salidas', label: 'Salidas', icon: TrendingDown, color: 'text-rose-400', variant: 'danger' as const },
+  { id: 'rf', label: 'RF Actual (Cortes)', icon: Scissors, color: 'text-amber-400', variant: 'warning' as const },
 ]
 
 const CHART_COLORS = ['#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444', '#3b82f6']
@@ -103,18 +103,18 @@ const RF_CORTES_DATA = [
 // HELPERS
 // ============================================================================
 const formatDate = (date: string | Date | { seconds: number } | undefined): string => {
-  if (!date) return "-"
+  if (!date) return '-'
   try {
     if (typeof date === 'object' && 'seconds' in date) {
       return new Date(date.seconds * 1000).toLocaleDateString('es-MX', { 
-        day: '2-digit', month: 'short', year: 'numeric' 
+        day: '2-digit', month: 'short', year: 'numeric', 
       })
     }
     return new Date(date as string | Date).toLocaleDateString('es-MX', { 
-      day: '2-digit', month: 'short', year: 'numeric' 
+      day: '2-digit', month: 'short', year: 'numeric', 
     })
   } catch {
-    return "-"
+    return '-'
   }
 }
 
@@ -126,7 +126,7 @@ const formatCurrency = (value: number | undefined): string => {
   return new Intl.NumberFormat('es-MX', { 
     style: 'currency', 
     currency: 'MXN',
-    minimumFractionDigits: 0 
+    minimumFractionDigits: 0, 
   }).format(value ?? 0)
 }
 
@@ -143,7 +143,7 @@ function StatCardPremium({
   variant = 'primary',
   trend,
   trendValue,
-  miniChartData
+  miniChartData,
 }: { 
   title: string
   value: string | number
@@ -211,9 +211,9 @@ function DataTablePremium<T extends Record<string, unknown>>({
   data, 
   columns, 
   loading,
-  emptyMessage = "No hay datos disponibles",
+  emptyMessage = 'No hay datos disponibles',
   onRowClick,
-  variant = 'primary'
+  variant = 'primary',
 }: { 
   data: T[]
   columns: { key: string; label: string; render?: (item: T) => React.ReactNode; width?: string }[]
@@ -330,7 +330,7 @@ function TabEntradas({ entradas, loading }: { entradas: MovimientoAlmacen[]; loa
     if (!searchTerm) return entradas
     return entradas.filter(e => 
       e.distribuidor?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      e.ordenCompraId?.toLowerCase().includes(searchTerm.toLowerCase())
+      e.ordenCompraId?.toLowerCase().includes(searchTerm.toLowerCase()),
     )
   }, [entradas, searchTerm])
   
@@ -488,7 +488,7 @@ function TabStock({ productos, loading }: { productos: ProductoAlmacen[]; loadin
     return Object.entries(grouped).map(([name, value], i) => ({ 
       name: name.length > 15 ? name.slice(0, 15) + '...' : name, 
       value,
-      fill: CHART_COLORS[i % CHART_COLORS.length]
+      fill: CHART_COLORS[i % CHART_COLORS.length],
     }))
   }, [productos])
 
@@ -518,7 +518,7 @@ function TabStock({ productos, loading }: { productos: ProductoAlmacen[]; loadin
           value={lowStockCount}
           subtitle="Productos en alerta"
           icon={AlertTriangle}
-          variant={lowStockCount > 0 ? "warning" : "success"}
+          variant={lowStockCount > 0 ? 'warning' : 'success'}
         />
         <StatCardPremium
           title="SKUs Activos"
@@ -575,7 +575,7 @@ function TabStock({ productos, loading }: { productos: ProductoAlmacen[]; loadin
               <BarChart data={productos.slice(0, 8).map(p => ({
                 name: (p.sku || p.nombre || 'N/A').slice(0, 10),
                 stock: p.stock ?? p.stockActual ?? 0,
-                minimo: p.stockMinimo ?? 10
+                minimo: p.stockMinimo ?? 10,
               }))}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                 <XAxis dataKey="name" stroke="rgba(255,255,255,0.5)" fontSize={10} />
@@ -610,7 +610,7 @@ function TabStock({ productos, loading }: { productos: ProductoAlmacen[]; loadin
           data={productos.filter(p => 
             !searchTerm || 
             p.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            p.sku?.toLowerCase().includes(searchTerm.toLowerCase())
+            p.sku?.toLowerCase().includes(searchTerm.toLowerCase()),
           )}
           loading={loading}
           variant="info"
@@ -664,7 +664,7 @@ function TabSalidas({ salidas, loading }: { salidas: MovimientoAlmacen[]; loadin
     return Object.entries(grouped).slice(0, 6).map(([name, value], i) => ({ 
       name: name.length > 12 ? name.slice(0, 12) + '...' : name, 
       value,
-      fill: CHART_COLORS[i % CHART_COLORS.length]
+      fill: CHART_COLORS[i % CHART_COLORS.length],
     }))
   }, [salidas])
 
@@ -747,7 +747,7 @@ function TabSalidas({ salidas, loading }: { salidas: MovimientoAlmacen[]; loadin
           data={salidas.filter(s => 
             !searchTerm || 
             s.cliente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            s.destino?.toLowerCase().includes(searchTerm.toLowerCase())
+            s.destino?.toLowerCase().includes(searchTerm.toLowerCase()),
           )}
           loading={loading}
           variant="danger"
@@ -778,7 +778,7 @@ function TabRF() {
   const chartData = RF_CORTES_DATA.map(rf => ({
     name: rf.id,
     value: rf.corte,
-    fecha: rf.fecha
+    fecha: rf.fecha,
   }))
 
   return (
@@ -878,7 +878,7 @@ function TabRF() {
 // COMPONENTE PRINCIPAL
 // ============================================================================
 export function BentoAlmacenPremium() {
-  const [activeTab, setActiveTab] = useState("entradas")
+  const [activeTab, setActiveTab] = useState('entradas')
   const [showEntradaModal, setShowEntradaModal] = useState(false)
   const [showSalidaModal, setShowSalidaModal] = useState(false)
   
@@ -984,16 +984,16 @@ export function BentoAlmacenPremium() {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
-            {activeTab === "entradas" && (
+            {activeTab === 'entradas' && (
               <TabEntradas entradas={entradas as MovimientoAlmacen[]} loading={loadingEntradas} />
             )}
-            {activeTab === "stock" && (
+            {activeTab === 'stock' && (
               <TabStock productos={productos as ProductoAlmacen[]} loading={loadingProductos} />
             )}
-            {activeTab === "salidas" && (
+            {activeTab === 'salidas' && (
               <TabSalidas salidas={salidas as MovimientoAlmacen[]} loading={loadingSalidas} />
             )}
-            {activeTab === "rf" && <TabRF />}
+            {activeTab === 'rf' && <TabRF />}
           </motion.div>
         </AnimatePresence>
       </div>

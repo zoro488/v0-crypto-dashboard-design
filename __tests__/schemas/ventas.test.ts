@@ -16,16 +16,20 @@ describe('Ventas Schema - Validaciones', () => {
     
     it('✅ debe validar venta válida completa', () => {
       const ventaValida = {
-        clienteId: 'cliente_123',
-        fecha: new Date(),
+        fecha: new Date().toISOString(),
+        cliente: 'Juan Pérez',
+        producto: 'Producto Test',
         cantidad: 10,
         precioVentaUnidad: 10000,
         precioCompraUnidad: 6300,
         precioFlete: 500,
+        precioTotalVenta: 100000,
+        montoPagado: 100000,
+        montoRestante: 0,
         estadoPago: 'completo' as const,
-        distribuciones: {
-          boveda_monte: 63000,
-          flete_sur: 5000,
+        distribucionBancos: {
+          bovedaMonte: 63000,
+          fletes: 5000,
           utilidades: 32000,
         },
       }
@@ -41,13 +45,22 @@ describe('Ventas Schema - Validaciones', () => {
     
     it('❌ debe rechazar cantidad = 0', () => {
       const ventaInvalida = {
-        clienteId: 'cliente_123',
-        fecha: new Date(),
+        fecha: new Date().toISOString(),
+        cliente: 'Juan Pérez',
+        producto: 'Producto Test',
         cantidad: 0,
         precioVentaUnidad: 10000,
         precioCompraUnidad: 6300,
         precioFlete: 500,
+        precioTotalVenta: 0,
+        montoPagado: 0,
+        montoRestante: 0,
         estadoPago: 'completo' as const,
+        distribucionBancos: {
+          bovedaMonte: 0,
+          fletes: 0,
+          utilidades: 0,
+        },
       }
       
       const result = validarVenta(ventaInvalida)
@@ -57,13 +70,22 @@ describe('Ventas Schema - Validaciones', () => {
     
     it('❌ debe rechazar precio venta <= precio compra (sin ganancia)', () => {
       const ventaInvalida = {
-        clienteId: 'cliente_123',
-        fecha: new Date(),
+        fecha: new Date().toISOString(),
+        cliente: 'Juan Pérez',
+        producto: 'Producto Test',
         cantidad: 10,
-        precioVentaUnidad: 6000, // Menor que precioCompraUnidad
+        precioVentaUnidad: 6000,
         precioCompraUnidad: 6300,
         precioFlete: 500,
+        precioTotalVenta: 60000,
+        montoPagado: 60000,
+        montoRestante: 0,
         estadoPago: 'completo' as const,
+        distribucionBancos: {
+          bovedaMonte: 63000,
+          fletes: 5000,
+          utilidades: -8000,
+        },
       }
       
       const result = validarVenta(ventaInvalida)
@@ -73,13 +95,22 @@ describe('Ventas Schema - Validaciones', () => {
     
     it('❌ debe rechazar estado de pago inválido', () => {
       const ventaInvalida = {
-        clienteId: 'cliente_123',
-        fecha: new Date(),
+        fecha: new Date().toISOString(),
+        cliente: 'Juan Pérez',
+        producto: 'Producto Test',
         cantidad: 10,
         precioVentaUnidad: 10000,
         precioCompraUnidad: 6300,
         precioFlete: 500,
+        precioTotalVenta: 100000,
+        montoPagado: 100000,
+        montoRestante: 0,
         estadoPago: 'invalido' as any,
+        distribucionBancos: {
+          bovedaMonte: 63000,
+          fletes: 5000,
+          utilidades: 32000,
+        },
       }
       
       const result = validarVenta(ventaInvalida)
@@ -89,13 +120,22 @@ describe('Ventas Schema - Validaciones', () => {
     
     it('✅ debe validar estado pendiente', () => {
       const venta = {
-        clienteId: 'cliente_123',
-        fecha: new Date(),
+        fecha: new Date().toISOString(),
+        cliente: 'Juan Pérez',
+        producto: 'Producto Test',
         cantidad: 10,
         precioVentaUnidad: 10000,
         precioCompraUnidad: 6300,
         precioFlete: 500,
+        precioTotalVenta: 100000,
+        montoPagado: 0,
+        montoRestante: 100000,
         estadoPago: 'pendiente' as const,
+        distribucionBancos: {
+          bovedaMonte: 0,
+          fletes: 0,
+          utilidades: 0,
+        },
       }
       
       const result = validarVenta(venta)
@@ -105,14 +145,22 @@ describe('Ventas Schema - Validaciones', () => {
     
     it('✅ debe validar estado parcial', () => {
       const venta = {
-        clienteId: 'cliente_123',
-        fecha: new Date(),
+        fecha: new Date().toISOString(),
+        cliente: 'Juan Pérez',
+        producto: 'Producto Test',
         cantidad: 10,
         precioVentaUnidad: 10000,
         precioCompraUnidad: 6300,
         precioFlete: 500,
-        estadoPago: 'parcial' as const,
+        precioTotalVenta: 100000,
         montoPagado: 50000,
+        montoRestante: 50000,
+        estadoPago: 'parcial' as const,
+        distribucionBancos: {
+          bovedaMonte: 31500,
+          fletes: 2500,
+          utilidades: 16000,
+        },
       }
       
       const result = validarVenta(venta)
@@ -122,13 +170,22 @@ describe('Ventas Schema - Validaciones', () => {
     
     it('❌ debe rechazar precios negativos', () => {
       const ventaInvalida = {
-        clienteId: 'cliente_123',
-        fecha: new Date(),
+        fecha: new Date().toISOString(),
+        cliente: 'Juan Pérez',
+        producto: 'Producto Test',
         cantidad: 10,
         precioVentaUnidad: -10000,
         precioCompraUnidad: 6300,
         precioFlete: 500,
+        precioTotalVenta: -100000,
+        montoPagado: 0,
+        montoRestante: 0,
         estadoPago: 'completo' as const,
+        distribucionBancos: {
+          bovedaMonte: 63000,
+          fletes: 5000,
+          utilidades: 32000,
+        },
       }
       
       const result = validarVenta(ventaInvalida)
@@ -174,16 +231,20 @@ describe('Ventas Schema - Validaciones', () => {
     
     it('✅ debe parsear venta completa', () => {
       const venta = {
-        clienteId: 'cliente_123',
-        fecha: new Date(),
+        fecha: new Date().toISOString(),
+        cliente: 'Juan Pérez',
+        producto: 'Producto Test',
         cantidad: 10,
         precioVentaUnidad: 10000,
         precioCompraUnidad: 6300,
         precioFlete: 500,
+        precioTotalVenta: 100000,
+        montoPagado: 100000,
+        montoRestante: 0,
         estadoPago: 'completo',
-        distribuciones: {
-          boveda_monte: 63000,
-          flete_sur: 5000,
+        distribucionBancos: {
+          bovedaMonte: 63000,
+          fletes: 5000,
           utilidades: 32000,
         },
       }

@@ -194,7 +194,7 @@ function AgentCore({ isProcessing, mood }: { isProcessing: boolean; mood: 'idle'
   const moodColors = {
     idle: '#3b82f6',      // Azul
     thinking: '#f59e0b',  // Amarillo
-    speaking: '#10b981'   // Verde
+    speaking: '#10b981',   // Verde
   }
   
   useFrame((state) => {
@@ -298,7 +298,7 @@ export default function AIAgent3DWidget({
   mood = 'idle',
   onClick,
   showLabel = true,
-  labelText = 'CHRONOS AI'
+  labelText = 'CHRONOS AI',
 }: AIAgent3DWidgetProps) {
   const groupRef = useRef<THREE.Group>(null!)
   const [hovered, setHovered] = useState(false)
@@ -315,12 +315,12 @@ export default function AIAgent3DWidget({
     groupRef.current.rotation.x = THREE.MathUtils.lerp(
       groupRef.current.rotation.x,
       targetX,
-      0.05
+      0.05,
     )
     groupRef.current.rotation.y = THREE.MathUtils.lerp(
       groupRef.current.rotation.y,
       targetY,
-      0.05
+      0.05,
     )
     
     // Efecto de glitch cuando procesa

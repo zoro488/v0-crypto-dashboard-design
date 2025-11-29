@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 🎯 PERFORMANCE METRICS - Panel de métricas de rendimiento premium
@@ -6,8 +6,8 @@
  * Visualizaciones avanzadas de KPIs con animaciones y efectos 3D
  */
 
-import { motion } from "framer-motion"
-import { useState, useMemo } from "react"
+import { motion } from 'framer-motion'
+import { useState, useMemo } from 'react'
 import {
   TrendingUp,
   TrendingDown,
@@ -19,14 +19,14 @@ import {
   AlertTriangle,
   XCircle,
   Activity,
-} from "lucide-react"
+} from 'lucide-react'
 import {
   RadialBarChart,
   RadialBar,
   ResponsiveContainer,
   Cell,
-} from "recharts"
-import { SafeChartContainer, SAFE_ANIMATION_PROPS } from "@/app/components/ui/SafeChartContainer"
+} from 'recharts'
+import { SafeChartContainer, SAFE_ANIMATION_PROPS } from '@/app/components/ui/SafeChartContainer'
 
 // ============================================================
 // TIPOS
@@ -36,7 +36,7 @@ interface MetricData {
   value: number
   target: number
   unit?: string
-  trend: "up" | "down" | "stable"
+  trend: 'up' | 'down' | 'stable'
   color: string
 }
 
@@ -48,10 +48,10 @@ interface PerformanceMetricsProps {
 // DATOS DE MÉTRICAS
 // ============================================================
 const metricsData: MetricData[] = [
-  { label: "Margen Bruto", value: 42, target: 45, unit: "%", trend: "up", color: "#3b82f6" },
-  { label: "Rotación Stock", value: 78, target: 85, unit: "%", trend: "up", color: "#10b981" },
-  { label: "Satisfacción", value: 94, target: 90, unit: "%", trend: "up", color: "#8b5cf6" },
-  { label: "Cumplimiento", value: 89, target: 95, unit: "%", trend: "down", color: "#f59e0b" },
+  { label: 'Margen Bruto', value: 42, target: 45, unit: '%', trend: 'up', color: '#3b82f6' },
+  { label: 'Rotación Stock', value: 78, target: 85, unit: '%', trend: 'up', color: '#10b981' },
+  { label: 'Satisfacción', value: 94, target: 90, unit: '%', trend: 'up', color: '#8b5cf6' },
+  { label: 'Cumplimiento', value: 89, target: 95, unit: '%', trend: 'down', color: '#f59e0b' },
 ]
 
 // ============================================================
@@ -64,7 +64,7 @@ const CircularGauge = ({ metric, index }: { metric: MetricData; index: number })
   const isAboveTarget = metric.value >= metric.target
 
   const gaugeData = [
-    { name: "value", value: percentage, fill: metric.color },
+    { name: 'value', value: percentage, fill: metric.color },
   ]
 
   return (
@@ -87,7 +87,7 @@ const CircularGauge = ({ metric, index }: { metric: MetricData; index: number })
             data={gaugeData}
           >
             <RadialBar
-              background={{ fill: "rgba(255,255,255,0.1)" }}
+              background={{ fill: 'rgba(255,255,255,0.1)' }}
               dataKey="value"
               cornerRadius={10}
               {...SAFE_ANIMATION_PROPS}
@@ -119,8 +119,8 @@ const CircularGauge = ({ metric, index }: { metric: MetricData; index: number })
           ) : (
             <AlertTriangle className="w-3 h-3 text-amber-400" />
           )}
-          <span className={`text-[10px] ${isAboveTarget ? "text-emerald-400" : "text-amber-400"}`}>
-            {isAboveTarget ? "En objetivo" : `${metric.target}${metric.unit} objetivo`}
+          <span className={`text-[10px] ${isAboveTarget ? 'text-emerald-400' : 'text-amber-400'}`}>
+            {isAboveTarget ? 'En objetivo' : `${metric.target}${metric.unit} objetivo`}
           </span>
         </div>
       </div>
@@ -134,7 +134,7 @@ const HorizontalProgressBar = ({
   value, 
   maxValue, 
   color,
-  index 
+  index, 
 }: { 
   label: string
   value: number
@@ -161,7 +161,7 @@ const HorizontalProgressBar = ({
           style={{ backgroundColor: color }}
           initial={{ width: 0 }}
           animate={{ width: `${Math.min(percentage, 100)}%` }}
-          transition={{ delay: index * 0.1 + 0.2, duration: 0.8, ease: "easeOut" }}
+          transition={{ delay: index * 0.1 + 0.2, duration: 0.8, ease: 'easeOut' }}
         />
       </div>
     </motion.div>
@@ -171,16 +171,16 @@ const HorizontalProgressBar = ({
 // Status Badge
 const StatusBadge = ({ 
   status, 
-  label 
+  label, 
 }: { 
-  status: "success" | "warning" | "error" | "info"
+  status: 'success' | 'warning' | 'error' | 'info'
   label: string 
 }) => {
   const statusConfig = {
-    success: { icon: CheckCircle2, color: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" },
-    warning: { icon: AlertTriangle, color: "bg-amber-500/15 text-amber-400 border-amber-500/30" },
-    error: { icon: XCircle, color: "bg-red-500/15 text-red-400 border-red-500/30" },
-    info: { icon: Activity, color: "bg-blue-500/15 text-blue-400 border-blue-500/30" },
+    success: { icon: CheckCircle2, color: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
+    warning: { icon: AlertTriangle, color: 'bg-amber-500/15 text-amber-400 border-amber-500/30' },
+    error: { icon: XCircle, color: 'bg-red-500/15 text-red-400 border-red-500/30' },
+    info: { icon: Activity, color: 'bg-blue-500/15 text-blue-400 border-blue-500/30' },
   }
 
   const config = statusConfig[status]
@@ -200,16 +200,16 @@ const StatusBadge = ({
 // ============================================================
 // COMPONENTE PRINCIPAL
 // ============================================================
-export function PerformanceMetrics({ className = "" }: PerformanceMetricsProps) {
-  const [activeTab, setActiveTab] = useState<"gauges" | "progress">("gauges")
+export function PerformanceMetrics({ className = '' }: PerformanceMetricsProps) {
+  const [activeTab, setActiveTab] = useState<'gauges' | 'progress'>('gauges')
 
   // Datos de progreso
   const progressData = useMemo(() => [
-    { label: "Ventas Diarias", value: 45200, maxValue: 60000, color: "#3b82f6" },
-    { label: "Órdenes Procesadas", value: 87, maxValue: 100, color: "#10b981" },
-    { label: "Entregas Completadas", value: 42, maxValue: 50, color: "#8b5cf6" },
-    { label: "Nuevos Clientes", value: 12, maxValue: 20, color: "#f59e0b" },
-    { label: "Devoluciones", value: 3, maxValue: 10, color: "#ef4444" },
+    { label: 'Ventas Diarias', value: 45200, maxValue: 60000, color: '#3b82f6' },
+    { label: 'Órdenes Procesadas', value: 87, maxValue: 100, color: '#10b981' },
+    { label: 'Entregas Completadas', value: 42, maxValue: 50, color: '#8b5cf6' },
+    { label: 'Nuevos Clientes', value: 12, maxValue: 20, color: '#f59e0b' },
+    { label: 'Devoluciones', value: 3, maxValue: 10, color: '#ef4444' },
   ], [])
 
   return (
@@ -226,24 +226,24 @@ export function PerformanceMetrics({ className = "" }: PerformanceMetricsProps) 
 
         {/* Tabs */}
         <div className="flex gap-1 p-1 bg-white/5 rounded-xl border border-white/10">
-          {(["gauges", "progress"] as const).map((tab) => (
+          {(['gauges', 'progress'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
                 activeTab === tab
-                  ? "bg-purple-500 text-white shadow-lg shadow-purple-500/30"
-                  : "text-white/50 hover:text-white hover:bg-white/5"
+                  ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/30'
+                  : 'text-white/50 hover:text-white hover:bg-white/5'
               }`}
             >
-              {tab === "gauges" ? "Gauges" : "Progreso"}
+              {tab === 'gauges' ? 'Gauges' : 'Progreso'}
             </button>
           ))}
         </div>
       </div>
 
       {/* Content */}
-      {activeTab === "gauges" ? (
+      {activeTab === 'gauges' ? (
         <>
           {/* Circular Gauges */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
@@ -304,10 +304,10 @@ export function MiniPerformanceWidget() {
         className="absolute inset-0"
         animate={{
           background: [
-            "radial-gradient(circle at 20% 20%, rgba(139,92,246,0.2) 0%, transparent 50%)",
-            "radial-gradient(circle at 80% 80%, rgba(59,130,246,0.2) 0%, transparent 50%)",
-            "radial-gradient(circle at 20% 20%, rgba(139,92,246,0.2) 0%, transparent 50%)",
-          ]
+            'radial-gradient(circle at 20% 20%, rgba(139,92,246,0.2) 0%, transparent 50%)',
+            'radial-gradient(circle at 80% 80%, rgba(59,130,246,0.2) 0%, transparent 50%)',
+            'radial-gradient(circle at 20% 20%, rgba(139,92,246,0.2) 0%, transparent 50%)',
+          ],
         }}
         transition={{ duration: 6, repeat: Infinity }}
       />
@@ -322,7 +322,7 @@ export function MiniPerformanceWidget() {
           </div>
           <motion.div
             animate={{ rotate: 360 }}
-            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
           >
             <Zap className="w-4 h-4 text-yellow-400" />
           </motion.div>

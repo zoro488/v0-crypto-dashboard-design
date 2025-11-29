@@ -5,11 +5,11 @@
  * Úsalo como referencia para implementar nuevos componentes.
  */
 
-import { motion } from "framer-motion"
-import { Sparkles, Zap, TrendingUp, ArrowRight } from "lucide-react"
-import { Button } from "@/app/components/ui/button"
-import { Badge } from "@/app/components/ui/badge"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/app/components/ui/card"
+import { motion } from 'framer-motion'
+import { Sparkles, Zap, TrendingUp, ArrowRight } from 'lucide-react'
+import { Button } from '@/app/components/ui/button'
+import { Badge } from '@/app/components/ui/badge'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/app/components/ui/card'
 
 export default function ComponentShowcase() {
   return (

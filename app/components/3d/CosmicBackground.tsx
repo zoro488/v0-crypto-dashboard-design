@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import { useEffect, useRef } from "react"
-import { motion } from "framer-motion"
+import { useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
 
 interface Particle {
   x: number
@@ -29,7 +29,7 @@ export default function CosmicBackground() {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const ctx = canvas.getContext("2d")
+    const ctx = canvas.getContext('2d')
     if (!ctx) return
 
     // Set canvas size
@@ -38,12 +38,12 @@ export default function CosmicBackground() {
       canvas.height = window.innerHeight
     }
     resizeCanvas()
-    window.addEventListener("resize", resizeCanvas)
+    window.addEventListener('resize', resizeCanvas)
 
     const colors = [
-      "rgba(10, 132, 255, 0.15)", // Apple blue
-      "rgba(94, 234, 212, 0.12)", // Teal
-      "rgba(168, 85, 247, 0.15)", // Purple
+      'rgba(10, 132, 255, 0.15)', // Apple blue
+      'rgba(94, 234, 212, 0.12)', // Teal
+      'rgba(168, 85, 247, 0.15)', // Purple
     ]
 
     const particles: Particle[] = []
@@ -66,7 +66,7 @@ export default function CosmicBackground() {
       length: 200,
       angle: Math.PI / 5,
       speed: 0.6,
-      color: "rgba(10, 132, 255, 0.2)",
+      color: 'rgba(10, 132, 255, 0.2)',
     }
 
     const constellations: { x: number; y: number }[][] = []
@@ -84,7 +84,7 @@ export default function CosmicBackground() {
 
     let animationFrameId: number
     const animate = () => {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)"
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       // Particles with refined trails
@@ -94,7 +94,7 @@ export default function CosmicBackground() {
 
         particle.trail.forEach((point, index) => {
           const alpha = (1 - index / particle.trail.length) * 0.15
-          ctx.fillStyle = particle.color.replace(/[\d.]+\)/, String(alpha) + ")")
+          ctx.fillStyle = particle.color.replace(/[\d.]+\)/, String(alpha) + ')')
           ctx.beginPath()
           ctx.arc(point.x, point.y, particle.size * (1 - index / particle.trail.length), 0, Math.PI * 2)
           ctx.fill()
@@ -118,7 +118,7 @@ export default function CosmicBackground() {
       })
 
       constellations.forEach((constellation) => {
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.03)"
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)'
         ctx.lineWidth = 0.5
         ctx.beginPath()
         constellation.forEach((star, index) => {
@@ -127,7 +127,7 @@ export default function CosmicBackground() {
           } else {
             ctx.lineTo(star.x, star.y)
           }
-          ctx.fillStyle = "rgba(255, 255, 255, 0.15)"
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.15)'
           ctx.arc(star.x, star.y, 0.8, 0, Math.PI * 2)
           ctx.fill()
         })
@@ -140,13 +140,13 @@ export default function CosmicBackground() {
         comet.x - Math.cos(comet.angle) * comet.length,
         comet.y - Math.sin(comet.angle) * comet.length,
       )
-      gradient.addColorStop(0, comet.color.replace("0.2", "0.3"))
-      gradient.addColorStop(0.3, comet.color.replace("0.2", "0.15"))
-      gradient.addColorStop(1, "transparent")
+      gradient.addColorStop(0, comet.color.replace('0.2', '0.3'))
+      gradient.addColorStop(0.3, comet.color.replace('0.2', '0.15'))
+      gradient.addColorStop(1, 'transparent')
 
       ctx.strokeStyle = gradient
       ctx.lineWidth = 1.5
-      ctx.lineCap = "round"
+      ctx.lineCap = 'round'
       ctx.shadowBlur = 12
       ctx.shadowColor = comet.color
 
@@ -171,7 +171,7 @@ export default function CosmicBackground() {
 
     return () => {
       cancelAnimationFrame(animationFrameId)
-      window.removeEventListener("resize", resizeCanvas)
+      window.removeEventListener('resize', resizeCanvas)
     }
   }, [])
 
@@ -181,8 +181,8 @@ export default function CosmicBackground() {
       className="fixed inset-0 pointer-events-none z-0"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 2, ease: "easeOut" }}
-      style={{ background: "transparent" }}
+      transition={{ duration: 2, ease: 'easeOut' }}
+      style={{ background: 'transparent' }}
     />
   )
 }
