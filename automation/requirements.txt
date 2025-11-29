@@ -1,0 +1,43 @@
+# Automation Requirements
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-json-report>=1.5.0
+asyncio>=3.4.3
+aiofiles>=23.0.0
+
+# Testing & Analysis
+coverage>=7.3.0
+pytest-cov>=4.1.0
+pytest-xdist>=3.3.0
+
+# Logging & Monitoring
+structlog>=23.1.0
+colorlog>=6.7.0
+
+# Data Processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# File System
+watchdog>=3.0.0
+pathspec>=0.11.0
+
+# HTTP & APIs
+httpx>=0.24.0
+requests>=2.31.0
+
+# JSON & YAML
+pyyaml>=6.0
+jsonschema>=4.19.0
+
+# Code Analysis
+ast-grep-py>=0.12.0
+autopep8>=2.0.0
+black>=23.7.0
+
+# Git Integration
+gitpython>=3.1.32
+
+# Reports
+jinja2>=3.1.2
+markdown>=3.4.0
