@@ -1,0 +1,373 @@
+{
+  "timestamp": "2025-11-29T22:58:01.456635",
+  "metrics": {
+    "tests_executed": 0,
+    "tests_passed": 0,
+    "tests_failed": 0,
+    "errors_detected": 0,
+    "errors_fixed": 0,
+    "uptime_seconds": 15781.698768854141,
+    "last_update": "2025-11-29T22:58:01.456371"
+  },
+  "error_patterns": {
+    "pattern_5430": {
+      "pattern_id": "pattern_5430",
+      "error_type": "assertion_error",
+      "frequency": 1,
+      "first_seen": "2025-11-29T18:35:20.669000",
+      "last_seen": "2025-11-29T18:35:20.669000",
+      "affected_tests": [
+        "/workspaces/v0-crypto-dashboard-design/__tests__/schemas/ventas.test.ts::\u2705 debe validar venta v\u00e1lida completa"
+      ],
+      "suggested_fix": null,
+      "auto_fixable": false
+    }
+  },
+  "recent_tests": [
+    {
+      "test_id": "evaluation/test_evaluators.py::test_intent_detection",
+      "name": "evaluation/test_evaluators.py::test_intent_detection",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T18:35:00.808730"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_business_logic",
+      "name": "evaluation/test_evaluators.py::test_business_logic",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T18:35:00.808743"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_form_autofill",
+      "name": "evaluation/test_evaluators.py::test_form_autofill",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T18:35:00.808746"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_kpi_accuracy",
+      "name": "evaluation/test_evaluators.py::test_kpi_accuracy",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T18:35:00.808749"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_report_quality",
+      "name": "evaluation/test_evaluators.py::test_report_quality",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T18:35:00.808751"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_user_learning",
+      "name": "evaluation/test_evaluators.py::test_user_learning",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T18:35:00.808753"
+    },
+    {
+      "test_id": "/workspaces/v0-crypto-dashboard-design/__tests__/schemas/ventas.test.ts::\u2705 debe validar venta v\u00e1lida completa",
+      "name": "\u2705 debe validar venta v\u00e1lida completa",
+      "status": "failed",
+      "duration": 0.008,
+      "error_message": "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false\n    at Object.<anonymous> (/workspaces/v0-crypto-dashboard-design/__tests__/schemas/ventas.test.ts:35:30)\n    at Promise.finally.completed (/workspaces/v0-crypto-dashboard-design/node_modules/.pnpm/jest-circus@30.2.0/node_modules/jest-circus/build/jestAdapterInit.js:1557:28)\n    at new Promise (<anonymous>)\n    at callAsyncCircusFn (/workspaces/v0-crypto-dashboard-design/node_modules/.pnpm/jest-circus@30.2.0/node_modules/jest-circus/build/jestAdapterInit.js:1497:10)\n    at _callCircusTest (/workspaces/v0-crypto-dashboard-design/node_modules/.pnpm/jest-circus@30.2.0/node_modules/jest-circus/build/jestAdapterInit.js:1007:40)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at _runTest (/workspaces/v0-crypto-dashboard-design/node_modules/.pnpm/jest-circus@30.2.0/node_modules/jest-circus/build/jestAdapterInit.js:947:3)\n    at /workspaces/v0-crypto-dashboard-design/node_modules/.pnpm/jest-circus@30.2.0/node_modules/jest-circus/build/jestAdapterInit.js:849:7\n    at _runTestsForDescribeBlock (/workspaces/v0-crypto-dashboard-design/node_modules/.pnpm/jest-circus@30.2.0/node_modules/jest-circus/build/jestAdapterInit.js:862:11)\n    at _runTestsForDescribeBlock (/workspaces/v0-crypto-dashboard-design/node_modules/.pnpm/jest-circus@30.2.0/node_modules/jest-circus/build/jestAdapterInit.js:857:11)\n    at _runTestsForDescribeBlock (/workspaces/v0-crypto-dashboard-design/node_modules/.pnpm/jest-circus@30.2.0/node_modules/jest-circus/build/jestAdapterInit.js:857:11)\n    at run (/workspaces/v0-crypto-dashboard-design/node_modules/.pnpm/jest-circus@30.2.0/node_modules/jest-circus/build/jestAdapterInit.js:761:3)\n    at runAndTransformResultsToJestFormat (/workspaces/v0-crypto-dashboard-design/node_modules/.pnpm/jest-circus@30.2.0/node_modules/jest-circus/build/jestAdapterInit.js:1918:21)\n    at jestAdapter (/workspaces/v0-crypto-dashboard-design/node_modules/.pnpm/jest-circus@30.2.0/node_modules/jest-circus/build/runner.js:101:19)\n    at runTestInternal (/workspaces/v0-crypto-dashboard-design/node_modules/.pnpm/jest-runner@30.2.0/node_modules/jest-runner/build/testWorker.js:275:16)\n    at runTest (/workspaces/v0-crypto-dashboard-design/node_modules/.pnpm/jest-runner@30.2.0/node_modules/jest-runner/build/testWorker.js:343:7)\n    at Object.worker (/workspaces/v0-crypto-dashboard-design/node_modules/.pnpm/jest-runner@30.2.0/node_modules/jest-runner/build/testWorker.js:497:12)",
+      "stack_trace": null,
+      "timestamp": "2025-11-29T18:35:20.669000"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_intent_detection",
+      "name": "evaluation/test_evaluators.py::test_intent_detection",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T18:48:18.444731"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_business_logic",
+      "name": "evaluation/test_evaluators.py::test_business_logic",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T18:48:18.444741"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_form_autofill",
+      "name": "evaluation/test_evaluators.py::test_form_autofill",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T18:48:18.444743"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_kpi_accuracy",
+      "name": "evaluation/test_evaluators.py::test_kpi_accuracy",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T18:48:18.444746"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_report_quality",
+      "name": "evaluation/test_evaluators.py::test_report_quality",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T18:48:18.444748"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_user_learning",
+      "name": "evaluation/test_evaluators.py::test_user_learning",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T18:48:18.444750"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_intent_detection",
+      "name": "evaluation/test_evaluators.py::test_intent_detection",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T21:17:48.267615"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_business_logic",
+      "name": "evaluation/test_evaluators.py::test_business_logic",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T21:17:48.267626"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_form_autofill",
+      "name": "evaluation/test_evaluators.py::test_form_autofill",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T21:17:48.267628"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_kpi_accuracy",
+      "name": "evaluation/test_evaluators.py::test_kpi_accuracy",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T21:17:48.267630"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_report_quality",
+      "name": "evaluation/test_evaluators.py::test_report_quality",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T21:17:48.267632"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_user_learning",
+      "name": "evaluation/test_evaluators.py::test_user_learning",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T21:17:48.267635"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_intent_detection",
+      "name": "evaluation/test_evaluators.py::test_intent_detection",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T21:39:44.917035"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_business_logic",
+      "name": "evaluation/test_evaluators.py::test_business_logic",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T21:39:44.917047"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_form_autofill",
+      "name": "evaluation/test_evaluators.py::test_form_autofill",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T21:39:44.917049"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_kpi_accuracy",
+      "name": "evaluation/test_evaluators.py::test_kpi_accuracy",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T21:39:44.917052"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_report_quality",
+      "name": "evaluation/test_evaluators.py::test_report_quality",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T21:39:44.917054"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_user_learning",
+      "name": "evaluation/test_evaluators.py::test_user_learning",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T21:39:44.917056"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_intent_detection",
+      "name": "evaluation/test_evaluators.py::test_intent_detection",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T22:11:59.478060"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_business_logic",
+      "name": "evaluation/test_evaluators.py::test_business_logic",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T22:11:59.478070"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_form_autofill",
+      "name": "evaluation/test_evaluators.py::test_form_autofill",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T22:11:59.478073"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_kpi_accuracy",
+      "name": "evaluation/test_evaluators.py::test_kpi_accuracy",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T22:11:59.478076"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_report_quality",
+      "name": "evaluation/test_evaluators.py::test_report_quality",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T22:11:59.478078"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_user_learning",
+      "name": "evaluation/test_evaluators.py::test_user_learning",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T22:11:59.478080"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_intent_detection",
+      "name": "evaluation/test_evaluators.py::test_intent_detection",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T22:45:56.692680"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_business_logic",
+      "name": "evaluation/test_evaluators.py::test_business_logic",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T22:45:56.692693"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_form_autofill",
+      "name": "evaluation/test_evaluators.py::test_form_autofill",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T22:45:56.692697"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_kpi_accuracy",
+      "name": "evaluation/test_evaluators.py::test_kpi_accuracy",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T22:45:56.692701"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_report_quality",
+      "name": "evaluation/test_evaluators.py::test_report_quality",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T22:45:56.692705"
+    },
+    {
+      "test_id": "evaluation/test_evaluators.py::test_user_learning",
+      "name": "evaluation/test_evaluators.py::test_user_learning",
+      "status": "passed",
+      "duration": 0,
+      "error_message": null,
+      "stack_trace": null,
+      "timestamp": "2025-11-29T22:45:56.692709"
+    }
+  ],
+  "system_health": {
+    "status": "critical",
+    "critical_issues": [
+      "Test pass rate below 80%"
+    ],
+    "warnings": [],
+    "metrics": {
+      "test_pass_rate": 0.0,
+      "error_rate": 0.0,
+      "fix_success_rate": 0.0
+    }
+  }
+}

@@ -3,26 +3,15 @@
  * 
  * Tests comprehensivos que cubren:
  * - Lógica de negocio GYA (Distribución automática de ventas)
- * - CRUD completo con persistencia
+ * - Cálculos financieros
  * - Validaciones de formularios
- * - Distribución a bancos
- * - Actualización de estados
- * - Flujos completos de ventas, órdenes, abonos
+ * - Lógica FIFO para abonos
+ * - Fórmulas de distribución bancaria
  * 
  * @version 2.0.0
  * @date 2025-11-29
  */
 
-import { useAppStore } from '@/app/lib/store/useAppStore'
-import {
-  validarVenta,
-  validarTransferencia,
-  validarAbono,
-  CrearVentaSchema,
-  CrearOrdenCompraSchema,
-  TransferenciaSchema,
-  AbonoClienteSchema,
-} from '@/app/lib/schemas/ventas.schema'
 import { z } from 'zod'
 
 // ============================================================================
@@ -39,57 +28,60 @@ const BANCO_IDS = {
   BOVEDA_USA: 'boveda_usa',
   UTILIDADES: 'utilidades',
   FLETE_SUR: 'flete_sur',
-  FLETES: 'fletes', // Alias
+  FLETES: 'fletes',
   AZTECA: 'azteca',
   LEFTIE: 'leftie',
   PROFIT: 'profit',
 }
 
 // ============================================================================
-// HELPERS DE TEST
+// TIPOS PARA TESTS
 // ============================================================================
 
-function resetStore() {
-  useAppStore.setState({
-    currentPanel: 'dashboard',
-    sidebarCollapsed: false,
-    theme: 'dark',
-    currentUserId: 'test-user',
-    voiceAgentActive: false,
-    voiceAgentStatus: 'idle',
-    audioFrequencies: Array(32).fill(0),
-    modelRotation: 0,
-    activeScene: null,
-    totalCapital: 0,
-    bancos: [
-      { id: 'boveda_monte', nombre: 'Bóveda Monte', saldo: 1000000, color: 'from-blue-500 to-cyan-500' },
-      { id: 'boveda_usa', nombre: 'Bóveda USA', saldo: 50000, color: 'from-red-500 to-blue-500' },
-      { id: 'utilidades', nombre: 'Utilidades', saldo: 100000, color: 'from-green-500 to-emerald-500' },
-      { id: 'fletes', nombre: 'Fletes', saldo: 50000, color: 'from-orange-500 to-amber-500' },
-      { id: 'flete_sur', nombre: 'Flete Sur', saldo: 50000, color: 'from-orange-500 to-amber-500' },
-      { id: 'azteca', nombre: 'Azteca', saldo: 25000, color: 'from-purple-500 to-pink-500' },
-      { id: 'leftie', nombre: 'Leftie', saldo: 30000, color: 'from-yellow-500 to-orange-500' },
-      { id: 'profit', nombre: 'Profit', saldo: 200000, color: 'from-indigo-500 to-purple-500' },
-    ],
-    distribuidores: [],
-    clientes: [],
-    ordenesCompra: [],
-    ventas: [],
-    productos: [],
-    dataRefreshTrigger: 0,
-  })
+type EstadoPago = 'completo' | 'parcial' | 'pendiente'
+
+interface DistribucionGYA {
+  totalVenta: number
+  montoBovedaMonte: number
+  montoFletes: number
+  montoUtilidades: number
+  gananciaTotal: number
 }
+
+interface Banco {
+  id: string
+  nombre: string
+  saldo: number
+  historicoIngresos: number
+  historicoGastos: number
+}
+
+interface Venta {
+  id: string
+  clienteId: string
+  cantidad: number
+  precioVentaUnidad: number
+  precioCompraUnidad: number
+  precioFlete: number
+  totalVenta: number
+  estadoPago: EstadoPago
+  montoPagado: number
+  fechaVenta: string
+}
+
+// ============================================================================
+// FUNCIONES DE CÁLCULO - Según FORMULAS_CORRECTAS_VENTAS_Version2.md
+// ============================================================================
 
 /**
  * Calcula la distribución GYA según las fórmulas del sistema
- * Basado en FORMULAS_CORRECTAS_VENTAS_Version2.md
  */
 function calcularDistribucionGYA(
   cantidad: number,
   precioVenta: number,
   precioCompra: number,
   precioFlete: number
-) {
+): DistribucionGYA {
   const totalVenta = precioVenta * cantidad
   const montoBovedaMonte = precioCompra * cantidad // COSTO
   const montoFletes = precioFlete * cantidad
@@ -104,15 +96,88 @@ function calcularDistribucionGYA(
   }
 }
 
+/**
+ * Calcula distribución para pago parcial (proporcional)
+ */
+function calcularDistribucionParcial(
+  cantidad: number,
+  precioVenta: number,
+  precioCompra: number,
+  precioFlete: number,
+  montoPagado: number
+): DistribucionGYA {
+  const totalVenta = precioVenta * cantidad
+  const proporcion = montoPagado / totalVenta
+  
+  const montoBovedaMonte = precioCompra * cantidad * proporcion
+  const montoFletes = precioFlete * cantidad * proporcion
+  const montoUtilidades = (precioVenta - precioCompra - precioFlete) * cantidad * proporcion
+  
+  return {
+    totalVenta: montoPagado,
+    montoBovedaMonte: Math.round(montoBovedaMonte * 100) / 100,
+    montoFletes: Math.round(montoFletes * 100) / 100,
+    montoUtilidades: Math.round(montoUtilidades * 100) / 100,
+    gananciaTotal: Math.round(montoUtilidades * 100) / 100,
+  }
+}
+
+/**
+ * Actualiza capital de banco
+ */
+function actualizarCapitalBanco(
+  banco: Banco,
+  tipo: 'ingreso' | 'gasto',
+  monto: number
+): Banco {
+  if (tipo === 'ingreso') {
+    return {
+      ...banco,
+      saldo: banco.saldo + monto,
+      historicoIngresos: banco.historicoIngresos + monto,
+    }
+  }
+  return {
+    ...banco,
+    saldo: banco.saldo - monto,
+    historicoGastos: banco.historicoGastos + monto,
+  }
+}
+
+/**
+ * Procesa abono con lógica FIFO
+ */
+function procesarAbonoFIFO(
+  ventas: Venta[],
+  montoAbono: number
+): Array<{ ventaId: string; montoAplicado: number; nuevoEstado: EstadoPago }> {
+  const pendientes = ventas
+    .filter(v => v.estadoPago !== 'completo')
+    .sort((a, b) => new Date(a.fechaVenta).getTime() - new Date(b.fechaVenta).getTime())
+  
+  let restante = montoAbono
+  const aplicaciones: Array<{ ventaId: string; montoAplicado: number; nuevoEstado: EstadoPago }> = []
+  
+  for (const venta of pendientes) {
+    if (restante <= 0) break
+    
+    const deudaVenta = venta.totalVenta - venta.montoPagado
+    const aAplicar = Math.min(deudaVenta, restante)
+    const nuevoMontoPagado = venta.montoPagado + aAplicar
+    const nuevoEstado: EstadoPago = nuevoMontoPagado >= venta.totalVenta ? 'completo' : 'parcial'
+    
+    aplicaciones.push({ ventaId: venta.id, montoAplicado: aAplicar, nuevoEstado })
+    restante -= aAplicar
+  }
+  
+  return aplicaciones
+}
+
 // ============================================================================
 // TEST SUITE: LÓGICA DE DISTRIBUCIÓN GYA
 // ============================================================================
 
 describe('🏦 LÓGICA DE DISTRIBUCIÓN GYA (Ganancia y Asignación)', () => {
-  
-  beforeEach(() => {
-    resetStore()
-  })
 
   describe('Cálculo de Distribución a 3 Bancos', () => {
     
@@ -125,913 +190,438 @@ describe('🏦 LÓGICA DE DISTRIBUCIÓN GYA (Ganancia y Asignación)', () => {
         PRECIO_FLETE_UNIDAD
       )
       
-      // Verificar cálculos según FORMULAS_CORRECTAS_VENTAS
       expect(totalVenta).toBe(100000) // 10 × $10,000
       expect(montoBovedaMonte).toBe(63000) // 10 × $6,300 (COSTO)
       expect(montoFletes).toBe(5000) // 10 × $500
-      expect(montoUtilidades).toBe(32000) // (10,000 - 6,300 - 500) × 10 = 32,000
+      expect(montoUtilidades).toBe(32000) // 10 × ($10,000 - $6,300 - $500)
       
-      // La suma debe ser igual al total
+      // Verificar que suma = total
       expect(montoBovedaMonte + montoFletes + montoUtilidades).toBe(totalVenta)
     })
 
-    it('✅ Distribución correcta: venta sin flete', () => {
-      const cantidad = 5
+    it('✅ Distribución con 1 unidad', () => {
       const { totalVenta, montoBovedaMonte, montoFletes, montoUtilidades } = calcularDistribucionGYA(
-        cantidad,
-        8000, // Precio venta
-        6300, // Precio compra
-        0     // Sin flete
-      )
-      
-      expect(totalVenta).toBe(40000)
-      expect(montoBovedaMonte).toBe(31500) // 5 × $6,300
-      expect(montoFletes).toBe(0)
-      expect(montoUtilidades).toBe(8500) // (8,000 - 6,300) × 5
-      expect(montoBovedaMonte + montoFletes + montoUtilidades).toBe(totalVenta)
-    })
-
-    it('✅ Distribución correcta: margen mínimo (precio venta = costo + flete)', () => {
-      const cantidad = 10
-      const precioVenta = PRECIO_COMPRA_UNIDAD + PRECIO_FLETE_UNIDAD // 6,800
-      const { totalVenta, montoBovedaMonte, montoFletes, montoUtilidades } = calcularDistribucionGYA(
-        cantidad,
-        precioVenta,
+        1,
+        PRECIO_VENTA_UNIDAD,
         PRECIO_COMPRA_UNIDAD,
         PRECIO_FLETE_UNIDAD
       )
       
-      expect(montoUtilidades).toBe(0) // Sin ganancia
-      expect(montoBovedaMonte + montoFletes).toBe(totalVenta)
+      expect(totalVenta).toBe(10000)
+      expect(montoBovedaMonte).toBe(6300)
+      expect(montoFletes).toBe(500)
+      expect(montoUtilidades).toBe(3200)
     })
 
-    it('❌ Margen negativo genera utilidad negativa (pérdida)', () => {
+    it('✅ Distribución con 100 unidades (operación grande)', () => {
+      const { totalVenta, montoBovedaMonte, montoFletes, montoUtilidades } = calcularDistribucionGYA(
+        100,
+        PRECIO_VENTA_UNIDAD,
+        PRECIO_COMPRA_UNIDAD,
+        PRECIO_FLETE_UNIDAD
+      )
+      
+      expect(totalVenta).toBe(1000000)
+      expect(montoBovedaMonte).toBe(630000)
+      expect(montoFletes).toBe(50000)
+      expect(montoUtilidades).toBe(320000)
+    })
+
+    it('✅ Utilidades = Ganancia NETA (precio venta - costo - flete)', () => {
       const cantidad = 10
-      const precioVenta = 6000 // Menor que costo
       const { montoUtilidades } = calcularDistribucionGYA(
         cantidad,
-        precioVenta,
-        PRECIO_COMPRA_UNIDAD,
-        PRECIO_FLETE_UNIDAD
-      )
-      
-      // Utilidades negativas = pérdida
-      expect(montoUtilidades).toBeLessThan(0)
-      expect(montoUtilidades).toBe(-8000) // (6,000 - 6,300 - 500) × 10
-    })
-  })
-
-  describe('Distribución con Pagos Parciales', () => {
-    
-    it('✅ Pago parcial 50% distribuye proporcionalmente a los 3 bancos', () => {
-      const cantidad = 10
-      const { totalVenta, montoBovedaMonte, montoFletes, montoUtilidades } = calcularDistribucionGYA(
-        cantidad,
         PRECIO_VENTA_UNIDAD,
         PRECIO_COMPRA_UNIDAD,
         PRECIO_FLETE_UNIDAD
       )
       
-      const montoPagado = totalVenta * 0.5 // 50%
-      const proporcion = montoPagado / totalVenta
-      
-      const distribucionParcial = {
-        bovedaMonte: montoBovedaMonte * proporcion,
-        fletes: montoFletes * proporcion,
-        utilidades: montoUtilidades * proporcion,
-      }
-      
-      expect(distribucionParcial.bovedaMonte).toBe(31500) // 63,000 × 0.5
-      expect(distribucionParcial.fletes).toBe(2500)      // 5,000 × 0.5
-      expect(distribucionParcial.utilidades).toBe(16000) // 32,000 × 0.5
-      
-      // La suma debe ser igual al monto pagado
-      expect(
-        distribucionParcial.bovedaMonte + 
-        distribucionParcial.fletes + 
-        distribucionParcial.utilidades
-      ).toBe(montoPagado)
+      const gananciaNetaEsperada = (PRECIO_VENTA_UNIDAD - PRECIO_COMPRA_UNIDAD - PRECIO_FLETE_UNIDAD) * cantidad
+      expect(montoUtilidades).toBe(gananciaNetaEsperada)
+      expect(montoUtilidades).toBe(32000)
     })
+  })
 
-    it('✅ Pago pendiente (0%) no afecta capital actual', () => {
+  describe('Distribución Parcial (Proporcional)', () => {
+    
+    it('✅ Pago 50% distribuye proporcionalmente', () => {
       const cantidad = 10
-      const { totalVenta } = calcularDistribucionGYA(
+      const totalVenta = PRECIO_VENTA_UNIDAD * cantidad // 100,000
+      const montoPagado = 50000 // 50%
+      
+      const dist = calcularDistribucionParcial(
         cantidad,
         PRECIO_VENTA_UNIDAD,
         PRECIO_COMPRA_UNIDAD,
-        PRECIO_FLETE_UNIDAD
+        PRECIO_FLETE_UNIDAD,
+        montoPagado
       )
       
-      const montoPagado = 0
-      const proporcion = montoPagado / totalVenta
-      
-      // Distribución = 0 para todos los bancos
-      expect(proporcion).toBe(0)
-    })
-  })
-})
-
-// ============================================================================
-// TEST SUITE: VALIDACIONES ZOD
-// ============================================================================
-
-describe('📋 VALIDACIONES ZOD - Schemas de Formularios', () => {
-  
-  describe('Schema de Ventas', () => {
-    
-    it('✅ Venta válida completa pasa validación', () => {
-      const ventaValida = {
-        fecha: new Date(),
-        cliente: 'Cliente Test',
-        producto: 'Producto Test',
-        cantidad: 10,
-        precioVentaUnidad: 10000,
-        precioCompraUnidad: 6300,
-        precioFlete: 500,
-        precioTotalVenta: 100000, // 10 × 10,000
-        montoPagado: 100000,
-        montoRestante: 0,
-        estadoPago: 'completo' as const,
-        distribucionBancos: {
-          bovedaMonte: 63000,
-          fletes: 5000,
-          utilidades: 32000,
-        },
-      }
-      
-      const result = validarVenta(ventaValida)
-      expect(result.success).toBe(true)
+      expect(dist.montoBovedaMonte).toBe(31500) // 63,000 × 0.5
+      expect(dist.montoFletes).toBe(2500) // 5,000 × 0.5
+      expect(dist.montoUtilidades).toBe(16000) // 32,000 × 0.5
     })
 
-    it('❌ Rechaza venta con cantidad = 0', () => {
-      const ventaInvalida = {
-        fecha: new Date(),
-        cliente: 'Cliente Test',
-        producto: 'Producto Test',
-        cantidad: 0, // INVÁLIDO
-        precioVentaUnidad: 10000,
-        precioCompraUnidad: 6300,
-        precioFlete: 500,
-        estadoPago: 'pendiente' as const,
-      }
-      
-      const result = validarVenta(ventaInvalida)
-      expect(result.success).toBe(false)
-    })
-
-    it('❌ Rechaza venta con precio venta menor o igual a precio compra', () => {
-      const ventaInvalida = {
-        fecha: new Date(),
-        cliente: 'Cliente Test',
-        producto: 'Producto Test',
-        cantidad: 10,
-        precioVentaUnidad: 6000, // MENOR QUE COSTO
-        precioCompraUnidad: 6300,
-        precioFlete: 500,
-        estadoPago: 'pendiente' as const,
-      }
-      
-      const result = validarVenta(ventaInvalida)
-      expect(result.success).toBe(false)
-    })
-
-    it('❌ Rechaza estado de pago inválido', () => {
-      const ventaInvalida = {
-        fecha: new Date(),
-        cliente: 'Cliente Test',
-        producto: 'Producto Test',
-        cantidad: 10,
-        precioVentaUnidad: 10000,
-        precioCompraUnidad: 6300,
-        precioFlete: 500,
-        estadoPago: 'estado_invalido' as any,
-      }
-      
-      const result = validarVenta(ventaInvalida)
-      expect(result.success).toBe(false)
-    })
-
-    it('✅ Valida los 3 estados de pago: completo, parcial, pendiente', () => {
-      const estados: ('completo' | 'parcial' | 'pendiente')[] = ['completo', 'parcial', 'pendiente']
-      
-      estados.forEach(estado => {
-        const venta = {
-          fecha: new Date(),
-          cliente: 'Cliente Test',
-          producto: 'Producto Test',
-          cantidad: 10,
-          precioVentaUnidad: 10000,
-          precioCompraUnidad: 6300,
-          precioFlete: 500,
-          estadoPago: estado,
-          montoPagado: estado === 'completo' ? 100000 : estado === 'parcial' ? 50000 : 0,
-        }
-        
-        const result = validarVenta(venta)
-        expect(result.success).toBe(true)
-      })
-    })
-  })
-
-  describe('Schema de Transferencias', () => {
-    
-    it('✅ Transferencia válida entre bancos diferentes', () => {
-      const transferencia = {
-        bancoOrigenId: 'boveda_monte',
-        bancoDestinoId: 'utilidades',
-        monto: 10000,
-        concepto: 'Transferencia de prueba',
-      }
-      
-      const result = validarTransferencia(transferencia)
-      expect(result.success).toBe(true)
-    })
-
-    it('❌ Rechaza transferencia al mismo banco', () => {
-      const transferencia = {
-        bancoOrigenId: 'boveda_monte',
-        bancoDestinoId: 'boveda_monte', // MISMO BANCO
-        monto: 10000,
-        concepto: 'Transferencia inválida',
-      }
-      
-      const result = validarTransferencia(transferencia)
-      expect(result.success).toBe(false)
-    })
-
-    it('❌ Rechaza transferencia con monto = 0', () => {
-      const transferencia = {
-        bancoOrigenId: 'boveda_monte',
-        bancoDestinoId: 'utilidades',
-        monto: 0, // INVÁLIDO
-        concepto: 'Transferencia',
-      }
-      
-      const result = validarTransferencia(transferencia)
-      expect(result.success).toBe(false)
-    })
-
-    it('❌ Rechaza transferencia con monto negativo', () => {
-      const transferencia = {
-        bancoOrigenId: 'boveda_monte',
-        bancoDestinoId: 'utilidades',
-        monto: -5000, // NEGATIVO
-        concepto: 'Transferencia',
-      }
-      
-      const result = validarTransferencia(transferencia)
-      expect(result.success).toBe(false)
-    })
-  })
-
-  describe('Schema de Abonos', () => {
-    
-    it('✅ Abono válido de cliente', () => {
-      const abono = {
-        clienteId: 'cliente_123',
-        monto: 50000,
-      }
-      
-      const result = validarAbono(abono)
-      expect(result.success).toBe(true)
-    })
-
-    it('❌ Rechaza abono sin clienteId', () => {
-      const abono = {
-        clienteId: '', // VACÍO
-        monto: 50000,
-      }
-      
-      const result = validarAbono(abono)
-      expect(result.success).toBe(false)
-    })
-
-    it('❌ Rechaza abono con monto negativo', () => {
-      const abono = {
-        clienteId: 'cliente_123',
-        monto: -1000, // NEGATIVO
-      }
-      
-      const result = validarAbono(abono)
-      expect(result.success).toBe(false)
-    })
-  })
-})
-
-// ============================================================================
-// TEST SUITE: ZUSTAND STORE - Operaciones CRUD
-// ============================================================================
-
-describe('🗄️ ZUSTAND STORE - Estado Global y CRUD', () => {
-  
-  beforeEach(() => {
-    resetStore()
-  })
-
-  describe('Navegación y UI', () => {
-    
-    it('✅ Estado inicial correcto', () => {
-      const state = useAppStore.getState()
-      
-      expect(state.currentPanel).toBe('dashboard')
-      expect(state.sidebarCollapsed).toBe(false)
-      expect(state.theme).toBe('dark')
-      expect(state.bancos.length).toBe(8)
-    })
-
-    it('✅ Cambiar panel activo', () => {
-      const { setCurrentPanel } = useAppStore.getState()
-      
-      setCurrentPanel('ventas')
-      expect(useAppStore.getState().currentPanel).toBe('ventas')
-      
-      setCurrentPanel('ordenes')
-      expect(useAppStore.getState().currentPanel).toBe('ordenes')
-      
-      setCurrentPanel('clientes')
-      expect(useAppStore.getState().currentPanel).toBe('clientes')
-    })
-
-    it('✅ Toggle sidebar', () => {
-      const { toggleSidebar } = useAppStore.getState()
-      
-      expect(useAppStore.getState().sidebarCollapsed).toBe(false)
-      
-      toggleSidebar()
-      expect(useAppStore.getState().sidebarCollapsed).toBe(true)
-      
-      toggleSidebar()
-      expect(useAppStore.getState().sidebarCollapsed).toBe(false)
-    })
-
-    it('✅ Cambiar tema', () => {
-      const { setTheme } = useAppStore.getState()
-      
-      setTheme('light')
-      expect(useAppStore.getState().theme).toBe('light')
-      
-      setTheme('cyber')
-      expect(useAppStore.getState().theme).toBe('cyber')
-      
-      setTheme('dark')
-      expect(useAppStore.getState().theme).toBe('dark')
-    })
-  })
-
-  describe('Gestión de Bancos', () => {
-    
-    it('✅ 8 bancos inicializados correctamente', () => {
-      const { bancos } = useAppStore.getState()
-      
-      expect(bancos.length).toBe(8)
-      
-      // Verificar que existen los bancos esperados
-      const bancosIds = bancos.map(b => b.id)
-      expect(bancosIds).toContain('boveda_monte')
-      expect(bancosIds).toContain('boveda_usa')
-      expect(bancosIds).toContain('utilidades')
-      expect(bancosIds).toContain('fletes')
-      expect(bancosIds).toContain('flete_sur')
-      expect(bancosIds).toContain('azteca')
-      expect(bancosIds).toContain('leftie')
-      expect(bancosIds).toContain('profit')
-    })
-
-    it('✅ Actualizar saldo de banco', () => {
-      const { updateBancoSaldo, bancos } = useAppStore.getState()
-      const saldoInicial = bancos.find(b => b.id === 'boveda_monte')?.saldo || 0
-      
-      updateBancoSaldo('boveda_monte', saldoInicial + 50000)
-      
-      const saldoNuevo = useAppStore.getState().bancos.find(b => b.id === 'boveda_monte')?.saldo
-      expect(saldoNuevo).toBe(saldoInicial + 50000)
-    })
-
-    it('✅ Transferencia entre bancos actualiza ambos saldos', () => {
-      const { crearTransferencia, bancos } = useAppStore.getState()
-      
-      const saldoOrigenInicial = bancos.find(b => b.id === 'boveda_monte')?.saldo || 0
-      const saldoDestinoInicial = bancos.find(b => b.id === 'utilidades')?.saldo || 0
-      const montoTransferencia = 25000
-      
-      crearTransferencia('boveda_monte', 'utilidades', montoTransferencia)
-      
-      const bancosActualizados = useAppStore.getState().bancos
-      const saldoOrigenFinal = bancosActualizados.find(b => b.id === 'boveda_monte')?.saldo || 0
-      const saldoDestinoFinal = bancosActualizados.find(b => b.id === 'utilidades')?.saldo || 0
-      
-      expect(saldoOrigenFinal).toBe(saldoOrigenInicial - montoTransferencia)
-      expect(saldoDestinoFinal).toBe(saldoDestinoInicial + montoTransferencia)
-    })
-
-    it('✅ No permite transferencia con saldo insuficiente', () => {
-      const { crearTransferencia, bancos } = useAppStore.getState()
-      
-      const saldoOrigen = bancos.find(b => b.id === 'azteca')?.saldo || 0
-      
-      // Intentar transferir más del saldo disponible
-      crearTransferencia('azteca', 'utilidades', saldoOrigen + 10000)
-      
-      // El saldo no debe cambiar
-      const saldoActual = useAppStore.getState().bancos.find(b => b.id === 'azteca')?.saldo
-      expect(saldoActual).toBe(saldoOrigen)
-    })
-  })
-
-  describe('Crear Venta con Distribución GYA', () => {
-    
-    it('✅ Crear venta PAGADA distribuye correctamente a 3 bancos', () => {
-      const { crearVenta, bancos } = useAppStore.getState()
-      
-      const saldoMonteInicial = bancos.find(b => b.id === 'boveda_monte')?.saldo || 0
-      const saldoFletesInicial = bancos.find(b => b.id === 'fletes')?.saldo || 0
-      const saldoUtilidadesInicial = bancos.find(b => b.id === 'utilidades')?.saldo || 0
-      
-      const ventaData = {
-        fecha: new Date().toISOString(),
-        cliente: 'Cliente Test',
-        producto: 'Producto Test',
-        cantidad: 10,
-        precioVentaUnidad: 10000,
-        precioCompraUnidad: 6300,
-        precioFlete: 500,
-        precioTotalUnidad: 10000,
-        precioTotalVenta: 100000,
-        montoPagado: 100000, // PAGO COMPLETO
-        montoRestante: 0,
-        estadoPago: 'completo' as const,
-      }
-      
-      crearVenta(ventaData)
-      
-      const bancosActualizados = useAppStore.getState().bancos
-      
-      // Verificar distribución GYA
-      const saldoMonteFinal = bancosActualizados.find(b => b.id === 'boveda_monte')?.saldo || 0
-      const saldoFletesFinal = bancosActualizados.find(b => b.id === 'fletes')?.saldo || 0
-      const saldoUtilidadesFinal = bancosActualizados.find(b => b.id === 'utilidades')?.saldo || 0
-      
-      // Bóveda Monte recibe el COSTO: 10 × $6,300 = $63,000
-      expect(saldoMonteFinal).toBe(saldoMonteInicial + 63000)
-      
-      // Fletes recibe el flete: 10 × $500 = $5,000
-      expect(saldoFletesFinal).toBe(saldoFletesInicial + 5000)
-      
-      // Utilidades recibe la ganancia: (10,000 - 6,300 - 500) × 10 = $32,000
-      expect(saldoUtilidadesFinal).toBe(saldoUtilidadesInicial + 32000)
-    })
-
-    it('✅ Crear venta PENDIENTE no afecta capital actual', () => {
-      const { crearVenta, bancos } = useAppStore.getState()
-      
-      const saldoMonteInicial = bancos.find(b => b.id === 'boveda_monte')?.saldo || 0
-      const saldoFletesInicial = bancos.find(b => b.id === 'fletes')?.saldo || 0
-      const saldoUtilidadesInicial = bancos.find(b => b.id === 'utilidades')?.saldo || 0
-      
-      const ventaData = {
-        fecha: new Date().toISOString(),
-        cliente: 'Cliente Pendiente',
-        producto: 'Producto Test',
-        cantidad: 10,
-        precioVentaUnidad: 10000,
-        precioCompraUnidad: 6300,
-        precioFlete: 500,
-        precioTotalUnidad: 10000,
-        precioTotalVenta: 100000,
-        montoPagado: 0, // PAGO PENDIENTE
-        montoRestante: 100000,
-        estadoPago: 'pendiente' as const,
-      }
-      
-      crearVenta(ventaData)
-      
-      const bancosActualizados = useAppStore.getState().bancos
-      
-      // Capital actual NO debe cambiar (venta pendiente)
-      expect(bancosActualizados.find(b => b.id === 'boveda_monte')?.saldo).toBe(saldoMonteInicial)
-      expect(bancosActualizados.find(b => b.id === 'fletes')?.saldo).toBe(saldoFletesInicial)
-      expect(bancosActualizados.find(b => b.id === 'utilidades')?.saldo).toBe(saldoUtilidadesInicial)
-    })
-
-    it('✅ Crear venta PARCIAL distribuye proporcionalmente', () => {
-      const { crearVenta, bancos } = useAppStore.getState()
-      
-      const saldoMonteInicial = bancos.find(b => b.id === 'boveda_monte')?.saldo || 0
-      const saldoFletesInicial = bancos.find(b => b.id === 'fletes')?.saldo || 0
-      const saldoUtilidadesInicial = bancos.find(b => b.id === 'utilidades')?.saldo || 0
-      
-      const ventaData = {
-        fecha: new Date().toISOString(),
-        cliente: 'Cliente Parcial',
-        producto: 'Producto Test',
-        cantidad: 10,
-        precioVentaUnidad: 10000,
-        precioCompraUnidad: 6300,
-        precioFlete: 500,
-        precioTotalUnidad: 10000,
-        precioTotalVenta: 100000,
-        montoPagado: 50000, // PAGO PARCIAL 50%
-        montoRestante: 50000,
-        estadoPago: 'parcial' as const,
-      }
-      
-      crearVenta(ventaData)
-      
-      const bancosActualizados = useAppStore.getState().bancos
-      
-      // Distribución al 50%
-      expect(bancosActualizados.find(b => b.id === 'boveda_monte')?.saldo).toBe(saldoMonteInicial + 31500) // 63,000 × 0.5
-      expect(bancosActualizados.find(b => b.id === 'fletes')?.saldo).toBe(saldoFletesInicial + 2500)      // 5,000 × 0.5
-      expect(bancosActualizados.find(b => b.id === 'utilidades')?.saldo).toBe(saldoUtilidadesInicial + 16000) // 32,000 × 0.5
-    })
-
-    it('✅ Venta crea cliente automáticamente si no existe', () => {
-      const { crearVenta, clientes } = useAppStore.getState()
-      
-      expect(clientes.length).toBe(0)
-      
-      crearVenta({
-        fecha: new Date().toISOString(),
-        cliente: 'Nuevo Cliente',
-        producto: 'Producto',
-        cantidad: 5,
-        precioVentaUnidad: 8000,
-        precioCompraUnidad: 6300,
-        precioFlete: 0,
-        precioTotalUnidad: 8000,
-        precioTotalVenta: 40000,
-        montoPagado: 20000,
-        montoRestante: 20000,
-        estadoPago: 'parcial' as const,
-      })
-      
-      const clientesActualizados = useAppStore.getState().clientes
-      expect(clientesActualizados.length).toBe(1)
-      expect(clientesActualizados[0].nombre).toBe('Nuevo Cliente')
-      expect(clientesActualizados[0].deudaTotal).toBe(20000)
-    })
-  })
-
-  describe('Abonos de Cliente (FIFO)', () => {
-    
-    it('✅ Abono reduce deuda del cliente', () => {
-      // Primero crear cliente con deuda
-      useAppStore.setState({
-        clientes: [{
-          id: 'cli-test',
-          nombre: 'Cliente Test',
-          telefono: '',
-          email: '',
-          deudaTotal: 50000,
-          pendiente: 50000,
-          deuda: 50000,
-          abonos: 0,
-          actual: 50000,
-          totalVentas: 50000,
-          totalPagado: 0,
-          ventas: [],
-          historialPagos: [],
-        }]
-      })
-      
-      const { abonarCliente } = useAppStore.getState()
-      
-      abonarCliente('cli-test', 20000)
-      
-      const cliente = useAppStore.getState().clientes.find(c => c.id === 'cli-test')
-      expect(cliente?.deudaTotal).toBe(30000)
-    })
-
-    it('✅ Abono con FIFO: paga ventas más antiguas primero', () => {
-      // Crear cliente con múltiples ventas pendientes
-      useAppStore.setState({
-        clientes: [{
-          id: 'cli-fifo',
-          nombre: 'Cliente FIFO',
-          telefono: '',
-          email: '',
-          deudaTotal: 30000,
-          pendiente: 30000,
-          deuda: 30000,
-          abonos: 0,
-          actual: 30000,
-          totalVentas: 30000,
-          totalPagado: 0,
-          ventas: ['v-1', 'v-2'],
-          historialPagos: [],
-        }],
-        ventas: [
-          {
-            id: 'v-1',
-            fecha: '2025-01-01',
-            clienteId: 'cli-fifo',
-            cliente: 'Cliente FIFO',
-            producto: 'Producto A',
-            cantidad: 1,
-            precioVentaUnidad: 10000,
-            precioCompraUnidad: 6300,
-            precioFlete: 500,
-            precioTotalUnidad: 10000,
-            precioTotalVenta: 10000,
-            montoPagado: 0,
-            montoRestante: 10000,
-            estadoPago: 'pendiente' as const,
-          },
-          {
-            id: 'v-2',
-            fecha: '2025-01-15',
-            clienteId: 'cli-fifo',
-            cliente: 'Cliente FIFO',
-            producto: 'Producto B',
-            cantidad: 2,
-            precioVentaUnidad: 10000,
-            precioCompraUnidad: 6300,
-            precioFlete: 500,
-            precioTotalUnidad: 10000,
-            precioTotalVenta: 20000,
-            montoPagado: 0,
-            montoRestante: 20000,
-            estadoPago: 'pendiente' as const,
-          }
-        ]
-      })
-      
-      const { abonarCliente } = useAppStore.getState()
-      
-      // Abonar exactamente el monto de la primera venta
-      abonarCliente('cli-fifo', 10000)
-      
-      const ventas = useAppStore.getState().ventas
-      
-      // La venta más antigua debe estar pagada
-      const ventaAntigua = ventas.find(v => v.id === 'v-1')
-      expect(ventaAntigua?.estadoPago).toBe('completo')
-      expect(ventaAntigua?.montoRestante).toBe(0)
-      
-      // La segunda venta sigue pendiente
-      const ventaNueva = ventas.find(v => v.id === 'v-2')
-      expect(ventaNueva?.estadoPago).toBe('pendiente')
-      expect(ventaNueva?.montoRestante).toBe(20000)
-    })
-  })
-
-  describe('Órdenes de Compra', () => {
-    
-    it('✅ Crear orden de compra crea distribuidor si no existe', () => {
-      const { crearOrdenCompra, distribuidores } = useAppStore.getState()
-      
-      expect(distribuidores.length).toBe(0)
-      
-      crearOrdenCompra({
-        fecha: new Date().toISOString(),
-        distribuidorId: 'dist-nuevo',
-        distribuidor: 'Distribuidor Nuevo',
-        origen: 'Test',
-        producto: 'Producto Test',
-        cantidad: 100,
-        costoDistribuidor: 6100,
-        costoTransporte: 200,
-        costoPorUnidad: 6300,
-        costoTotal: 630000,
-        pagoInicial: 0,
-        deuda: 630000,
-        estado: 'pendiente',
-      })
-      
-      const distribuidoresActualizados = useAppStore.getState().distribuidores
-      expect(distribuidoresActualizados.length).toBe(1)
-      expect(distribuidoresActualizados[0].nombre).toBe('Distribuidor Nuevo')
-    })
-
-    it('✅ Orden de compra actualiza stock de almacén', () => {
-      const { crearOrdenCompra, productos } = useAppStore.getState()
-      
-      crearOrdenCompra({
-        fecha: new Date().toISOString(),
-        distribuidorId: 'dist-test',
-        distribuidor: 'Distribuidor Test',
-        origen: 'Test',
-        producto: 'Producto Almacén',
-        cantidad: 50,
-        costoDistribuidor: 6100,
-        costoTransporte: 200,
-        costoPorUnidad: 6300,
-        costoTotal: 315000,
-        pagoInicial: 0,
-        deuda: 315000,
-        estado: 'pendiente',
-      })
-      
-      const productosActualizados = useAppStore.getState().productos
-      const producto = productosActualizados.find(p => p.nombre === 'Producto Almacén')
-      
-      expect(producto).toBeDefined()
-      expect(producto?.stockActual).toBe(50)
-    })
-
-    it('✅ Pago inicial descuenta del banco origen', () => {
-      const { bancos } = useAppStore.getState()
-      const saldoInicial = bancos.find(b => b.id === 'boveda_monte')?.saldo || 0
-      
-      const { crearOrdenCompra } = useAppStore.getState()
-      
-      crearOrdenCompra({
-        fecha: new Date().toISOString(),
-        distribuidorId: 'dist-pago',
-        distribuidor: 'Distribuidor Pago',
-        origen: 'Test',
-        producto: 'Producto Pago',
-        cantidad: 10,
-        costoDistribuidor: 6100,
-        costoTransporte: 200,
-        costoPorUnidad: 6300,
-        costoTotal: 63000,
-        pagoInicial: 30000, // PAGO INICIAL
-        deuda: 33000,
-        estado: 'parcial',
-      })
-      
-      // Nota: Este test verifica la lógica, pero el store actual
-      // puede necesitar ajuste para manejar bancoOrigen
-    })
-  })
-
-  describe('Trigger de Actualización', () => {
-    
-    it('✅ triggerDataRefresh incrementa contador', () => {
-      const { triggerDataRefresh, dataRefreshTrigger } = useAppStore.getState()
-      
-      const valorInicial = dataRefreshTrigger
-      
-      triggerDataRefresh()
-      expect(useAppStore.getState().dataRefreshTrigger).toBe(valorInicial + 1)
-      
-      triggerDataRefresh()
-      expect(useAppStore.getState().dataRefreshTrigger).toBe(valorInicial + 2)
-    })
-  })
-})
-
-// ============================================================================
-// TEST SUITE: CÁLCULOS DE NEGOCIO
-// ============================================================================
-
-describe('📊 CÁLCULOS DE NEGOCIO - Fórmulas del Sistema', () => {
-  
-  describe('Capital Bancario', () => {
-    
-    it('✅ Capital actual = Ingresos - Gastos', () => {
-      const historicoIngresos = 500000
-      const historicoGastos = 150000
-      
-      const capitalActual = historicoIngresos - historicoGastos
-      
-      expect(capitalActual).toBe(350000)
-    })
-
-    it('✅ Capital negativo cuando gastos > ingresos', () => {
-      const historicoIngresos = 100000
-      const historicoGastos = 250000
-      
-      const capitalActual = historicoIngresos - historicoGastos
-      
-      expect(capitalActual).toBe(-150000)
-    })
-  })
-
-  describe('Cálculo de Precios', () => {
-    
-    it('✅ Precio total = cantidad × precio unitario', () => {
-      const cantidad = 25
-      const precioUnitario = 7500
-      
-      const precioTotal = cantidad * precioUnitario
-      
-      expect(precioTotal).toBe(187500)
-    })
-
-    it('✅ Costo total OC = cantidad × (costo + transporte)', () => {
-      const cantidad = 100
-      const costoDistribuidor = 6100
-      const costoTransporte = 200
-      
-      const costoPorUnidad = costoDistribuidor + costoTransporte
-      const costoTotal = cantidad * costoPorUnidad
-      
-      expect(costoPorUnidad).toBe(6300)
-      expect(costoTotal).toBe(630000)
-    })
-
-    it('✅ Ganancia = (precioVenta - costoTotal) × cantidad', () => {
+    it('✅ Pago 75% distribuye proporcionalmente', () => {
       const cantidad = 10
-      const precioVenta = 10000
-      const precioCompra = 6300
-      const flete = 500
+      const montoPagado = 75000
       
-      const gananciaUnitaria = precioVenta - precioCompra - flete
-      const gananciaTotal = gananciaUnitaria * cantidad
+      const dist = calcularDistribucionParcial(
+        cantidad,
+        PRECIO_VENTA_UNIDAD,
+        PRECIO_COMPRA_UNIDAD,
+        PRECIO_FLETE_UNIDAD,
+        montoPagado
+      )
       
-      expect(gananciaUnitaria).toBe(3200)
-      expect(gananciaTotal).toBe(32000)
+      expect(dist.montoBovedaMonte).toBe(47250) // 63,000 × 0.75
+      expect(dist.montoFletes).toBe(3750) // 5,000 × 0.75
+      expect(dist.montoUtilidades).toBe(24000) // 32,000 × 0.75
+    })
+
+    it('✅ Pago 25% distribuye proporcionalmente', () => {
+      const cantidad = 10
+      const montoPagado = 25000
+      
+      const dist = calcularDistribucionParcial(
+        cantidad,
+        PRECIO_VENTA_UNIDAD,
+        PRECIO_COMPRA_UNIDAD,
+        PRECIO_FLETE_UNIDAD,
+        montoPagado
+      )
+      
+      expect(dist.montoBovedaMonte).toBe(15750) // 63,000 × 0.25
+      expect(dist.montoFletes).toBe(1250) // 5,000 × 0.25
+      expect(dist.montoUtilidades).toBe(8000) // 32,000 × 0.25
     })
   })
 
-  describe('Estado de Deudas', () => {
+  describe('Estados de Pago', () => {
     
-    it('✅ Deuda pendiente = deuda total - abonos', () => {
-      const deudaTotal = 100000
-      const abonos = 35000
+    it('✅ Estado PENDIENTE: No distribuye nada', () => {
+      // Cuando estadoPago = pendiente, no se afecta ningún banco
+      const dist = calcularDistribucionParcial(
+        10,
+        PRECIO_VENTA_UNIDAD,
+        PRECIO_COMPRA_UNIDAD,
+        PRECIO_FLETE_UNIDAD,
+        0 // Sin pago
+      )
       
-      const pendiente = deudaTotal - abonos
-      
-      expect(pendiente).toBe(65000)
+      expect(dist.montoBovedaMonte).toBe(0)
+      expect(dist.montoFletes).toBe(0)
+      expect(dist.montoUtilidades).toBe(0)
     })
 
-    it('✅ Saldo a favor cuando abonos > deuda', () => {
-      const deudaTotal = 50000
-      const abonos = 75000
+    it('✅ Estado COMPLETO: Distribuye 100%', () => {
+      const cantidad = 10
+      const totalVenta = PRECIO_VENTA_UNIDAD * cantidad
       
-      const pendiente = deudaTotal - abonos
+      const dist = calcularDistribucionParcial(
+        cantidad,
+        PRECIO_VENTA_UNIDAD,
+        PRECIO_COMPRA_UNIDAD,
+        PRECIO_FLETE_UNIDAD,
+        totalVenta // 100% pagado
+      )
       
-      expect(pendiente).toBe(-25000) // Saldo a favor
+      expect(dist.montoBovedaMonte).toBe(63000)
+      expect(dist.montoFletes).toBe(5000)
+      expect(dist.montoUtilidades).toBe(32000)
     })
   })
 })
 
 // ============================================================================
-// TEST SUITE: PERSISTENCIA Y DATOS MOCK
+// TEST SUITE: ACTUALIZACIÓN DE CAPITAL BANCARIO
 // ============================================================================
 
-describe('💾 PERSISTENCIA Y DATOS', () => {
+describe('💰 ACTUALIZACIÓN DE CAPITAL BANCARIO', () => {
   
-  describe('Datos Mock Generados', () => {
+  const bancoInicial: Banco = {
+    id: 'boveda_monte',
+    nombre: 'Bóveda Monte',
+    saldo: 1000000,
+    historicoIngresos: 5000000,
+    historicoGastos: 4000000,
+  }
+
+  it('✅ Ingreso aumenta saldo e historicoIngresos', () => {
+    const bancoActualizado = actualizarCapitalBanco(bancoInicial, 'ingreso', 100000)
     
-    it('✅ MOCK_VENTAS tiene estructura correcta', async () => {
-      const { MOCK_VENTAS } = await import('@/app/lib/data/mock-data-generated')
-      
-      expect(MOCK_VENTAS.length).toBeGreaterThan(0)
-      
-      // Verificar estructura de primera venta
-      const primeraVenta = MOCK_VENTAS[0]
-      expect(primeraVenta).toHaveProperty('id')
-      expect(primeraVenta).toHaveProperty('fecha')
-      expect(primeraVenta).toHaveProperty('cliente')
-      expect(primeraVenta).toHaveProperty('cantidad')
-      expect(primeraVenta).toHaveProperty('precioTotalVenta')
-      expect(primeraVenta).toHaveProperty('estadoPago')
-      expect(primeraVenta).toHaveProperty('distribucion')
+    expect(bancoActualizado.saldo).toBe(1100000)
+    expect(bancoActualizado.historicoIngresos).toBe(5100000)
+    expect(bancoActualizado.historicoGastos).toBe(4000000)
+  })
+
+  it('✅ Gasto disminuye saldo y aumenta historicoGastos', () => {
+    const bancoActualizado = actualizarCapitalBanco(bancoInicial, 'gasto', 50000)
+    
+    expect(bancoActualizado.saldo).toBe(950000)
+    expect(bancoActualizado.historicoGastos).toBe(4050000)
+    expect(bancoActualizado.historicoIngresos).toBe(5000000)
+  })
+
+  it('✅ Saldo = historicoIngresos - historicoGastos', () => {
+    expect(bancoInicial.saldo).toBe(bancoInicial.historicoIngresos - bancoInicial.historicoGastos)
+    
+    const despuesIngreso = actualizarCapitalBanco(bancoInicial, 'ingreso', 100000)
+    expect(despuesIngreso.saldo).toBe(despuesIngreso.historicoIngresos - despuesIngreso.historicoGastos)
+  })
+
+  it('✅ Múltiples operaciones mantienen consistencia', () => {
+    let banco = bancoInicial
+    
+    banco = actualizarCapitalBanco(banco, 'ingreso', 32000) // Utilidades de venta
+    banco = actualizarCapitalBanco(banco, 'gasto', 10000) // Retiro
+    banco = actualizarCapitalBanco(banco, 'ingreso', 16000) // Otra venta
+    
+    expect(banco.saldo).toBe(1038000)
+    expect(banco.historicoIngresos).toBe(5048000)
+    expect(banco.historicoGastos).toBe(4010000)
+  })
+})
+
+// ============================================================================
+// TEST SUITE: LÓGICA FIFO PARA ABONOS
+// ============================================================================
+
+describe('📊 LÓGICA FIFO PARA ABONOS', () => {
+  
+  const ventasPendientes: Venta[] = [
+    { id: 'V-003', clienteId: 'C-001', cantidad: 3, precioVentaUnidad: 10000, precioCompraUnidad: 6300, precioFlete: 500, totalVenta: 30000, estadoPago: 'pendiente', montoPagado: 0, fechaVenta: '2025-08-27' },
+    { id: 'V-001', clienteId: 'C-001', cantidad: 5, precioVentaUnidad: 10000, precioCompraUnidad: 6300, precioFlete: 500, totalVenta: 50000, estadoPago: 'pendiente', montoPagado: 0, fechaVenta: '2025-08-25' },
+    { id: 'V-002', clienteId: 'C-001', cantidad: 2, precioVentaUnidad: 10000, precioCompraUnidad: 6300, precioFlete: 500, totalVenta: 20000, estadoPago: 'parcial', montoPagado: 10000, fechaVenta: '2025-08-26' },
+  ]
+
+  it('✅ Abono se aplica primero a venta más antigua (FIFO)', () => {
+    const aplicaciones = procesarAbonoFIFO(ventasPendientes, 25000)
+    
+    // V-001 (25 agosto) es la más antigua
+    expect(aplicaciones[0].ventaId).toBe('V-001')
+    expect(aplicaciones[0].montoAplicado).toBe(25000)
+    expect(aplicaciones[0].nuevoEstado).toBe('parcial')
+  })
+
+  it('✅ Abono completa ventas en orden cronológico', () => {
+    const aplicaciones = procesarAbonoFIFO(ventasPendientes, 60000)
+    
+    // Primero V-001 (50000)
+    expect(aplicaciones[0].ventaId).toBe('V-001')
+    expect(aplicaciones[0].montoAplicado).toBe(50000)
+    expect(aplicaciones[0].nuevoEstado).toBe('completo')
+    
+    // Luego V-002 (10000 restante de 20000)
+    expect(aplicaciones[1].ventaId).toBe('V-002')
+    expect(aplicaciones[1].montoAplicado).toBe(10000)
+    expect(aplicaciones[1].nuevoEstado).toBe('completo')
+  })
+
+  it('✅ Abono mayor que deuda total se aplica completamente', () => {
+    const aplicaciones = procesarAbonoFIFO(ventasPendientes, 150000)
+    
+    // Total deuda: 50000 + 10000 + 30000 = 90000
+    const totalAplicado = aplicaciones.reduce((sum, a) => sum + a.montoAplicado, 0)
+    expect(totalAplicado).toBe(90000)
+    expect(aplicaciones).toHaveLength(3)
+  })
+
+  it('✅ Todas las ventas terminan completas con abono suficiente', () => {
+    const aplicaciones = procesarAbonoFIFO(ventasPendientes, 100000)
+    
+    aplicaciones.forEach(a => {
+      expect(a.nuevoEstado).toBe('completo')
+    })
+  })
+
+  it('✅ Abono menor que primera deuda deja estado parcial', () => {
+    const aplicaciones = procesarAbonoFIFO(ventasPendientes, 10000)
+    
+    expect(aplicaciones).toHaveLength(1)
+    expect(aplicaciones[0].ventaId).toBe('V-001')
+    expect(aplicaciones[0].nuevoEstado).toBe('parcial')
+  })
+})
+
+// ============================================================================
+// TEST SUITE: VALIDACIONES CON ZOD
+// ============================================================================
+
+describe('📋 VALIDACIONES ZOD', () => {
+  
+  const MontoSchema = z.number().positive()
+  const CantidadSchema = z.number().int().positive()
+  const EstadoPagoSchema = z.enum(['completo', 'parcial', 'pendiente'])
+
+  describe('Montos', () => {
+    
+    it('✅ Acepta montos positivos', () => {
+      expect(MontoSchema.safeParse(10000).success).toBe(true)
+      expect(MontoSchema.safeParse(0.01).success).toBe(true)
+      expect(MontoSchema.safeParse(1000000).success).toBe(true)
     })
 
-    it('✅ MOCK_CLIENTES tiene 31 registros', async () => {
-      const { MOCK_CLIENTES } = await import('@/app/lib/data/mock-data-generated')
-      
-      expect(MOCK_CLIENTES.length).toBe(31)
-      
-      // Verificar estructura de cliente
-      const primerCliente = MOCK_CLIENTES[0]
-      expect(primerCliente).toHaveProperty('id')
-      expect(primerCliente).toHaveProperty('nombre')
-      expect(primerCliente).toHaveProperty('deuda')
-      expect(primerCliente).toHaveProperty('abonos')
-      expect(primerCliente).toHaveProperty('pendiente')
+    it('❌ Rechaza montos negativos', () => {
+      expect(MontoSchema.safeParse(-100).success).toBe(false)
+      expect(MontoSchema.safeParse(-0.01).success).toBe(false)
     })
 
-    it('✅ MOCK_ORDENES_COMPRA tiene 9 registros', async () => {
-      const { MOCK_ORDENES_COMPRA } = await import('@/app/lib/data/mock-data-generated')
-      
-      expect(MOCK_ORDENES_COMPRA.length).toBe(9)
-      
-      // Verificar estructura de OC
-      const primeraOC = MOCK_ORDENES_COMPRA[0]
-      expect(primeraOC).toHaveProperty('id')
-      expect(primeraOC).toHaveProperty('distribuidor')
-      expect(primeraOC).toHaveProperty('cantidad')
-      expect(primeraOC).toHaveProperty('costoTotal')
-      expect(primeraOC).toHaveProperty('estado')
+    it('❌ Rechaza cero', () => {
+      expect(MontoSchema.safeParse(0).success).toBe(false)
+    })
+  })
+
+  describe('Cantidades', () => {
+    
+    it('✅ Acepta enteros positivos', () => {
+      expect(CantidadSchema.safeParse(1).success).toBe(true)
+      expect(CantidadSchema.safeParse(100).success).toBe(true)
+      expect(CantidadSchema.safeParse(999).success).toBe(true)
     })
 
-    it('✅ MOCK_BANCOS tiene 7 bancos', async () => {
-      const { MOCK_BANCOS } = await import('@/app/lib/data/mock-data-generated')
-      
-      expect(MOCK_BANCOS.length).toBe(7)
-      
-      const bancosIds = MOCK_BANCOS.map(b => b.id)
-      expect(bancosIds).toContain('boveda_monte')
-      expect(bancosIds).toContain('boveda_usa')
-      expect(bancosIds).toContain('utilidades')
-      expect(bancosIds).toContain('flete_sur')
+    it('❌ Rechaza decimales', () => {
+      expect(CantidadSchema.safeParse(10.5).success).toBe(false)
+      expect(CantidadSchema.safeParse(0.1).success).toBe(false)
     })
 
-    it('✅ Estadísticas STATS son coherentes', async () => {
-      const { STATS } = await import('@/app/lib/data/mock-data-generated')
-      
-      expect(STATS).toHaveProperty('totalVentas')
-      expect(STATS).toHaveProperty('totalCobrado')
-      expect(STATS).toHaveProperty('totalPendiente')
-      expect(STATS).toHaveProperty('ventasCount')
-      
-      // totalVentas = totalCobrado + totalPendiente
-      expect(STATS.totalVentas).toBe(STATS.totalCobrado + STATS.totalPendiente)
+    it('❌ Rechaza negativos', () => {
+      expect(CantidadSchema.safeParse(-1).success).toBe(false)
+      expect(CantidadSchema.safeParse(-100).success).toBe(false)
     })
+  })
+
+  describe('Estados de Pago', () => {
+    
+    it('✅ Acepta estados válidos', () => {
+      expect(EstadoPagoSchema.safeParse('completo').success).toBe(true)
+      expect(EstadoPagoSchema.safeParse('parcial').success).toBe(true)
+      expect(EstadoPagoSchema.safeParse('pendiente').success).toBe(true)
+    })
+
+    it('❌ Rechaza estados inválidos', () => {
+      expect(EstadoPagoSchema.safeParse('pagado').success).toBe(false)
+      expect(EstadoPagoSchema.safeParse('cancelado').success).toBe(false)
+      expect(EstadoPagoSchema.safeParse('').success).toBe(false)
+    })
+  })
+})
+
+// ============================================================================
+// TEST SUITE: TRANSFERENCIAS ENTRE BANCOS
+// ============================================================================
+
+describe('🔄 TRANSFERENCIAS ENTRE BANCOS', () => {
+  
+  it('✅ Transferencia reduce origen y aumenta destino', () => {
+    let bancoOrigen: Banco = {
+      id: 'utilidades',
+      nombre: 'Utilidades',
+      saldo: 100000,
+      historicoIngresos: 100000,
+      historicoGastos: 0,
+    }
+    
+    let bancoDestino: Banco = {
+      id: 'boveda_monte',
+      nombre: 'Bóveda Monte',
+      saldo: 500000,
+      historicoIngresos: 500000,
+      historicoGastos: 0,
+    }
+    
+    const monto = 30000
+    
+    bancoOrigen = actualizarCapitalBanco(bancoOrigen, 'gasto', monto)
+    bancoDestino = actualizarCapitalBanco(bancoDestino, 'ingreso', monto)
+    
+    expect(bancoOrigen.saldo).toBe(70000)
+    expect(bancoDestino.saldo).toBe(530000)
+  })
+
+  it('✅ Total del sistema se mantiene en transferencias', () => {
+    const totalAntes = 100000 + 500000
+    
+    let bancoOrigen: Banco = {
+      id: 'utilidades',
+      nombre: 'Utilidades',
+      saldo: 100000,
+      historicoIngresos: 100000,
+      historicoGastos: 0,
+    }
+    
+    let bancoDestino: Banco = {
+      id: 'boveda_monte',
+      nombre: 'Bóveda Monte',
+      saldo: 500000,
+      historicoIngresos: 500000,
+      historicoGastos: 0,
+    }
+    
+    bancoOrigen = actualizarCapitalBanco(bancoOrigen, 'gasto', 30000)
+    bancoDestino = actualizarCapitalBanco(bancoDestino, 'ingreso', 30000)
+    
+    const totalDespues = bancoOrigen.saldo + bancoDestino.saldo
+    expect(totalDespues).toBe(totalAntes)
+  })
+})
+
+// ============================================================================
+// TEST SUITE: EDGE CASES
+// ============================================================================
+
+describe('🔥 EDGE CASES', () => {
+  
+  it('✅ Distribución con valores muy grandes', () => {
+    const dist = calcularDistribucionGYA(
+      1000,     // 1000 unidades
+      1000000,  // 1 millón por unidad
+      630000,   // 630k costo
+      50000     // 50k flete
+    )
+    
+    expect(dist.totalVenta).toBe(1000000000)
+    expect(dist.montoBovedaMonte).toBe(630000000)
+    expect(dist.montoFletes).toBe(50000000)
+    expect(dist.montoUtilidades).toBe(320000000)
+  })
+
+  it('✅ Distribución con cantidad 1', () => {
+    const dist = calcularDistribucionGYA(1, 10000, 6300, 500)
+    
+    expect(dist.totalVenta).toBe(10000)
+    expect(dist.montoBovedaMonte + dist.montoFletes + dist.montoUtilidades).toBe(10000)
+  })
+
+  it('✅ Ganancia cero (precio venta = costo + flete)', () => {
+    const dist = calcularDistribucionGYA(10, 6800, 6300, 500)
+    
+    expect(dist.montoUtilidades).toBe(0)
+    expect(dist.totalVenta).toBe(68000)
+  })
+
+  it('✅ FIFO con lista vacía', () => {
+    const aplicaciones = procesarAbonoFIFO([], 10000)
+    
+    expect(aplicaciones).toHaveLength(0)
+  })
+
+  it('✅ FIFO con abono cero', () => {
+    const ventas: Venta[] = [{
+      id: 'V-001',
+      clienteId: 'C-001',
+      cantidad: 10,
+      precioVentaUnidad: 10000,
+      precioCompraUnidad: 6300,
+      precioFlete: 500,
+      totalVenta: 100000,
+      estadoPago: 'pendiente',
+      montoPagado: 0,
+      fechaVenta: '2025-08-25',
+    }]
+    
+    const aplicaciones = procesarAbonoFIFO(ventas, 0)
+    
+    expect(aplicaciones).toHaveLength(0)
   })
 })

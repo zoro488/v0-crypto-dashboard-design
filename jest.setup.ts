@@ -1,5 +1,65 @@
 import '@testing-library/jest-dom'
 
+// Polyfills para Web APIs requeridas por Firebase Auth en Node.js
+if (typeof global.fetch === 'undefined') {
+  global.fetch = jest.fn(() =>
+    Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({}),
+      text: () => Promise.resolve(''),
+      headers: new Map(),
+    })
+  ) as jest.Mock
+}
+
+// Polyfill para Response
+if (typeof global.Response === 'undefined') {
+  global.Response = class Response {
+    ok = true
+    status = 200
+    statusText = 'OK'
+    headers = new Map()
+    body = null
+    
+    constructor(body?: BodyInit | null, init?: ResponseInit) {
+      this.body = body as unknown as ReadableStream<Uint8Array> | null
+      if (init?.status) this.status = init.status
+      if (init?.statusText) this.statusText = init.statusText
+    }
+    
+    json() { return Promise.resolve({}) }
+    text() { return Promise.resolve('') }
+    clone() { return new Response() }
+  } as unknown as typeof Response
+}
+
+// Polyfill para Request
+if (typeof global.Request === 'undefined') {
+  global.Request = class Request {
+    url: string
+    method = 'GET'
+    headers = new Map()
+    
+    constructor(input: RequestInfo | URL, init?: RequestInit) {
+      this.url = typeof input === 'string' ? input : input.toString()
+      if (init?.method) this.method = init.method
+    }
+  } as unknown as typeof Request
+}
+
+// Polyfill para Headers
+if (typeof global.Headers === 'undefined') {
+  global.Headers = class Headers {
+    private map = new Map<string, string>()
+    
+    append(name: string, value: string) { this.map.set(name.toLowerCase(), value) }
+    get(name: string) { return this.map.get(name.toLowerCase()) || null }
+    has(name: string) { return this.map.has(name.toLowerCase()) }
+    set(name: string, value: string) { this.map.set(name.toLowerCase(), value) }
+    delete(name: string) { this.map.delete(name.toLowerCase()) }
+  } as unknown as typeof Headers
+}
+
 // Polyfills para jsdom - TextEncoder y TextDecoder
 if (typeof global.TextEncoder === 'undefined') {
   const { TextEncoder, TextDecoder } = require('util')

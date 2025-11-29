@@ -1,0 +1,195 @@
+# 🤖 Auto-Solve Workflow - Sistema CHRONOS
+# Detecta errores en tests, intenta solucionarlos y crea PRs automáticos
+
+name: Auto-Solve Issues
+
+on:
+  workflow_run:
+    workflows: ["Test Runner", "CI Pipeline"]
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      fix_type:
+        description: 'Type of fix to apply'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - lint
+          - types
+          - tests
+
+concurrency:
+  group: auto-solve-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '8'
+
+jobs:
+  # ============================================
+  # JOB 1: Analyze Failures
+  # ============================================
+  analyze:
+    name: 🔍 Analyze Failures
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' || github.event_name == 'workflow_dispatch' }}
+    outputs:
+      has_lint_errors: ${{ steps.check.outputs.has_lint_errors }}
+      has_type_errors: ${{ steps.check.outputs.has_type_errors }}
+      has_test_errors: ${{ steps.check.outputs.has_test_errors }}
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Check for errors
+        id: check
+        run: |
+          # Check lint errors
+          if pnpm lint 2>&1 | grep -q "error"; then
+            echo "has_lint_errors=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_lint_errors=false" >> $GITHUB_OUTPUT
+          fi
+          
+          # Check type errors
+          if pnpm tsc --noEmit 2>&1 | grep -q "error"; then
+            echo "has_type_errors=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_type_errors=false" >> $GITHUB_OUTPUT
+          fi
+          
+          # Check test errors
+          if ! pnpm test --passWithNoTests 2>&1; then
+            echo "has_test_errors=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_test_errors=false" >> $GITHUB_OUTPUT
+          fi
+
+  # ============================================
+  # JOB 2: Fix Lint Errors
+  # ============================================
+  fix-lint:
+    name: 🔧 Fix Lint Errors
+    runs-on: ubuntu-latest
+    needs: analyze
+    if: needs.analyze.outputs.has_lint_errors == 'true' || github.event.inputs.fix_type == 'all' || github.event.inputs.fix_type == 'lint'
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔧 Fix Lint Errors
+        run: |
+          pnpm lint:fix || true
+          pnpm format || true
+
+      - name: 📝 Check for changes
+        id: changes
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 🌿 Create Fix Branch
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          BRANCH_NAME="fix/auto-lint-$(date +%Y%m%d-%H%M%S)"
+          git checkout -b $BRANCH_NAME
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add -A
+          git commit -m "fix: auto-fix lint and format errors"
+          git push origin $BRANCH_NAME
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+
+      - name: 🔀 Create Pull Request
+        if: steps.changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ env.BRANCH_NAME }}
+          title: "fix: 🔧 Auto-fix lint and format errors"
+          body: |
+            ## 🤖 Auto-generated PR
+            
+            This PR was automatically generated to fix lint and format errors.
+            
+            ### Changes
+            - Applied ESLint auto-fix
+            - Applied Prettier formatting
+            
+            ### Verification
+            - [ ] All tests pass
+            - [ ] No new lint errors
+            
+            ---
+            Generated by Auto-Solve Workflow
+          labels: |
+            auto-fix
+            lint
+
+  # ============================================
+  # JOB 3: Report Results
+  # ============================================
+  report:
+    name: 📊 Report Results
+    runs-on: ubuntu-latest
+    needs: [analyze, fix-lint]
+    if: always()
+    steps:
+      - name: 📝 Generate Report
+        run: |
+          echo "# 🤖 Auto-Solve Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Analysis Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint Errors | ${{ needs.analyze.outputs.has_lint_errors }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Type Errors | ${{ needs.analyze.outputs.has_type_errors }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Errors | ${{ needs.analyze.outputs.has_test_errors }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Actions Taken" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Result |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Fix Lint | ${{ needs.fix-lint.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
