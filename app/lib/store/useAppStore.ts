@@ -155,16 +155,17 @@ interface AppState {
 
 // ============================================================
 // CONSTANTES - 7 Bancos del Sistema CHRONOS
+// Valores iniciales basados en datos reales de CSV
 // ============================================================
 const BANCOS_INICIALES: BancoStore[] = [
-  { id: "boveda_monte", nombre: "Bóveda Monte", saldo: 0, color: "from-blue-500 to-cyan-500" },
-  { id: "boveda_usa", nombre: "Bóveda USA", saldo: 0, color: "from-red-500 to-blue-500" },
-  { id: "utilidades", nombre: "Utilidades", saldo: 0, color: "from-green-500 to-emerald-500" },
-  { id: "fletes", nombre: "Fletes", saldo: 0, color: "from-orange-500 to-amber-500" },      // Alias de flete_sur
+  { id: "boveda_monte", nombre: "Bóveda Monte", saldo: 5722280, color: "from-blue-500 to-cyan-500" },
+  { id: "boveda_usa", nombre: "Bóveda USA", saldo: 128005, color: "from-red-500 to-blue-500" },
+  { id: "utilidades", nombre: "Utilidades", saldo: 632000, color: "from-green-500 to-emerald-500" },
+  { id: "fletes", nombre: "Fletes", saldo: 459000, color: "from-orange-500 to-amber-500" },
   { id: "flete_sur", nombre: "Flete Sur", saldo: 0, color: "from-orange-500 to-amber-500" },
   { id: "azteca", nombre: "Azteca", saldo: 0, color: "from-purple-500 to-pink-500" },
-  { id: "leftie", nombre: "Leftie", saldo: 0, color: "from-yellow-500 to-orange-500" },
-  { id: "profit", nombre: "Profit", saldo: 0, color: "from-indigo-500 to-purple-500" },
+  { id: "leftie", nombre: "Leftie", saldo: 3700000, color: "from-yellow-500 to-orange-500" },
+  { id: "profit", nombre: "Profit", saldo: 12577748, color: "from-indigo-500 to-purple-500" },
 ]
 
 interface AppState {
