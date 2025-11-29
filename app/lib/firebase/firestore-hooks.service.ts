@@ -546,18 +546,44 @@ const MOCK_ORDENES_COMPRA = GENERATED_ORDENES
 
 const MOCK_VENTAS = GENERATED_VENTAS
 
+// Producto principal con stock actualizado según CSV (2296 entradas - 2279 salidas = 17)
 const MOCK_PRODUCTOS = [
-  { id: "P-001", nombre: "Producto Principal", stock: 2296, precio: 6300, categoria: "Principal", totalEntradas: 2296, totalSalidas: 0 },
+  { 
+    id: "P-001", 
+    nombre: "Producto Principal", 
+    sku: "PROD-001",
+    stock: 17, 
+    stockActual: 17,
+    stockMinimo: 50,
+    precio: 6300, 
+    valorUnitario: 6300,
+    categoria: "Principal", 
+    totalEntradas: 2296, 
+    totalSalidas: 2279,
+    ultimaActualizacion: new Date().toISOString()
+  },
 ]
 
+// Entradas basadas en las 9 órdenes de compra del CSV
 const MOCK_ENTRADAS = [
-  { id: "E-001", fecha: new Date().toISOString(), origen: "Q-MAYA", cantidad: 423, valorTotal: 2664900, oc: "OC0001" },
-  { id: "E-002", fecha: new Date().toISOString(), origen: "PACMAN", cantidad: 487, valorTotal: 3068100, oc: "OC0004" },
+  { id: "E-001", fecha: "2025-08-25", distribuidor: "Q-MAYA", ordenCompraId: "OC0001", cantidad: 423, valorTotal: 2664900, valorUnitario: 6300 },
+  { id: "E-002", fecha: "2025-08-25", distribuidor: "Q-MAYA", ordenCompraId: "OC0002", cantidad: 32, valorTotal: 201600, valorUnitario: 6300 },
+  { id: "E-003", fecha: "2025-08-25", distribuidor: "A/X", ordenCompraId: "OC0003", cantidad: 33, valorTotal: 207900, valorUnitario: 6300 },
+  { id: "E-004", fecha: "2025-08-30", distribuidor: "PACMAN", ordenCompraId: "OC0004", cantidad: 487, valorTotal: 3068100, valorUnitario: 6300 },
+  { id: "E-005", fecha: "2025-09-06", distribuidor: "Q-MAYA", ordenCompraId: "OC0005", cantidad: 513, valorTotal: 3231900, valorUnitario: 6300 },
+  { id: "E-006", fecha: "2025-09-09", distribuidor: "CH-MONTE", ordenCompraId: "OC0006", cantidad: 100, valorTotal: 630000, valorUnitario: 6300 },
+  { id: "E-007", fecha: "2025-09-29", distribuidor: "VALLE-MONTE", ordenCompraId: "OC0007", cantidad: 20, valorTotal: 140000, valorUnitario: 7000 },
+  { id: "E-008", fecha: "2025-10-05", distribuidor: "PACMAN", ordenCompraId: "OC0008", cantidad: 488, valorTotal: 3074400, valorUnitario: 6300 },
+  { id: "E-009", fecha: "2025-10-05", distribuidor: "Q-MAYA-MP", ordenCompraId: "OC0009", cantidad: 200, valorTotal: 1260000, valorUnitario: 6300 },
 ]
 
+// Salidas resumen - 2279 unidades vendidas según CSV
 const MOCK_SALIDAS = [
-  { id: "S-001", fecha: new Date().toISOString(), destino: "Bódega M-P", cantidad: 150, valorTotal: 945000 },
+  { id: "S-001", fecha: "2025-08-23", cliente: "Bódega M-P", destino: "Bódega M-P", cantidad: 150, valorTotal: 945000 },
+  { id: "S-002", fecha: "2025-08-23", cliente: "Valle", destino: "Valle", cantidad: 60, valorTotal: 408000 },
+  { id: "S-003", fecha: "2025-08-26", cliente: "Varios", destino: "Múltiples clientes", cantidad: 2069, valorTotal: 7148600, observaciones: "93 ventas adicionales" },
 ]
 
 // Mock de los 7 bancos del sistema CHRONOS - Usando datos generados
 const MOCK_BANCOS = GENERATED_BANCOS
+

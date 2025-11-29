@@ -20,6 +20,9 @@ import {
   Activity,
   BarChart3,
   Zap,
+  Edit2,
+  Trash2,
+  MoreHorizontal,
 } from "lucide-react"
 import { useState, useMemo } from "react"
 import { BANCOS } from "@/app/lib/constants"
@@ -644,12 +647,13 @@ export default function BentoBanco() {
                       <TableHeader>T.C.</TableHeader>
                       <TableHeader>Dólares</TableHeader>
                       <TableHeader>Observaciones</TableHeader>
+                      <TableHeader>Acciones</TableHeader>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
                     {ingresos.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="px-6 py-12 text-center text-white/40">
+                        <td colSpan={8} className="px-6 py-12 text-center text-white/40">
                           No hay ingresos registrados para este banco
                         </td>
                       </tr>
@@ -669,6 +673,16 @@ export default function BentoBanco() {
                           <td className="px-6 py-4 text-cyan-400 font-mono text-sm">{ingreso.tc ? `$${ingreso.tc.toFixed(2)}` : "-"}</td>
                           <td className="px-6 py-4 text-amber-400 font-mono">{ingreso.dolares ? `$${formatNumber(ingreso.dolares)}` : "-"}</td>
                           <td className="px-6 py-4 text-white/40 text-sm max-w-[200px] truncate">{ingreso.observaciones ?? "-"}</td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
+                              <button className="p-1.5 rounded-lg hover:bg-blue-500/20 text-blue-400 transition-colors" title="Editar">
+                                <Edit2 className="w-4 h-4" />
+                              </button>
+                              <button className="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-400 transition-colors" title="Eliminar">
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
                         </motion.tr>
                       ))
                     )}
@@ -720,12 +734,13 @@ export default function BentoBanco() {
                       <TableHeader>Destino</TableHeader>
                       <TableHeader>Concepto</TableHeader>
                       <TableHeader>Observaciones</TableHeader>
+                      <TableHeader>Acciones</TableHeader>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
                     {gastos.length === 0 ? (
                       <tr>
-                        <td colSpan={8} className="px-6 py-12 text-center text-white/40">
+                        <td colSpan={9} className="px-6 py-12 text-center text-white/40">
                           No hay gastos registrados para este banco
                         </td>
                       </tr>
@@ -746,6 +761,16 @@ export default function BentoBanco() {
                           <td className="px-6 py-4 text-white/60">{gasto.destino ?? "-"}</td>
                           <td className="px-6 py-4 text-white/60">{gasto.concepto ?? "-"}</td>
                           <td className="px-6 py-4 text-white/40 text-sm max-w-[200px] truncate">{gasto.observaciones ?? "-"}</td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
+                              <button className="p-1.5 rounded-lg hover:bg-blue-500/20 text-blue-400 transition-colors" title="Editar">
+                                <Edit2 className="w-4 h-4" />
+                              </button>
+                              <button className="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-400 transition-colors" title="Eliminar">
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
                         </motion.tr>
                       ))
                     )}
@@ -863,12 +888,13 @@ export default function BentoBanco() {
                       </th>
                       <TableHeader>Concepto</TableHeader>
                       <TableHeader>Observaciones</TableHeader>
+                      <TableHeader>Acciones</TableHeader>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
                     {transferencias.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="px-6 py-12 text-center text-white/40">
+                        <td colSpan={7} className="px-6 py-12 text-center text-white/40">
                           No hay transferencias registradas
                         </td>
                       </tr>
@@ -897,6 +923,16 @@ export default function BentoBanco() {
                           </td>
                           <td className="py-4 px-6 text-white/60 text-sm">{trans.concepto ?? "-"}</td>
                           <td className="py-4 px-6 text-white/40 text-sm max-w-[200px] truncate">{trans.observaciones ?? "-"}</td>
+                          <td className="py-4 px-6">
+                            <div className="flex items-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
+                              <button className="p-1.5 rounded-lg hover:bg-blue-500/20 text-blue-400 transition-colors" title="Editar">
+                                <Edit2 className="w-4 h-4" />
+                              </button>
+                              <button className="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-400 transition-colors" title="Eliminar">
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
                         </motion.tr>
                       ))
                     )}
