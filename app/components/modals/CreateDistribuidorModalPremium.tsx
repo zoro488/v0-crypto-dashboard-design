@@ -355,7 +355,7 @@ export function CreateDistribuidorModalPremium({
 
                 {/* Precios */}
                 <motion.div variants={itemVariants}>
-                  <Label className="text-sm text-gray-400 mb-3 block flex items-center gap-2">
+                  <Label className="text-sm text-gray-400 mb-3 flex items-center gap-2">
                     <DollarSign className="w-4 h-4 text-green-400" />
                     Estructura de Precios
                   </Label>
@@ -438,7 +438,7 @@ export function CreateDistribuidorModalPremium({
 
                 {/* Ubicación */}
                 <motion.div variants={itemVariants}>
-                  <Label className="text-sm text-gray-400 mb-3 block flex items-center gap-2">
+                  <Label className="text-sm text-gray-400 mb-3 flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-rose-400" />
                     Ubicación
                   </Label>
