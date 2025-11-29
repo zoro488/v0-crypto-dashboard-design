@@ -49,9 +49,9 @@ import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from "@/app/
 import { useState, useEffect, useMemo, Suspense, lazy } from "react"
 import { useVentas, useOrdenesCompra, useProductos, useClientes } from "@/app/lib/firebase/firestore-hooks.service"
 import { Skeleton } from "@/app/components/ui/skeleton"
-import CreateOrdenCompraModal from "@/app/components/modals/CreateOrdenCompraModalSmart"
-import CreateVentaModal from "@/app/components/modals/CreateVentaModalSmart"
-import CreateTransferenciaModal from "@/app/components/modals/CreateTransferenciaModalSmart"
+import { CreateOrdenCompraModalPremium } from "@/app/components/modals/CreateOrdenCompraModalPremium"
+import { CreateVentaModalPremium } from "@/app/components/modals/CreateVentaModalPremium"
+import { CreateTransferenciaModalPremium } from "@/app/components/modals/CreateTransferenciaModalPremium"
 import { LiveMarketTicker } from "@/app/components/ui/LiveMarketTicker"
 import { PerformanceMetrics, MiniPerformanceWidget } from "@/app/components/ui/PerformanceMetrics"
 
@@ -921,9 +921,9 @@ export default function ChronosDashboard() {
       {/* ============================================================ */}
       {/* MODALES */}
       {/* ============================================================ */}
-      <CreateOrdenCompraModal open={isOrdenModalOpen} onClose={() => setIsOrdenModalOpen(false)} />
-      <CreateVentaModal open={isVentaModalOpen} onClose={() => setIsVentaModalOpen(false)} />
-      <CreateTransferenciaModal isOpen={isTransferenciaModalOpen} onClose={() => setIsTransferenciaModalOpen(false)} />
+      <CreateOrdenCompraModalPremium open={isOrdenModalOpen} onClose={() => setIsOrdenModalOpen(false)} />
+      <CreateVentaModalPremium open={isVentaModalOpen} onClose={() => setIsVentaModalOpen(false)} />
+      <CreateTransferenciaModalPremium open={isTransferenciaModalOpen} onClose={() => setIsTransferenciaModalOpen(false)} />
     </div>
   )
 }

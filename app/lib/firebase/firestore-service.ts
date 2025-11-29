@@ -338,15 +338,25 @@ export const suscribirOrdenesCompra = (callback: (ordenes: OrdenCompra[]) => voi
 }
 
 // ============================================================
-// VENTAS
+// VENTAS - CON LÓGICA GYA (Ganancia y Asignación)
 // ============================================================
 
-// Tipo flexible para crear ventas - solo requiere campos esenciales
+/**
+ * Tipo flexible para crear ventas
+ * La lógica GYA calcula automáticamente la distribución a bancos:
+ * - Bóveda Monte: Recibe el COSTO (precioCompra × cantidad)
+ * - Flete Sur: Recibe el monto de flete (si aplica)
+ * - Utilidades: Recibe la ganancia neta (Venta - Costo - Flete)
+ */
 type CrearVentaInput = Partial<Omit<Venta, "id">> & {
   cliente: string
   cantidad: number
   precioTotalVenta?: number
+  precioVenta?: number      // Precio unitario de venta
   producto?: string
+  ocRelacionada?: string    // OC de donde viene el producto (para obtener costo)
+  precioFlete?: number      // Flete por unidad
+  fleteUtilidad?: number    // Flete total (alternativa)
 }
 
 export const crearVenta = async (data: CrearVentaInput) => {
@@ -357,136 +367,330 @@ export const crearVenta = async (data: CrearVentaInput) => {
   
   try {
     const batch = writeBatch(db!)
-
-    // Validar stock disponible
-    const prodQuery = query(collection(db!, COLLECTIONS.ALMACEN), where("nombre", "==", data.producto))
-    const prodSnapshot = await getDocs(prodQuery)
-
-    if (prodSnapshot.empty) {
-      throw new Error("Producto no encontrado en almacén")
+    
+    // ═══════════════════════════════════════════════════════════════════════
+    // 1. OBTENER DATOS DEL PRODUCTO Y COSTO BASE
+    // ═══════════════════════════════════════════════════════════════════════
+    
+    let costoUnitarioBase = 0 // Costo por unidad (de la OC)
+    let prodSnapshot: Awaited<ReturnType<typeof getDocs>> | null = null
+    
+    // Intentar obtener costo desde la OC relacionada
+    if (data.ocRelacionada) {
+      try {
+        const ocDoc = await getDoc(doc(db!, COLLECTIONS.ORDENES_COMPRA, data.ocRelacionada))
+        if (ocDoc.exists()) {
+          const ocData = ocDoc.data()
+          costoUnitarioBase = ocData.costoPorUnidad || ocData.costoDistribuidor || 0
+          logger.info(`Costo obtenido de OC ${data.ocRelacionada}: $${costoUnitarioBase}`, { context: "FirestoreService" })
+        }
+      } catch {
+        logger.warn(`No se pudo obtener OC ${data.ocRelacionada}`, { context: "FirestoreService" })
+      }
     }
-
-    const prodData = prodSnapshot.docs[0].data()
-    if (prodData.stockActual < data.cantidad) {
-      throw new Error(`Stock insuficiente. Disponible: ${prodData.stockActual}, Solicitado: ${data.cantidad}`)
+    
+    // Si hay producto, validar stock y obtener costo alternativo
+    if (data.producto) {
+      const prodQuery = query(collection(db!, COLLECTIONS.ALMACEN), where("nombre", "==", data.producto))
+      prodSnapshot = await getDocs(prodQuery)
+      
+      if (!prodSnapshot.empty) {
+        const prodData = prodSnapshot.docs[0].data() as Record<string, unknown>
+        
+        // Validar stock
+        const stockActual = Number(prodData.stockActual) || 0
+        if (stockActual < data.cantidad) {
+          throw new Error(`Stock insuficiente. Disponible: ${stockActual}, Solicitado: ${data.cantidad}`)
+        }
+        
+        // Si no tenemos costo de OC, usar valorUnitario del producto
+        if (costoUnitarioBase === 0) {
+          costoUnitarioBase = Number(prodData.valorUnitario) || Number(prodData.precioCompra) || 0
+        }
+      }
     }
-
-    // Completar campos faltantes con valores por defecto
-    const ventaCompleta = {
-      ...data,
-      clienteId: data.clienteId || data.cliente?.toLowerCase().replace(/\s+/g, '_') || '',
-      keywords: data.keywords || [data.cliente?.toLowerCase(), data.producto?.toLowerCase()].filter(Boolean) as string[],
-      precioVenta: data.precioVenta || data.precioTotalVenta || 0,
-      ingreso: data.ingreso || data.precioTotalVenta || 0,
-      totalVenta: data.totalVenta || data.precioTotalVenta || 0,
-      flete: data.flete || "NoAplica",
-      fleteUtilidad: data.fleteUtilidad || data.precioFlete || 0,
-      precioFlete: data.precioFlete || 0,
-      utilidad: data.utilidad || 0,
-      bovedaMonte: data.bovedaMonte || data.distribucionBancos?.bovedaMonte || 0,
-      estatus: data.estatus || (data.estadoPago === "completo" ? "Pagado" : data.estadoPago === "parcial" ? "Parcial" : "Pendiente"),
-      estadoPago: data.estadoPago || "pendiente",
-      montoPagado: data.montoPagado || 0,
-      montoRestante: data.montoRestante || (data.precioTotalVenta || 0) - (data.montoPagado || 0),
-      adeudo: data.adeudo || (data.precioTotalVenta || 0) - (data.montoPagado || 0),
-      ocRelacionada: data.ocRelacionada || "",
+    
+    // ═══════════════════════════════════════════════════════════════════════
+    // 2. CÁLCULOS DE NEGOCIO - LÓGICA GYA (del Excel)
+    // ═══════════════════════════════════════════════════════════════════════
+    
+    const cantidad = data.cantidad
+    const precioVentaUnitario = data.precioVenta || (data.precioTotalVenta ? data.precioTotalVenta / cantidad : 0)
+    const totalVenta = data.precioTotalVenta || (precioVentaUnitario * cantidad)
+    
+    // DISTRIBUCIÓN GYA:
+    // A. Bóveda Monte recupera la INVERSIÓN (Costo × Cantidad)
+    const montoBovedaMonte = costoUnitarioBase * cantidad
+    
+    // B. Flete Sur recibe el costo de flete
+    const fleteAplica = data.flete === "Aplica" || (data.precioFlete && data.precioFlete > 0) || (data.fleteUtilidad && data.fleteUtilidad > 0)
+    const montoFlete = data.fleteUtilidad || ((data.precioFlete || 0) * cantidad) || 0
+    
+    // C. Utilidades = Ganancia Neta (Venta - Costo - Flete)
+    const montoUtilidad = totalVenta - montoBovedaMonte - montoFlete
+    
+    // Log de cálculo para debugging
+    logger.info("Cálculo GYA de venta:", {
+      context: "FirestoreService",
+      data: {
+        totalVenta,
+        costoUnitario: costoUnitarioBase,
+        costoTotal: montoBovedaMonte,
+        flete: montoFlete,
+        utilidad: montoUtilidad,
+      }
+    })
+    
+    // ═══════════════════════════════════════════════════════════════════════
+    // 3. DETERMINAR ESTADO DE PAGO
+    // ═══════════════════════════════════════════════════════════════════════
+    
+    const montoPagado = data.montoPagado || 0
+    const montoRestante = totalVenta - montoPagado
+    
+    let estadoPago: "completo" | "parcial" | "pendiente" = "pendiente"
+    let estatus: "Pagado" | "Parcial" | "Pendiente" = "Pendiente"
+    
+    if (montoPagado >= totalVenta) {
+      estadoPago = "completo"
+      estatus = "Pagado"
+    } else if (montoPagado > 0) {
+      estadoPago = "parcial"
+      estatus = "Parcial"
     }
-
-    // Crear venta
+    
+    // Proporción pagada (para distribución parcial)
+    const proporcionPagada = totalVenta > 0 ? montoPagado / totalVenta : 0
+    
+    // ═══════════════════════════════════════════════════════════════════════
+    // 4. CREAR DOCUMENTO DE VENTA
+    // ═══════════════════════════════════════════════════════════════════════
+    
+    const clienteId = data.clienteId || data.cliente?.toLowerCase().replace(/[^a-z0-9]/g, '_') || ''
+    
     const ventaRef = doc(collection(db!, COLLECTIONS.VENTAS))
     batch.set(ventaRef, {
-      ...ventaCompleta,
+      // IDs y referencias
+      id: ventaRef.id,
+      clienteId,
+      cliente: data.cliente,
+      ocRelacionada: data.ocRelacionada || "",
+      producto: data.producto || "",
+      
+      // Cantidades y precios
+      cantidad,
+      precioVenta: precioVentaUnitario,
+      precioCompra: costoUnitarioBase, // Guardamos el costo unitario
+      ingreso: totalVenta,
+      totalVenta,
+      precioTotalVenta: totalVenta,
+      
+      // Flete
+      flete: fleteAplica ? "Aplica" : "NoAplica",
+      fleteUtilidad: montoFlete,
+      precioFlete: data.precioFlete || (cantidad > 0 ? montoFlete / cantidad : 0),
+      
+      // Utilidad/Ganancia
+      utilidad: montoUtilidad,
+      ganancia: montoUtilidad,
+      bovedaMonte: montoBovedaMonte,
+      
+      // DISTRIBUCIÓN GYA (para reportes y auditoría)
+      distribucion: {
+        bovedaMonte: montoBovedaMonte,
+        fletes: montoFlete,
+        utilidades: montoUtilidad,
+      },
+      distribucionBancos: {
+        bovedaMonte: montoBovedaMonte,
+        fletes: montoFlete,
+        utilidades: montoUtilidad,
+      },
+      
+      // Estado de pago
+      estatus,
+      estadoPago,
+      montoPagado,
+      montoRestante,
+      adeudo: montoRestante,
+      
+      // Metadata
+      fecha: data.fecha || Timestamp.now(),
+      concepto: data.concepto || "",
+      notas: data.notas || "",
+      keywords: [ventaRef.id, data.cliente?.toLowerCase(), data.producto?.toLowerCase()].filter(Boolean) as string[],
+      
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
     })
-
-    // Crear o actualizar cliente
-    const clienteQuery = query(collection(db!, COLLECTIONS.CLIENTES), where("nombre", "==", ventaCompleta.cliente))
+    
+    // ═══════════════════════════════════════════════════════════════════════
+    // 5. CREAR/ACTUALIZAR CLIENTE
+    // ═══════════════════════════════════════════════════════════════════════
+    
+    const clienteQuery = query(collection(db!, COLLECTIONS.CLIENTES), where("nombre", "==", data.cliente))
     const clienteSnapshot = await getDocs(clienteQuery)
-
-    let clienteId: string
 
     if (clienteSnapshot.empty) {
       // Crear nuevo cliente
-      const clienteRef = doc(collection(db!, COLLECTIONS.CLIENTES))
-      clienteId = clienteRef.id
+      const clienteRef = doc(db!, COLLECTIONS.CLIENTES, clienteId)
       batch.set(clienteRef, {
-        nombre: ventaCompleta.cliente,
-        deudaTotal: ventaCompleta.montoRestante || 0,
-        totalVentas: ventaCompleta.precioTotalVenta || 0,
-        totalPagado: ventaCompleta.montoPagado || 0,
+        id: clienteId,
+        nombre: data.cliente,
+        deudaTotal: montoRestante,
+        pendiente: montoRestante,
+        totalVentas: totalVenta,
+        totalPagado: montoPagado,
         ventas: [ventaRef.id],
         historialPagos: [],
+        estado: "activo",
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
       })
     } else {
       // Actualizar cliente existente
-      clienteId = clienteSnapshot.docs[0].id
-      const clienteRef = doc(db!, COLLECTIONS.CLIENTES, clienteId)
-      batch.update(clienteRef, {
-        deudaTotal: increment(ventaCompleta.montoRestante || 0),
-        totalVentas: increment(ventaCompleta.precioTotalVenta || 0),
-        totalPagado: increment(ventaCompleta.montoPagado || 0),
+      const existingClienteRef = doc(db!, COLLECTIONS.CLIENTES, clienteSnapshot.docs[0].id)
+      batch.update(existingClienteRef, {
+        deudaTotal: increment(montoRestante),
+        pendiente: increment(montoRestante),
+        totalVentas: increment(totalVenta),
+        totalPagado: increment(montoPagado),
         ventas: [...(clienteSnapshot.docs[0].data().ventas || []), ventaRef.id],
         updatedAt: Timestamp.now(),
       })
     }
 
-    // Actualizar almacén (crear salida)
-    const prodRef = doc(db!, COLLECTIONS.ALMACEN, prodSnapshot.docs[0].id)
-    batch.update(prodRef, {
-      stockActual: increment(-ventaCompleta.cantidad),
-      totalSalidas: increment(ventaCompleta.cantidad),
-      salidas: [
-        ...(prodData.salidas || []),
-        {
-          id: ventaRef.id,
-          fecha: ventaCompleta.fecha,
-          cantidad: ventaCompleta.cantidad,
-          destino: ventaCompleta.cliente,
-          tipo: "salida",
-        },
-      ],
-      updatedAt: Timestamp.now(),
-    })
+    // ═══════════════════════════════════════════════════════════════════════
+    // 6. ACTUALIZAR ALMACÉN (salida de inventario)
+    // ═══════════════════════════════════════════════════════════════════════
+    
+    if (prodSnapshot && !prodSnapshot.empty) {
+      const prodRef = doc(db!, COLLECTIONS.ALMACEN, prodSnapshot.docs[0].id)
+      const prodData = prodSnapshot.docs[0].data() as Record<string, unknown>
+      
+      batch.update(prodRef, {
+        stockActual: increment(-cantidad),
+        totalSalidas: increment(cantidad),
+        salidas: [
+          ...((prodData.salidas as unknown[]) || []),
+          {
+            id: ventaRef.id,
+            fecha: data.fecha || Timestamp.now(),
+            cantidad: cantidad,
+            destino: data.cliente,
+            tipo: "salida",
+          },
+        ],
+        updatedAt: Timestamp.now(),
+      })
+    }
 
-    // Actualizar bancos (distribución proporcional)
-    const precioTotal = ventaCompleta.precioTotalVenta || ventaCompleta.ingreso || 0
-    const montoPagado = ventaCompleta.montoPagado || 0
-    const proporcion = precioTotal > 0 ? montoPagado / precioTotal : 0
-
-    const distribucion = ventaCompleta.distribucionBancos || { bovedaMonte: 0, fletes: 0, utilidades: 0 }
-
-    // Bóveda Monte
-    const bovedaMonteRef = doc(db!, COLLECTIONS.BANCOS, "boveda_monte")
-    batch.update(bovedaMonteRef, {
-      capitalActual: increment((distribucion.bovedaMonte || 0) * proporcion),
-      historicoIngresos: increment(distribucion.bovedaMonte || 0),
-      updatedAt: Timestamp.now(),
-    })
-
-    // Fletes
-    const fletesRef = doc(db!, COLLECTIONS.BANCOS, "flete_sur")
-    batch.update(fletesRef, {
-      capitalActual: increment((distribucion.fletes || 0) * proporcion),
-      historicoIngresos: increment(distribucion.fletes || 0),
-      updatedAt: Timestamp.now(),
-    })
-
-    // Utilidades
-    const utilidadesRef = doc(db!, COLLECTIONS.BANCOS, "utilidades")
-    batch.update(utilidadesRef, {
-      capitalActual: increment((distribucion.utilidades || 0) * proporcion),
-      historicoIngresos: increment(distribucion.utilidades || 0),
-      updatedAt: Timestamp.now(),
-    })
+    // ═══════════════════════════════════════════════════════════════════════
+    // 7. GENERAR MOVIMIENTOS BANCARIOS (distribución GYA)
+    // ═══════════════════════════════════════════════════════════════════════
+    
+    // Solo generamos movimientos si hay pago (completo o parcial)
+    if (montoPagado > 0) {
+      // Monto que va a cada banco (proporcional al pago)
+      const montoBovedaMonteReal = montoBovedaMonte * proporcionPagada
+      const montoFleteReal = montoFlete * proporcionPagada
+      const montoUtilidadReal = montoUtilidad * proporcionPagada
+      
+      // 1. Ingreso a Bóveda Monte (recuperación de costo)
+      if (montoBovedaMonteReal > 0) {
+        const movMonteRef = doc(collection(db!, COLLECTIONS.MOVIMIENTOS))
+        batch.set(movMonteRef, {
+          tipoMovimiento: "ingreso",
+          tipo: "ingreso_venta",
+          bancoId: "boveda_monte",
+          monto: montoBovedaMonteReal,
+          concepto: `Venta ${ventaRef.id} - ${data.cliente}`,
+          referencia: "Recuperación de costo",
+          referenciaId: ventaRef.id,
+          referenciaTipo: "venta",
+          cliente: data.cliente,
+          fecha: data.fecha || Timestamp.now(),
+          createdAt: Timestamp.now(),
+        })
+        
+        // Actualizar banco
+        const bovedaMonteRef = doc(db!, COLLECTIONS.BANCOS, "boveda_monte")
+        batch.update(bovedaMonteRef, {
+          capitalActual: increment(montoBovedaMonteReal),
+          historicoIngresos: increment(montoBovedaMonteReal),
+          updatedAt: Timestamp.now(),
+        })
+      }
+      
+      // 2. Ingreso a Flete Sur
+      if (montoFleteReal > 0) {
+        const movFleteRef = doc(collection(db!, COLLECTIONS.MOVIMIENTOS))
+        batch.set(movFleteRef, {
+          tipoMovimiento: "ingreso",
+          tipo: "ingreso_venta",
+          bancoId: "flete_sur",
+          monto: montoFleteReal,
+          concepto: `Flete Venta ${ventaRef.id}`,
+          referencia: "Recuperación de flete",
+          referenciaId: ventaRef.id,
+          referenciaTipo: "venta",
+          cliente: data.cliente,
+          fecha: data.fecha || Timestamp.now(),
+          createdAt: Timestamp.now(),
+        })
+        
+        // Actualizar banco
+        const fletesRef = doc(db!, COLLECTIONS.BANCOS, "flete_sur")
+        batch.update(fletesRef, {
+          capitalActual: increment(montoFleteReal),
+          historicoIngresos: increment(montoFleteReal),
+          updatedAt: Timestamp.now(),
+        })
+      }
+      
+      // 3. Ingreso a Utilidades (ganancia neta)
+      if (montoUtilidadReal > 0) {
+        const movUtilRef = doc(collection(db!, COLLECTIONS.MOVIMIENTOS))
+        batch.set(movUtilRef, {
+          tipoMovimiento: "ingreso",
+          tipo: "ingreso_venta",
+          bancoId: "utilidades",
+          monto: montoUtilidadReal,
+          concepto: `Utilidad Venta ${ventaRef.id}`,
+          referencia: "Ganancia neta",
+          referenciaId: ventaRef.id,
+          referenciaTipo: "venta",
+          cliente: data.cliente,
+          fecha: data.fecha || Timestamp.now(),
+          createdAt: Timestamp.now(),
+        })
+        
+        // Actualizar banco
+        const utilidadesRef = doc(db!, COLLECTIONS.BANCOS, "utilidades")
+        batch.update(utilidadesRef, {
+          capitalActual: increment(montoUtilidadReal),
+          historicoIngresos: increment(montoUtilidadReal),
+          updatedAt: Timestamp.now(),
+        })
+      }
+    }
 
     await batch.commit()
+    
+    logger.info("Venta creada con distribución GYA", {
+      context: "FirestoreService",
+      data: {
+        ventaId: ventaRef.id,
+        totalVenta,
+        distribucion: { bovedaMonte: montoBovedaMonte, fletes: montoFlete, utilidades: montoUtilidad },
+        estadoPago,
+      }
+    })
+    
     return ventaRef.id
   } catch (error) {
-    logger.error("Error creating venta", error, { context: "FirestoreService" })
-    return null
+    logger.error("Error creating venta con lógica GYA", error, { context: "FirestoreService" })
+    throw error
   }
 }
 

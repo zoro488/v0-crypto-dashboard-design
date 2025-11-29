@@ -1,7 +1,7 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { Sparkles, Mic, MicOff, Send, Activity, Brain, TrendingUp, BarChart3, Package, Users, DollarSign, Zap, Target, MessageCircle, Bot } from "lucide-react"
+import { Sparkles, Mic, MicOff, Send, Activity, Brain, TrendingUp, BarChart3, Package, Users, DollarSign, Zap, Target, MessageCircle, Bot, Loader2 } from "lucide-react"
 import { useState, useEffect, useRef, useMemo, useCallback, lazy, Suspense } from "react"
 import { useVoiceAgent } from "@/app/hooks/useVoiceAgent"
 import { useAppStore } from "@/app/lib/store/useAppStore"
@@ -12,6 +12,8 @@ import { AIBrainVisualizer } from "@/app/components/visualizations/AIBrainVisual
 import { QuickStatWidget } from "@/app/components/widgets/QuickStatWidget"
 import { MiniChartWidget } from "@/app/components/widgets/MiniChartWidget"
 import { ActivityFeedWidget, ActivityItem } from "@/app/components/widgets/ActivityFeedWidget"
+import { getMegaAIAgent, type AIResponse, type AIVisualization } from "@/app/lib/services/ai/MegaAIAgent.service"
+import { logger } from "@/app/lib/utils/logger"
 
 // Flag para habilitar/deshabilitar Spline (causa errores de runtime)
 const SPLINE_ENABLED = false
@@ -61,6 +63,8 @@ interface Message {
   text: string
   sender: "user" | "ai"
   timestamp: Date
+  visualizations?: AIVisualization[]
+  suggestions?: string[]
 }
 
 export default function BentoIA() {
@@ -71,9 +75,13 @@ export default function BentoIA() {
   const [showAnalytics, setShowAnalytics] = useState(false)
   const [analyticsType, setAnalyticsType] = useState<"sales" | "inventory" | "clients" | "predictions">("sales")
   const [use3DMode, setUse3DMode] = useState(true)
+  const [aiError, setAiError] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { connect, disconnect, isConnected } = useVoiceAgent()
-  const { voiceAgentStatus, audioFrequencies } = useAppStore()
+  const { voiceAgentStatus, audioFrequencies, currentUserId } = useAppStore()
+  
+  // Instancia del MegaAIAgent
+  const aiAgent = useMemo(() => getMegaAIAgent(currentUserId || 'anonymous'), [currentUserId])
   
   // Hook del bot 3D de Spline
   const botControl = useSplineBot()
@@ -155,64 +163,188 @@ export default function BentoIA() {
     }
 
     setMessages((prev) => [...prev, userMessage])
+    const currentInput = inputText
     setInputText("")
     setIsTyping(true)
+    setAiError(null)
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      // Usar MegaAIAgent para procesar el mensaje
+      const response = await aiAgent.sendMessage({
+        message: currentInput,
+        userId: currentUserId || 'anonymous',
+        context: { 
+          panelActual: 'ia',
+          historialMensajes: messages.length 
+        }
+      })
+      
+      logger.info('Respuesta de MegaAIAgent', { 
+        context: 'BentoIA', 
+        data: { responseType: response.type }
+      })
+      
+      // Determinar tipo de analytics a mostrar
+      if (response.type === 'data' || response.type === 'visualization') {
+        setShowAnalytics(true)
+        const lowerInput = currentInput.toLowerCase()
+        if (lowerInput.includes('venta')) setAnalyticsType('sales')
+        else if (lowerInput.includes('inventario') || lowerInput.includes('stock') || lowerInput.includes('compra')) setAnalyticsType('inventory')
+        else if (lowerInput.includes('cliente')) setAnalyticsType('clients')
+        else if (lowerInput.includes('predicción') || lowerInput.includes('prediccion')) setAnalyticsType('predictions')
+      }
+
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: generateAIResponse(inputText),
+        text: response.message,
+        sender: "ai",
+        timestamp: new Date(),
+        visualizations: response.visualizations,
+        suggestions: response.suggestions
+      }
+      
+      setMessages((prev) => [...prev, aiResponse])
+    } catch (error) {
+      logger.error('Error en MegaAIAgent', error, { context: 'BentoIA' })
+      setAiError('Error al procesar tu mensaje. Intenta de nuevo.')
+      
+      // Fallback a respuesta local
+      const fallbackResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        text: generateAIResponse(currentInput),
         sender: "ai",
         timestamp: new Date(),
       }
-      setMessages((prev) => [...prev, aiResponse])
+      setMessages((prev) => [...prev, fallbackResponse])
+    } finally {
       setIsTyping(false)
-    }, 1500)
+    }
   }
 
   const generateAIResponse = (userInput: string): string => {
     const input = userInput.toLowerCase()
 
+    // Respuestas con datos reales del sistema CHRONOS
     if (input.includes("ventas") || input.includes("vender")) {
       setShowAnalytics(true)
       setAnalyticsType("sales")
-      return "📊 Las ventas totales ascienden a $3,378,700. Hay 3 ventas registradas, con un promedio de $1,126,233 por venta. He activado la visualización de análisis de ventas. ¿Te gustaría ver un análisis más detallado?"
+      return "📊 **Resumen de Ventas del Sistema:**\n\n" +
+        "• Total registros: **96 ventas**\n" +
+        "• Clientes activos: **31**\n" +
+        "• Órdenes de compra: **9**\n" +
+        "• Distribuidores: **6 orígenes** (PACMAN, Q-MAYA, A/X🌶️🦀, CH-MONTE, VALLE-MONTE, Q-MAYA-MP)\n\n" +
+        "He activado la visualización de análisis de ventas. ¿Te gustaría ver un análisis más detallado de algún cliente o distribuidor específico?"
     }
 
-    if (input.includes("compras") || input.includes("órdenes")) {
+    if (input.includes("compras") || input.includes("órdenes") || input.includes("ordenes")) {
       setShowAnalytics(true)
       setAnalyticsType("inventory")
-      return "📦 Hay 9 órdenes de compra registradas por un total de $14,678,900. La deuda pendiente es de $13,725,800. He mostrado el análisis de inventario. ¿Necesitas información sobre algún distribuidor específico?"
+      return "📦 **Órdenes de Compra:**\n\n" +
+        "• OC0001 - Q-MAYA: 423 unidades @ $6,300\n" +
+        "• OC0004 - PACMAN: 487 unidades @ $6,300\n" +
+        "• OC0005 - Q-MAYA: 513 unidades @ $6,300\n" +
+        "• OC0008 - PACMAN: 488 unidades @ $6,300\n" +
+        "• OC0009 - Q-MAYA-MP: 200 unidades @ $6,300\n\n" +
+        "Total: **9 órdenes** | Costo promedio: **$6,300/unidad**\n\n" +
+        "¿Necesitas información sobre algún distribuidor específico?"
     }
 
-    if (input.includes("banco") || input.includes("saldo")) {
-      return "💰 Estado de bancos: Bóveda Monte ($0), Bóveda USA ($0), Utilidades ($0), Fletes ($0), Azteca ($0), Leftie ($0), Profit ($0). ¿Quieres ver movimientos recientes?"
+    if (input.includes("banco") || input.includes("saldo") || input.includes("capital")) {
+      return "💰 **Estado de Bancos/Bóvedas:**\n\n" +
+        "• 🏛️ **Bóveda Monte** - MXN (Principal)\n" +
+        "• 🇺🇸 **Bóveda USA** - USD\n" +
+        "• 📊 **Profit** - Operativo\n" +
+        "• 🔵 **Leftie** - Operativo\n" +
+        "• 🏧 **Azteca** - Operativo\n" +
+        "• 🚛 **Flete Sur** - Gastos de flete\n" +
+        "• 💎 **Utilidades** - Ganancias\n\n" +
+        "Los saldos se calculan: `capitalActual = historicoIngresos - historicoGastos`\n\n" +
+        "¿Quieres ver movimientos recientes de algún banco específico?"
     }
 
     if (input.includes("stock") || input.includes("inventario")) {
       setShowAnalytics(true)
       setAnalyticsType("inventory")
-      return "📦 Stock actual: 17 unidades del Producto Principal. Total entradas: 2,296 | Total salidas: 2,279. El stock está en nivel bajo, considera generar una orden de compra. He activado el análisis de inventario."
+      return "📦 **Estado del Inventario:**\n\n" +
+        "Las unidades se rastrean por OC (Orden de Compra). Cada OC tiene:\n" +
+        "• `stockActual` - Unidades disponibles\n" +
+        "• `costoPorUnidad` = costoDistribuidor + costoTransporte\n\n" +
+        "**Distribución por origen:**\n" +
+        "• Q-MAYA: 1,168 unidades (OC0001, OC0002, OC0005)\n" +
+        "• PACMAN: 975 unidades (OC0004, OC0008)\n" +
+        "• Q-MAYA-MP: 200 unidades (OC0009)\n\n" +
+        "¿Quieres ver el detalle de alguna OC específica?"
     }
 
     if (input.includes("clientes") || input.includes("cliente")) {
       setShowAnalytics(true)
       setAnalyticsType("clients")
-      return "👥 Análisis de clientes activado. Tenemos 31 clientes activos con una tasa de retención del 94%. ¿Quieres ver detalles específicos?"
+      return "👥 **Análisis de Clientes:**\n\n" +
+        "• Total: **31 clientes activos**\n\n" +
+        "**Top clientes por deuda:**\n" +
+        "• Bódega M-P: $945,000\n" +
+        "• amigo playa azul: $355,000\n" +
+        "• flama: $335,000\n" +
+        "• Tio Tocayo: $315,000\n" +
+        "• Tocayo: $255,200\n\n" +
+        "**Clientes al corriente:**\n" +
+        "• A/X: $317,380 a favor\n" +
+        "• Primo: $3,000 a favor\n\n" +
+        "¿Quieres ver el historial de algún cliente específico?"
     }
 
-    if (input.includes("predicción") || input.includes("prediccion") || input.includes("futuro")) {
+    if (input.includes("predicción") || input.includes("prediccion") || input.includes("futuro") || input.includes("tendencia")) {
       setShowAnalytics(true)
       setAnalyticsType("predictions")
-      return "🔮 He generado predicciones basadas en IA. La tendencia del mercado es alcista con 87% de probabilidad de alcanzar objetivos. ¿Quieres explorar más?"
+      return "🔮 **Predicciones basadas en IA:**\n\n" +
+        "📈 **Tendencias detectadas:**\n" +
+        "• Demanda alta: Valle (recurrente)\n" +
+        "• Cliente estrella: Lamas (6 transacciones)\n" +
+        "• Origen preferido: Q-MAYA (mejor relación costo/calidad)\n\n" +
+        "⚠️ **Alertas:**\n" +
+        "• Deuda pendiente alta: $2,500,000+\n" +
+        "• Clientes con pagos pendientes: 15\n" +
+        "• OCs con stock bajo: revisar OC0006, OC0007\n\n" +
+        "¿Quieres un análisis más profundo?"
     }
 
-    if (input.includes("dashboard") || input.includes("inicio")) {
-      return "🏠 Te llevaré al dashboard principal donde puedes ver todos los KPIs en tiempo real."
+    if (input.includes("distribuidor")) {
+      return "🏭 **Distribuidores del Sistema:**\n\n" +
+        "| Origen | Costo Unit. | Transporte | Total |\n" +
+        "|--------|------------|------------|-------|\n" +
+        "| Q-MAYA | $6,100 | $200 | $6,300 |\n" +
+        "| PACMAN | $6,100 | $200 | $6,300 |\n" +
+        "| A/X🌶️🦀 | $6,100 | $200 | $6,300 |\n" +
+        "| CH-MONTE | $6,300 | $0 | $6,300 |\n" +
+        "| VALLE-MONTE | $7,000 | $0 | $7,000 |\n" +
+        "| Q-MAYA-MP | $6,100 | $200 | $6,300 |\n\n" +
+        "¿Necesitas más información de alguno?"
     }
 
-    return "🤖 Soy tu asistente inteligente de Chronos. Puedo ayudarte con información sobre ventas, compras, bancos, inventario y mucho más. ¿Qué te gustaría saber?"
+    if (input.includes("dashboard") || input.includes("inicio") || input.includes("resumen")) {
+      return "🏠 **Resumen del Dashboard CHRONOS:**\n\n" +
+        "📊 **KPIs Principales:**\n" +
+        "• 96 ventas registradas\n" +
+        "• 31 clientes activos\n" +
+        "• 9 órdenes de compra\n" +
+        "• 6 distribuidores/orígenes\n" +
+        "• 7 bancos/bóvedas\n\n" +
+        "💡 **Fórmula de Ganancia:**\n" +
+        "```\n" +
+        "utilidad = (precioVenta - precioCompra - flete) × cantidad\n" +
+        "```\n\n" +
+        "¿En qué puedo ayudarte?"
+    }
+
+    return "🤖 **Soy tu asistente inteligente de CHRONOS.**\n\n" +
+      "Puedo ayudarte con:\n" +
+      "• 📊 Ventas (96 registros)\n" +
+      "• 👥 Clientes (31 activos)\n" +
+      "• 📦 Órdenes de compra (9 OCs)\n" +
+      "• 🏭 Distribuidores (6 orígenes)\n" +
+      "• 💰 Bancos y capital (7 bóvedas)\n" +
+      "• 🔮 Predicciones y tendencias\n\n" +
+      "¿Qué te gustaría consultar?"
   }
 
   const quickActions = [

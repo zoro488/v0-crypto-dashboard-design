@@ -27,7 +27,7 @@ import { Skeleton } from "@/app/components/ui/skeleton"
 import { useState, useEffect, useMemo } from "react"
 import { suscribirOrdenesCompra } from "@/app/lib/firebase/firestore-service"
 import type { OrdenCompra, FirestoreTimestamp } from "@/app/types"
-import { CreateOrdenCompraModal } from "@/app/components/modals/CreateOrdenCompraModalSmart"
+import { CreateOrdenCompraModalPremium } from "@/app/components/modals/CreateOrdenCompraModalPremium"
 import { 
   AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, 
   Tooltip, PieChart, Pie, Cell, CartesianGrid, Legend, ComposedChart, Line
@@ -651,7 +651,7 @@ export function BentoOrdenesCompraPremium() {
       
       {/* Modal de creación */}
       {isModalOpen && (
-        <CreateOrdenCompraModal
+        <CreateOrdenCompraModalPremium
           open={isModalOpen}
           onClose={() => setIsModalOpen(false)}
         />

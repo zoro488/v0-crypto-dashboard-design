@@ -394,7 +394,29 @@ export function useDashboardData(): HookResult<DocumentData> & { totales: Record
     mockData: []
   })
   
-  return { ...result, totales: { ventas: 150000, gastos: 50000, clientes: 120 } }
+  // Usar estadísticas reales calculadas desde los CSVs
+  const totales = {
+    // Ventas
+    totalVentas: STATS.totalVentas,
+    totalCobrado: STATS.totalCobrado,
+    totalPendiente: STATS.totalPendiente,
+    ventasCount: STATS.ventasCount,
+    // Clientes
+    clientesCount: STATS.clientesCount,
+    // Órdenes
+    ordenesCount: STATS.ordenesCount,
+    distribuidoresCount: STATS.distribuidoresCount,
+    // Distribución GYA (Lógica del Excel)
+    totalBovedaMonte: STATS.totalBovedaMonte,
+    totalFletes: STATS.totalFletes,
+    totalUtilidades: STATS.totalUtilidades,
+    // Legacy aliases
+    ventas: STATS.totalVentas,
+    gastos: 50000,
+    clientes: STATS.clientesCount
+  }
+  
+  return { ...result, totales }
 }
 
 export function useGYAData(): HookResult<DocumentData> {
@@ -406,58 +428,55 @@ export function useGYAData(): HookResult<DocumentData> {
 }
 
 export function useIngresosBanco(bancoId: string): HookResult<DocumentData> {
-  const result = useRealtimeQuery('movimientos', {
-    whereField: 'bancoId',
-    whereValue: bancoId,
+  // Usar la colección específica del banco: {bancoId}_ingresos
+  const collectionName = `${bancoId}_ingresos`
+  
+  return useRealtimeQuery(collectionName, {
     orderByField: 'fecha',
     orderDirection: 'desc',
     mockData: MOCK_MOVIMIENTOS.filter(m => m.tipo === 'ingreso')
   })
-  
-  return {
-    ...result,
-    data: result.data.filter(m => m.tipoMovimiento === 'ingreso' || m.tipoMovimiento === 'transferencia_entrada')
-  }
 }
 
 export function useGastos(bancoId: string): HookResult<DocumentData> {
-  const result = useRealtimeQuery('movimientos', {
-    whereField: 'bancoId',
-    whereValue: bancoId,
+  // Usar la colección específica del banco: {bancoId}_gastos
+  const collectionName = `${bancoId}_gastos`
+  
+  return useRealtimeQuery(collectionName, {
     orderByField: 'fecha',
     orderDirection: 'desc',
     mockData: MOCK_MOVIMIENTOS.filter(m => m.tipo === 'gasto')
   })
-  
-  return {
-    ...result,
-    data: result.data.filter(m => {
-      const mov = m as Record<string, unknown>;
-      return mov.tipoMovimiento === 'gasto' || mov.tipoMovimiento === 'transferencia_salida';
-    })
-  }
 }
 
-export function useTransferencias(bancoId: string): HookResult<DocumentData> {
-  const result = useRealtimeQuery('movimientos', {
-    whereField: 'bancoId',
-    whereValue: bancoId,
+export function useTransferencias(bancoId?: string): HookResult<DocumentData> {
+  // Transferencias están en colección separada
+  const result = useRealtimeQuery('transferencias', {
     orderByField: 'fecha',
     orderDirection: 'desc',
     mockData: MOCK_TRANSFERENCIAS
   })
   
-  return {
-    ...result,
-    data: result.data.filter(m => (m as Record<string, unknown>).tipoMovimiento?.toString().includes('transferencia'))
+  // Si se especifica bancoId, filtrar por origen
+  if (bancoId) {
+    return {
+      ...result,
+      data: result.data.filter(t => 
+        (t as Record<string, unknown>).bancoOrigenId === bancoId ||
+        (t as Record<string, unknown>).bancoDestinoId === bancoId
+      )
+    }
   }
+  
+  return result
 }
 
 export function useCorteBancario(bancoId: string): HookResult<DocumentData> {
-  return useRealtimeQuery('cortes_bancarios', {
-    whereField: 'bancoId',
-    whereValue: bancoId,
-    orderByField: 'fechaInicio',
+  // Usar la colección específica del banco: {bancoId}_cortes
+  const collectionName = `${bancoId}_cortes`
+  
+  return useRealtimeQuery(collectionName, {
+    orderByField: 'fecha',
     orderDirection: 'desc',
     mockData: MOCK_CORTES
   })
@@ -489,16 +508,28 @@ export const useClientes = useClientesData
 export const useDistribuidores = useDistribuidoresData
 
 // ===================================================================
-// MOCK DATA
+// MOCK DATA - Generados desde CSVs reales (96 ventas, 31 clientes, 9 OCs)
 // ===================================================================
-const MOCK_CLIENTES = [
-  { id: "C-001", nombre: "Cliente VIP 1", email: "vip1@example.com", telefono: "555-0001", saldo: 0 },
-  { id: "C-002", nombre: "Cliente Regular 2", email: "reg2@example.com", telefono: "555-0002", saldo: 1500 },
-]
 
-const MOCK_MOVIMIENTOS = [
-  { id: "M-001", tipo: "ingreso", tipoMovimiento: "ingreso", fecha: new Date().toISOString(), monto: 5000, concepto: "Venta", bancoId: "banco_1" },
-  { id: "M-002", tipo: "gasto", tipoMovimiento: "gasto", fecha: new Date().toISOString(), monto: 2000, concepto: "Pago", bancoId: "banco_1" },
+// Importar datos generados desde el script de migración
+import { 
+  MOCK_VENTAS as GENERATED_VENTAS,
+  MOCK_CLIENTES as GENERATED_CLIENTES,
+  MOCK_ORDENES_COMPRA as GENERATED_ORDENES,
+  MOCK_DISTRIBUIDORES as GENERATED_DISTRIBUIDORES,
+  MOCK_BANCOS as GENERATED_BANCOS,
+  MOCK_MOVIMIENTOS as GENERATED_MOVIMIENTOS,
+  STATS
+} from '@/app/lib/data/mock-data-generated'
+
+// Re-exportar estadísticas para uso global
+export { STATS as CHRONOS_STATS }
+
+const MOCK_CLIENTES = GENERATED_CLIENTES
+
+const MOCK_MOVIMIENTOS = GENERATED_MOVIMIENTOS.length > 0 ? GENERATED_MOVIMIENTOS : [
+  { id: "M-001", tipo: "ingreso", tipoMovimiento: "ingreso", fecha: new Date().toISOString(), monto: 5000, concepto: "Venta", bancoId: "boveda_monte" },
+  { id: "M-002", tipo: "gasto", tipoMovimiento: "gasto", fecha: new Date().toISOString(), monto: 2000, concepto: "Pago", bancoId: "boveda_monte" },
 ]
 
 const MOCK_TRANSFERENCIAS = [
@@ -509,41 +540,24 @@ const MOCK_CORTES = [
   { id: "CT-001", periodo: "Marzo 2024", fechaInicio: new Date().toISOString(), capitalInicial: 50000, capitalFinal: 65000 },
 ]
 
-const MOCK_DISTRIBUIDORES = [
-  { id: "1", nombre: "Distribuidor Alpha", totalOrdenesCompra: 150000, deudaTotal: 50000 },
-  { id: "2", nombre: "Distribuidor Beta", totalOrdenesCompra: 80000, deudaTotal: 0 },
-]
+const MOCK_DISTRIBUIDORES = GENERATED_DISTRIBUIDORES
 
-const MOCK_ORDENES_COMPRA = [
-  { id: "OC-001", fecha: "2024-03-20", distribuidor: "Alpha", cantidad: 100, costoTotal: 50000, estado: "pendiente" },
-  { id: "OC-002", fecha: "2024-03-18", distribuidor: "Beta", cantidad: 50, costoTotal: 25000, estado: "pagado" },
-]
+const MOCK_ORDENES_COMPRA = GENERATED_ORDENES
 
-const MOCK_VENTAS = [
-  { id: "V-001", fecha: "2024-03-21", cliente: "Cliente A", total: 1500, estado: "completado" },
-  { id: "V-002", fecha: "2024-03-21", cliente: "Cliente B", total: 3500, estado: "completado" },
-]
+const MOCK_VENTAS = GENERATED_VENTAS
 
 const MOCK_PRODUCTOS = [
-  { id: "P-001", nombre: "Producto Premium A", stock: 150, precio: 299, categoria: "Electrónica" },
-  { id: "P-002", nombre: "Producto Básico B", stock: 500, precio: 99, categoria: "Hogar" },
+  { id: "P-001", nombre: "Producto Principal", stock: 2296, precio: 6300, categoria: "Principal", totalEntradas: 2296, totalSalidas: 0 },
 ]
 
 const MOCK_ENTRADAS = [
-  { id: "E-001", fecha: new Date().toISOString(), origen: "Distribuidor Alpha", cantidad: 100, valorTotal: 50000 },
+  { id: "E-001", fecha: new Date().toISOString(), origen: "Q-MAYA", cantidad: 423, valorTotal: 2664900, oc: "OC0001" },
+  { id: "E-002", fecha: new Date().toISOString(), origen: "PACMAN", cantidad: 487, valorTotal: 3068100, oc: "OC0004" },
 ]
 
 const MOCK_SALIDAS = [
-  { id: "S-001", fecha: new Date().toISOString(), destino: "Cliente VIP", cantidad: 10, valorTotal: 10000 },
+  { id: "S-001", fecha: new Date().toISOString(), destino: "Bódega M-P", cantidad: 150, valorTotal: 945000 },
 ]
 
-// Mock de los 7 bancos del sistema CHRONOS
-const MOCK_BANCOS = [
-  { id: "boveda_monte", nombre: "Bóveda Monte", icon: "building", color: "from-violet-500 to-violet-700", tipo: "boveda", moneda: "MXN", capitalActual: 5722280, capitalInicial: 5722280, estado: "activo", descripcion: "Bóveda principal MXN" },
-  { id: "boveda_usa", nombre: "Bóveda USA", icon: "flag", color: "from-blue-500 to-blue-700", tipo: "boveda", moneda: "USD", capitalActual: 128005, capitalInicial: 128005, estado: "activo", descripcion: "Bóveda internacional USD" },
-  { id: "utilidades", nombre: "Utilidades", icon: "trending-up", color: "from-emerald-500 to-emerald-700", tipo: "utilidades", moneda: "MXN", capitalActual: 102658, capitalInicial: 102658, estado: "activo", descripcion: "Ganancias del sistema" },
-  { id: "flete_sur", nombre: "Flete Sur", icon: "truck", color: "from-amber-500 to-amber-700", tipo: "gastos", moneda: "MXN", capitalActual: 185792, capitalInicial: 185792, estado: "activo", descripcion: "Costos de transporte" },
-  { id: "azteca", nombre: "Azteca", icon: "briefcase", color: "from-pink-500 to-pink-700", tipo: "operativo", moneda: "MXN", capitalActual: -178714.88, capitalInicial: -178714.88, estado: "activo", descripcion: "Pagos de servicios" },
-  { id: "leftie", nombre: "Leftie", icon: "store", color: "from-indigo-500 to-indigo-700", tipo: "operativo", moneda: "USD", capitalActual: 45844, capitalInicial: 45844, estado: "activo", descripcion: "Operaciones USD" },
-  { id: "profit", nombre: "Profit", icon: "diamond", color: "from-teal-500 to-teal-700", tipo: "operativo", moneda: "MXN", capitalActual: 12577748, capitalInicial: 12577748, estado: "activo", descripcion: "Banco operativo principal" },
-]
+// Mock de los 7 bancos del sistema CHRONOS - Usando datos generados
+const MOCK_BANCOS = GENERATED_BANCOS

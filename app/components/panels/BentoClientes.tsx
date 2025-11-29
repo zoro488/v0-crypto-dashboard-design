@@ -5,8 +5,8 @@ import { Users, AlertTriangle, CheckCircle2, Clock, DollarSign, Plus, TrendingUp
 import { Button } from "@/app/components/ui/button"
 import { Badge } from "@/app/components/ui/badge"
 import { useClientes } from "@/app/lib/firebase/firestore-hooks.service"
-import CreateClienteModalSmart from "@/app/components/modals/CreateClienteModalSmart"
-import CreateAbonoClienteModal from "@/app/components/modals/CreateAbonoClienteModal"
+import { CreateClienteModalPremium } from "@/app/components/modals/CreateClienteModalPremium"
+import { CreateAbonoModalPremium } from "@/app/components/modals/CreateAbonoModalPremium"
 import { useState, useMemo } from "react"
 import { Skeleton } from "@/app/components/ui/skeleton"
 import { ClientNetworkGraph } from "@/app/components/visualizations/ClientNetworkGraph"
@@ -43,14 +43,16 @@ export default function BentoClientes() {
   // Colores para gráficos
   const CHART_COLORS = ['#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444']
 
-  // Datos para gráficos
+  // Datos para gráficos - Usando datos reales de top clientes
   const trendData = useMemo(() => {
-    return Array.from({ length: 7 }, (_, i) => ({
-      name: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'][i],
-      ventas: Math.floor(Math.random() * 50000) + 30000,
-      cobros: Math.floor(Math.random() * 40000) + 20000,
+    // Mostrar los top 7 clientes por ventas
+    return topClientes.slice(0, 7).map((c, i) => ({
+      name: c.nombre?.substring(0, 6) || `C${i + 1}`,
+      ventas: c.totalVentas ?? 0,
+      cobros: c.totalPagado ?? 0,
+      deuda: c.deudaTotal ?? 0
     }))
-  }, [])
+  }, [topClientes])
 
   // Distribución de clientes por estado
   const clientesPorEstado = useMemo(() => {
@@ -384,11 +386,11 @@ export default function BentoClientes() {
         </div>
       </motion.div>
       {/* Create Cliente Modal */}
-      <CreateClienteModalSmart 
-        isOpen={showCreateModal} 
+      <CreateClienteModalPremium 
+        open={showCreateModal} 
         onClose={() => setShowCreateModal(false)} 
       />
-      <CreateAbonoClienteModal isOpen={showAbonoModal} onClose={() => setShowAbonoModal(false)} /> {/* Add Abono Modal */}
+      <CreateAbonoModalPremium open={showAbonoModal} onClose={() => setShowAbonoModal(false)} /> {/* Add Abono Modal */}
 
       {/* Client Network Graph - Premium Visualization */}
       <motion.div

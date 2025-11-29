@@ -235,6 +235,126 @@ service cloud.firestore {
     }
 
     // ===================================================================
+    // TABLAS POR BANCO - INGRESOS
+    // Colecciones: boveda_monte_ingresos, boveda_usa_ingresos, etc.
+    // ===================================================================
+    match /boveda_monte_ingresos/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    match /boveda_usa_ingresos/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    match /profit_ingresos/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    match /leftie_ingresos/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    match /azteca_ingresos/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    match /flete_sur_ingresos/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    match /utilidades_ingresos/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // TABLAS POR BANCO - GASTOS
+    // Colecciones: boveda_monte_gastos, boveda_usa_gastos, etc.
+    // ===================================================================
+    match /boveda_monte_gastos/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    match /boveda_usa_gastos/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    match /profit_gastos/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    match /leftie_gastos/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    match /azteca_gastos/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    match /flete_sur_gastos/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    match /utilidades_gastos/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // TABLAS POR BANCO - CORTES (RF Actual histórico)
+    // Colecciones: boveda_monte_cortes, boveda_usa_cortes, etc.
+    // ===================================================================
+    match /boveda_monte_cortes/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    match /boveda_usa_cortes/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    match /profit_cortes/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    match /leftie_cortes/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    match /azteca_cortes/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    match /flete_sur_cortes/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    match /utilidades_cortes/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+
+    // ===================================================================
     // REGLA POR DEFECTO - DENEGAR TODO LO DEMÁS
     // ⚠️ CRÍTICO: No cambiar esta regla
     // ===================================================================

@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // REGLAS TEMPORALES PARA MIGRACION COMPLETA
+    
+    match /bancos/{document=**} { allow read, write: if true; }
+    match /movimientos/{document=**} { allow read, write: if true; }
+    match /clientes/{document=**} { allow read, write: if true; }
+    match /ventas/{document=**} { allow read, write: if true; }
+    match /ordenes_compra/{document=**} { allow read, write: if true; }
+    match /distribuidores/{document=**} { allow read, write: if true; }
+    match /almacen/{document=**} { allow read, write: if true; }
+    match /gastos_abonos/{document=**} { allow read, write: if true; }
+    match /transferencias/{document=**} { allow read, write: if true; }
+    
+    // Tablas por banco - INGRESOS
+    match /boveda_monte_ingresos/{document=**} { allow read, write: if true; }
+    match /boveda_usa_ingresos/{document=**} { allow read, write: if true; }
+    match /profit_ingresos/{document=**} { allow read, write: if true; }
+    match /leftie_ingresos/{document=**} { allow read, write: if true; }
+    match /azteca_ingresos/{document=**} { allow read, write: if true; }
+    match /flete_sur_ingresos/{document=**} { allow read, write: if true; }
+    match /utilidades_ingresos/{document=**} { allow read, write: if true; }
+    
+    // Tablas por banco - GASTOS
+    match /boveda_monte_gastos/{document=**} { allow read, write: if true; }
+    match /boveda_usa_gastos/{document=**} { allow read, write: if true; }
+    match /profit_gastos/{document=**} { allow read, write: if true; }
+    match /leftie_gastos/{document=**} { allow read, write: if true; }
+    match /azteca_gastos/{document=**} { allow read, write: if true; }
+    match /flete_sur_gastos/{document=**} { allow read, write: if true; }
+    match /utilidades_gastos/{document=**} { allow read, write: if true; }
+    
+    // Tablas por banco - CORTES
+    match /boveda_monte_cortes/{document=**} { allow read, write: if true; }
+    match /boveda_usa_cortes/{document=**} { allow read, write: if true; }
+    match /profit_cortes/{document=**} { allow read, write: if true; }
+    match /leftie_cortes/{document=**} { allow read, write: if true; }
+    match /azteca_cortes/{document=**} { allow read, write: if true; }
+    match /flete_sur_cortes/{document=**} { allow read, write: if true; }
+    match /utilidades_cortes/{document=**} { allow read, write: if true; }
+    
+    match /{document=**} { allow read, write: if false; }
+  }
+}

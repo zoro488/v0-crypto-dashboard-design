@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/ta
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/app/components/ui/dialog"
 import { useState, useMemo, useCallback, memo } from "react"
 import { useVentasData, useClientesData } from "@/app/lib/firebase/firestore-hooks.service"
-import { CreateVentaModal } from "@/app/components/modals/CreateVentaModalSmart"
+import { CreateVentaModalPremium } from "@/app/components/modals/CreateVentaModalPremium"
 import { SalesFlowDiagram } from "@/app/components/visualizations/SalesFlowDiagram"
 import { PremiumDataTable, Column, TableAction } from "@/app/components/ui/PremiumDataTable"
 import { QuickStatWidget } from "@/app/components/widgets/QuickStatWidget"
@@ -782,7 +782,7 @@ export default memo(function BentoVentasPremium() {
       </motion.div>
 
       {/* Modales */}
-      <CreateVentaModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <CreateVentaModalPremium open={isModalOpen} onClose={() => setIsModalOpen(false)} />
       
       <VentaProfileModal
         venta={selectedVenta}

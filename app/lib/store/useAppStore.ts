@@ -172,6 +172,9 @@ interface AppState {
   currentPanel: string
   sidebarCollapsed: boolean
   theme: "light" | "dark" | "cyber"
+  
+  // User State
+  currentUserId: string | null
 
   // Voice Agent State
   voiceAgentActive: boolean
@@ -230,6 +233,7 @@ export const useAppStore = create<AppState>()(
         currentPanel: "dashboard",
         sidebarCollapsed: false,
         theme: "dark",
+        currentUserId: "anonymous",
         voiceAgentActive: false,
         voiceAgentStatus: "idle",
         audioFrequencies: Array(32).fill(0),

@@ -11,8 +11,8 @@ import { Button } from "@/app/components/ui/button"
 import { Badge } from "@/app/components/ui/badge"
 import { useClientes, useVentas } from "@/app/lib/firebase/firestore-hooks.service"
 import { useFirestoreCRUD } from "@/app/hooks/useFirestoreCRUD"
-import CreateClienteModalSmart from "@/app/components/modals/CreateClienteModalSmart"
-import CreateAbonoClienteModal from "@/app/components/modals/CreateAbonoClienteModal"
+import { CreateClienteModalPremium } from "@/app/components/modals/CreateClienteModalPremium"
+import { CreateAbonoModalPremium } from "@/app/components/modals/CreateAbonoModalPremium"
 import { Skeleton } from "@/app/components/ui/skeleton"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, BarChart, Bar } from "recharts"
 import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from "@/app/components/ui/SafeChartContainer"
@@ -775,12 +775,12 @@ export default function BentoClientesPremium() {
       />
 
       {/* Modals */}
-      <CreateClienteModalSmart 
-        isOpen={showCreateModal} 
+      <CreateClienteModalPremium 
+        open={showCreateModal} 
         onClose={() => setShowCreateModal(false)} 
       />
-      <CreateAbonoClienteModal 
-        isOpen={showAbonoModal} 
+      <CreateAbonoModalPremium 
+        open={showAbonoModal} 
         onClose={() => setShowAbonoModal(false)} 
       />
       <ClienteProfileModal

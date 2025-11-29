@@ -24,9 +24,9 @@ import {
 import { useState, useMemo } from "react"
 import { BANCOS } from "@/app/lib/constants"
 import SimpleCurrencyWidget from "@/app/components/widgets/SimpleCurrencyWidget"
-import CreateGastoModalSmart from "@/app/components/modals/CreateGastoModalSmart"
-import CreateTransferenciaModalSmart from "@/app/components/modals/CreateTransferenciaModalSmart"
-import CreateIngresoModalSmart from "@/app/components/modals/CreateIngresoModalSmart"
+import { CreateGastoModalPremium } from "@/app/components/modals/CreateGastoModalPremium"
+import { CreateTransferenciaModalPremium } from "@/app/components/modals/CreateTransferenciaModalPremium"
+import { CreateIngresoModalPremium } from "@/app/components/modals/CreateIngresoModalPremium"
 import { FinancialRiverFlow } from "@/app/components/visualizations/FinancialRiverFlow"
 import {
   useIngresosBanco,
@@ -41,35 +41,65 @@ import { QuickStatWidget } from "@/app/components/widgets/QuickStatWidget"
 import { MiniChartWidget } from "@/app/components/widgets/MiniChartWidget"
 import { ActivityFeedWidget, ActivityItem } from "@/app/components/widgets/ActivityFeedWidget"
 
-// Interfaces para tipado
-interface MovimientoBanco {
+// Interfaces para tipado - Actualizadas con campos del JSON migrado
+interface IngresoBanco {
   id?: string
-  monto?: number
-  fecha?: string | Date
-  descripcion?: string
+  fecha?: string | Date | { seconds: number }
+  cliente?: string
+  ingreso?: number
   concepto?: string
-  bancoOrigen?: string
-  bancoDestino?: string
-  [key: string]: unknown
+  observaciones?: string
+  tc?: number
+  dolares?: number
+  destino?: string
+  bancoId?: string
 }
 
-interface CorteBancarioDetalle {
+interface GastoBanco {
   id?: string
-  periodo?: string
-  fechaInicio?: string | Date
-  fechaFin?: string | Date
-  capitalInicial?: number
-  capitalFinal?: number
-  diferencia?: number
-  variacion?: number
-  [key: string]: unknown
+  fecha?: string | Date | { seconds: number }
+  origen?: string
+  gasto?: number
+  concepto?: string
+  observaciones?: string
+  destino?: string
+  tc?: number
+  pesos?: number
+  bancoId?: string
 }
 
-// Helper para formatear fecha
-const formatDate = (date: string | Date | undefined): string => {
+interface CorteBancario {
+  id?: string
+  numero?: number
+  fecha?: string | Date | { seconds: number }
+  corte?: number
+  capitalFinal?: number
+  bancoId?: string
+}
+
+interface TransferenciaBanco {
+  id?: string
+  fecha?: string | Date | { seconds: number }
+  origen?: string
+  destino?: string
+  bancoOrigenId?: string
+  bancoDestinoId?: string
+  monto?: number
+  concepto?: string
+  observaciones?: string
+  tc?: number
+  pesos?: number
+}
+
+// Helper para formatear fecha - Maneja Timestamps de Firestore
+const formatDate = (date: string | Date | { seconds: number } | undefined): string => {
   if (!date) return "-"
   try {
-    return new Date(date).toLocaleDateString()
+    // Manejar Timestamp de Firestore
+    if (typeof date === 'object' && 'seconds' in date) {
+      return new Date(date.seconds * 1000).toLocaleDateString('es-MX')
+    }
+    return new Date(date as string | Date).toLocaleDateString('es-MX')
   } catch {
     return "-"
   }
@@ -102,15 +132,15 @@ export default function BentoBanco() {
   const { data: transferenciasRaw = [], loading: loadingTransferencias } = useTransferencias(selectedBanco.id)
   const { data: cortesRaw = [], loading: loadingCortes } = useCorteBancario(selectedBanco.id)
 
-  // Casting seguro
-  const ingresos = ingresosRaw as MovimientoBanco[]
-  const gastos = gastosRaw as MovimientoBanco[]
-  const transferencias = transferenciasRaw as MovimientoBanco[]
-  const cortes = cortesRaw as CorteBancarioDetalle[]
+  // Casting seguro a los tipos correctos
+  const ingresos = ingresosRaw as IngresoBanco[]
+  const gastos = gastosRaw as GastoBanco[]
+  const transferencias = transferenciasRaw as TransferenciaBanco[]
+  const cortes = cortesRaw as CorteBancario[]
 
-  // Cálculos básicos
-  const totalIngresos = ingresos.reduce((sum, i) => sum + (i.monto ?? 0), 0)
-  const totalGastos = gastos.reduce((sum, g) => sum + (g.monto ?? 0), 0)
+  // Cálculos básicos - usando los campos correctos del JSON
+  const totalIngresos = ingresos.reduce((sum, i) => sum + (i.ingreso ?? 0), 0)
+  const totalGastos = gastos.reduce((sum, g) => sum + (g.gasto ?? 0), 0)
   const saldoActual = totalIngresos - totalGastos
 
   // Datos para gráficos - DEBE estar antes de cualquier return condicional
@@ -129,33 +159,41 @@ export default function BentoBanco() {
     { name: 'Transferencias', value: transferencias.reduce((sum, t) => sum + (t.monto ?? 0), 0) || 1, color: '#8b5cf6' },
   ], [totalIngresos, totalGastos, transferencias])
 
-  // Activity feed
+  // Activity feed - usando campos correctos
   const recentActivity: ActivityItem[] = useMemo(() => {
     const activities: ActivityItem[] = []
     
-    ingresos.slice(0, 2).forEach((ing, i) => {
+    ingresos.slice(0, 3).forEach((ing, i) => {
+      const fecha = ing.fecha && typeof ing.fecha === 'object' && 'seconds' in ing.fecha 
+        ? new Date(ing.fecha.seconds * 1000) 
+        : new Date(ing.fecha as string || Date.now())
+      
       activities.push({
         id: `ing-${ing.id || i}`,
         type: 'pago',
-        title: 'Ingreso registrado',
-        description: `+$${(ing.monto ?? 0).toLocaleString()} - ${ing.concepto || 'Sin concepto'}`,
-        timestamp: ing.fecha ? new Date(ing.fecha as string) : new Date(),
+        title: `Ingreso de ${ing.cliente || 'Cliente'}`,
+        description: `+$${(ing.ingreso ?? 0).toLocaleString()} - ${ing.concepto || 'Sin concepto'}`,
+        timestamp: fecha,
         status: 'success'
       })
     })
     
-    gastos.slice(0, 2).forEach((g, i) => {
+    gastos.slice(0, 3).forEach((g, i) => {
+      const fecha = g.fecha && typeof g.fecha === 'object' && 'seconds' in g.fecha 
+        ? new Date(g.fecha.seconds * 1000) 
+        : new Date(g.fecha as string || Date.now())
+      
       activities.push({
         id: `gasto-${g.id || i}`,
         type: 'compra',
-        title: 'Gasto registrado',
-        description: `-$${(g.monto ?? 0).toLocaleString()} - ${g.concepto || 'Sin concepto'}`,
-        timestamp: g.fecha ? new Date(g.fecha as string) : new Date(),
+        title: `Gasto - ${g.origen || 'Varios'}`,
+        description: `-$${(g.gasto ?? 0).toLocaleString()} - ${g.concepto || g.observaciones || 'Sin concepto'}`,
+        timestamp: fecha,
         status: 'error'
       })
     })
     
-    return activities.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()).slice(0, 4)
+    return activities.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()).slice(0, 5)
   }, [ingresos, gastos])
 
   const loading = loadingIngresos || loadingGastos || loadingTransferencias || loadingCortes
@@ -599,44 +637,52 @@ export default function BentoBanco() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-white/5 bg-white/[0.02]">
-                      <TableHeader>ID</TableHeader>
                       <TableHeader>Fecha</TableHeader>
-                      <TableHeader>Origen</TableHeader>
-                      <TableHeader>Monto</TableHeader>
+                      <TableHeader>Cliente</TableHeader>
+                      <TableHeader>Ingreso</TableHeader>
                       <TableHeader>Concepto</TableHeader>
-                      <TableHeader>Referencia</TableHeader>
+                      <TableHeader>T.C.</TableHeader>
+                      <TableHeader>Dólares</TableHeader>
+                      <TableHeader>Observaciones</TableHeader>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
-                    {ingresos.map((ingreso, index) => (
-                      <motion.tr
-                        key={ingreso.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                        className="group/row hover:bg-white/[0.02] transition-colors"
-                      >
-                        <td className="px-6 py-4 text-white/80">{ingreso.id}</td>
-                        <td className="px-6 py-4 text-white/60">{formatDate(ingreso.fecha)}</td>
-                        <td className="px-6 py-4 text-white/80">{String(ingreso.origen ?? "-")}</td>
-                        <td className="px-6 py-4 text-emerald-400 font-semibold">${formatNumber(ingreso.monto)}</td>
-                        <td className="px-6 py-4 text-white/60">{ingreso.concepto ?? "-"}</td>
-                        <td className="px-6 py-4 text-blue-400">{String(ingreso.referencia ?? "-")}</td>
-                      </motion.tr>
-                    ))}
+                    {ingresos.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="px-6 py-12 text-center text-white/40">
+                          No hay ingresos registrados para este banco
+                        </td>
+                      </tr>
+                    ) : (
+                      ingresos.map((ingreso, index) => (
+                        <motion.tr
+                          key={ingreso.id || index}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="group/row hover:bg-white/[0.02] transition-colors"
+                        >
+                          <td className="px-6 py-4 text-white/60 text-sm">{formatDate(ingreso.fecha)}</td>
+                          <td className="px-6 py-4 text-white/80 font-medium">{ingreso.cliente ?? "-"}</td>
+                          <td className="px-6 py-4 text-emerald-400 font-semibold">${formatNumber(ingreso.ingreso)}</td>
+                          <td className="px-6 py-4 text-white/60">{ingreso.concepto ?? "-"}</td>
+                          <td className="px-6 py-4 text-cyan-400 font-mono text-sm">{ingreso.tc ? `$${ingreso.tc.toFixed(2)}` : "-"}</td>
+                          <td className="px-6 py-4 text-amber-400 font-mono">{ingreso.dolares ? `$${formatNumber(ingreso.dolares)}` : "-"}</td>
+                          <td className="px-6 py-4 text-white/40 text-sm max-w-[200px] truncate">{ingreso.observaciones ?? "-"}</td>
+                        </motion.tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
 
               {/* Pagination / Footer */}
               <div className="p-4 border-t border-white/5 flex items-center justify-between text-xs text-white/40">
-                <span>Mostrando 1-10 de 145 registros</span>
+                <span>Mostrando {ingresos.length} registros</span>
                 <div className="flex gap-2">
-                  <button className="px-3 py-1 rounded-lg hover:bg-white/5 transition-colors">Anterior</button>
-                  <button className="px-3 py-1 rounded-lg bg-white/10 text-white">1</button>
-                  <button className="px-3 py-1 rounded-lg hover:bg-white/5 transition-colors">2</button>
-                  <button className="px-3 py-1 rounded-lg hover:bg-white/5 transition-colors">3</button>
-                  <button className="px-3 py-1 rounded-lg hover:bg-white/5 transition-colors">Siguiente</button>
+                  <span className="px-3 py-1 text-emerald-400 font-medium">
+                    Total: ${formatNumber(ingresos.reduce((sum, ing) => sum + (ing.ingreso || 0), 0))}
+                  </span>
                 </div>
               </div>
             </div>
@@ -644,15 +690,78 @@ export default function BentoBanco() {
 
           {activeTab === "gastos" && (
             <div className="crystal-card p-1 relative overflow-hidden group">
-              <motion.button
-                whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(244, 63, 94, 0.3)" }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowGastoModal(true)}
-                className="btn-premium bg-rose-500 hover:bg-rose-400 text-white border-none flex items-center gap-2 shadow-lg shadow-rose-900/20"
-              >
-                <Plus className="w-4 h-4" />
-                Registrar Gasto
-              </motion.button>
+              <div className="absolute inset-0 bg-gradient-to-b from-rose-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+              <div className="flex items-center justify-between p-6 relative z-10">
+                <div>
+                  <h3 className="text-2xl font-bold text-white tracking-tight">Gastos Históricos</h3>
+                  <p className="text-white/40 text-sm mt-1">Registro detallado de salidas de capital</p>
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(244, 63, 94, 0.3)" }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowGastoModal(true)}
+                  className="btn-premium bg-rose-500 hover:bg-rose-400 text-white border-none flex items-center gap-2 shadow-lg shadow-rose-900/20"
+                >
+                  <Plus className="w-4 h-4" />
+                  Registrar Gasto
+                </motion.button>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-white/5 bg-white/[0.02]">
+                      <TableHeader>Fecha</TableHeader>
+                      <TableHeader>Origen</TableHeader>
+                      <TableHeader>Gasto</TableHeader>
+                      <TableHeader>T.C.</TableHeader>
+                      <TableHeader>Pesos</TableHeader>
+                      <TableHeader>Destino</TableHeader>
+                      <TableHeader>Concepto</TableHeader>
+                      <TableHeader>Observaciones</TableHeader>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {gastos.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="px-6 py-12 text-center text-white/40">
+                          No hay gastos registrados para este banco
+                        </td>
+                      </tr>
+                    ) : (
+                      gastos.map((gasto, index) => (
+                        <motion.tr
+                          key={gasto.id || index}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="group/row hover:bg-white/[0.02] transition-colors"
+                        >
+                          <td className="px-6 py-4 text-white/60 text-sm">{formatDate(gasto.fecha)}</td>
+                          <td className="px-6 py-4 text-white/80 font-medium">{gasto.origen ?? "-"}</td>
+                          <td className="px-6 py-4 text-rose-400 font-semibold">${formatNumber(gasto.gasto)}</td>
+                          <td className="px-6 py-4 text-cyan-400 font-mono text-sm">{gasto.tc ? `$${gasto.tc.toFixed(2)}` : "-"}</td>
+                          <td className="px-6 py-4 text-amber-400 font-mono">{gasto.pesos ? `$${formatNumber(gasto.pesos)}` : "-"}</td>
+                          <td className="px-6 py-4 text-white/60">{gasto.destino ?? "-"}</td>
+                          <td className="px-6 py-4 text-white/60">{gasto.concepto ?? "-"}</td>
+                          <td className="px-6 py-4 text-white/40 text-sm max-w-[200px] truncate">{gasto.observaciones ?? "-"}</td>
+                        </motion.tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Footer con totales */}
+              <div className="p-4 border-t border-white/5 flex items-center justify-between text-xs text-white/40">
+                <span>Mostrando {gastos.length} registros</span>
+                <div className="flex gap-2">
+                  <span className="px-3 py-1 text-rose-400 font-medium">
+                    Total: ${formatNumber(gastos.reduce((sum, g) => sum + (g.gasto || 0), 0))}
+                  </span>
+                </div>
+              </div>
             </div>
           )}
 
@@ -662,77 +771,64 @@ export default function BentoBanco() {
               <div className="flex items-center justify-between p-6 relative z-10">
                 <div>
                   <h3 className="text-2xl font-bold text-white tracking-tight">Cortes de Cuenta</h3>
-                  <p className="text-white/40 text-sm mt-1">Auditoría de balances periódicos</p>
+                  <p className="text-white/40 text-sm mt-1">Registro de cortes y balance actual</p>
                 </div>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-white/5 bg-white/[0.02]">
-                      <TableHeader>Periodo</TableHeader>
-                      <TableHeader>Fecha Inicio</TableHeader>
-                      <TableHeader>Fecha Fin</TableHeader>
+                      <TableHeader>Número</TableHeader>
+                      <TableHeader>Fecha</TableHeader>
                       <th className="text-right py-4 px-6 text-white/40 text-xs font-semibold uppercase tracking-wider">
-                        Capital Inicial
-                      </th>
-                      <th className="text-right py-4 px-6 text-white/40 text-xs font-semibold uppercase tracking-wider">
-                        Capital Final
-                      </th>
-                      <th className="text-right py-4 px-6 text-white/40 text-xs font-semibold uppercase tracking-wider">
-                        Diferencia
-                      </th>
-                      <th className="text-right py-4 px-6 text-white/40 text-xs font-semibold uppercase tracking-wider">
-                        Variación
+                        Corte (RF Actual)
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
-                    {cortes.map((corte, index) => (
-                      <motion.tr
-                        key={corte.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                        className="group/row hover:bg-white/[0.02] transition-colors"
-                      >
-                        <td className="py-4 px-6">
-                          <span
-                            className={`px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-medium border border-blue-500/20`}
-                          >
-                            {corte.periodo ?? "-"}
-                          </span>
+                    {cortes.length === 0 ? (
+                      <tr>
+                        <td colSpan={3} className="px-6 py-12 text-center text-white/40">
+                          No hay cortes registrados para este banco
                         </td>
-                        <td className="py-4 px-6 text-white/60 text-sm">
-                          {formatDate(corte.fechaInicio)}
-                        </td>
-                        <td className="py-4 px-6 text-white/60 text-sm">
-                          {formatDate(corte.fechaFin)}
-                        </td>
-                        <td className="py-4 px-6 text-right text-white/60 font-mono text-sm">
-                          ${formatNumber(corte.capitalInicial)}
-                        </td>
-                        <td className="py-4 px-6 text-right text-white font-bold text-sm">
-                          ${formatNumber(corte.capitalFinal)}
-                        </td>
-                        <td
-                          className={`py-4 px-6 text-right text-sm font-bold ${
-                            (corte.diferencia ?? 0) >= 0 ? "text-emerald-400" : "text-rose-400"
-                          }`}
+                      </tr>
+                    ) : (
+                      cortes.map((corte, index) => (
+                        <motion.tr
+                          key={corte.id || index}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="group/row hover:bg-white/[0.02] transition-colors"
                         >
-                          {(corte.diferencia ?? 0) >= 0 ? "+" : ""}${formatNumber(corte.diferencia)}
-                        </td>
-                        <td
-                          className={`py-4 px-6 text-right text-sm font-bold ${
-                            (corte.variacion ?? 0) >= 0 ? "text-emerald-400" : "text-rose-400"
-                          }`}
-                        >
-                          {(corte.variacion ?? 0) >= 0 ? "+" : ""}
-                          {corte.variacion ?? 0}%
-                        </td>
-                      </motion.tr>
-                    ))}
+                          <td className="py-4 px-6">
+                            <span className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-medium border border-blue-500/20">
+                              #{corte.numero ?? index + 1}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6 text-white/60 text-sm">
+                            {formatDate(corte.fecha)}
+                          </td>
+                          <td className="py-4 px-6 text-right text-cyan-400 font-bold text-lg font-mono">
+                            ${formatNumber(corte.corte)}
+                          </td>
+                        </motion.tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Footer con totales */}
+              <div className="p-4 border-t border-white/5 flex items-center justify-between text-xs text-white/40">
+                <span>Mostrando {cortes.length} cortes</span>
+                {cortes.length > 0 && (
+                  <div className="flex gap-2">
+                    <span className="px-3 py-1 text-cyan-400 font-medium">
+                      Último Corte: ${formatNumber(cortes[cortes.length - 1]?.corte)}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -742,7 +838,7 @@ export default function BentoBanco() {
               <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="flex items-center justify-between p-6 relative z-10">
                 <div>
-                  <h3 className="text-2xl font-bold text-white tracking-tight">Transferencias Internas</h3>
+                  <h3 className="text-2xl font-bold text-white tracking-tight">Transferencias</h3>
                   <p className="text-white/40 text-sm mt-1">Movimientos de capital entre bancos</p>
                 </div>
                 <motion.button
@@ -759,51 +855,63 @@ export default function BentoBanco() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-white/5 bg-white/[0.02]">
-                      <TableHeader>ID</TableHeader>
                       <TableHeader>Fecha</TableHeader>
-                      <TableHeader>Tipo</TableHeader>
                       <TableHeader>Origen</TableHeader>
                       <TableHeader>Destino</TableHeader>
-                      <TableHeader>Monto</TableHeader>
+                      <th className="text-right py-4 px-6 text-white/40 text-xs font-semibold uppercase tracking-wider">
+                        Monto
+                      </th>
                       <TableHeader>Concepto</TableHeader>
-                      <TableHeader>Estado</TableHeader>
+                      <TableHeader>Observaciones</TableHeader>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
-                    {transferencias.map((trans, index) => (
-                      <motion.tr
-                        key={trans.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                        className="group/row hover:bg-white/[0.02] transition-colors"
-                      >
-                        <td className="py-4 px-6 text-white/80 text-sm font-medium">{trans.id}</td>
-                        <td className="py-4 px-6 text-white/60">{formatDate(trans.fecha)}</td>
-                        <td className="py-4 px-6">
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-medium border ${
-                              String(trans.tipo) === "entrada"
-                                ? "bg-emerald-500/20 text-emerald-400"
-                                : "bg-red-500/20 text-red-400"
-                            }`}
-                          >
-                            {String(trans.tipo ?? "-")}
-                          </span>
+                    {transferencias.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="px-6 py-12 text-center text-white/40">
+                          No hay transferencias registradas
                         </td>
-                        <td className="py-4 px-6 text-white/80 text-sm">{trans.bancoOrigen ?? "-"}</td>
-                        <td className="py-4 px-6 text-white/80 text-sm">{trans.bancoDestino ?? "-"}</td>
-                        <td className="py-4 px-6 text-right text-sm font-bold">${formatNumber(trans.monto)}</td>
-                        <td className="py-4 px-6 text-white/60 text-sm">{trans.concepto ?? "-"}</td>
-                        <td className="py-4 px-6">
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400`}>
-                            {String(trans.estado ?? "-")}
-                          </span>
-                        </td>
-                      </motion.tr>
-                    ))}
+                      </tr>
+                    ) : (
+                      transferencias.map((trans, index) => (
+                        <motion.tr
+                          key={trans.id || index}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="group/row hover:bg-white/[0.02] transition-colors"
+                        >
+                          <td className="py-4 px-6 text-white/60 text-sm">{formatDate(trans.fecha)}</td>
+                          <td className="py-4 px-6">
+                            <span className="px-2 py-1 rounded-lg bg-rose-500/10 text-rose-400 text-xs font-medium">
+                              {trans.origen ?? "-"}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <span className="px-2 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-medium">
+                              {trans.destino ?? "-"}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6 text-right text-purple-400 font-bold font-mono">
+                            ${formatNumber(trans.monto)}
+                          </td>
+                          <td className="py-4 px-6 text-white/60 text-sm">{trans.concepto ?? "-"}</td>
+                          <td className="py-4 px-6 text-white/40 text-sm max-w-[200px] truncate">{trans.observaciones ?? "-"}</td>
+                        </motion.tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Footer con totales */}
+              <div className="p-4 border-t border-white/5 flex items-center justify-between text-xs text-white/40">
+                <span>Mostrando {transferencias.length} transferencias</span>
+                <div className="flex gap-2">
+                  <span className="px-3 py-1 text-purple-400 font-medium">
+                    Total: ${formatNumber(transferencias.reduce((sum, t) => sum + (t.monto || 0), 0))}
+                  </span>
+                </div>
               </div>
             </div>
           )}
@@ -811,10 +919,10 @@ export default function BentoBanco() {
       </motion.div>
 
       {/* Modals */}
-      {showIngresoModal && <CreateIngresoModalSmart isOpen={showIngresoModal} onClose={() => setShowIngresoModal(false)} />}
-      {showGastoModal && <CreateGastoModalSmart isOpen={showGastoModal} onClose={() => setShowGastoModal(false)} />}
+      {showIngresoModal && <CreateIngresoModalPremium open={showIngresoModal} onClose={() => setShowIngresoModal(false)} />}
+      {showGastoModal && <CreateGastoModalPremium open={showGastoModal} onClose={() => setShowGastoModal(false)} />}
       {showTransferenciaModal && (
-        <CreateTransferenciaModalSmart isOpen={showTransferenciaModal} onClose={() => setShowTransferenciaModal(false)} />
+        <CreateTransferenciaModalPremium open={showTransferenciaModal} onClose={() => setShowTransferenciaModal(false)} />
       )}
 
       {/* Financial River Flow - Premium Visualization */}

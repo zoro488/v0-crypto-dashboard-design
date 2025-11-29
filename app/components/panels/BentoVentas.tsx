@@ -7,7 +7,7 @@ import { Badge } from "@/app/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs"
 import { useState, useEffect, useMemo, useRef, memo } from "react"
 import { useVentasData } from "@/app/lib/firebase/firestore-hooks.service"
-import { CreateVentaModal } from "@/app/components/modals/CreateVentaModalSmart"
+import { CreateVentaModalPremium } from "@/app/components/modals/CreateVentaModalPremium"
 import { SalesFlowDiagram } from "@/app/components/visualizations/SalesFlowDiagram"
 import { 
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, 
@@ -24,6 +24,15 @@ interface VentaData {
   fecha?: string
   producto?: string
   cantidad?: number
+  // Distribución GYA
+  bovedaMonte?: number
+  fleteUtilidad?: number
+  utilidad?: number
+  distribucion?: {
+    bovedaMonte: number
+    fletes: number
+    utilidades: number
+  }
   [key: string]: unknown
 }
 
@@ -101,22 +110,42 @@ const PulsingOrb = memo(function PulsingOrb({ color = "green" }: { color?: strin
 // CUSTOM TOOLTIP
 // ============================================================================
 
-function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number; name: string; color: string }[]; label?: string }) {
+interface TooltipPayload {
+  value: number
+  name: string
+  color: string
+  dataKey?: string
+}
+
+function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: TooltipPayload[]; label?: string }) {
   if (!active || !payload) return null
+  
+  const colorNames: Record<string, string> = {
+    ventas: 'Total Ventas',
+    cobrado: 'Cobrado',
+    bovedaMonte: 'Bóveda Monte',
+    fletes: 'Flete Sur',
+    utilidades: 'Utilidades'
+  }
   
   return (
     <motion.div
       initial={{ opacity: 0, y: 5 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-xl p-3 shadow-xl"
+      className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-xl p-4 shadow-xl"
     >
-      <p className="text-xs text-zinc-400 mb-2">{label}</p>
-      {payload.map((entry, index) => (
-        <div key={index} className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-          <span className="text-sm text-white font-medium">${(entry.value / 1000).toFixed(1)}K</span>
-        </div>
-      ))}
+      <p className="text-xs text-zinc-400 mb-3 font-medium">{label}</p>
+      <div className="space-y-2">
+        {payload.map((entry, index) => (
+          <div key={index} className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
+              <span className="text-xs text-zinc-400">{colorNames[entry.dataKey || entry.name] || entry.name}</span>
+            </div>
+            <span className="text-sm text-white font-mono font-medium">${(entry.value / 1000).toFixed(1)}K</span>
+          </div>
+        ))}
+      </div>
     </motion.div>
   )
 }
@@ -142,6 +171,14 @@ export default memo(function BentoVentas() {
     const promedioVenta = ventasData.length > 0 ? totalVentas / ventasData.length : 0
     const tasaCobro = totalVentas > 0 ? (totalCobrado / totalVentas) * 100 : 0
     
+    // Métricas de distribución GYA
+    const totalBovedaMonte = ventasData.reduce((acc, v) => 
+      acc + (v.distribucion?.bovedaMonte || v.bovedaMonte || 0), 0)
+    const totalFletes = ventasData.reduce((acc, v) => 
+      acc + (v.distribucion?.fletes || v.fleteUtilidad || 0), 0)
+    const totalUtilidades = ventasData.reduce((acc, v) => 
+      acc + (v.distribucion?.utilidades || v.utilidad || 0), 0)
+    
     return {
       totalVentas,
       totalCobrado,
@@ -151,19 +188,56 @@ export default memo(function BentoVentas() {
       ventasParciales,
       promedioVenta,
       tasaCobro,
+      // GYA
+      totalBovedaMonte,
+      totalFletes,
+      totalUtilidades,
     }
   }, [ventasData])
   
-  // Datos simulados para gráficos (reemplazar con datos reales agrupados)
-  const chartData = useMemo(() => [
-    { name: 'Lun', ventas: 125000, cobrado: 98000 },
-    { name: 'Mar', ventas: 230000, cobrado: 180000 },
-    { name: 'Mie', ventas: 185000, cobrado: 160000 },
-    { name: 'Jue', ventas: 320000, cobrado: 280000 },
-    { name: 'Vie', ventas: 280000, cobrado: 250000 },
-    { name: 'Sab', ventas: 150000, cobrado: 130000 },
-    { name: 'Dom', ventas: 90000, cobrado: 80000 },
-  ], [])
+  // Datos agrupados por fecha para gráficos (datos reales)
+  const chartData = useMemo(() => {
+    // Agrupar ventas por día de la semana
+    const diasSemana = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab']
+    const agrupado: Record<string, { ventas: number, cobrado: number, bovedaMonte: number, fletes: number, utilidades: number }> = {}
+    
+    diasSemana.forEach(dia => {
+      agrupado[dia] = { ventas: 0, cobrado: 0, bovedaMonte: 0, fletes: 0, utilidades: 0 }
+    })
+    
+    ventasData.forEach((venta: VentaData) => {
+      if (venta.fecha) {
+        // Parsear fecha (formato DD/MM/YYYY o YYYY-MM-DD)
+        let date: Date
+        if (venta.fecha.includes('/')) {
+          const [dia, mes, año] = venta.fecha.split('/')
+          date = new Date(parseInt(año), parseInt(mes) - 1, parseInt(dia))
+        } else {
+          date = new Date(venta.fecha)
+        }
+        
+        const diaSemana = diasSemana[date.getDay()]
+        if (agrupado[diaSemana]) {
+          agrupado[diaSemana].ventas += venta.precioTotalVenta || 0
+          agrupado[diaSemana].cobrado += venta.montoPagado || 0
+          agrupado[diaSemana].bovedaMonte += venta.distribucion?.bovedaMonte || venta.bovedaMonte || 0
+          agrupado[diaSemana].fletes += venta.distribucion?.fletes || venta.fleteUtilidad || 0
+          agrupado[diaSemana].utilidades += venta.distribucion?.utilidades || venta.utilidad || 0
+        }
+      }
+    })
+    
+    // Ordenar por día de semana empezando desde Lunes
+    const ordenDias = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom']
+    return ordenDias.map(dia => ({
+      name: dia,
+      ventas: agrupado[dia].ventas,
+      cobrado: agrupado[dia].cobrado,
+      bovedaMonte: agrupado[dia].bovedaMonte,
+      fletes: agrupado[dia].fletes,
+      utilidades: agrupado[dia].utilidades
+    }))
+  }, [ventasData])
   
   const pieData = useMemo(() => [
     { name: 'Completas', value: metrics.ventasCompletas, color: '#22c55e' },
@@ -387,6 +461,57 @@ export default memo(function BentoVentas() {
           </div>
         </motion.div>
         
+        {/* Gráfico de Distribución GYA (Bóveda Monte, Fletes, Utilidades) */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.52 }}
+          className="relative group"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-orange-500/5 rounded-2xl blur-2xl" />
+          <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 hover:border-purple-500/30 transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-purple-400" />
+                <h3 className="text-lg font-bold text-white">Distribución GYA</h3>
+              </div>
+              <Badge variant="outline" className="bg-purple-500/10 text-purple-400 border-purple-500/20">
+                Por Día
+              </Badge>
+            </div>
+            
+            <div className="h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
+                  <XAxis dataKey="name" stroke="#71717a" fontSize={12} />
+                  <YAxis stroke="#71717a" fontSize={12} tickFormatter={(v) => `$${(v/1000)}K`} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar dataKey="bovedaMonte" stackId="a" fill="#a855f7" name="Bóveda Monte" />
+                  <Bar dataKey="fletes" stackId="a" fill="#f97316" name="Flete Sur" />
+                  <Bar dataKey="utilidades" stackId="a" fill="#22c55e" name="Utilidades" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            
+            {/* Leyenda GYA */}
+            <div className="flex justify-center gap-6 mt-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-purple-500" />
+                <span className="text-sm text-zinc-400">B. Monte</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-orange-500" />
+                <span className="text-sm text-zinc-400">Flete</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-green-500" />
+                <span className="text-sm text-zinc-400">Utilidad</span>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+        
         {/* Gráfico de Distribución de Estados */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -565,7 +690,10 @@ export default memo(function BentoVentas() {
                       <th className="text-left py-4 px-4 text-sm font-medium text-zinc-400">Cliente</th>
                       <th className="text-right py-4 px-4 text-sm font-medium text-zinc-400">Cantidad</th>
                       <th className="text-right py-4 px-4 text-sm font-medium text-zinc-400">Total</th>
-                      <th className="text-right py-4 px-4 text-sm font-medium text-zinc-400">Pendiente</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-purple-400" title="Costo recuperado al distribuidor">B. Monte</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-orange-400" title="Ganancia del flete">Flete</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-emerald-400" title="Ganancia neta">Utilidad</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-yellow-400">Pendiente</th>
                       <th className="text-center py-4 px-4 text-sm font-medium text-zinc-400">Estado</th>
                     </tr>
                   </thead>
@@ -598,6 +726,21 @@ export default memo(function BentoVentas() {
                         <td className="py-4 px-4 text-right">
                           <div className="font-mono text-white">
                             ${((venta.precioTotalVenta || 0) / 1000).toFixed(0)}K
+                          </div>
+                        </td>
+                        <td className="py-4 px-4 text-right">
+                          <div className="font-mono text-purple-400" title="Costo recuperado">
+                            ${((venta.distribucion?.bovedaMonte || venta.bovedaMonte || 0) / 1000).toFixed(0)}K
+                          </div>
+                        </td>
+                        <td className="py-4 px-4 text-right">
+                          <div className="font-mono text-orange-400" title="Flete">
+                            ${((venta.distribucion?.fletes || venta.fleteUtilidad || 0) / 1000).toFixed(0)}K
+                          </div>
+                        </td>
+                        <td className="py-4 px-4 text-right">
+                          <div className={`font-mono ${(venta.distribucion?.utilidades || venta.utilidad || 0) >= 0 ? 'text-emerald-400' : 'text-red-400'}`} title="Ganancia neta">
+                            ${((venta.distribucion?.utilidades || venta.utilidad || 0) / 1000).toFixed(0)}K
                           </div>
                         </td>
                         <td className="py-4 px-4 text-right">
@@ -641,7 +784,10 @@ export default memo(function BentoVentas() {
                       <th className="text-left py-4 px-4 text-sm font-medium text-zinc-400">Cliente</th>
                       <th className="text-right py-4 px-4 text-sm font-medium text-zinc-400">Cantidad</th>
                       <th className="text-right py-4 px-4 text-sm font-medium text-zinc-400">Total</th>
-                      <th className="text-right py-4 px-4 text-sm font-medium text-zinc-400">Pendiente</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-purple-400" title="Costo recuperado al distribuidor">B. Monte</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-orange-400" title="Ganancia del flete">Flete</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-emerald-400" title="Ganancia neta">Utilidad</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-yellow-400">Pendiente</th>
                       <th className="text-center py-4 px-4 text-sm font-medium text-zinc-400">Estado</th>
                     </tr>
                   </thead>
@@ -681,6 +827,21 @@ export default memo(function BentoVentas() {
                             </div>
                           </td>
                           <td className="py-4 px-4 text-right">
+                            <div className="font-mono text-purple-400" title="Costo recuperado">
+                              ${((venta.distribucion?.bovedaMonte || venta.bovedaMonte || 0) / 1000).toFixed(0)}K
+                            </div>
+                          </td>
+                          <td className="py-4 px-4 text-right">
+                            <div className="font-mono text-orange-400" title="Flete">
+                              ${((venta.distribucion?.fletes || venta.fleteUtilidad || 0) / 1000).toFixed(0)}K
+                            </div>
+                          </td>
+                          <td className="py-4 px-4 text-right">
+                            <div className={`font-mono ${(venta.distribucion?.utilidades || venta.utilidad || 0) >= 0 ? 'text-emerald-400' : 'text-red-400'}`} title="Ganancia neta">
+                              ${((venta.distribucion?.utilidades || venta.utilidad || 0) / 1000).toFixed(0)}K
+                            </div>
+                          </td>
+                          <td className="py-4 px-4 text-right">
                             <div className="font-mono text-yellow-400">
                               ${((venta.montoRestante || 0) / 1000).toFixed(0)}K
                             </div>
@@ -708,7 +869,10 @@ export default memo(function BentoVentas() {
                       <th className="text-left py-4 px-4 text-sm font-medium text-zinc-400">Cliente</th>
                       <th className="text-right py-4 px-4 text-sm font-medium text-zinc-400">Cantidad</th>
                       <th className="text-right py-4 px-4 text-sm font-medium text-zinc-400">Total</th>
-                      <th className="text-right py-4 px-4 text-sm font-medium text-zinc-400">Pendiente</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-purple-400" title="Costo recuperado al distribuidor">B. Monte</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-orange-400" title="Ganancia del flete">Flete</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-emerald-400" title="Ganancia neta">Utilidad</th>
+                      <th className="text-right py-4 px-4 text-sm font-medium text-yellow-400">Pendiente</th>
                       <th className="text-center py-4 px-4 text-sm font-medium text-zinc-400">Estado</th>
                     </tr>
                   </thead>
@@ -745,6 +909,21 @@ export default memo(function BentoVentas() {
                           <td className="py-4 px-4 text-right">
                             <div className="font-mono text-white">
                               ${((venta.precioTotalVenta || 0) / 1000).toFixed(0)}K
+                            </div>
+                          </td>
+                          <td className="py-4 px-4 text-right">
+                            <div className="font-mono text-purple-400" title="Costo recuperado">
+                              ${((venta.distribucion?.bovedaMonte || venta.bovedaMonte || 0) / 1000).toFixed(0)}K
+                            </div>
+                          </td>
+                          <td className="py-4 px-4 text-right">
+                            <div className="font-mono text-orange-400" title="Flete">
+                              ${((venta.distribucion?.fletes || venta.fleteUtilidad || 0) / 1000).toFixed(0)}K
+                            </div>
+                          </td>
+                          <td className="py-4 px-4 text-right">
+                            <div className={`font-mono ${(venta.distribucion?.utilidades || venta.utilidad || 0) >= 0 ? 'text-emerald-400' : 'text-red-400'}`} title="Ganancia neta">
+                              ${((venta.distribucion?.utilidades || venta.utilidad || 0) / 1000).toFixed(0)}K
                             </div>
                           </td>
                           <td className="py-4 px-4 text-right">
@@ -785,7 +964,7 @@ export default memo(function BentoVentas() {
         </div>
       </motion.div>
 
-      <CreateVentaModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <CreateVentaModalPremium open={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   )
 })

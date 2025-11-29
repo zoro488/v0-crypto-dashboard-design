@@ -6,8 +6,8 @@ import { Building2, AlertCircle, CheckCircle2, Clock, DollarSign, Package, Plus,
 import { Button } from "@/app/components/ui/button"
 import { Badge } from "@/app/components/ui/badge"
 import { useDistribuidores, useOrdenesCompra } from "@/app/lib/firebase/firestore-hooks.service"
-import CreateDistribuidorModalSmart from "@/app/components/modals/CreateDistribuidorModalSmart"
-import CreatePagoDistribuidorModal from "@/app/components/modals/CreatePagoDistribuidorModal"
+import { CreateDistribuidorModalPremium } from "@/app/components/modals/CreateDistribuidorModalPremium"
+import { CreatePagoDistribuidorModalPremium } from "@/app/components/modals/CreatePagoDistribuidorModalPremium"
 import { Skeleton } from "@/app/components/ui/skeleton"
 import { Alert, AlertDescription, AlertTitle } from "@/app/components/ui/alert"
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from "recharts"
@@ -67,14 +67,15 @@ export default function BentoDistribuidores() {
   // Colores para gráficos
   const CHART_COLORS = ['#a855f7', '#ec4899', '#f59e0b', '#10b981', '#06b6d4']
 
-  // Datos para gráficos
+  // Datos para gráficos - Usando datos reales de top distribuidores
   const trendData = useMemo(() => {
-    return Array.from({ length: 7 }, (_, i) => ({
-      name: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'][i],
-      compras: Math.floor(Math.random() * 80000) + 40000,
-      pagos: Math.floor(Math.random() * 60000) + 20000,
+    return topDistribuidores.slice(0, 7).map((d, i) => ({
+      name: d.nombre?.substring(0, 6) || `D${i + 1}`,
+      compras: d.totalOrdenesCompra ?? 0,
+      pagos: d.totalPagado ?? 0,
+      deuda: d.deudaTotal ?? 0
     }))
-  }, [])
+  }, [topDistribuidores])
 
   // Distribución de proveedores por estado
   const distribuidoresPorEstado = useMemo(() => {
@@ -432,11 +433,11 @@ export default function BentoDistribuidores() {
       </motion.div>
 
       {/* Create Distribuidor Modal */}
-      <CreateDistribuidorModalSmart 
-        isOpen={showCreateModal} 
+      <CreateDistribuidorModalPremium 
+        open={showCreateModal} 
         onClose={() => setShowCreateModal(false)} 
       />
-      <CreatePagoDistribuidorModal isOpen={showAbonoModal} onClose={() => setShowAbonoModal(false)} />
+      <CreatePagoDistribuidorModalPremium open={showAbonoModal} onClose={() => setShowAbonoModal(false)} />
     </div>
   )
 }

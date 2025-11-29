@@ -11,8 +11,8 @@ import { Button } from "@/app/components/ui/button"
 import { Badge } from "@/app/components/ui/badge"
 import { useDistribuidores, useOrdenesCompra } from "@/app/lib/firebase/firestore-hooks.service"
 import { useFirestoreCRUD } from "@/app/hooks/useFirestoreCRUD"
-import CreateDistribuidorModalSmart from "@/app/components/modals/CreateDistribuidorModalSmart"
-import CreatePagoDistribuidorModal from "@/app/components/modals/CreatePagoDistribuidorModal"
+import { CreateDistribuidorModalPremium } from "@/app/components/modals/CreateDistribuidorModalPremium"
+import { CreatePagoDistribuidorModalPremium } from "@/app/components/modals/CreatePagoDistribuidorModalPremium"
 import { Skeleton } from "@/app/components/ui/skeleton"
 import { Alert, AlertDescription, AlertTitle } from "@/app/components/ui/alert"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, BarChart, Bar } from "recharts"
@@ -849,12 +849,12 @@ export default function BentoDistribuidoresPremium() {
       />
 
       {/* Modals */}
-      <CreateDistribuidorModalSmart 
-        isOpen={showCreateModal} 
+      <CreateDistribuidorModalPremium 
+        open={showCreateModal} 
         onClose={() => setShowCreateModal(false)} 
       />
-      <CreatePagoDistribuidorModal 
-        isOpen={showPagoModal} 
+      <CreatePagoDistribuidorModalPremium 
+        open={showPagoModal} 
         onClose={() => setShowPagoModal(false)} 
       />
       <DistribuidorProfileModal

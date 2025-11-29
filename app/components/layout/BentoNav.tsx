@@ -22,9 +22,9 @@ import {
 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Button } from "@/app/components/ui/button"
-import CreateOrdenCompraModal from "@/app/components/modals/CreateOrdenCompraModalSmart"
-import CreateVentaModal from "@/app/components/modals/CreateVentaModalSmart"
-import CreateTransferenciaModal from "@/app/components/modals/CreateTransferenciaModalSmart"
+import { CreateOrdenCompraModalPremium } from "@/app/components/modals/CreateOrdenCompraModalPremium"
+import { CreateVentaModalPremium } from "@/app/components/modals/CreateVentaModalPremium"
+import { CreateTransferenciaModalPremium } from "@/app/components/modals/CreateTransferenciaModalPremium"
 
 export default function BentoNav() {
   const { currentPanel, setCurrentPanel } = useAppStore()
@@ -309,9 +309,9 @@ export default function BentoNav() {
         </motion.div>
       )}
 
-      <CreateOrdenCompraModal open={showOrdenModal} onClose={() => setShowOrdenModal(false)} />
-      <CreateVentaModal open={showVentaModal} onClose={() => setShowVentaModal(false)} />
-      <CreateTransferenciaModal isOpen={showTransferenciaModal} onClose={() => setShowTransferenciaModal(false)} />
+      <CreateOrdenCompraModalPremium open={showOrdenModal} onClose={() => setShowOrdenModal(false)} />
+      <CreateVentaModalPremium open={showVentaModal} onClose={() => setShowVentaModal(false)} />
+      <CreateTransferenciaModalPremium open={showTransferenciaModal} onClose={() => setShowTransferenciaModal(false)} />
     </>
   )
 }
