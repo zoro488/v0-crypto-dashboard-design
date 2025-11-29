@@ -159,20 +159,18 @@ export function usePaginatedFirestore<T extends DocumentData>(
     }
   }, [])
 
-  // Construir query base con filtros
+  // Construir constraints de filtro (solo where clauses)
+  const buildFilterConstraints = useCallback((): QueryConstraint[] => {
+    return filters.map((filter) => where(filter.field, filter.operator, filter.value))
+  }, [filters])
+
+  // Construir query base con filtros y ordenamiento
   const buildBaseConstraints = useCallback((): QueryConstraint[] => {
-    const constraints: QueryConstraint[] = []
-    
-    // Agregar filtros
-    filters.forEach((filter) => {
-      constraints.push(where(filter.field, filter.operator, filter.value))
-    })
-    
+    const constraints = buildFilterConstraints()
     // Agregar ordenamiento
     constraints.push(orderBy(orderByField, orderDirection))
-    
     return constraints
-  }, [filters, orderByField, orderDirection])
+  }, [buildFilterConstraints, orderByField, orderDirection])
 
   // Obtener conteo total
   const fetchTotalCount = useCallback(async () => {
@@ -180,18 +178,16 @@ export function usePaginatedFirestore<T extends DocumentData>(
 
     try {
       const collectionRef = collection(db, collectionName)
-      const baseConstraints = buildBaseConstraints()
-      const countQuery = query(collectionRef, ...baseConstraints.filter(c => 
-        // Solo incluir where constraints para el conteo
-        c.type === 'where',
-      ))
+      // Solo usar filtros para el conteo (sin orderBy)
+      const filterConstraints = buildFilterConstraints()
+      const countQuery = query(collectionRef, ...filterConstraints)
       
       const snapshot = await getCountFromServer(countQuery)
       setTotalCount(snapshot.data().count)
     } catch (err) {
       console.error('Error al obtener conteo:', err)
     }
-  }, [db, enabled, collectionName, buildBaseConstraints])
+  }, [db, enabled, collectionName, buildFilterConstraints])
 
   // Fetch datos de una página
   const fetchPage = useCallback(async (

@@ -91,6 +91,20 @@ function formatCurrency(value: number): string {
 }
 
 /**
+ * Formatea un valor de forma segura como moneda (maneja null/undefined)
+ */
+function safeFormatCurrency(value: unknown): string {
+  if (value === null || value === undefined) {
+    return ''
+  }
+  if (typeof value === 'number') {
+    return formatCurrency(value)
+  }
+  const num = Number(value)
+  return isNaN(num) ? String(value) : formatCurrency(num)
+}
+
+/**
  * Prepara los datos para exportación según las columnas definidas
  */
 function prepareData<T>(data: T[], columns: ExportColumn<T>[]): (string | number)[][] {
@@ -373,8 +387,8 @@ export async function exportVentasToExcel(
       { key: 'fecha', header: 'Fecha', width: 12 },
       { key: 'cliente', header: 'Cliente', width: 25 },
       { key: 'cantidad', header: 'Cantidad', width: 10 },
-      { key: 'precioVenta', header: 'Precio Unit.', width: 15, format: (v) => formatCurrency(v as number) },
-      { key: 'totalVenta', header: 'Total', width: 15, format: (v) => formatCurrency(v as number) },
+      { key: 'precioVenta', header: 'Precio Unit.', width: 15, format: (v) => safeFormatCurrency(v) },
+      { key: 'totalVenta', header: 'Total', width: 15, format: (v) => safeFormatCurrency(v) },
       { key: 'estadoPago', header: 'Estado', width: 12 },
     ],
     data: ventas,
@@ -399,9 +413,9 @@ export async function exportBancosToPDF(
     orientation: 'landscape',
     columns: [
       { key: 'nombre', header: 'Banco', width: 40 },
-      { key: 'capitalActual', header: 'Capital Actual', width: 35, format: (v) => formatCurrency(v as number) },
-      { key: 'historicoIngresos', header: 'Total Ingresos', width: 35, format: (v) => formatCurrency(v as number) },
-      { key: 'historicoGastos', header: 'Total Gastos', width: 35, format: (v) => formatCurrency(v as number) },
+      { key: 'capitalActual', header: 'Capital Actual', width: 35, format: (v) => safeFormatCurrency(v) },
+      { key: 'historicoIngresos', header: 'Total Ingresos', width: 35, format: (v) => safeFormatCurrency(v) },
+      { key: 'historicoGastos', header: 'Total Gastos', width: 35, format: (v) => safeFormatCurrency(v) },
     ],
     data: bancos,
   })
@@ -428,7 +442,7 @@ export async function exportMovimientosToExcel(
       { key: 'fecha', header: 'Fecha', width: 12 },
       { key: 'bancoId', header: 'Banco', width: 15 },
       { key: 'tipoMovimiento', header: 'Tipo', width: 15 },
-      { key: 'monto', header: 'Monto', width: 15, format: (v) => formatCurrency(v as number) },
+      { key: 'monto', header: 'Monto', width: 15, format: (v) => safeFormatCurrency(v) },
       { key: 'concepto', header: 'Concepto', width: 30 },
     ],
     data: movimientos,
@@ -436,4 +450,4 @@ export async function exportMovimientosToExcel(
 }
 
 // Re-exportar utilidades de formato
-export { formatCurrency, formatDate }
+export { formatCurrency, safeFormatCurrency, formatDate }
