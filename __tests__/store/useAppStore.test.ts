@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { useAppStore } from '@/frontend/app/lib/store/useAppStore'
+import { useAppStore } from '@/app/lib/store/useAppStore'
 import '@testing-library/jest-dom'
 
 describe('useAppStore', () => {

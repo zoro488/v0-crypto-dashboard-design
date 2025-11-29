@@ -3,6 +3,9 @@ const nextConfig = {
   // Directorio de la app dentro de frontend
   distDir: '.next',
   
+  // CRÍTICO: Usar /frontend como directorio base (contiene /app)
+  // Next.js buscará automáticamente /frontend/app
+  
   typescript: {
     ignoreBuildErrors: false,
     tsconfigPath: './tsconfig.json',

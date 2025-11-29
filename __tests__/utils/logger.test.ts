@@ -2,7 +2,7 @@
  * Unit Tests - Logger Utility
  */
 
-import { logger } from '@/frontend/app/lib/utils/logger'
+import { logger } from '@/app/lib/utils/logger'
 
 describe('Logger Utility', () => {
   let consoleWarnSpy: jest.SpyInstance

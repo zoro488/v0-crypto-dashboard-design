@@ -5,13 +5,13 @@ import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import Script from "next/script"
 import "./globals.css"
-import { AppProvider } from "@/frontend/app/lib/context/AppContext"
-import { Toaster } from "@/frontend/app/components/ui/toaster"
-import { ErrorBoundary } from "@/frontend/app/components/ErrorBoundary"
-import ImmersiveWrapper from "@/frontend/app/components/layout/ImmersiveWrapper"
-import { FloatingAIWidget } from "@/frontend/app/components/FloatingAIWidget"
-import { SplashScreen } from "@/frontend/app/components/splash"
-// import { PerformanceMonitor } from "@/frontend/app/components/PerformanceMonitor"
+import { AppProvider } from "@/app/lib/context/AppContext"
+import { Toaster } from "@/app/components/ui/toaster"
+import { ErrorBoundary } from "@/app/components/ErrorBoundary"
+import ImmersiveWrapper from "@/app/components/layout/ImmersiveWrapper"
+import { SplashScreen } from "@/app/components/splash"
+// FloatingAIWidget removido - usar FloatingSplineAIWidget desde page.tsx
+// para evitar widgets duplicados
 
 const geist = Geist({ 
   subsets: ["latin"],
@@ -115,8 +115,7 @@ export default function RootLayout({
                 {children}
               </div>
               
-              {/* 🤖 AGENTE IA FLOTANTE - Siempre presente */}
-              <FloatingAIWidget />
+              {/* 🤖 AGENTE IA FLOTANTE - Manejado en page.tsx con FloatingSplineAIWidget */}
               
               <Toaster />
             </SplashScreen>

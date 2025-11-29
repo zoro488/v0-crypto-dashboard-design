@@ -3,8 +3,8 @@ service cloud.firestore {
   match /databases/{database}/documents {
     
     // 🔒 REGLAS DE PRODUCCIÓN - CHRONOS SYSTEM
-    // Última actualización: 2025-11-26
-    // Sincronizado con CSVs de datos reales
+    // Última actualización: 2025-01-27
+    // Sincronizado con CSVs de datos reales (783 registros)
     
     // ===================================================================
     // FUNCIONES DE VALIDACIÓN
@@ -23,7 +23,19 @@ service cloud.firestore {
     }
     
     function isValidMonto() {
-      return request.resource.data.monto is number;
+      return request.resource.data.monto is number && request.resource.data.monto >= 0;
+    }
+    
+    function isValidCantidad() {
+      return request.resource.data.cantidad is number && request.resource.data.cantidad > 0;
+    }
+    
+    function isValidBancoId(bancoId) {
+      return bancoId in ['boveda_monte', 'boveda_usa', 'profit', 'leftie', 'azteca', 'flete_sur', 'utilidades'];
+    }
+    
+    function isValidTipoMovimiento() {
+      return request.resource.data.tipoMovimiento in ['ingreso', 'gasto', 'transferencia_entrada', 'transferencia_salida', 'abono_cliente', 'pago_distribuidor'];
     }
 
     // ===================================================================
@@ -32,8 +44,11 @@ service cloud.firestore {
     // ===================================================================
     match /bancos/{bancoId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && hasRequiredFields(['nombre', 'tipo']);
-      allow update, delete: if isAuthenticated();
+      allow create: if isAuthenticated() 
+        && hasRequiredFields(['nombre', 'tipo'])
+        && isValidBancoId(bancoId);
+      allow update: if isAuthenticated();
+      allow delete: if false; // Los bancos no se pueden eliminar
     }
 
     // ===================================================================
@@ -44,9 +59,54 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated() 
         && hasRequiredFields(['bancoId', 'tipoMovimiento', 'monto', 'fecha']) 
-        && isValidMonto();
+        && isValidMonto()
+        && isValidTipoMovimiento();
       allow update: if isAuthenticated() && isValidMonto();
       allow delete: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // COLECCIÓN: TRANSFERENCIAS (Entre bancos)
+    // ===================================================================
+    match /transferencias/{transferenciaId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() 
+        && hasRequiredFields(['bancoOrigenId', 'bancoDestinoId', 'monto', 'fecha'])
+        && isValidMonto();
+      allow update, delete: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // COLECCIÓN: ABONOS (Pagos de clientes/distribuidores)
+    // ===================================================================
+    match /abonos/{abonoId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() 
+        && hasRequiredFields(['tipo', 'entidadId', 'monto', 'bancoDestino'])
+        && isValidMonto();
+      allow update, delete: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // COLECCIÓN: INGRESOS
+    // ===================================================================
+    match /ingresos/{ingresoId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() 
+        && hasRequiredFields(['monto', 'concepto', 'bancoDestino'])
+        && isValidMonto();
+      allow update, delete: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // COLECCIÓN: GASTOS
+    // ===================================================================
+    match /gastos/{gastoId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() 
+        && hasRequiredFields(['monto', 'concepto', 'bancoOrigen'])
+        && isValidMonto();
+      allow update, delete: if isAuthenticated();
     }
 
     // ===================================================================
@@ -55,7 +115,8 @@ service cloud.firestore {
     match /ventas/{ventaId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated() 
-        && hasRequiredFields(['cliente', 'fecha', 'totalVenta']);
+        && hasRequiredFields(['cliente', 'fecha', 'cantidad'])
+        && isValidCantidad();
       allow update, delete: if isAuthenticated();
     }
 
@@ -84,12 +145,13 @@ service cloud.firestore {
     match /ordenes_compra/{ordenId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated() 
-        && hasRequiredFields(['distribuidor', 'fecha', 'costoTotal', 'cantidad']);
+        && hasRequiredFields(['distribuidor', 'fecha', 'cantidad'])
+        && isValidCantidad();
       allow update, delete: if isAuthenticated();
     }
 
     // ===================================================================
-    // COLECCIÓN: GASTOS_ABONOS (302 registros - histórico de gastos/abonos)
+    // COLECCIÓN: GASTOS_ABONOS (302 registros - histórico legacy)
     // ===================================================================
     match /gastos_abonos/{gastoId} {
       allow read: if isAuthenticated();
@@ -103,25 +165,29 @@ service cloud.firestore {
     // ===================================================================
     match /almacen/{itemId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && hasRequiredFields(['cantidad']);
+      allow create: if isAuthenticated() && hasRequiredFields(['nombre']);
       allow update, delete: if isAuthenticated();
     }
 
     match /almacen_productos/{productoId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && hasRequiredFields(['nombre', 'stock']);
+      allow create: if isAuthenticated() && hasRequiredFields(['nombre']);
       allow update, delete: if isAuthenticated();
     }
 
     match /almacen_entradas/{entradaId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && hasRequiredFields(['fecha', 'cantidad']);
+      allow create: if isAuthenticated() 
+        && hasRequiredFields(['fecha', 'cantidad'])
+        && isValidCantidad();
       allow update, delete: if isAuthenticated();
     }
 
     match /almacen_salidas/{salidaId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && hasRequiredFields(['fecha', 'cantidad']);
+      allow create: if isAuthenticated() 
+        && hasRequiredFields(['fecha', 'cantidad'])
+        && isValidCantidad();
       allow update, delete: if isAuthenticated();
     }
 
@@ -140,7 +206,7 @@ service cloud.firestore {
     match /logs/{logId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated();
-      allow update, delete: if false;
+      allow update, delete: if false; // ⚠️ Los logs son INMUTABLES
     }
 
     // ===================================================================
@@ -155,7 +221,7 @@ service cloud.firestore {
     }
 
     // ===================================================================
-    // COLECCIÓN: USUARIOS (Perfil de usuario)
+    // COLECCIÓN: USUARIOS (Perfil de usuario - solo el propietario)
     // ===================================================================
     match /usuarios/{userId} {
       allow read, write: if isOwner(userId);
@@ -170,6 +236,7 @@ service cloud.firestore {
 
     // ===================================================================
     // REGLA POR DEFECTO - DENEGAR TODO LO DEMÁS
+    // ⚠️ CRÍTICO: No cambiar esta regla
     // ===================================================================
     match /{document=**} {
       allow read, write: if false;

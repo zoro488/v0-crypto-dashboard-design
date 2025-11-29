@@ -1,25 +1,25 @@
 "use client"
 
-import { useAppStore } from "@/frontend/app/lib/store/useAppStore"
-import BentoNav from "@/frontend/app/components/layout/BentoNav"
-import { FloatingSplineAIWidget } from "@/frontend/app/components/FloatingSplineAIWidget"
-import { FirestoreSetupAlert } from "@/frontend/app/components/ui/FirestoreSetupAlert"
-import { CommandMenu } from "@/frontend/app/components/CommandMenu"
+import { useAppStore } from "@/app/lib/store/useAppStore"
+import BentoNav from "@/app/components/layout/BentoNav"
+import { FloatingSplineAIWidget } from "@/app/components/FloatingSplineAIWidget"
+import { FirestoreSetupAlert } from "@/app/components/ui/FirestoreSetupAlert"
+import { CommandMenu } from "@/app/components/CommandMenu"
 import { motion, AnimatePresence } from "framer-motion"
 import { useEffect, lazy, Suspense } from "react"
-import { useOptimizedPerformance } from "@/frontend/app/lib/hooks/useOptimizedPerformance"
-import { ScrollProgress, ScrollReveal } from "@/frontend/app/components/ui/ScrollReveal"
+import { useOptimizedPerformance } from "@/app/lib/hooks/useOptimizedPerformance"
+import { ScrollProgress, ScrollReveal } from "@/app/components/ui/ScrollReveal"
 
-const BentoDashboard = lazy(() => import("@/frontend/app/components/panels/BentoDashboard"))
-const BentoOrdenesCompra = lazy(() => import("@/frontend/app/components/panels/BentoOrdenesCompra"))
-const BentoVentas = lazy(() => import("@/frontend/app/components/panels/BentoVentas"))
-const BentoBanco = lazy(() => import("@/frontend/app/components/panels/BentoBanco"))
-const BentoAlmacen = lazy(() => import("@/frontend/app/components/panels/BentoAlmacen"))
-const BentoReportes = lazy(() => import("@/frontend/app/components/panels/BentoReportes"))
-const BentoIA = lazy(() => import("@/frontend/app/components/panels/BentoIA"))
-const BentoDistribuidores = lazy(() => import("@/frontend/app/components/panels/BentoDistribuidores"))
-const BentoClientes = lazy(() => import("@/frontend/app/components/panels/BentoClientes"))
-const BentoProfit = lazy(() => import("@/frontend/app/components/panels/BentoProfit"))
+const BentoDashboard = lazy(() => import("@/app/components/panels/BentoDashboard"))
+const BentoOrdenesCompra = lazy(() => import("@/app/components/panels/BentoOrdenesCompra"))
+const BentoVentas = lazy(() => import("@/app/components/panels/BentoVentas"))
+const BentoBanco = lazy(() => import("@/app/components/panels/BentoBanco"))
+const BentoAlmacen = lazy(() => import("@/app/components/panels/BentoAlmacen"))
+const BentoReportes = lazy(() => import("@/app/components/panels/BentoReportes"))
+const BentoIA = lazy(() => import("@/app/components/panels/BentoIA"))
+const BentoDistribuidores = lazy(() => import("@/app/components/panels/BentoDistribuidores"))
+const BentoClientes = lazy(() => import("@/app/components/panels/BentoClientes"))
+const BentoProfit = lazy(() => import("@/app/components/panels/BentoProfit"))
 
 const PanelLoader = () => (
   <div className="flex items-center justify-center min-h-[60vh]">
@@ -177,8 +177,7 @@ export default function Chronos() {
         </main>
       </div>
 
-      {/* FloatingSplineAIWidget temporalmente deshabilitado - causa errores de position */}
-      {/* <FloatingSplineAIWidget /> */}
+      <FloatingSplineAIWidget />
 
       {/* Command Menu - Cmd+K para búsqueda rápida */}
       <CommandMenu />

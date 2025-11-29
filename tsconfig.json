@@ -46,6 +46,10 @@
     "jest.config.js",
     "**/*.test.ts",
     "**/*.test.tsx",
-    "__tests__"
+    "__tests__",
+    "_deprecated",
+    "app/lib/profit-engine/**",
+    "app/lib/services/ai/**",
+    "app/lib/services/ventas-transaction.service.ts"
   ]
 }

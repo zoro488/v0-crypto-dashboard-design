@@ -468,9 +468,9 @@ async function verifyUIConnections(): Promise<CodeIssue[]> {
   const issues: CodeIssue[] = []
   
   const directoriesToScan = [
-    'frontend/app/lib/firebase',
-    'frontend/app/hooks',
-    'frontend/app/components',
+    'app/lib/firebase',
+    'app/hooks',
+    'app/components',
     'app/lib/firebase',
     'app/hooks',
     'app/components',

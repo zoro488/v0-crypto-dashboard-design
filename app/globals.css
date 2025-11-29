@@ -12,6 +12,17 @@ html, body {
   min-height: 100%;
   background-color: hsl(240 10% 3.9%);
   color: hsl(0 0% 98%);
+  /* CRÍTICO: Prevenir scroll horizontal en toda la app */
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Contenedor principal - Sin scroll horizontal */
+#__next,
+main,
+.main-content {
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 @layer theme {
@@ -25,6 +36,26 @@ html, body {
   /* Updated color palette for Apple/SpaceX/Tesla aesthetic */
   --background: 240 10% 3.9%;
   --foreground: 0 0% 98%;
+
+  /* ========================================
+   * 🏦 COLORES DE LOS 7 BANCOS - CHRONOS
+   * ======================================== */
+  --color-boveda-monte: #8b5cf6;   /* Violeta - Bóveda principal MXN */
+  --color-boveda-usa: #3b82f6;     /* Azul Real - Bóveda USD */
+  --color-utilidades: #10b981;     /* Esmeralda - Ganancias */
+  --color-fletes: #f59e0b;         /* Ámbar - Transporte */
+  --color-azteca: #ec4899;         /* Rosa - Servicios */
+  --color-leftie: #6366f1;         /* Índigo - Operaciones USD */
+  --color-profit: #14b8a6;         /* Teal - Banco operativo */
+  
+  /* Versiones con transparencia para fondos */
+  --color-boveda-monte-bg: rgba(139, 92, 246, 0.15);
+  --color-boveda-usa-bg: rgba(59, 130, 246, 0.15);
+  --color-utilidades-bg: rgba(16, 185, 129, 0.15);
+  --color-fletes-bg: rgba(245, 158, 11, 0.15);
+  --color-azteca-bg: rgba(236, 72, 153, 0.15);
+  --color-leftie-bg: rgba(99, 102, 241, 0.15);
+  --color-profit-bg: rgba(20, 184, 166, 0.15);
 
   /* Accent colors - Premium and subtle */
   --accent-blue: 212 100% 55%; /* Apple blue */
@@ -449,6 +480,7 @@ html, body {
   padding: 24px;
   max-width: 1920px;
   margin: 0 auto;
+  overflow-x: hidden;
 }
 
 .bento-sm {

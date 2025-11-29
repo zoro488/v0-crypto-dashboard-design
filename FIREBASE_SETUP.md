@@ -7,50 +7,51 @@ Para que FlowDistributor funcione correctamente, necesitas configurar las reglas
 ### Pasos:
 
 1. Ve a [Firebase Console](https://console.firebase.google.com/)
-2. Selecciona tu proyecto: **premium-ecosystem-1760790572**
+2. Selecciona tu proyecto
 3. En el menú lateral, ve a **Firestore Database**
 4. Click en la pestaña **Rules** (Reglas)
 5. Copia y pega el contenido del archivo `firestore.rules`
 6. Click en **Publish** (Publicar)
 
-### Reglas de Seguridad (Copiar esto):
+### ⚠️ IMPORTANTE - Reglas de Seguridad
 
-\`\`\`
+**NUNCA uses `allow read, write: if true;` en producción.**
+
+Las reglas correctas requieren autenticación. Consulta el archivo `firestore.rules` del proyecto que implementa:
+- Validación de autenticación (`request.auth != null`)
+- Validación de campos requeridos
+- Funciones de validación reutilizables
+- Regla por defecto que deniega acceso
+
+### Reglas de Producción (en firestore.rules):
+
+```javascript
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    match /bancos/{bancoId} {
-      allow read, write: if true;
+    // Función de autenticación
+    function isAuthenticated() {
+      return request.auth != null;
     }
     
-    match /ordenesCompra/{ordenId} {
-      allow read, write: if true;
+    // Todas las colecciones requieren autenticación
+    match /bancos/{bancoId} {
+      allow read, write: if isAuthenticated();
     }
     
     match /ventas/{ventaId} {
-      allow read, write: if true;
+      allow read, write: if isAuthenticated();
     }
     
-    match /distribuidores/{distribuidorId} {
-      allow read, write: if true;
-    }
+    // ... ver firestore.rules para reglas completas
     
-    match /clientes/{clienteId} {
-      allow read, write: if true;
-    }
-    
-    match /almacen/{productoId} {
-      allow read, write: if true;
-    }
-    
-    match /productos/{productoId} {
-      allow read, write: if true;
+    // DENEGAR todo lo demás
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
-\`\`\`
+```
 
 ## 2. Inicializar Colecciones
 

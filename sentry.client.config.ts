@@ -5,7 +5,7 @@
  * ╚════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { initSentry } from './frontend/app/lib/monitoring/sentry'
+import { initSentry } from './app/lib/monitoring/sentry'
 
 // Initialize Sentry for client-side
 initSentry()

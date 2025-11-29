@@ -671,7 +671,7 @@ async function main() {
   logSection('2. BLINDAJE DE HOOKS FIRESTORE')
   
   // Frontend
-  const frontendHooksPath = path.join(rootDir, 'frontend/app/lib/firebase/firestore-hooks.service.ts')
+  const frontendHooksPath = path.join(rootDir, 'app/lib/firebase/firestore-hooks.service.ts')
   backupFile(frontendHooksPath)
   writeFile(frontendHooksPath, SAFE_FIRESTORE_HOOKS)
   
@@ -684,7 +684,7 @@ async function main() {
   logSection('3. CORTAFUEGOS DE UI (SafeView)')
   
   // Frontend
-  const frontendSafeViewPath = path.join(rootDir, 'frontend/app/components/SafeView.tsx')
+  const frontendSafeViewPath = path.join(rootDir, 'app/components/SafeView.tsx')
   writeFile(frontendSafeViewPath, SAFE_VIEW_COMPONENT)
   
   // App (duplicado)
