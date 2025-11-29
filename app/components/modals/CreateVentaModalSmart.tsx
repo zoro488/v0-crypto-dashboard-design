@@ -315,7 +315,7 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
     setCarrito(prev => prev.filter(item => item.id !== itemId))
   }
 
-  // Actualizar precio manualmente
+  // Actualizar precio de venta manualmente
   const actualizarPrecio = (itemId: string, nuevoPrecio: number) => {
     setCarrito(prev =>
       prev.map(item => {
@@ -324,6 +324,32 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
           ...item,
           precioUnitario: Math.max(0, nuevoPrecio),
           subtotal: item.cantidad * Math.max(0, nuevoPrecio),
+        }
+      })
+    )
+  }
+
+  // Actualizar precio de compra (costo)
+  const actualizarPrecioCompra = (itemId: string, nuevoPrecio: number) => {
+    setCarrito(prev =>
+      prev.map(item => {
+        if (item.id !== itemId) return item
+        return {
+          ...item,
+          precioCompra: Math.max(0, nuevoPrecio),
+        }
+      })
+    )
+  }
+
+  // Actualizar precio de flete
+  const actualizarPrecioFlete = (itemId: string, nuevoPrecio: number) => {
+    setCarrito(prev =>
+      prev.map(item => {
+        if (item.id !== itemId) return item
+        return {
+          ...item,
+          precioFlete: Math.max(0, nuevoPrecio),
         }
       })
     )
@@ -787,22 +813,20 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
                               "hover:bg-white/10 hover:border-white/20"
                             )}
                           >
-                            <div className="flex items-start justify-between gap-4">
-                              {/* Info del producto */}
-                              <div className="flex-1 min-w-0">
-                                <p className="font-medium text-white truncate">
-                                  {item.nombre}
-                                </p>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <span className="text-xs text-gray-500">
-                                    Stock: {item.stockDisponible}
-                                  </span>
-                                  <span className="text-xs text-gray-600">•</span>
-                                  <span className="text-xs text-gray-500">
-                                    Costo: {formatearMonto(item.precioCompra)}
-                                  </span>
+                            <div className="flex flex-col gap-3">
+                              {/* Fila 1: Nombre y controles */}
+                              <div className="flex items-start justify-between gap-4">
+                                {/* Info del producto */}
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-white truncate">
+                                    {item.nombre}
+                                  </p>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <span className="text-xs text-gray-500">
+                                      Stock: {item.stockDisponible}
+                                    </span>
+                                  </div>
                                 </div>
-                              </div>
 
                               {/* Controles de cantidad */}
                               <div className="flex items-center gap-2">
@@ -856,6 +880,40 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
                               >
                                 <Trash2 className="w-4 h-4" />
                               </Button>
+                              </div>
+                              
+                              {/* Fila 2: Precios editables */}
+                              <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/5">
+                                {/* Precio Compra (Costo) */}
+                                <div>
+                                  <Label className="text-[10px] text-blue-400">💰 Costo/u</Label>
+                                  <Input
+                                    type="number"
+                                    value={item.precioCompra}
+                                    onChange={(e) => actualizarPrecioCompra(item.id, Number(e.target.value))}
+                                    className="h-7 text-xs bg-blue-500/10 border-blue-500/30 text-blue-300"
+                                  />
+                                </div>
+                                {/* Precio Flete */}
+                                <div>
+                                  <Label className="text-[10px] text-orange-400">🚚 Flete/u</Label>
+                                  <Input
+                                    type="number"
+                                    value={item.precioFlete}
+                                    onChange={(e) => actualizarPrecioFlete(item.id, Number(e.target.value))}
+                                    className="h-7 text-xs bg-orange-500/10 border-orange-500/30 text-orange-300"
+                                  />
+                                </div>
+                                {/* Utilidad calculada */}
+                                <div>
+                                  <Label className="text-[10px] text-green-400">💎 Utilidad/u</Label>
+                                  <div className="h-7 flex items-center px-2 rounded bg-green-500/10 border border-green-500/30">
+                                    <span className="text-xs font-bold text-green-400">
+                                      {formatearMonto(item.precioUnitario - item.precioCompra - item.precioFlete)}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                           </motion.div>
                         ))
@@ -863,26 +921,66 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
                     </AnimatePresence>
                   </div>
 
-                  {/* Totales */}
+                  {/* Totales con Distribución a 3 Bancos */}
                   {carrito.length > 0 && (
-                    <div className="mt-4 pt-4 border-t border-white/10">
+                    <div className="mt-4 pt-4 border-t border-white/10 space-y-4">
+                      {/* Resumen rápido */}
                       <div className="flex justify-between items-center">
                         <div className="space-y-1 text-sm">
-                          <div className="flex justify-between gap-8">
+                          <div className="flex items-center gap-2">
+                            <span className="text-blue-400">🏦</span>
                             <span className="text-gray-400">Costo:</span>
-                            <span className="text-gray-300">{formatearMonto(totales.costoTotal)}</span>
+                            <span className="text-blue-300 font-medium">{formatearMonto(totales.distribucion.bovedaMonte)}</span>
                           </div>
-                          <div className="flex justify-between gap-8">
+                          <div className="flex items-center gap-2">
+                            <span className="text-orange-400">🚚</span>
+                            <span className="text-gray-400">Flete:</span>
+                            <span className="text-orange-300 font-medium">{formatearMonto(totales.distribucion.fletes)}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-green-400">💰</span>
                             <span className="text-gray-400">Utilidad:</span>
-                            <span className="text-green-400">{formatearMonto(totales.utilidad)}</span>
+                            <span className="text-green-400 font-bold">{formatearMonto(totales.distribucion.utilidades)}</span>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm text-gray-400">Total</p>
+                          <p className="text-sm text-gray-400">Total a Cobrar</p>
                           <p className="text-3xl font-bold text-white">
                             {formatearMonto(totales.total)}
                           </p>
                         </div>
+                      </div>
+                      
+                      {/* Mini barra de distribución */}
+                      <div className="h-2 rounded-full overflow-hidden flex bg-white/5">
+                        <div 
+                          className="h-full bg-blue-500" 
+                          style={{ width: `${(totales.distribucion.bovedaMonte / totales.total) * 100}%` }}
+                        />
+                        <div 
+                          className="h-full bg-orange-500" 
+                          style={{ width: `${(totales.distribucion.fletes / totales.total) * 100}%` }}
+                        />
+                        <div 
+                          className="h-full bg-green-500" 
+                          style={{ width: `${(totales.distribucion.utilidades / totales.total) * 100}%` }}
+                        />
+                      </div>
+                      
+                      {/* Margen de ganancia */}
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-gray-500">Margen de ganancia:</span>
+                        <Badge 
+                          variant="outline" 
+                          className={cn(
+                            "font-bold",
+                            totales.utilidad > 0 
+                              ? "border-green-500/50 text-green-400 bg-green-500/10" 
+                              : "border-red-500/50 text-red-400 bg-red-500/10"
+                          )}
+                        >
+                          {totales.total > 0 ? ((totales.distribucion.utilidades / totales.total) * 100).toFixed(1) : 0}%
+                        </Badge>
                       </div>
                     </div>
                   )}
@@ -1040,97 +1138,151 @@ export function CreateVentaModal({ open, onClose, onSuccess }: CreateVentaModalP
                     </div>
                   </div>
 
-                  {/* 💎 Distribución Visual a 3 Bancos - PRIORIDAD DE PAGO */}
-                  {montoRealPagado > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="mt-4 p-4 rounded-xl border border-white/10 bg-black/40 backdrop-blur-xl"
-                    >
-                      <p className="text-xs text-gray-400 mb-3 flex items-center gap-2">
-                        <Sparkles className="w-3 h-3" />
-                        Distribución Automática (Prioridad de Pago)
+                  {/* 💎 DISTRIBUCIÓN A 3 BANCOS - FÓRMULAS CORRECTAS */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-4 p-4 rounded-xl border border-white/10 bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-xl"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-xs text-gray-400 flex items-center gap-2">
+                        <Sparkles className="w-3 h-3 text-yellow-400" />
+                        Distribución Automática a 3 Bancos
                       </p>
-                      
-                      {/* Barra segmentada visual */}
-                      <div className="h-8 rounded-lg overflow-hidden flex mb-4 border border-white/10">
-                        {/* Segmento Costo */}
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${Math.min(100, (Math.min(montoRealPagado, totales.distribucion.bovedaMonte) / montoRealPagado) * 100)}%` }}
-                          transition={{ duration: 0.8, ease: "easeOut" }}
-                          className="h-full flex items-center justify-center text-xs font-medium"
-                          style={{ backgroundColor: 'var(--color-boveda-monte)' }}
-                        >
-                          {totales.distribucion.bovedaMonte > 0 && <span className="drop-shadow-lg">Costo</span>}
-                        </motion.div>
-                        {/* Segmento Flete */}
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ 
-                            width: `${Math.min(100 - (Math.min(montoRealPagado, totales.distribucion.bovedaMonte) / montoRealPagado) * 100, 
-                                              (Math.min(Math.max(0, montoRealPagado - totales.distribucion.bovedaMonte), totales.distribucion.fletes) / montoRealPagado) * 100)}%` 
-                          }}
-                          transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-                          className="h-full flex items-center justify-center text-xs font-medium"
-                          style={{ backgroundColor: 'var(--color-fletes)' }}
-                        >
-                          {totales.distribucion.fletes > 0 && <span className="drop-shadow-lg">Flete</span>}
-                        </motion.div>
-                        {/* Segmento Utilidad */}
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ 
-                            width: `${Math.max(0, ((montoRealPagado - totales.distribucion.bovedaMonte - totales.distribucion.fletes) / montoRealPagado) * 100)}%` 
-                          }}
-                          transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
-                          className="h-full flex items-center justify-center text-xs font-medium"
-                          style={{ backgroundColor: 'var(--color-utilidades)' }}
-                        >
-                          {totales.distribucion.utilidades > 0 && <span className="drop-shadow-lg">Ganancia</span>}
-                        </motion.div>
-                      </div>
+                      <Badge variant="outline" className="text-[10px] border-green-500/30 text-green-400">
+                        Fórmulas Activas
+                      </Badge>
+                    </div>
 
-                      <div className="grid grid-cols-3 gap-3 text-center">
-                        {/* Bóveda Monte - Costo */}
-                        <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-boveda-monte-bg)' }}>
-                          <p className="text-[10px] text-gray-400">🏦 Bóveda Monte</p>
-                          <motion.p 
-                            className="text-sm font-bold"
-                            style={{ color: 'var(--color-boveda-monte)' }}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                          >
-                            {formatearMonto(Math.min(montoRealPagado, totales.distribucion.bovedaMonte))}
-                          </motion.p>
-                        </div>
-                        {/* Fletes */}
-                        <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-fletes-bg)' }}>
-                          <p className="text-[10px] text-gray-400">🚚 Fletes</p>
-                          <motion.p 
-                            className="text-sm font-bold"
-                            style={{ color: 'var(--color-fletes)' }}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                          >
-                            {formatearMonto(Math.min(Math.max(0, montoRealPagado - totales.distribucion.bovedaMonte), totales.distribucion.fletes))}
-                          </motion.p>
-                        </div>
-                        {/* Utilidades */}
-                        <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-utilidades-bg)' }}>
-                          <p className="text-[10px] text-gray-400">💰 Utilidades</p>
-                          <motion.p 
-                            className="text-sm font-bold"
-                            style={{ color: 'var(--color-utilidades)' }}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                          >
-                            {formatearMonto(Math.max(0, montoRealPagado - totales.distribucion.bovedaMonte - totales.distribucion.fletes))}
-                          </motion.p>
-                        </div>
+                    {/* Fórmulas visuales */}
+                    <div className="grid grid-cols-1 gap-2 mb-4 text-xs">
+                      <div className="flex items-center gap-2 text-gray-500">
+                        <span className="text-blue-400">🏦</span>
+                        <span>Bóveda Monte = Precio Compra × Cantidad</span>
                       </div>
-                    </motion.div>
-                  )}
+                      <div className="flex items-center gap-2 text-gray-500">
+                        <span className="text-orange-400">🚚</span>
+                        <span>Fletes = Flete/unidad × Cantidad</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-500">
+                        <span className="text-green-400">💰</span>
+                        <span>Utilidad = (Venta - Compra - Flete) × Cantidad</span>
+                      </div>
+                    </div>
+                    
+                    {/* Barra segmentada visual */}
+                    <div className="h-10 rounded-lg overflow-hidden flex mb-4 border border-white/20 shadow-inner">
+                      {/* Segmento Bóveda Monte (Costo) */}
+                      {totales.distribucion.bovedaMonte > 0 && (
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${(totales.distribucion.bovedaMonte / totales.total) * 100}%` }}
+                          transition={{ duration: 0.8, ease: "easeOut" }}
+                          className="h-full flex items-center justify-center text-xs font-bold bg-gradient-to-r from-blue-600 to-blue-500 text-white"
+                        >
+                          <span className="drop-shadow-lg">COSTO</span>
+                        </motion.div>
+                      )}
+                      {/* Segmento Fletes */}
+                      {totales.distribucion.fletes > 0 && (
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${(totales.distribucion.fletes / totales.total) * 100}%` }}
+                          transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+                          className="h-full flex items-center justify-center text-xs font-bold bg-gradient-to-r from-orange-600 to-orange-500 text-white"
+                        >
+                          <span className="drop-shadow-lg">FLETE</span>
+                        </motion.div>
+                      )}
+                      {/* Segmento Utilidades */}
+                      {totales.distribucion.utilidades > 0 && (
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${(totales.distribucion.utilidades / totales.total) * 100}%` }}
+                          transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
+                          className="h-full flex items-center justify-center text-xs font-bold bg-gradient-to-r from-green-600 to-emerald-500 text-white"
+                        >
+                          <span className="drop-shadow-lg">GANANCIA</span>
+                        </motion.div>
+                      )}
+                    </div>
+
+                    {/* Cards de distribución */}
+                    <div className="grid grid-cols-3 gap-3">
+                      {/* Bóveda Monte - Costo */}
+                      <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/30">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-lg">🏦</span>
+                          <p className="text-[10px] text-blue-300 font-medium">Bóveda Monte</p>
+                        </div>
+                        <motion.p 
+                          className="text-lg font-bold text-blue-400"
+                          initial={{ opacity: 0, scale: 0.5 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.2 }}
+                        >
+                          {formatearMonto(totales.distribucion.bovedaMonte)}
+                        </motion.p>
+                        <p className="text-[9px] text-gray-500 mt-1">
+                          {carrito.reduce((acc, i) => acc + i.cantidad, 0)} × ${carrito[0]?.precioCompra?.toLocaleString() || 0}
+                        </p>
+                      </div>
+                      
+                      {/* Fletes */}
+                      <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/30">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-lg">🚚</span>
+                          <p className="text-[10px] text-orange-300 font-medium">Fletes</p>
+                        </div>
+                        <motion.p 
+                          className="text-lg font-bold text-orange-400"
+                          initial={{ opacity: 0, scale: 0.5 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.3 }}
+                        >
+                          {formatearMonto(totales.distribucion.fletes)}
+                        </motion.p>
+                        <p className="text-[9px] text-gray-500 mt-1">
+                          {carrito.reduce((acc, i) => acc + i.cantidad, 0)} × ${carrito[0]?.precioFlete?.toLocaleString() || 500}
+                        </p>
+                      </div>
+                      
+                      {/* Utilidades */}
+                      <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/30">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-lg">💰</span>
+                          <p className="text-[10px] text-green-300 font-medium">Utilidades</p>
+                        </div>
+                        <motion.p 
+                          className="text-lg font-bold text-green-400"
+                          initial={{ opacity: 0, scale: 0.5 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.4 }}
+                        >
+                          {formatearMonto(totales.distribucion.utilidades)}
+                        </motion.p>
+                        <p className="text-[9px] text-gray-500 mt-1">
+                          Ganancia neta
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Verificación total */}
+                    <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs">
+                      <span className="text-gray-500">Total distribuido:</span>
+                      <span className={cn(
+                        "font-bold",
+                        Math.abs(totales.distribucion.bovedaMonte + totales.distribucion.fletes + totales.distribucion.utilidades - totales.total) < 1
+                          ? "text-green-400"
+                          : "text-red-400"
+                      )}>
+                        {formatearMonto(totales.distribucion.bovedaMonte + totales.distribucion.fletes + totales.distribucion.utilidades)}
+                        {Math.abs(totales.distribucion.bovedaMonte + totales.distribucion.fletes + totales.distribucion.utilidades - totales.total) < 1 
+                          ? " ✓" 
+                          : ` (≠ ${formatearMonto(totales.total)})`}
+                      </span>
+                    </div>
+                  </motion.div>
                 </motion.div>
               )}
             </AnimatePresence>

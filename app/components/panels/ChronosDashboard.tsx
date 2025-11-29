@@ -26,6 +26,7 @@ import {
   ExternalLink,
   Layers,
   Box,
+  Target,
   type LucideIcon,
 } from "lucide-react"
 import {
@@ -50,6 +51,8 @@ import { Skeleton } from "@/app/components/ui/skeleton"
 import CreateOrdenCompraModal from "@/app/components/modals/CreateOrdenCompraModalSmart"
 import CreateVentaModal from "@/app/components/modals/CreateVentaModalSmart"
 import CreateTransferenciaModal from "@/app/components/modals/CreateTransferenciaModalSmart"
+import { LiveMarketTicker } from "@/app/components/ui/LiveMarketTicker"
+import { PerformanceMetrics, MiniPerformanceWidget } from "@/app/components/ui/PerformanceMetrics"
 
 // Lazy load 3D components
 const PremiumSplineOrb = lazy(() => 
@@ -514,6 +517,27 @@ export default function ChronosDashboard() {
       </AnimatePresence>
 
       {/* ============================================================ */}
+      {/* LIVE MARKET TICKER */}
+      {/* ============================================================ */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="col-span-12 -mx-4 md:-mx-6"
+      >
+        <LiveMarketTicker 
+          items={[
+            { id: "capital", label: "Capital Total", value: `$${(capitalTotal / 1000000).toFixed(2)}M`, change: 2.34, icon: DollarSign, color: "from-blue-500 to-cyan-500" },
+            { id: "ventas", label: "Ventas Hoy", value: `$${(ventasMes / 1000).toFixed(1)}K`, change: 8.3, icon: TrendingUp, color: "from-green-500 to-emerald-500" },
+            { id: "ordenes", label: "Órdenes Activas", value: ordenesActivas.toString(), change: 15.8, icon: Package, color: "from-purple-500 to-pink-500" },
+            { id: "stock", label: "Stock Actual", value: stockActual.toLocaleString(), change: -3.2, icon: Box, color: "from-orange-500 to-amber-500" },
+            { id: "clientes", label: "Clientes", value: clientesActivos.toString(), change: 5.6, icon: Users, color: "from-indigo-500 to-violet-500" },
+          ]}
+          speed={25}
+        />
+      </motion.div>
+
+      {/* ============================================================ */}
       {/* STATS CARDS */}
       {/* ============================================================ */}
       {stats.map((stat, index) => (
@@ -769,6 +793,89 @@ export default function ChronosDashboard() {
               <ActivityItem key={index} {...activity} />
             ))}
           </div>
+        </div>
+      </motion.div>
+
+      {/* ============================================================ */}
+      {/* PERFORMANCE METRICS */}
+      {/* ============================================================ */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.85 }}
+        className="col-span-12 lg:col-span-8"
+      >
+        <PerformanceMetrics />
+      </motion.div>
+
+      {/* ============================================================ */}
+      {/* MINI PERFORMANCE WIDGET */}
+      {/* ============================================================ */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.87 }}
+        className="col-span-12 lg:col-span-4"
+      >
+        <div className="space-y-4">
+          <MiniPerformanceWidget />
+          
+          {/* Quick Summary Card */}
+          <motion.div
+            className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4"
+            whileHover={{ scale: 1.01 }}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                <Target className="w-4 h-4 text-cyan-400" />
+                Objetivos del Mes
+              </h4>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-white/60">Ventas</span>
+                  <span className="text-white font-bold">78%</span>
+                </div>
+                <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                  <motion.div 
+                    className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: "78%" }}
+                    transition={{ delay: 1, duration: 1 }}
+                  />
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-white/60">Nuevos Clientes</span>
+                  <span className="text-white font-bold">92%</span>
+                </div>
+                <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                  <motion.div 
+                    className="h-full bg-gradient-to-r from-emerald-500 to-green-500 rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: "92%" }}
+                    transition={{ delay: 1.1, duration: 1 }}
+                  />
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-white/60">Entregas</span>
+                  <span className="text-white font-bold">65%</span>
+                </div>
+                <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                  <motion.div 
+                    className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: "65%" }}
+                    transition={{ delay: 1.2, duration: 1 }}
+                  />
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </motion.div>
 

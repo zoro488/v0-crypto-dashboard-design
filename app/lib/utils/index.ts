@@ -103,3 +103,63 @@ export {
   text,
   file,
 } from './formatters';
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// GESTIÓN DE INVENTARIO / STOCK
+// ═══════════════════════════════════════════════════════════════════════════════
+export {
+  calcularNuevoStock,
+  determinarNivelStock,
+  calcularRotacion,
+  proyectarAgotamiento,
+  valorizarInventario,
+  recomendarReabastecimiento,
+  calcularCostoPromedioPonderado,
+  generarTimelineMovimientos,
+  type MovimientoStock,
+  type Producto,
+  type NivelStock,
+  type ProyeccionAgotamiento,
+  type RotacionInventario,
+  type ValorizacionInventario,
+} from './stock';
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// GESTIÓN DE CRÉDITO
+// ═══════════════════════════════════════════════════════════════════════════════
+export {
+  calcularCreditoDisponible,
+  validarCreditoParaVenta,
+  procesarPago,
+  calcularFacturasVencidas,
+  analizarCredito,
+  calcularCalificacionCrediticia,
+  calcularLimiteCreditoRecomendado,
+  generarEstadoCuenta,
+  type Distribuidor,
+  type Pago,
+  type Factura,
+  type AnalisisCredito,
+  type ResultadoValidacion,
+  type EstadoCuenta,
+} from './credit';
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CORTES DE CAJA
+// ═══════════════════════════════════════════════════════════════════════════════
+export {
+  calcularCorte,
+  generarCorteDiario,
+  cerrarCorte,
+  detectarDiscrepancias,
+  generarResumenDiario,
+  conciliarTransferencias,
+  obtenerSaldoAnterior,
+  generarHistorialCortes,
+  generarCierreMensual,
+  type MovimientoCaja,
+  type CorteCaja,
+  type ResumenDiario,
+  type Discrepancia,
+  type CierreMensual,
+} from './cortes';
