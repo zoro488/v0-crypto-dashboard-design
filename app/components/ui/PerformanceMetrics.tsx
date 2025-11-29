@@ -26,6 +26,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts"
+import { SafeChartContainer, SAFE_ANIMATION_PROPS } from "@/app/components/ui/SafeChartContainer"
 
 // ============================================================
 // TIPOS
@@ -75,7 +76,7 @@ const CircularGauge = ({ metric, index }: { metric: MetricData; index: number })
     >
       {/* Gauge */}
       <div className="relative w-24 h-24 md:w-28 md:h-28">
-        <ResponsiveContainer width="100%" height="100%">
+        <SafeChartContainer height={112} minHeight={96}>
           <RadialBarChart
             cx="50%"
             cy="50%"
@@ -89,11 +90,12 @@ const CircularGauge = ({ metric, index }: { metric: MetricData; index: number })
               background={{ fill: "rgba(255,255,255,0.1)" }}
               dataKey="value"
               cornerRadius={10}
+              {...SAFE_ANIMATION_PROPS}
             >
               <Cell fill={metric.color} />
             </RadialBar>
           </RadialBarChart>
-        </ResponsiveContainer>
+        </SafeChartContainer>
 
         {/* Center value */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">

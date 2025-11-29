@@ -17,7 +17,8 @@ import {
   doc, 
   serverTimestamp,
   getDoc,
-  Timestamp 
+  Timestamp,
+  increment as firestoreIncrement
 } from "firebase/firestore"
 import { db, isFirebaseConfigured } from "@/app/lib/firebase/config"
 import { logger } from "@/app/lib/utils/logger"
@@ -296,6 +297,7 @@ export async function procesarVentaAtomica(venta: VentaData): Promise<ResultadoT
 
         for (const mov of movimientosData) {
           if (mov.monto > 0) {
+            // Crear movimiento
             const movRef = doc(collection(db!, "movimientos"))
             transaction.set(movRef, {
               bancoId: mov.bancoId,
@@ -307,6 +309,46 @@ export async function procesarVentaAtomica(venta: VentaData): Promise<ResultadoT
               referenciaId: nuevaVentaRef.id,
               fecha: serverTimestamp(),
               createdAt: serverTimestamp()
+            })
+            
+            // CRÍTICO: Actualizar saldo del banco
+            const bancoRef = doc(db!, "bancos", mov.bancoId)
+            transaction.update(bancoRef, {
+              capitalActual: firestoreIncrement(mov.monto),
+              historicoIngresos: firestoreIncrement(mov.monto),
+              updatedAt: serverTimestamp()
+            })
+          }
+        }
+        
+        // HISTÓRICOS: Si hay ventas pendientes, registrar en histórico sin sumar al capital
+        if (venta.montoRestante > 0) {
+          const totalesParaHistorico = {
+            bovedaMonte: totalCostoProducto - distribucion[bancoCosto],
+            fletes: totalFletes - distribucion.flete_sur,
+            utilidades: totalUtilidades - distribucion.utilidades
+          }
+          
+          // Solo registrar histórico de lo pendiente (sin sumar a capitalActual)
+          if (totalesParaHistorico.bovedaMonte > 0) {
+            const bovedaRef = doc(db!, "bancos", bancoCosto)
+            transaction.update(bovedaRef, {
+              historicoIngresos: firestoreIncrement(totalesParaHistorico.bovedaMonte),
+              updatedAt: serverTimestamp()
+            })
+          }
+          if (totalesParaHistorico.fletes > 0) {
+            const fletesRef = doc(db!, "bancos", "flete_sur")
+            transaction.update(fletesRef, {
+              historicoIngresos: firestoreIncrement(totalesParaHistorico.fletes),
+              updatedAt: serverTimestamp()
+            })
+          }
+          if (totalesParaHistorico.utilidades > 0) {
+            const utilidadesRef = doc(db!, "bancos", "utilidades")
+            transaction.update(utilidadesRef, {
+              historicoIngresos: firestoreIncrement(totalesParaHistorico.utilidades),
+              updatedAt: serverTimestamp()
             })
           }
         }

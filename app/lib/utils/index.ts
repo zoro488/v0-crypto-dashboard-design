@@ -141,7 +141,6 @@ export {
   type Factura,
   type AnalisisCredito,
   type ResultadoValidacion,
-  type EstadoCuenta,
 } from './credit';
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -161,5 +160,4 @@ export {
   type CorteCaja,
   type ResumenDiario,
   type Discrepancia,
-  type CierreMensual,
 } from './cortes';

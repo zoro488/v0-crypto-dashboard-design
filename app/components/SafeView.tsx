@@ -9,6 +9,7 @@
  */
 
 import React, { Component, ReactNode } from 'react'
+import { logger } from '@/app/lib/utils/logger'
 
 interface ErrorBoundaryState {
   hasError: boolean
@@ -37,8 +38,10 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     this.setState({ errorInfo })
     
     // Log del error
-    console.error(`[SafeView] Error en ${this.props.componentName || 'componente'}:`, error)
-    console.error('Stack:', errorInfo.componentStack)
+    logger.error(`Error en ${this.props.componentName || 'componente'}`, error, {
+      context: 'SafeView',
+      data: { componentStack: errorInfo.componentStack }
+    })
     
     // Callback opcional
     this.props.onError?.(error, errorInfo)

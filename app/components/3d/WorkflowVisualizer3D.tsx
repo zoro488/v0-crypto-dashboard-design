@@ -1,9 +1,9 @@
 'use client';
 
 import { useRef, useEffect, useState, useCallback } from 'react';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card } from '@/app/components/ui/card';
+import { Badge } from '@/app/components/ui/badge';
+import { Button } from '@/app/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play,
@@ -21,12 +21,12 @@ import {
   GitBranch,
   ArrowRight
 } from 'lucide-react';
-import logger from '@/app/lib/utils/logger';
+import { logger } from '@/app/lib/utils/logger';
 
 // ============================================
 // INTERFACES Y TIPOS
 // ============================================
-interface WorkflowNode {
+export interface WorkflowNode {
   id: string;
   name: string;
   type: 'start' | 'process' | 'decision' | 'end' | 'wait' | 'parallel';
@@ -37,14 +37,14 @@ interface WorkflowNode {
   description?: string;
 }
 
-interface WorkflowConnection {
+export interface WorkflowConnection {
   from: string;
   to: string;
   label?: string;
   condition?: string;
 }
 
-interface WorkflowVisualizerProps {
+export interface WorkflowVisualizer3DProps {
   nodes: WorkflowNode[];
   connections: WorkflowConnection[];
   title?: string;
@@ -115,7 +115,7 @@ export const WorkflowVisualizer3D = ({
   onNodeClick,
   autoPlay = false,
   playSpeed = 1000
-}: WorkflowVisualizerProps) => {
+}: WorkflowVisualizer3DProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
   const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null);

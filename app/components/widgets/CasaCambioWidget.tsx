@@ -23,9 +23,9 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   ReferenceLine,
 } from 'recharts';
+import { SafeChartContainer, SAFE_ANIMATION_PROPS } from "@/app/components/ui/SafeChartContainer";
 import { casaCambioService } from '@/app/lib/services/casa-cambio.service';
 import { AnimatedCounter, AnimatedBadge } from '@/app/components/ui/PremiumComponents';
 import { logger } from '@/app/lib/utils/logger';
@@ -222,7 +222,7 @@ export default function CasaCambioWidget() {
           <Activity className="w-5 h-5 text-blue-400" />
           Historial 30 días con Bollinger Bands
         </h4>
-        <ResponsiveContainer width="100%" height={300}>
+        <SafeChartContainer height={300} minHeight={200}>
           <LineChart data={chartData}>
             <defs>
               <linearGradient id="rateGradient" x1="0" y1="0" x2="0" y2="1">
@@ -254,6 +254,7 @@ export default function CasaCambioWidget() {
               strokeDasharray="5 5"
               dot={false}
               name="Banda Superior"
+              {...SAFE_ANIMATION_PROPS}
             />
             <Line
               type="monotone"
@@ -263,6 +264,7 @@ export default function CasaCambioWidget() {
               strokeDasharray="3 3"
               dot={false}
               name="Media Móvil"
+              {...SAFE_ANIMATION_PROPS}
             />
             <Line
               type="monotone"
@@ -272,6 +274,7 @@ export default function CasaCambioWidget() {
               strokeDasharray="5 5"
               dot={false}
               name="Banda Inferior"
+              {...SAFE_ANIMATION_PROPS}
             />
             
             {/* Precio actual */}
@@ -283,9 +286,10 @@ export default function CasaCambioWidget() {
               dot={{ fill: '#3b82f6', r: 4 }}
               activeDot={{ r: 6 }}
               name="Tipo de Cambio"
+              {...SAFE_ANIMATION_PROPS}
             />
           </LineChart>
-        </ResponsiveContainer>
+        </SafeChartContainer>
       </div>
 
       {/* Indicadores técnicos */}

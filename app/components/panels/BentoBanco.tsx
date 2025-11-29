@@ -36,6 +36,7 @@ import {
 } from "@/app/lib/firebase/firestore-hooks.service"
 import { Skeleton } from "@/app/components/ui/skeleton"
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from "recharts"
+import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from "@/app/components/ui/SafeChartContainer"
 import { QuickStatWidget } from "@/app/components/widgets/QuickStatWidget"
 import { MiniChartWidget } from "@/app/components/widgets/MiniChartWidget"
 import { ActivityFeedWidget, ActivityItem } from "@/app/components/widgets/ActivityFeedWidget"
@@ -363,7 +364,7 @@ export default function BentoBanco() {
               </div>
             </div>
             <div style={{ width: '100%', minWidth: 200, height: 200, minHeight: 200 }}>
-            <ResponsiveContainer width="100%" height="100%">
+            <SafeChartContainer height={200} minHeight={200}>
               <AreaChart data={trendData}>
                 <defs>
                   <linearGradient id="colorIngresosB" x1="0" y1="0" x2="0" y2="1">
@@ -385,10 +386,10 @@ export default function BentoBanco() {
                   }}
                   formatter={(value: number) => [`$${value.toLocaleString()}`, '']}
                 />
-                <Area type="monotone" dataKey="ingresos" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorIngresosB)" name="Ingresos" />
-                <Area type="monotone" dataKey="gastos" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorGastosB)" name="Gastos" />
+                <Area type="monotone" dataKey="ingresos" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorIngresosB)" name="Ingresos" {...SAFE_ANIMATION_PROPS} />
+                <Area type="monotone" dataKey="gastos" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorGastosB)" name="Gastos" {...SAFE_ANIMATION_PROPS} />
               </AreaChart>
-            </ResponsiveContainer>
+            </SafeChartContainer>
             </div>
           </motion.div>
 
@@ -409,7 +410,7 @@ export default function BentoBanco() {
               </div>
             </div>
             <div style={{ width: '100%', minWidth: 120, height: 140, minHeight: 140 }}>
-            <ResponsiveContainer width="100%" height="100%">
+            <SafeChartContainer height={140} minHeight={140}>
               <PieChart>
                 <Pie
                   data={distribucionMovimientos}
@@ -419,6 +420,7 @@ export default function BentoBanco() {
                   outerRadius={55}
                   paddingAngle={4}
                   dataKey="value"
+                  {...SAFE_PIE_PROPS}
                 >
                   {distribucionMovimientos.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
@@ -426,7 +428,7 @@ export default function BentoBanco() {
                 </Pie>
                 <Tooltip />
               </PieChart>
-            </ResponsiveContainer>
+            </SafeChartContainer>
             </div>
             <div className="space-y-2 mt-2">
               {distribucionMovimientos.map((item, i) => (

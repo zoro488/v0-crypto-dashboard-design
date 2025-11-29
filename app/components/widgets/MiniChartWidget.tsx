@@ -28,6 +28,7 @@ import {
   XAxis,
   YAxis
 } from 'recharts'
+import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/components/ui/SafeChartContainer'
 
 // ============================================================================
 // TIPOS
@@ -123,7 +124,7 @@ function AreaChartComponent({
   const gradientId = `areaGrad-${colors.primary.replace('#', '')}`
   
   return (
-    <ResponsiveContainer width="100%" height={height}>
+    <SafeChartContainer height={height} minHeight={60}>
       <AreaChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
@@ -159,8 +160,7 @@ function AreaChartComponent({
           stroke={colors.primary}
           strokeWidth={2}
           fill={`url(#${gradientId})`}
-          animationDuration={1500}
-          animationEasing="ease-out"
+          {...SAFE_ANIMATION_PROPS}
         />
         
         {data[0]?.value2 !== undefined && (
@@ -171,12 +171,11 @@ function AreaChartComponent({
             strokeWidth={2}
             fill="transparent"
             strokeDasharray="4 4"
-            animationDuration={1500}
-            animationBegin={300}
+            {...SAFE_ANIMATION_PROPS}
           />
         )}
       </AreaChart>
-    </ResponsiveContainer>
+    </SafeChartContainer>
   )
 }
 
@@ -197,7 +196,7 @@ function LineChartComponent({
   height: number
 }) {
   return (
-    <ResponsiveContainer width="100%" height={height}>
+    <SafeChartContainer height={height} minHeight={60}>
       <LineChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
         {showAxis && (
           <>
@@ -226,7 +225,7 @@ function LineChartComponent({
           strokeWidth={2}
           dot={false}
           activeDot={{ r: 4, fill: colors.primary }}
-          animationDuration={1500}
+          {...SAFE_ANIMATION_PROPS}
         />
         
         {data[0]?.value2 !== undefined && (
@@ -237,12 +236,11 @@ function LineChartComponent({
             strokeWidth={2}
             dot={false}
             strokeDasharray="4 4"
-            animationDuration={1500}
-            animationBegin={300}
+            {...SAFE_ANIMATION_PROPS}
           />
         )}
       </LineChart>
-    </ResponsiveContainer>
+    </SafeChartContainer>
   )
 }
 
@@ -263,7 +261,7 @@ function BarChartComponent({
   height: number
 }) {
   return (
-    <ResponsiveContainer width="100%" height={height}>
+    <SafeChartContainer height={height} minHeight={60}>
       <BarChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
         {showAxis && (
           <>
@@ -289,7 +287,7 @@ function BarChartComponent({
           dataKey="value" 
           fill={colors.primary}
           radius={[4, 4, 0, 0]}
-          animationDuration={1500}
+          {...SAFE_ANIMATION_PROPS}
         />
         
         {data[0]?.value2 !== undefined && (
@@ -297,12 +295,11 @@ function BarChartComponent({
             dataKey="value2" 
             fill={colors.secondary}
             radius={[4, 4, 0, 0]}
-            animationDuration={1500}
-            animationBegin={300}
+            {...SAFE_ANIMATION_PROPS}
           />
         )}
       </BarChart>
-    </ResponsiveContainer>
+    </SafeChartContainer>
   )
 }
 
@@ -327,7 +324,7 @@ function DonutChartComponent({
   
   return (
     <div className="relative" style={{ height }}>
-      <ResponsiveContainer width="100%" height="100%">
+      <SafeChartContainer height={height} minHeight={80}>
         <PieChart>
           {showTooltip && <Tooltip content={<CustomTooltip />} />}
           
@@ -339,8 +336,7 @@ function DonutChartComponent({
             outerRadius="90%"
             paddingAngle={3}
             dataKey="value"
-            animationDuration={1500}
-            animationEasing="ease-out"
+            {...SAFE_PIE_PROPS}
           >
             {data.map((entry, index) => (
               <Cell 
@@ -350,7 +346,7 @@ function DonutChartComponent({
             ))}
           </Pie>
         </PieChart>
-      </ResponsiveContainer>
+      </SafeChartContainer>
       
       {/* Centro con total */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">

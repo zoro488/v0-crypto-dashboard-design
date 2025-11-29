@@ -1,0 +1,180 @@
+# ============================================================================
+# Mergify Configuration - Advanced PR Automation
+# ============================================================================
+
+queue_rules:
+  - name: default
+    speculative_checks: 2
+    merge_method: squash
+
+pull_request_rules:
+  # Auto-merge dependabot PRs
+  - name: Auto-merge Dependabot minor/patch updates
+    conditions:
+      - author=dependabot[bot]
+      - check-success=lint
+      - check-success=unit-tests
+      - check-success=build
+      - -title~=BREAKING CHANGE
+    actions:
+      queue:
+        name: default
+      review:
+        type: APPROVE
+        message: "Dependabot PR auto-approved ✅" # Auto-add labels based on files
+  - name: Label frontend changes
+    conditions:
+      - files~=^src/(components|apps)/.*\.(jsx|tsx)$
+    actions:
+      label:
+        add:
+          - "🎨 ui-ux"
+
+  - name: Label backend changes
+    conditions:
+      - files~=^src/(services|api)/
+    actions:
+      label:
+        add:
+          - "🔌 api"
+
+  - name: Label test changes
+    conditions:
+      - files~=.*\.(test|spec)\.(js|ts|jsx|tsx)$
+    actions:
+      label:
+        add:
+          - "🧪 testing"
+
+  - name: Label documentation changes
+    conditions:
+      - files~=.*\.md$
+    actions:
+      label:
+        add:
+          - "📝 documentation"
+
+  - name: Label configuration changes
+    conditions:
+      - files~=.*\.config\.(js|ts)$
+      - files=package.json
+      - files~=^\.github/
+    actions:
+      label:
+        add:
+          - "🔧 maintenance"
+
+  # Auto-assign reviewers
+  - name: Auto-assign reviewer
+    conditions:
+      - -draft
+      - -author=dependabot[bot]
+    actions:
+      request_reviews:
+        users:
+          - zoro488
+
+  # Add comment for large PRs
+  - name: Comment on large PRs
+    conditions:
+      - files-changed>20
+    actions:
+      comment:
+        message: |
+          ⚠️ **Large PR Detected**
+
+          This PR modifies {{files-changed}} files. Consider breaking it down into smaller PRs for easier review.
+
+          - Files changed: {{files-changed}}
+          - Lines added: {{additions}}
+          - Lines deleted: {{deletions}}
+
+  # Auto-update PRs
+  - name: Auto-update PRs
+    conditions:
+      - -draft
+      - -conflict
+    actions:
+      update: {}
+
+  # Delete head branch after merge
+  - name: Delete head branch after merge
+    conditions:
+      - merged
+    actions:
+      delete_head_branch: {}
+
+  # Add labels for tracking
+  - name: Add tracking labels
+    conditions:
+      - base=main
+      - -draft
+    actions:
+      label:
+        add:
+          - "📦 ready-for-review"
+
+  # Require changelog
+  - name: Require changelog entry
+    conditions:
+      - -files~=^CHANGELOG\.md$
+      - -label=skip-changelog
+      - -label=dependencies
+    actions:
+      comment:
+        message: |
+          📝 **Changelog Required**
+
+          Please add an entry to `CHANGELOG.md` describing your changes, or add the `skip-changelog` label if this change doesn't require a changelog entry.
+
+  # Congratulate on first PR
+  - name: Welcome first-time contributor
+    conditions:
+      - author~=^(?!dependabot\[bot\]).*$
+      - "author-is-first-time-contributor"
+    actions:
+      comment:
+        message: |
+          🎉 **Welcome!**
+
+          Thank you for your first contribution to Chronos System!
+
+          A maintainer will review your PR soon. In the meantime, please make sure:
+          - [ ] Tests pass
+          - [ ] Code is properly formatted
+          - [ ] Documentation is updated if needed
+
+  # Auto-approve trusted contributors
+  - name: Auto-approve trusted PRs
+    conditions:
+      - author=zoro488
+      - check-success=lint
+      - check-success=unit-tests
+      - -draft
+    actions:
+      review:
+        type: APPROVE
+        message: "Auto-approved trusted contributor ✅"
+
+  # Mark as WIP
+  - name: Mark as Work in Progress
+    conditions:
+      - or:
+          - title~=^WIP
+          - title~=^\[WIP\]
+          - draft
+    actions:
+      label:
+        add:
+          - "🚧 wip"
+
+  # Security PRs priority
+  - name: Priority security PRs
+    conditions:
+      - label=🔒 security
+    actions:
+      label:
+        add:
+          - "🔥 priority-high"
+      comment:
+        message: "⚠️ Security PR - prioritizing for review"

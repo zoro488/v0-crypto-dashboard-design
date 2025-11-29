@@ -155,7 +155,7 @@ export default function Chronos() {
   }
 
   return (
-    <div id="root" className="min-h-screen bg-black relative overflow-x-hidden">
+    <div id="root" className="min-h-screen bg-black relative overflow-x-hidden w-full max-w-[100vw]">
       <ScrollProgress />
 
       <FirestoreSetupAlert />
@@ -241,7 +241,7 @@ export default function Chronos() {
         {/* Nuevo Header Ultra Premium */}
         <ChronosHeader />
 
-        <main className="pt-20 px-4 md:px-6 lg:px-8 pb-8">
+        <main className="pt-20 px-4 md:px-6 lg:px-8 pb-8 overflow-x-hidden max-w-full">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentPanel}

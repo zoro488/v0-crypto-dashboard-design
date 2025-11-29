@@ -1,0 +1,834 @@
+{
+  "timestamp": "2025-11-29T17:27:39.179825",
+  "services": {
+    "mega_ai_agent": {
+      "service": "MegaAIAgent",
+      "timestamp": "2025-11-29T17:27:39.180446",
+      "total_samples": 20,
+      "metrics": {
+        "intent_detection": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0,
+          "samples": 20
+        }
+      },
+      "detailed_results": [
+        {
+          "sample_id": 0,
+          "query": "Muéstrame las ventas del mes pasado",
+          "intent_score": 1.0,
+          "details": {
+            "expected_intent": "query_data",
+            "detected_intent": "query_data",
+            "intent_match": true,
+            "confidence": 0.92,
+            "expected_entities": {
+              "collection": "ventas",
+              "timeframe": "mes pasado"
+            },
+            "detected_entities": {
+              "collection": "ventas",
+              "timeframe": "mes pasado"
+            },
+            "valid_intent": true
+          }
+        },
+        {
+          "sample_id": 1,
+          "query": "¿Cuántos clientes tenemos registrados?",
+          "intent_score": 1.0,
+          "details": {
+            "expected_intent": "query_data",
+            "detected_intent": "query_data",
+            "intent_match": true,
+            "confidence": 0.88,
+            "expected_entities": {
+              "collection": "clientes"
+            },
+            "detected_entities": {
+              "collection": "clientes"
+            },
+            "valid_intent": true
+          }
+        },
+        {
+          "sample_id": 2,
+          "query": "Registra una venta de 50 unidades a $10,000 por unidad",
+          "intent_score": 1.0,
+          "details": {
+            "expected_intent": "create_record",
+            "detected_intent": "create_record",
+            "intent_match": true,
+            "confidence": 0.91,
+            "expected_entities": {
+              "collection": "ventas",
+              "cantidad": 50,
+              "precioUnitario": 10000
+            },
+            "detected_entities": {
+              "collection": "ventas",
+              "cantidad": 50,
+              "precioUnitario": 10000
+            },
+            "valid_intent": true
+          }
+        },
+        {
+          "sample_id": 3,
+          "query": "Crea un nuevo cliente llamado Juan Pérez",
+          "intent_score": 1.0,
+          "details": {
+            "expected_intent": "create_record",
+            "detected_intent": "create_record",
+            "intent_match": true,
+            "confidence": 0.89,
+            "expected_entities": {
+              "collection": "clientes",
+              "nombre": "Juan Pérez"
+            },
+            "detected_entities": {
+              "collection": "clientes",
+              "nombre": "Juan Pérez"
+            },
+            "valid_intent": true
+          }
+        },
+        {
+          "sample_id": 4,
+          "query": "Actualiza el precio del producto SKU-001 a $15,000",
+          "intent_score": 1.0,
+          "details": {
+            "expected_intent": "update_record",
+            "detected_intent": "update_record",
+            "intent_match": true,
+            "confidence": 0.87,
+            "expected_entities": {
+              "collection": "productos",
+              "sku": "SKU-001",
+              "precio": 15000
+            },
+            "detected_entities": {
+              "collection": "productos",
+              "sku": "SKU-001",
+              "precio": 15000
+            },
+            "valid_intent": true
+          }
+        },
+        {
+          "sample_id": 5,
+          "query": "Genera un reporte de ventas de este mes",
+          "intent_score": 1.0,
+          "details": {
+            "expected_intent": "generate_report",
+            "detected_intent": "generate_report",
+            "intent_match": true,
+            "confidence": 0.93,
+            "expected_entities": {
+              "reportType": "ventas",
+              "period": "mes actual"
+            },
+            "detected_entities": {
+              "reportType": "ventas",
+              "period": "mes actual"
+            },
+            "valid_intent": true
+          }
+        },
+        {
+          "sample_id": 6,
+          "query": "Programa un reporte diario de inventario a las 8am",
+          "intent_score": 1.0,
+          "details": {
+            "expected_intent": "schedule_report",
+            "detected_intent": "schedule_report",
+            "intent_match": true,
+            "confidence": 0.86,
+            "expected_entities": {
+              "reportType": "inventario",
+              "frequency": "daily",
+              "hour": 8
+            },
+            "detected_entities": {
+              "reportType": "inventario",
+              "frequency": "daily",
+              "hour": 8
+            },
+            "valid_intent": true
+          }
+        },
+        {
+          "sample_id": 7,
+          "query": "Llévame al panel de clientes",
+          "intent_score": 1.0,
+          "details": {
+            "expected_intent": "navigate",
+            "detected_intent": "navigate",
+            "intent_match": true,
+            "confidence": 0.95,
+            "expected_entities": {
+              "panel": "clientes"
+            },
+            "detected_entities": {
+              "panel": "clientes"
+            },
+            "valid_intent": true
+          }
+        },
+        {
+          "sample_id": 8,
+          "query": "Ir a ventas",
+          "intent_score": 1.0,
+          "details": {
+            "expected_intent": "navigate",
+            "detected_intent": "navigate",
+            "intent_match": true,
+            "confidence": 0.94,
+            "expected_entities": {
+              "panel": "ventas"
+            },
+            "detected_entities": {
+              "panel": "ventas"
+            },
+            "valid_intent": true
+          }
+        },
+        {
+          "sample_id": 9,
+          "query": "Exporta las ventas a Excel",
+          "intent_score": 1.0,
+          "details": {
+            "expected_intent": "export",
+            "detected_intent": "export",
+            "intent_match": true,
+            "confidence": 0.9,
+            "expected_entities": {
+              "collection": "ventas",
+              "format": "excel"
+            },
+            "detected_entities": {
+              "collection": "ventas",
+              "format": "excel"
+            },
+            "valid_intent": true
+          }
+        },
+        {
+          "sample_id": 10,
+          "query": "Descarga los clientes en CSV",
+          "intent_score": 1.0,
+          "details": {
+            "expected_intent": "export",
+            "detected_intent": "export",
+            "intent_match": true,
+            "confidence": 0.89,
+            "expected_entities": {
+              "collection": "clientes",
+              "format": "csv"
+            },
+            "detected_entities": {
+              "collection": "clientes",
+              "format": "csv"
+            },
+            "valid_intent": true
+          }
+        },
+        {
+          "sample_id": 11,
+          "query": "Analiza las tendencias de ventas del último trimestre",
+          "intent_score": 1.0,
+          "details": {
+            "expected_intent": "analyze",
+            "detected_intent": "analyze",
+            "intent_match": true,
+            "confidence": 0.88,
+            "expected_entities": {
+              "type": "tendencias",
+              "collection": "ventas",
+              "period": "trimestre"
+            },
+            "detected_entities": {
+              "type": "tendencias",
+              "collection": "ventas",
+              "period": "trimestre"
+            },
+            "valid_intent": true
+          }
+        },
+        {
+          "sample_id": 12,
+          "query": "Compara las ventas de este año con el año pasado",
+          "intent_score": 1.0,
+          "details": {
+            "expected_intent": "analyze",
+            "detected_intent": "analyze",
+            "intent_match": true,
+            "confidence": 0.85,
+            "expected_entities": {
+              "type": "comparativo",
+              "collection": "ventas"
+            },
+            "detected_entities": {
+              "type": "comparativo",
+              "collection": "ventas"
+            },
+            "valid_intent": true
+          }
+        },
+        {
+          "sample_id": 13,
+          "query": "Hola, ¿cómo estás?",
+          "intent_score": 1.0,
+          "details": {
+            "expected_intent": "conversation",
+            "detected_intent": "conversation",
+            "intent_match": true,
+            "confidence": 0.97,
+            "expected_entities": {},
+            "detected_entities": {},
+            "valid_intent": true
+          }
+        },
+        {
+          "sample_id": 14,
+          "query": "Buenos días",
+          "intent_score": 1.0,
+          "details": {
+            "expected_intent": "conversation",
+            "detected_intent": "conversation",
+            "intent_match": true,
+            "confidence": 0.96,
+            "expected_entities": {},
+            "detected_entities": {},
+            "valid_intent": true
+          }
+        },
+        {
+          "sample_id": 15,
+          "query": "¿Qué puedes hacer?",
+          "intent_score": 1.0,
+          "details": {
+            "expected_intent": "help",
+            "detected_intent": "help",
+            "intent_match": true,
+            "confidence": 0.92,
+            "expected_entities": {},
+            "detected_entities": {},
+            "valid_intent": true
+          }
+        },
+        {
+          "sample_id": 16,
+          "query": "Ayuda con el sistema",
+          "intent_score": 1.0,
+          "details": {
+            "expected_intent": "help",
+            "detected_intent": "help",
+            "intent_match": true,
+            "confidence": 0.91,
+            "expected_entities": {},
+            "detected_entities": {},
+            "valid_intent": true
+          }
+        },
+        {
+          "sample_id": 17,
+          "query": "Lista los productos con stock bajo",
+          "intent_score": 1.0,
+          "details": {
+            "expected_intent": "query_data",
+            "detected_intent": "query_data",
+            "intent_match": true,
+            "confidence": 0.87,
+            "expected_entities": {
+              "collection": "productos",
+              "filter": "stock_bajo"
+            },
+            "detected_entities": {
+              "collection": "productos",
+              "filter": "stock_bajo"
+            },
+            "valid_intent": true
+          }
+        },
+        {
+          "sample_id": 18,
+          "query": "¿Cuál es el capital actual de la bóveda Monte?",
+          "intent_score": 1.0,
+          "details": {
+            "expected_intent": "query_data",
+            "detected_intent": "query_data",
+            "intent_match": true,
+            "confidence": 0.89,
+            "expected_entities": {
+              "collection": "bancos",
+              "banco": "boveda_monte",
+              "field": "capitalActual"
+            },
+            "detected_entities": {
+              "collection": "bancos",
+              "banco": "boveda_monte",
+              "field": "capitalActual"
+            },
+            "valid_intent": true
+          }
+        },
+        {
+          "sample_id": 19,
+          "query": "Elimina la venta V-2025-001",
+          "intent_score": 1.0,
+          "details": {
+            "expected_intent": "delete_record",
+            "detected_intent": "delete_record",
+            "intent_match": true,
+            "confidence": 0.84,
+            "expected_entities": {
+              "collection": "ventas",
+              "id": "V-2025-001"
+            },
+            "detected_entities": {
+              "collection": "ventas",
+              "id": "V-2025-001"
+            },
+            "valid_intent": true
+          }
+        }
+      ]
+    },
+    "form_automation": {
+      "service": "AIFormAutomation",
+      "timestamp": "2025-11-29T17:27:39.182530",
+      "total_samples": 12,
+      "metrics": {
+        "form_venta": {
+          "mean": 0.8333333333333334,
+          "samples": 3
+        },
+        "form_compra": {
+          "mean": 0.9,
+          "samples": 1
+        },
+        "form_cliente": {
+          "mean": 0.5716666666666668,
+          "samples": 2
+        },
+        "form_gasto": {
+          "mean": 0.8133333333333334,
+          "samples": 2
+        },
+        "form_transferencia": {
+          "mean": 0.9,
+          "samples": 2
+        },
+        "form_orden_compra": {
+          "mean": 0.8333333333333334,
+          "samples": 1
+        },
+        "form_producto": {
+          "mean": 0.67,
+          "samples": 1
+        },
+        "overall": {
+          "mean": 0.7894444444444444,
+          "samples": 12
+        }
+      },
+      "detailed_results": [
+        {
+          "sample_id": 0,
+          "form_type": "venta",
+          "overall_score": 0.9,
+          "completion_rate": 1.0,
+          "validation_accuracy": 1.0
+        },
+        {
+          "sample_id": 1,
+          "form_type": "venta",
+          "overall_score": 0.9,
+          "completion_rate": 1.0,
+          "validation_accuracy": 1.0
+        },
+        {
+          "sample_id": 2,
+          "form_type": "compra",
+          "overall_score": 0.9,
+          "completion_rate": 1.0,
+          "validation_accuracy": 1.0
+        },
+        {
+          "sample_id": 3,
+          "form_type": "cliente",
+          "overall_score": 0.6133333333333334,
+          "completion_rate": 1.0,
+          "validation_accuracy": 0.3333333333333333
+        },
+        {
+          "sample_id": 4,
+          "form_type": "cliente",
+          "overall_score": 0.53,
+          "completion_rate": 1.0,
+          "validation_accuracy": 0.0
+        },
+        {
+          "sample_id": 5,
+          "form_type": "gasto",
+          "overall_score": 0.9,
+          "completion_rate": 1.0,
+          "validation_accuracy": 1.0
+        },
+        {
+          "sample_id": 6,
+          "form_type": "gasto",
+          "overall_score": 0.7266666666666667,
+          "completion_rate": 1.0,
+          "validation_accuracy": 1.0
+        },
+        {
+          "sample_id": 7,
+          "form_type": "transferencia",
+          "overall_score": 0.9,
+          "completion_rate": 1.0,
+          "validation_accuracy": 1.0
+        },
+        {
+          "sample_id": 8,
+          "form_type": "transferencia",
+          "overall_score": 0.9,
+          "completion_rate": 1.0,
+          "validation_accuracy": 1.0
+        },
+        {
+          "sample_id": 9,
+          "form_type": "orden_compra",
+          "overall_score": 0.8333333333333334,
+          "completion_rate": 1.0,
+          "validation_accuracy": 1.0
+        },
+        {
+          "sample_id": 10,
+          "form_type": "producto",
+          "overall_score": 0.67,
+          "completion_rate": 1.0,
+          "validation_accuracy": 1.0
+        },
+        {
+          "sample_id": 11,
+          "form_type": "venta",
+          "overall_score": 0.7,
+          "completion_rate": 0.2,
+          "validation_accuracy": 1.0
+        }
+      ]
+    },
+    "power_bi": {
+      "service": "AIPowerBI",
+      "timestamp": "2025-11-29T17:27:39.183419",
+      "total_samples": 6,
+      "metrics": {
+        "kpi_accuracy": {
+          "mean": 0.7252777777777778,
+          "min": 0.6875,
+          "max": 0.8109999999999999,
+          "samples": 6
+        }
+      },
+      "detailed_results": [
+        {
+          "sample_id": 0,
+          "dashboard_type": "ventas",
+          "overall_score": 0.7276666666666667,
+          "trend_accuracy": 0.5,
+          "insight_relevance": 0.72
+        },
+        {
+          "sample_id": 1,
+          "dashboard_type": "financiero",
+          "overall_score": 0.70775,
+          "trend_accuracy": 0.5,
+          "insight_relevance": 0.52
+        },
+        {
+          "sample_id": 2,
+          "dashboard_type": "inventario",
+          "overall_score": 0.71,
+          "trend_accuracy": 0.5,
+          "insight_relevance": 0.52
+        },
+        {
+          "sample_id": 3,
+          "dashboard_type": "clientes",
+          "overall_score": 0.6875,
+          "trend_accuracy": 0.5,
+          "insight_relevance": 0.52
+        },
+        {
+          "sample_id": 4,
+          "dashboard_type": "compras",
+          "overall_score": 0.70775,
+          "trend_accuracy": 0.5,
+          "insight_relevance": 0.52
+        },
+        {
+          "sample_id": 5,
+          "dashboard_type": "general",
+          "overall_score": 0.8109999999999999,
+          "trend_accuracy": 0.5,
+          "insight_relevance": 0.48666666666666664
+        }
+      ]
+    },
+    "scheduled_reports": {
+      "service": "AIScheduledReports",
+      "timestamp": "2025-11-29T17:27:39.184319",
+      "total_samples": 8,
+      "metrics": {
+        "report_quality": {
+          "mean": 0.8143005952380953,
+          "min": 0.44642857142857145,
+          "max": 1.0,
+          "samples": 8
+        }
+      },
+      "detailed_results": [
+        {
+          "sample_id": 0,
+          "report_type": "ventas",
+          "overall_quality": 0.9285714285714286,
+          "data_completeness": 1.0,
+          "format_correctness": 1.0
+        },
+        {
+          "sample_id": 1,
+          "report_type": "ventas",
+          "overall_quality": 0.8535714285714285,
+          "data_completeness": 1.0,
+          "format_correctness": 1.0
+        },
+        {
+          "sample_id": 2,
+          "report_type": "financiero",
+          "overall_quality": 1.0,
+          "data_completeness": 1.0,
+          "format_correctness": 1.0
+        },
+        {
+          "sample_id": 3,
+          "report_type": "inventario",
+          "overall_quality": 0.8566666666666666,
+          "data_completeness": 1.0,
+          "format_correctness": 1.0
+        },
+        {
+          "sample_id": 4,
+          "report_type": "clientes",
+          "overall_quality": 0.875,
+          "data_completeness": 1.0,
+          "format_correctness": 1.0
+        },
+        {
+          "sample_id": 5,
+          "report_type": "compras",
+          "overall_quality": 0.8791666666666667,
+          "data_completeness": 1.0,
+          "format_correctness": 1.0
+        },
+        {
+          "sample_id": 6,
+          "report_type": "general",
+          "overall_quality": 0.675,
+          "data_completeness": 1.0,
+          "format_correctness": 0.0
+        },
+        {
+          "sample_id": 7,
+          "report_type": "ventas",
+          "overall_quality": 0.44642857142857145,
+          "data_completeness": 0.35,
+          "format_correctness": 0.9
+        }
+      ]
+    },
+    "user_learning": {
+      "service": "UserLearning",
+      "timestamp": "2025-11-29T17:27:39.185852",
+      "total_samples": 5,
+      "metrics": {
+        "learning_effectiveness": {
+          "mean": 0.617830404040404,
+          "min": 0.48124772727272724,
+          "max": 0.7714848484848484,
+          "samples": 5
+        }
+      },
+      "detailed_results": [
+        {
+          "sample_id": 0,
+          "overall_effectiveness": 0.618594696969697,
+          "pattern_accuracy": 0.9017857142857143,
+          "prediction_accuracy": 1.0
+        },
+        {
+          "sample_id": 1,
+          "overall_effectiveness": 0.5940030303030303,
+          "pattern_accuracy": 0.6547619047619048,
+          "prediction_accuracy": 1.0
+        },
+        {
+          "sample_id": 2,
+          "overall_effectiveness": 0.6238217171717171,
+          "pattern_accuracy": 0.8381746031746031,
+          "prediction_accuracy": 1.0
+        },
+        {
+          "sample_id": 3,
+          "overall_effectiveness": 0.7714848484848484,
+          "pattern_accuracy": 0.8142857142857143,
+          "prediction_accuracy": 1.0
+        },
+        {
+          "sample_id": 4,
+          "overall_effectiveness": 0.48124772727272724,
+          "pattern_accuracy": 0.8688636363636364,
+          "prediction_accuracy": 0.5
+        }
+      ]
+    },
+    "business_logic": {
+      "service": "BusinessLogic",
+      "timestamp": "2025-11-29T17:27:39.187446",
+      "total_samples": 15,
+      "metrics": {
+        "sale_distribution": {
+          "mean": 1.0,
+          "samples": 5,
+          "perfect_score_rate": 1.0
+        },
+        "capital_calculation": {
+          "mean": 1.0,
+          "samples": 4,
+          "perfect_score_rate": 1.0
+        },
+        "payment_status": {
+          "mean": 1.0,
+          "samples": 3,
+          "perfect_score_rate": 1.0
+        },
+        "partial_payment": {
+          "mean": 1.0,
+          "samples": 3,
+          "perfect_score_rate": 1.0
+        },
+        "overall": {
+          "mean": 1.0,
+          "samples": 15
+        }
+      },
+      "detailed_results": [
+        {
+          "sample_id": 0,
+          "operation_type": "sale_distribution",
+          "overall_accuracy": 1.0,
+          "errors": []
+        },
+        {
+          "sample_id": 1,
+          "operation_type": "sale_distribution",
+          "overall_accuracy": 1.0,
+          "errors": []
+        },
+        {
+          "sample_id": 2,
+          "operation_type": "sale_distribution",
+          "overall_accuracy": 1.0,
+          "errors": []
+        },
+        {
+          "sample_id": 3,
+          "operation_type": "capital_calculation",
+          "overall_accuracy": 1.0,
+          "errors": []
+        },
+        {
+          "sample_id": 4,
+          "operation_type": "capital_calculation",
+          "overall_accuracy": 1.0,
+          "errors": []
+        },
+        {
+          "sample_id": 5,
+          "operation_type": "capital_calculation",
+          "overall_accuracy": 1.0,
+          "errors": []
+        },
+        {
+          "sample_id": 6,
+          "operation_type": "payment_status",
+          "overall_accuracy": 1.0,
+          "errors": []
+        },
+        {
+          "sample_id": 7,
+          "operation_type": "payment_status",
+          "overall_accuracy": 1.0,
+          "errors": []
+        },
+        {
+          "sample_id": 8,
+          "operation_type": "payment_status",
+          "overall_accuracy": 1.0,
+          "errors": []
+        },
+        {
+          "sample_id": 9,
+          "operation_type": "partial_payment",
+          "overall_accuracy": 1.0,
+          "errors": []
+        },
+        {
+          "sample_id": 10,
+          "operation_type": "partial_payment",
+          "overall_accuracy": 1.0,
+          "errors": []
+        },
+        {
+          "sample_id": 11,
+          "operation_type": "partial_payment",
+          "overall_accuracy": 1.0,
+          "errors": []
+        },
+        {
+          "sample_id": 12,
+          "operation_type": "sale_distribution",
+          "overall_accuracy": 1.0,
+          "errors": []
+        },
+        {
+          "sample_id": 13,
+          "operation_type": "sale_distribution",
+          "overall_accuracy": 1.0,
+          "errors": []
+        },
+        {
+          "sample_id": 14,
+          "operation_type": "capital_calculation",
+          "overall_accuracy": 1.0,
+          "errors": []
+        }
+      ]
+    }
+  },
+  "summary": {
+    "total_services": 6,
+    "overall_score": 0.824475536916787,
+    "service_scores": {
+      "mega_ai_agent": 1.0,
+      "form_automation": 0.7894444444444444,
+      "power_bi": 0.7252777777777778,
+      "scheduled_reports": 0.8143005952380953,
+      "user_learning": 0.617830404040404,
+      "business_logic": 1.0
+    },
+    "status": "passed"
+  }
+}

@@ -1,0 +1,291 @@
+{
+  "azteca": {
+    "ingresos": 1880970.0,
+    "ingresosList": [
+      {
+        "fecha": "08/09/2025",
+        "cliente": "Gasto Bóveda Usa",
+        "ingreso": 73200.0,
+        "tc": 0,
+        "dolares": 0,
+        "observaciones": "Azteca",
+        "concepto": "venta local chucho#22 - sra karla playa azul"
+      },
+      {
+        "fecha": "11/09/2025",
+        "cliente": "Abono",
+        "ingreso": 1400000.0,
+        "tc": 0,
+        "dolares": 0,
+        "observaciones": "Azteca",
+        "concepto": "trajo blin blin"
+      },
+      {
+        "fecha": "11/09/2025",
+        "cliente": "Abono",
+        "ingreso": 164370.0,
+        "tc": 0,
+        "dolares": 0,
+        "observaciones": "Azteca",
+        "concepto": "dejo inspector playa"
+      },
+      {
+        "fecha": "12/09/2025",
+        "cliente": "Abono",
+        "ingreso": 142000.0,
+        "tc": 0,
+        "dolares": 0,
+        "observaciones": "Azteca",
+        "concepto": "dejaron inspector"
+      },
+      {
+        "fecha": "12/09/2025",
+        "cliente": "Abono",
+        "ingreso": 100000.0,
+        "tc": 0,
+        "dolares": 0,
+        "observaciones": "Azteca",
+        "concepto": "dejaron inspector"
+      },
+      {
+        "fecha": "13/09/2025",
+        "cliente": "Abono",
+        "ingreso": 1400.0,
+        "tc": 0,
+        "dolares": 0,
+        "observaciones": "Azteca",
+        "concepto": "dejaron inspector"
+      }
+    ],
+    "rfActual": -178714.88,
+    "rfCortes": [],
+    "gastos": 2059684.88,
+    "gastosList": [
+      {
+        "fecha": "",
+        "origen": "",
+        "gasto": 214993.2,
+        "destino": "",
+        "a": "",
+        "observaciones": "",
+        "concepto": ""
+      },
+      {
+        "fecha": "29/08/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 1666.67,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "",
+        "concepto": "Retiro inspector"
+      },
+      {
+        "fecha": "30/08/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 1500.0,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "Bóveda USA",
+        "concepto": "prestamo sra karla-a/x playa azul"
+      },
+      {
+        "fecha": "30/08/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 8000.0,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "",
+        "concepto": "Retiro Inspector"
+      },
+      {
+        "fecha": "30/08/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 2777.78,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "",
+        "concepto": "Retiro inspector"
+      },
+      {
+        "fecha": "31/08/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 3300.0,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "",
+        "concepto": "Retiro inspector"
+      },
+      {
+        "fecha": "05/09/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 20000.0,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "",
+        "concepto": "Retiro inspector"
+      },
+      {
+        "fecha": "05/09/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 3180.0,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "",
+        "concepto": "Retiro inspector"
+      },
+      {
+        "fecha": "05/09/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 41436.46,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "",
+        "concepto": "Retiro inspector (750/18.10)"
+      },
+      {
+        "fecha": "06/09/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 3300.0,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "",
+        "concepto": "Retiro inspector"
+      },
+      {
+        "fecha": "06/09/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 2777.78,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "",
+        "concepto": "Retiro inspector (50,000/18)"
+      },
+      {
+        "fecha": "12/09/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 4419.0,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "NA",
+        "concepto": "retiro inspector (80,000 tc-18.10)"
+      },
+      {
+        "fecha": "12/09/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 20000.0,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "NA",
+        "concepto": "retiro inspecor"
+      },
+      {
+        "fecha": "12/09/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 3300.0,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "NA",
+        "concepto": "retiro inspector"
+      },
+      {
+        "fecha": "13/09/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 100000.0,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "NA",
+        "concepto": "retiro inspector dany1-rojo"
+      },
+      {
+        "fecha": "13/09/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 500000.0,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "NA",
+        "concepto": "retiro inspector dany1-letty"
+      },
+      {
+        "fecha": "13/09/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 500000.0,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "NA",
+        "concepto": "retiro inspector dany1-letty"
+      },
+      {
+        "fecha": "22/09/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 3300.0,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "NA",
+        "concepto": "Retiro inspector"
+      },
+      {
+        "fecha": "23/09/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 30000.0,
+        "destino": "0",
+        "a": "30000",
+        "observaciones": "NA",
+        "concepto": "Retiro Inspector"
+      },
+      {
+        "fecha": "24/09/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 1555.0,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "NA",
+        "concepto": "Retiro Inspector (28000/18)"
+      },
+      {
+        "fecha": "25/09/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 83370.0,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "NA",
+        "concepto": "Retiro Inspector"
+      },
+      {
+        "fecha": "26/09/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 8000.0,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "NA",
+        "concepto": "Retiro inspector"
+      },
+      {
+        "fecha": "26/09/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 100000.0,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "NA",
+        "concepto": "Retiro inspector"
+      },
+      {
+        "fecha": "06/10/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 2808.99,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "NA",
+        "concepto": "Retiro inspector (50,000/17.80)"
+      },
+      {
+        "fecha": "09/10/2025",
+        "origen": "Gasto Azteca",
+        "gasto": 400000.0,
+        "destino": "0",
+        "a": "0",
+        "observaciones": "NA",
+        "concepto": "Retiro inspector 1era"
+      }
+    ]
+  }
+}

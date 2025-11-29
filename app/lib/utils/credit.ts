@@ -10,7 +10,7 @@
  */
 
 import { Timestamp } from 'firebase/firestore';
-import logger from '@/app/lib/utils/logger';
+import { logger } from '@/app/lib/utils/logger';
 
 // ============================================
 // INTERFACES
@@ -141,10 +141,12 @@ export function procesarPago(
   }
 
   logger.info('Pago procesado', {
-    distribuidorId: distribuidor.id,
-    montoPago: pago.monto,
-    nuevaDeuda,
-    pagoExcedente
+    data: {
+      distribuidorId: distribuidor.id,
+      montoPago: pago.monto,
+      nuevaDeuda,
+      pagoExcedente
+    }
   });
 
   return {

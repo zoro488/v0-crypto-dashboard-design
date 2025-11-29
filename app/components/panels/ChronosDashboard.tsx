@@ -45,6 +45,7 @@ import {
   LineChart,
   Line,
 } from "recharts"
+import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from "@/app/components/ui/SafeChartContainer"
 import { useState, useEffect, useMemo, Suspense, lazy } from "react"
 import { useVentas, useOrdenesCompra, useProductos, useClientes } from "@/app/lib/firebase/firestore-hooks.service"
 import { Skeleton } from "@/app/components/ui/skeleton"
@@ -162,7 +163,7 @@ const StatCard = ({ title, value, change, trend, icon: Icon, color, index, spark
           {/* Mini Sparkline */}
           {sparklineData && sparklineData.length > 0 && (
             <div className="mt-3 md:mt-4 h-8 md:h-10">
-              <ResponsiveContainer width="100%" height="100%">
+              <SafeChartContainer height={40} minHeight={32}>
                 <AreaChart data={sparklineData.map((v, i) => ({ value: v }))}>
                   <defs>
                     <linearGradient id={`spark-${index}`} x1="0" y1="0" x2="0" y2="1">
@@ -176,9 +177,10 @@ const StatCard = ({ title, value, change, trend, icon: Icon, color, index, spark
                     stroke={trend === "up" ? "#10b981" : "#ef4444"}
                     strokeWidth={2}
                     fill={`url(#spark-${index})`}
+                    {...SAFE_ANIMATION_PROPS}
                   />
                 </AreaChart>
-              </ResponsiveContainer>
+              </SafeChartContainer>
             </div>
           )}
         </div>
@@ -408,7 +410,7 @@ export default function ChronosDashboard() {
   }
 
   return (
-    <div className="grid grid-cols-12 gap-4 md:gap-6 p-4 md:p-6 relative min-h-screen">
+    <div className="grid grid-cols-12 gap-4 md:gap-6 p-4 md:p-6 relative min-h-screen overflow-x-hidden max-w-full">
       {/* ============================================================ */}
       {/* INTRO ANIMATION - CHRONOS */}
       {/* ============================================================ */}
@@ -581,7 +583,7 @@ export default function ChronosDashboard() {
 
           {/* Chart */}
           <div className="h-48 md:h-80">
-            <ResponsiveContainer width="100%" height="100%">
+            <SafeChartContainer height="100%" minHeight={192}>
               <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorVentas" x1="0" y1="0" x2="0" y2="1">
@@ -597,10 +599,10 @@ export default function ChronosDashboard() {
                 <XAxis dataKey="name" stroke="#ffffff40" fontSize={11} tickLine={false} axisLine={false} />
                 <YAxis stroke="#ffffff40" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v/1000}k`} />
                 <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="ventas" name="Ventas" stroke="#3b82f6" strokeWidth={2} fill="url(#colorVentas)" />
-                <Area type="monotone" dataKey="profit" name="Profit" stroke="#10b981" strokeWidth={2} fill="url(#colorProfit)" />
+                <Area type="monotone" dataKey="ventas" name="Ventas" stroke="#3b82f6" strokeWidth={2} fill="url(#colorVentas)" {...SAFE_ANIMATION_PROPS} />
+                <Area type="monotone" dataKey="profit" name="Profit" stroke="#10b981" strokeWidth={2} fill="url(#colorProfit)" {...SAFE_ANIMATION_PROPS} />
               </AreaChart>
-            </ResponsiveContainer>
+            </SafeChartContainer>
           </div>
         </div>
       </motion.div>
@@ -659,7 +661,7 @@ export default function ChronosDashboard() {
           </div>
 
           <div className="h-40 md:h-52">
-            <ResponsiveContainer width="100%" height="100%">
+            <SafeChartContainer height={208} minHeight={160}>
               <RechartsPieChart>
                 <Pie
                   data={pieData}
@@ -669,6 +671,7 @@ export default function ChronosDashboard() {
                   outerRadius={70}
                   paddingAngle={4}
                   dataKey="value"
+                  {...SAFE_PIE_PROPS}
                 >
                   {pieData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
@@ -676,7 +679,7 @@ export default function ChronosDashboard() {
                 </Pie>
                 <Tooltip />
               </RechartsPieChart>
-            </ResponsiveContainer>
+            </SafeChartContainer>
           </div>
 
           {/* Legend */}

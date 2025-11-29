@@ -7,7 +7,6 @@ import { TrendingUp, DollarSign, Package, ShoppingCart, Zap, PieChart, Filter, U
 import {
   AreaChart,
   Area,
-  ResponsiveContainer,
   BarChart,
   Bar,
   XAxis,
@@ -23,7 +22,8 @@ import {
   Pie,
   Cell,
 } from "recharts"
-import { useState, useEffect, useMemo, useCallback } from "react"
+import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from "@/app/components/ui/SafeChartContainer"
+import { useState, useEffect, useMemo, useCallback, memo } from "react"
 import { useVentas, useOrdenesCompra, useProductos, useClientes } from "@/app/lib/firebase/firestore-hooks.service"
 import { Skeleton } from "@/app/components/ui/skeleton"
 import CreateOrdenCompraModal from "@/app/components/modals/CreateOrdenCompraModalSmart"
@@ -69,7 +69,7 @@ interface CustomTooltipProps {
   label?: string
 }
 
-const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+const CustomTooltip = memo(function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (active && payload && payload.length) {
     return (
       <div className="bg-black/80 backdrop-blur-md border border-white/10 p-4 rounded-xl shadow-2xl">
@@ -85,9 +85,9 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     )
   }
   return null
-}
+})
 
-export default function BentoDashboard() {
+export default memo(function BentoDashboard() {
   const { bancos } = useAppStore()
   const { data: ventasRaw, loading: loadingVentas } = useVentas()
   const { data: ordenesCompraRaw, loading: loadingOC } = useOrdenesCompra()
@@ -114,10 +114,18 @@ export default function BentoDashboard() {
     return () => clearTimeout(timer)
   }, [])
 
-  const capitalTotal = bancos?.reduce((acc, b) => acc + (b?.saldo || 0), 0) || 0
-  const ventasMes = ventas?.reduce((acc, v) => acc + (v?.montoTotal ?? 0), 0) ?? 0
-  const stockActual = productos?.reduce((acc, p) => acc + (p?.stock ?? 0), 0) ?? 0
-  const ordenesActivas = ordenesCompra?.filter((oc) => oc?.estado === "pendiente")?.length ?? 0
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CÁLCULOS OPTIMIZADOS CON useMemo - Solo se recalculan cuando cambian datos
+  // ═══════════════════════════════════════════════════════════════════════════
+  
+  const metrics = useMemo(() => {
+    const capitalTotal = bancos?.reduce((acc, b) => acc + (b?.saldo || 0), 0) || 0
+    const ventasMes = ventas?.reduce((acc, v) => acc + (v?.montoTotal ?? 0), 0) ?? 0
+    const stockActual = productos?.reduce((acc, p) => acc + (p?.stock ?? 0), 0) ?? 0
+    const ordenesActivas = ordenesCompra?.filter((oc) => oc?.estado === "pendiente")?.length ?? 0
+    
+    return { capitalTotal, ventasMes, stockActual, ordenesActivas }
+  }, [bancos, ventas, productos, ordenesCompra])
 
   // Helper para formatear fecha de Firestore
   const formatVentaDate = (fecha: VentaData["fecha"]): string => {
@@ -131,27 +139,28 @@ export default function BentoDashboard() {
     return new Date(fecha).toLocaleDateString("es-MX", { month: "short" })
   }
 
-  const mockChartData =
+  const mockChartData = useMemo(() => 
     ventas?.slice(-7).map((v) => ({
       name: formatVentaDate(v?.fecha),
       value: v?.montoTotal ?? 0,
       sales: (v?.precioVenta ?? 0) * (v?.cantidad ?? 0),
       profit: v?.ganancia ?? 0,
     })) ?? []
+  , [ventas])
 
-  const radarData = [
+  const radarData = useMemo(() => [
     { subject: "Ventas", A: 120, fullMark: 150 },
     { subject: "Compras", A: 98, fullMark: 150 },
     { subject: "Stock", A: 86, fullMark: 150 },
     { subject: "Distribución", A: 99, fullMark: 150 },
     { subject: "Profit", A: 85, fullMark: 150 },
     { subject: "Clientes", A: 65, fullMark: 150 },
-  ]
+  ], [])
 
-  const stats = [
+  const stats = useMemo(() => [
     {
       title: "Capital Total",
-      value: `$${capitalTotal.toLocaleString()}`,
+      value: `$${metrics.capitalTotal.toLocaleString()}`,
       change: "+12.5%",
       trend: "up",
       icon: DollarSign,
@@ -159,7 +168,7 @@ export default function BentoDashboard() {
     },
     {
       title: "Ventas del Mes",
-      value: `$${ventasMes.toLocaleString()}`,
+      value: `$${metrics.ventasMes.toLocaleString()}`,
       change: "+8.3%",
       trend: "up",
       icon: TrendingUp,
@@ -167,7 +176,7 @@ export default function BentoDashboard() {
     },
     {
       title: "Stock Actual",
-      value: stockActual.toString(),
+      value: metrics.stockActual.toString(),
       change: "-3.2%",
       trend: "down",
       icon: Package,
@@ -175,13 +184,13 @@ export default function BentoDashboard() {
     },
     {
       title: "Órdenes Activas",
-      value: ordenesActivas.toString(),
+      value: metrics.ordenesActivas.toString(),
       change: "+15.8%",
       trend: "up",
       icon: ShoppingCart,
       color: "from-amber-500 via-orange-400 to-red-400",
     },
-  ]
+  ], [metrics])
 
   if (loadingVentas || loadingOC || loadingProductos) {
     return (
@@ -369,7 +378,7 @@ export default function BentoDashboard() {
         </div>
 
         <div className="h-[400px] w-full relative z-10" style={{ minWidth: 300, minHeight: 300 }}>
-          <ResponsiveContainer width="100%" height="100%" minWidth={300} minHeight={300}>
+          <SafeChartContainer height={400} minHeight={300}>
             <AreaChart data={mockChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
@@ -402,7 +411,7 @@ export default function BentoDashboard() {
                 strokeWidth={3}
                 fill="url(#colorValue)"
                 activeDot={{ r: 6, strokeWidth: 0, fill: "#fff" }}
-                isAnimationActive={false}
+                {...SAFE_ANIMATION_PROPS}
               />
               <Area
                 type="monotone"
@@ -411,10 +420,10 @@ export default function BentoDashboard() {
                 strokeWidth={3}
                 fill="url(#colorProfit)"
                 activeDot={{ r: 6, strokeWidth: 0, fill: "#fff" }}
-                isAnimationActive={false}
+                {...SAFE_ANIMATION_PROPS}
               />
             </AreaChart>
-          </ResponsiveContainer>
+          </SafeChartContainer>
         </div>
       </motion.div>
 
@@ -531,15 +540,15 @@ export default function BentoDashboard() {
           </div>
 
           <div className="h-[200px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <SafeChartContainer height={200} minHeight={150}>
               <BarChart data={mockChartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
                 <XAxis dataKey="name" stroke="#ffffff40" fontSize={10} tickLine={false} axisLine={false} />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.05)" }} />
-                <Bar dataKey="sales" name="Ventas" fill="#ec4899" radius={[8, 8, 0, 0]} stackId="a" />
-                <Bar dataKey="profit" name="Profit" fill="#3b82f6" radius={[8, 8, 0, 0]} stackId="a" />
+                <Bar dataKey="sales" name="Ventas" fill="#ec4899" radius={[8, 8, 0, 0]} stackId="a" {...SAFE_ANIMATION_PROPS} />
+                <Bar dataKey="profit" name="Profit" fill="#3b82f6" radius={[8, 8, 0, 0]} stackId="a" {...SAFE_ANIMATION_PROPS} />
               </BarChart>
-            </ResponsiveContainer>
+            </SafeChartContainer>
           </div>
         </div>
       </motion.div>
@@ -768,4 +777,4 @@ export default function BentoDashboard() {
       <CreateTransferenciaModal isOpen={isTransferenciaModalOpen} onClose={() => setIsTransferenciaModalOpen(false)} />
     </div>
   )
-}
+})

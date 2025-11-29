@@ -6,10 +6,12 @@ import { motion } from 'framer-motion';
 // ============================================
 // INTERFACES Y TIPOS
 // ============================================
-interface PremiumOrbBackgroundProps {
+export type ColorScheme = 'blue' | 'purple' | 'green' | 'orange' | 'multi' | 'cyberpunk';
+
+export interface PremiumOrbBackgroundProps {
   opacity?: number;
   animate?: boolean;
-  colorScheme?: 'blue' | 'purple' | 'green' | 'orange' | 'multi' | 'cyberpunk';
+  colorScheme?: ColorScheme;
   intensity?: 'low' | 'medium' | 'high';
   blur?: number;
   interactive?: boolean;

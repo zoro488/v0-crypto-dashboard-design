@@ -7,10 +7,11 @@ import { Button } from "@/app/components/ui/button"
 import { Badge } from "@/app/components/ui/badge"
 import { useDistribuidores, useOrdenesCompra } from "@/app/lib/firebase/firestore-hooks.service"
 import CreateDistribuidorModalSmart from "@/app/components/modals/CreateDistribuidorModalSmart"
-import CreateAbonoModalSmart from "@/app/components/modals/CreateAbonoModalSmart"
+import CreatePagoDistribuidorModal from "@/app/components/modals/CreatePagoDistribuidorModal"
 import { Skeleton } from "@/app/components/ui/skeleton"
 import { Alert, AlertDescription, AlertTitle } from "@/app/components/ui/alert"
-import { AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from "recharts"
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from "recharts"
+import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from "@/app/components/ui/SafeChartContainer"
 import { QuickStatWidget } from "@/app/components/widgets/QuickStatWidget"
 import { MiniChartWidget } from "@/app/components/widgets/MiniChartWidget"
 import { ActivityFeedWidget, ActivityItem } from "@/app/components/widgets/ActivityFeedWidget"
@@ -234,7 +235,7 @@ export default function BentoDistribuidores() {
                 <Activity className="w-3 h-3 mr-1" /> Actualizado
               </Badge>
             </div>
-            <ResponsiveContainer width="100%" height={220}>
+            <SafeChartContainer height={220} minHeight={180}>
               <AreaChart data={trendData}>
                 <defs>
                   <linearGradient id="colorComprasD" x1="0" y1="0" x2="0" y2="1">
@@ -256,10 +257,10 @@ export default function BentoDistribuidores() {
                   }}
                   formatter={(value: number) => [`$${value.toLocaleString()}`, '']}
                 />
-                <Area type="monotone" dataKey="compras" stroke="#a855f7" strokeWidth={2} fillOpacity={1} fill="url(#colorComprasD)" name="Compras" />
-                <Area type="monotone" dataKey="pagos" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorPagosD)" name="Pagos" />
+                <Area type="monotone" dataKey="compras" stroke="#a855f7" strokeWidth={2} fillOpacity={1} fill="url(#colorComprasD)" name="Compras" {...SAFE_ANIMATION_PROPS} />
+                <Area type="monotone" dataKey="pagos" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorPagosD)" name="Pagos" {...SAFE_ANIMATION_PROPS} />
               </AreaChart>
-            </ResponsiveContainer>
+            </SafeChartContainer>
           </div>
         </motion.div>
 
@@ -281,7 +282,7 @@ export default function BentoDistribuidores() {
                 <p className="text-xs text-zinc-400">Estado proveedores</p>
               </div>
             </div>
-            <ResponsiveContainer width="100%" height={150}>
+            <SafeChartContainer height={150} minHeight={120}>
               <PieChart>
                 <Pie
                   data={distribuidoresPorEstado}
@@ -291,6 +292,7 @@ export default function BentoDistribuidores() {
                   outerRadius={60}
                   paddingAngle={4}
                   dataKey="value"
+                  {...SAFE_PIE_PROPS}
                 >
                   {distribuidoresPorEstado.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
@@ -298,7 +300,7 @@ export default function BentoDistribuidores() {
                 </Pie>
                 <Tooltip />
               </PieChart>
-            </ResponsiveContainer>
+            </SafeChartContainer>
             <div className="flex justify-center gap-6 mt-2">
               {distribuidoresPorEstado.map((item, i) => (
                 <div key={i} className="flex items-center gap-2 text-sm">
@@ -434,7 +436,7 @@ export default function BentoDistribuidores() {
         isOpen={showCreateModal} 
         onClose={() => setShowCreateModal(false)} 
       />
-      <CreateAbonoModalSmart isOpen={showAbonoModal} onClose={() => setShowAbonoModal(false)} />
+      <CreatePagoDistribuidorModal isOpen={showAbonoModal} onClose={() => setShowAbonoModal(false)} />
     </div>
   )
 }

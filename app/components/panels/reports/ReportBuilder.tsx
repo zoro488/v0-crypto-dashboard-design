@@ -1,27 +1,27 @@
 'use client';
 
-import { useState, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useCallback, useMemo, useRef, ChangeEvent } from 'react';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card } from '@/app/components/ui/card';
+import { Button } from '@/app/components/ui/button';
+import { Badge } from '@/app/components/ui/badge';
+import { Input } from '@/app/components/ui/input';
+import { Label } from '@/app/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/components/ui/tabs';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/app/components/ui/dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/app/components/ui/select';
 import {
   Table,
   BarChart3,
@@ -49,14 +49,14 @@ import {
   Hash,
   Image as ImageIcon
 } from 'lucide-react';
-import logger from '@/app/lib/utils/logger';
+import { logger } from '@/app/lib/utils/logger';
 
 // ============================================
 // TIPOS E INTERFACES
 // ============================================
-type ComponentType = 'table' | 'bar-chart' | 'line-chart' | 'pie-chart' | 'kpi' | 'text' | 'image';
+export type ComponentType = 'table' | 'bar-chart' | 'line-chart' | 'pie-chart' | 'kpi' | 'text' | 'image';
 
-interface ReportComponent {
+export interface ReportComponent {
   id: string;
   type: ComponentType;
   title: string;
@@ -65,7 +65,7 @@ interface ReportComponent {
   size: { width: number; height: number };
 }
 
-interface ComponentConfig {
+export interface ComponentConfig {
   dataSource?: string;
   columns?: string[];
   filters?: Record<string, unknown>;
@@ -102,12 +102,12 @@ interface DataSource {
   fields: { name: string; type: string }[];
 }
 
-interface ReportBuilderProps {
-  onSave?: (report: ReportData) => void;
-  initialReport?: ReportData;
+export interface ReportBuilderProps {
+  onSave?: (report: ReportConfig) => void;
+  initialReport?: ReportConfig;
 }
 
-interface ReportData {
+export interface ReportConfig {
   id?: string;
   name: string;
   description: string;
@@ -326,7 +326,7 @@ export const ReportBuilder = ({ onSave, initialReport }: ReportBuilderProps) => 
 
   // Guardar reporte
   const handleSave = useCallback(() => {
-    const reportData: ReportData = {
+    const reportData: ReportConfig = {
       id: initialReport?.id,
       name: reportName,
       description: reportDescription,
@@ -336,7 +336,7 @@ export const ReportBuilder = ({ onSave, initialReport }: ReportBuilderProps) => 
     };
 
     onSave?.(reportData);
-    logger.info('Reporte guardado', { reportName, componentCount: components.length });
+    logger.info('Reporte guardado', { data: { reportName, componentCount: components.length } });
   }, [reportName, reportDescription, components, initialReport?.id, onSave]);
 
   // Componente seleccionado actual
@@ -402,7 +402,7 @@ export const ReportBuilder = ({ onSave, initialReport }: ReportBuilderProps) => 
           <div className="flex items-center gap-4">
             <Input
               value={reportName}
-              onChange={(e) => setReportName(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setReportName(e.target.value)}
               className="w-64 bg-slate-800 border-slate-700 text-white"
               placeholder="Nombre del reporte"
             />
@@ -572,7 +572,7 @@ const ReportComponentCard = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={(e) => { e.stopPropagation(); onDuplicate(); }}
+              onClick={(e: React.MouseEvent) => { e.stopPropagation(); onDuplicate(); }}
               className="h-7 w-7 p-0 text-slate-500 hover:text-slate-300"
             >
               <Copy className="w-3 h-3" />
@@ -580,7 +580,7 @@ const ReportComponentCard = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={(e) => { e.stopPropagation(); onRemove(); }}
+              onClick={(e: React.MouseEvent) => { e.stopPropagation(); onRemove(); }}
               className="h-7 w-7 p-0 text-slate-500 hover:text-red-400"
             >
               <Trash2 className="w-3 h-3" />
@@ -758,7 +758,7 @@ const ComponentConfigPanel = ({ component, onUpdate, dataSources }: ComponentCon
         <Label className="text-slate-400 text-xs uppercase">Título</Label>
         <Input
           value={component.title}
-          onChange={(e) => onUpdate({ title: e.target.value })}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => onUpdate({ title: e.target.value })}
           className="mt-1 bg-slate-800 border-slate-700 text-white"
         />
       </div>
@@ -769,7 +769,7 @@ const ComponentConfigPanel = ({ component, onUpdate, dataSources }: ComponentCon
           <Label className="text-slate-400 text-xs uppercase">Fuente de Datos</Label>
           <Select
             value={component.config.dataSource}
-            onValueChange={(value) => onUpdate({
+            onValueChange={(value: string) => onUpdate({
               config: { ...component.config, dataSource: value }
             })}
           >
@@ -829,7 +829,7 @@ const ComponentConfigPanel = ({ component, onUpdate, dataSources }: ComponentCon
             <Label className="text-slate-400 text-xs uppercase">Etiqueta</Label>
             <Input
               value={component.config.kpiConfig?.label || ''}
-              onChange={(e) => onUpdate({
+              onChange={(e: ChangeEvent<HTMLInputElement>) => onUpdate({
                 config: {
                   ...component.config,
                   kpiConfig: { ...component.config.kpiConfig!, label: e.target.value }

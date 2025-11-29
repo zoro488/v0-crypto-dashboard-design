@@ -5,7 +5,7 @@ import { TrendingUp, Plus, DollarSign, Users, Package, CheckCircle2, Clock, Arro
 import { Button } from "@/app/components/ui/button"
 import { Badge } from "@/app/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs"
-import { useState, useEffect, useMemo, useRef } from "react"
+import { useState, useEffect, useMemo, useRef, memo } from "react"
 import { useVentasData } from "@/app/lib/firebase/firestore-hooks.service"
 import { CreateVentaModal } from "@/app/components/modals/CreateVentaModalSmart"
 import { SalesFlowDiagram } from "@/app/components/visualizations/SalesFlowDiagram"
@@ -28,10 +28,10 @@ interface VentaData {
 }
 
 // ============================================================================
-// COMPONENTES DE ANIMACIÓN PREMIUM
+// COMPONENTES DE ANIMACIÓN PREMIUM (Optimizados con memo)
 // ============================================================================
 
-function AnimatedCounter({ value, prefix = "", suffix = "", className = "" }: {
+const AnimatedCounter = memo(function AnimatedCounter({ value, prefix = "", suffix = "", className = "" }: {
   value: number
   prefix?: string
   suffix?: string
@@ -64,16 +64,16 @@ function AnimatedCounter({ value, prefix = "", suffix = "", className = "" }: {
       {prefix}{displayValue.toFixed(value >= 1000 ? 2 : 0)}{suffix}
     </span>
   )
-}
+})
 
-function PulsingOrb({ color = "green" }: { color?: string }) {
-  const colorMap: Record<string, string> = {
+const PulsingOrb = memo(function PulsingOrb({ color = "green" }: { color?: string }) {
+  const colorMap: Record<string, string> = useMemo(() => ({
     green: "from-green-500 to-emerald-500",
     blue: "from-blue-500 to-cyan-500",
     purple: "from-purple-500 to-violet-500",
     yellow: "from-yellow-500 to-orange-500",
     cyan: "from-cyan-500 to-teal-500"
-  }
+  }), [])
   
   return (
     <motion.div
@@ -95,7 +95,7 @@ function PulsingOrb({ color = "green" }: { color?: string }) {
       />
     </motion.div>
   )
-}
+})
 
 // ============================================================================
 // CUSTOM TOOLTIP
@@ -121,23 +121,38 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
   )
 }
 
-export default function BentoVentas() {
+export default memo(function BentoVentas() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedTimeRange, setSelectedTimeRange] = useState<'day' | 'week' | 'month'>('week')
 
   const { data: ventasDataRaw, loading, error } = useVentasData()
   const ventasData = ventasDataRaw as VentaData[]
 
-  const totalVentas = ventasData.reduce((acc, v) => acc + (v.precioTotalVenta || 0), 0)
-  const totalCobrado = ventasData.reduce((acc, v) => acc + (v.montoPagado || 0), 0)
-  const totalPendiente = ventasData.reduce((acc, v) => acc + (v.montoRestante || 0), 0)
-  const ventasPendientes = ventasData.filter((v) => v.estadoPago === "pendiente").length
-  const ventasCompletas = ventasData.filter((v) => v.estadoPago === "completo").length
-  const ventasParciales = ventasData.filter((v) => v.estadoPago === "parcial").length
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CÁLCULOS OPTIMIZADOS CON useMemo - Solo se recalculan cuando cambian ventas
+  // ═══════════════════════════════════════════════════════════════════════════
   
-  // Calcular métricas adicionales
-  const promedioVenta = ventasData.length > 0 ? totalVentas / ventasData.length : 0
-  const tasaCobro = totalVentas > 0 ? (totalCobrado / totalVentas) * 100 : 0
+  const metrics = useMemo(() => {
+    const totalVentas = ventasData.reduce((acc, v) => acc + (v.precioTotalVenta || 0), 0)
+    const totalCobrado = ventasData.reduce((acc, v) => acc + (v.montoPagado || 0), 0)
+    const totalPendiente = ventasData.reduce((acc, v) => acc + (v.montoRestante || 0), 0)
+    const ventasPendientes = ventasData.filter((v) => v.estadoPago === "pendiente").length
+    const ventasCompletas = ventasData.filter((v) => v.estadoPago === "completo").length
+    const ventasParciales = ventasData.filter((v) => v.estadoPago === "parcial").length
+    const promedioVenta = ventasData.length > 0 ? totalVentas / ventasData.length : 0
+    const tasaCobro = totalVentas > 0 ? (totalCobrado / totalVentas) * 100 : 0
+    
+    return {
+      totalVentas,
+      totalCobrado,
+      totalPendiente,
+      ventasPendientes,
+      ventasCompletas,
+      ventasParciales,
+      promedioVenta,
+      tasaCobro,
+    }
+  }, [ventasData])
   
   // Datos simulados para gráficos (reemplazar con datos reales agrupados)
   const chartData = useMemo(() => [
@@ -151,10 +166,10 @@ export default function BentoVentas() {
   ], [])
   
   const pieData = useMemo(() => [
-    { name: 'Completas', value: ventasCompletas, color: '#22c55e' },
-    { name: 'Parciales', value: ventasParciales, color: '#eab308' },
-    { name: 'Pendientes', value: ventasPendientes, color: '#ef4444' },
-  ], [ventasCompletas, ventasParciales, ventasPendientes])
+    { name: 'Completas', value: metrics.ventasCompletas, color: '#22c55e' },
+    { name: 'Parciales', value: metrics.ventasParciales, color: '#eab308' },
+    { name: 'Pendientes', value: metrics.ventasPendientes, color: '#ef4444' },
+  ], [metrics.ventasCompletas, metrics.ventasParciales, metrics.ventasPendientes])
 
   if (loading) {
     return (
@@ -231,7 +246,7 @@ export default function BentoVentas() {
           <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
           <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 hover:border-emerald-500/50 transition-colors">
             <DollarSign className="w-8 h-8 text-emerald-400 mb-4" />
-            <div className="text-3xl font-bold text-white mb-2">${(totalVentas / 1000000).toFixed(2)}M</div>
+            <div className="text-3xl font-bold text-white mb-2">${(metrics.totalVentas / 1000000).toFixed(2)}M</div>
             <p className="text-sm text-zinc-400">Valor Total</p>
           </div>
         </motion.div>
@@ -245,7 +260,7 @@ export default function BentoVentas() {
           <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-lime-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
           <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 hover:border-green-500/50 transition-colors">
             <CheckCircle2 className="w-8 h-8 text-lime-400 mb-4" />
-            <div className="text-3xl font-bold text-white mb-2">${(totalCobrado / 1000000).toFixed(2)}M</div>
+            <div className="text-3xl font-bold text-white mb-2">${(metrics.totalCobrado / 1000000).toFixed(2)}M</div>
             <p className="text-sm text-zinc-400">Cobrado</p>
           </div>
         </motion.div>
@@ -259,7 +274,7 @@ export default function BentoVentas() {
           <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
           <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 hover:border-yellow-500/50 transition-colors">
             <Clock className="w-8 h-8 text-yellow-400 mb-4" />
-            <div className="text-3xl font-bold text-white mb-2">${(totalPendiente / 1000000).toFixed(2)}M</div>
+            <div className="text-3xl font-bold text-white mb-2">${(metrics.totalPendiente / 1000000).toFixed(2)}M</div>
             <p className="text-sm text-zinc-400">Por Cobrar</p>
           </div>
         </motion.div>
@@ -273,7 +288,7 @@ export default function BentoVentas() {
           <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
           <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 hover:border-cyan-500/50 transition-colors">
             <Users className="w-8 h-8 text-cyan-400 mb-4" />
-            <div className="text-3xl font-bold text-white mb-2">{ventasCompletas}</div>
+            <div className="text-3xl font-bold text-white mb-2">{metrics.ventasCompletas}</div>
             <p className="text-sm text-zinc-400">Completas</p>
           </div>
         </motion.div>
@@ -437,7 +452,7 @@ export default function BentoVentas() {
               <div>
                 <p className="text-sm text-zinc-400 mb-1">Promedio por Venta</p>
                 <div className="text-2xl font-bold text-white">
-                  $<AnimatedCounter value={promedioVenta / 1000} suffix="K" />
+                  $<AnimatedCounter value={metrics.promedioVenta / 1000} suffix="K" />
                 </div>
               </div>
               <div className="p-3 rounded-xl bg-cyan-500/10">
@@ -460,7 +475,7 @@ export default function BentoVentas() {
                 <p className="text-sm text-zinc-400 mb-1">Tasa de Cobro</p>
                 <div className="flex items-center gap-2">
                   <span className="text-2xl font-bold text-white">
-                    <AnimatedCounter value={tasaCobro} suffix="%" />
+                    <AnimatedCounter value={metrics.tasaCobro} suffix="%" />
                   </span>
                   <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
                     <ArrowUpRight className="w-3 h-3 mr-1" />
@@ -477,7 +492,7 @@ export default function BentoVentas() {
               <motion.div
                 className="h-full bg-gradient-to-r from-emerald-500 to-green-400"
                 initial={{ width: 0 }}
-                animate={{ width: `${tasaCobro}%` }}
+                animate={{ width: `${metrics.tasaCobro}%` }}
                 transition={{ duration: 1.5, ease: "easeOut" }}
               />
             </div>
@@ -536,8 +551,8 @@ export default function BentoVentas() {
           <Tabs defaultValue="todas" className="w-full">
             <TabsList className="bg-zinc-800/50 backdrop-blur-xl mb-6">
               <TabsTrigger value="todas">Todas</TabsTrigger>
-              <TabsTrigger value="pendientes">Pendientes ({ventasPendientes})</TabsTrigger>
-              <TabsTrigger value="completas">Completas ({ventasCompletas})</TabsTrigger>
+              <TabsTrigger value="pendientes">Pendientes ({metrics.ventasPendientes})</TabsTrigger>
+              <TabsTrigger value="completas">Completas ({metrics.ventasCompletas})</TabsTrigger>
             </TabsList>
 
             <TabsContent value="todas">
@@ -773,4 +788,4 @@ export default function BentoVentas() {
       <CreateVentaModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   )
-}
+})

@@ -14,8 +14,8 @@
 
 import { useEffect, useState, useRef, useCallback } from "react"
 import { 
-  collection, query, orderBy, where, limit, getDocs, 
-  DocumentData, QueryDocumentSnapshot 
+  collection, query, orderBy, where, limit, getDocs, onSnapshot,
+  DocumentData, QueryDocumentSnapshot, Unsubscribe
 } from "firebase/firestore"
 import { db, isFirebaseConfigured } from "./config"
 import { logger } from "../utils/logger"
@@ -24,9 +24,9 @@ import { useAppStore } from "../store/useAppStore"
 // ===================================================================
 // CONFIGURACIÓN
 // ===================================================================
-const DEFAULT_PAGE_SIZE = 500  // Aumentado para mostrar todos los registros
+const DEFAULT_PAGE_SIZE = 1000  // Aumentado para mostrar todos los registros
 const SMALL_PAGE_SIZE = 100    // Para colecciones pequeñas
-const LARGE_PAGE_SIZE = 1000   // Para consultas completas
+const LARGE_PAGE_SIZE = 5000   // Para consultas completas sin límite práctico
 
 // Flag global para modo mock
 let USE_MOCK_DATA = false
@@ -227,6 +227,95 @@ function useFirestoreQuery<T extends DocumentData>(
 }
 
 // ===================================================================
+// HOOK CON SUSCRIPCIÓN EN TIEMPO REAL
+// ===================================================================
+function useRealtimeQuery<T extends DocumentData>(
+  collectionName: string,
+  options: {
+    orderByField?: string
+    orderDirection?: 'asc' | 'desc'
+    whereField?: string
+    whereValue?: string
+    mockData: T[]
+  }
+): HookResult<T> {
+  const [data, setData] = useState<T[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const isMountedRef = useRef(true)
+  const unsubscribeRef = useRef<Unsubscribe | null>(null)
+
+  const refresh = useCallback(async () => {
+    // No-op para tiempo real, los datos se actualizan automáticamente
+  }, [])
+
+  useEffect(() => {
+    isMountedRef.current = true
+
+    // Modo mock
+    if (USE_MOCK_DATA || !isFirebaseConfigured || !db) {
+      setData(options.mockData)
+      setLoading(false)
+      return
+    }
+
+    try {
+      const collRef = collection(db, collectionName)
+      const constraints: Parameters<typeof query>[1][] = []
+
+      if (options.whereField && options.whereValue) {
+        constraints.push(where(options.whereField, '==', options.whereValue))
+      }
+
+      if (options.orderByField) {
+        constraints.push(orderBy(options.orderByField, options.orderDirection || 'desc'))
+      }
+
+      const q = query(collRef, ...constraints)
+
+      // 🔴 SUSCRIPCIÓN EN TIEMPO REAL
+      unsubscribeRef.current = onSnapshot(q, 
+        (snapshot) => {
+          if (!isMountedRef.current) return
+          
+          const items = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          })) as unknown as T[]
+          
+          logger.info(`[Firestore RT] ${collectionName}: ${items.length} registros`)
+          setData(items)
+          setLoading(false)
+          setError(null)
+        },
+        (err) => {
+          if (!isMountedRef.current) return
+          logger.error(`[Firestore RT] Error en ${collectionName}:`, err.message)
+          setData(options.mockData)
+          setLoading(false)
+          setError(err.message)
+        }
+      )
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : "Error desconocido"
+      logger.error(`[Firestore RT] Error configurando ${collectionName}:`, errMsg)
+      setData(options.mockData)
+      setLoading(false)
+      setError(errMsg)
+    }
+
+    return () => {
+      isMountedRef.current = false
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current()
+      }
+    }
+  }, [collectionName, options.whereField, options.whereValue, options.orderByField, options.orderDirection, options.mockData])
+
+  return { data, loading, error, refresh }
+}
+
+// ===================================================================
 // HOOKS ESPECÍFICOS
 // ===================================================================
 
@@ -251,64 +340,57 @@ export function useBancoData(bancoId: string): HookResult<DocumentData> & { stat
   return { ...result, stats }
 }
 
-// Hook para obtener todos los bancos desde Firestore
+// Hook para obtener todos los bancos desde Firestore (TIEMPO REAL)
 export function useBancosData(): HookResult<DocumentData> {
-  return useFirestoreQuery('bancos', {
+  return useRealtimeQuery('bancos', {
     orderByField: 'nombre',
     orderDirection: 'asc',
-    pageSize: SMALL_PAGE_SIZE,
     mockData: MOCK_BANCOS
   })
 }
 
 export function useAlmacenData(): HookResult<DocumentData> {
-  return useFirestoreQuery('almacen_productos', {
+  return useRealtimeQuery('almacen_productos', {
     orderByField: 'nombre',
     orderDirection: 'asc',
-    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_PRODUCTOS
   })
 }
 
 export function useVentasData(): HookResult<DocumentData> {
-  return useFirestoreQuery('ventas', {
+  return useRealtimeQuery('ventas', {
     orderByField: 'fecha',
     orderDirection: 'desc',
-    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_VENTAS
   })
 }
 
 export function useClientesData(): HookResult<DocumentData> {
-  return useFirestoreQuery('clientes', {
+  return useRealtimeQuery('clientes', {
     orderByField: 'nombre',
     orderDirection: 'asc',
-    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_CLIENTES
   })
 }
 
 export function useDistribuidoresData(): HookResult<DocumentData> {
-  return useFirestoreQuery('distribuidores', {
+  return useRealtimeQuery('distribuidores', {
     orderByField: 'nombre',
     orderDirection: 'asc',
-    pageSize: DEFAULT_PAGE_SIZE,
     mockData: MOCK_DISTRIBUIDORES
   })
 }
 
 export function useOrdenesCompraData(): HookResult<DocumentData> {
-  return useFirestoreQuery('ordenes_compra', {
+  return useRealtimeQuery('ordenes_compra', {
     orderByField: 'fecha',
     orderDirection: 'desc',
-    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_ORDENES_COMPRA
   })
 }
 
 export function useDashboardData(): HookResult<DocumentData> & { totales: Record<string, unknown> } {
-  const result = useFirestoreQuery('dashboard_paneles', {
-    pageSize: SMALL_PAGE_SIZE,
+  const result = useRealtimeQuery('dashboard_paneles', {
     mockData: []
   })
   
@@ -316,21 +398,19 @@ export function useDashboardData(): HookResult<DocumentData> & { totales: Record
 }
 
 export function useGYAData(): HookResult<DocumentData> {
-  return useFirestoreQuery('movimientos', {
+  return useRealtimeQuery('movimientos', {
     orderByField: 'fecha',
     orderDirection: 'desc',
-    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_MOVIMIENTOS
   })
 }
 
 export function useIngresosBanco(bancoId: string): HookResult<DocumentData> {
-  const result = useFirestoreQuery('movimientos', {
+  const result = useRealtimeQuery('movimientos', {
     whereField: 'bancoId',
     whereValue: bancoId,
     orderByField: 'fecha',
     orderDirection: 'desc',
-    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_MOVIMIENTOS.filter(m => m.tipo === 'ingreso')
   })
   
@@ -341,12 +421,11 @@ export function useIngresosBanco(bancoId: string): HookResult<DocumentData> {
 }
 
 export function useGastos(bancoId: string): HookResult<DocumentData> {
-  const result = useFirestoreQuery('movimientos', {
+  const result = useRealtimeQuery('movimientos', {
     whereField: 'bancoId',
     whereValue: bancoId,
     orderByField: 'fecha',
     orderDirection: 'desc',
-    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_MOVIMIENTOS.filter(m => m.tipo === 'gasto')
   })
   
@@ -360,12 +439,11 @@ export function useGastos(bancoId: string): HookResult<DocumentData> {
 }
 
 export function useTransferencias(bancoId: string): HookResult<DocumentData> {
-  const result = useFirestoreQuery('movimientos', {
+  const result = useRealtimeQuery('movimientos', {
     whereField: 'bancoId',
     whereValue: bancoId,
     orderByField: 'fecha',
     orderDirection: 'desc',
-    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_TRANSFERENCIAS
   })
   
@@ -376,30 +454,27 @@ export function useTransferencias(bancoId: string): HookResult<DocumentData> {
 }
 
 export function useCorteBancario(bancoId: string): HookResult<DocumentData> {
-  return useFirestoreQuery('cortes_bancarios', {
+  return useRealtimeQuery('cortes_bancarios', {
     whereField: 'bancoId',
     whereValue: bancoId,
     orderByField: 'fechaInicio',
     orderDirection: 'desc',
-    pageSize: SMALL_PAGE_SIZE,
     mockData: MOCK_CORTES
   })
 }
 
 export function useEntradasAlmacen(): HookResult<DocumentData> {
-  return useFirestoreQuery('almacen_entradas', {
+  return useRealtimeQuery('almacen_entradas', {
     orderByField: 'fecha',
     orderDirection: 'desc',
-    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_ENTRADAS
   })
 }
 
 export function useSalidasAlmacen(): HookResult<DocumentData> {
-  return useFirestoreQuery('almacen_salidas', {
+  return useRealtimeQuery('almacen_salidas', {
     orderByField: 'fecha',
     orderDirection: 'desc',
-    pageSize: LARGE_PAGE_SIZE,
     mockData: MOCK_SALIDAS
   })
 }

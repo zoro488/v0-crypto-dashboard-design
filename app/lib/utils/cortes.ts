@@ -10,7 +10,7 @@
  */
 
 import { Timestamp } from 'firebase/firestore';
-import logger from '@/app/lib/utils/logger';
+import { logger } from '@/app/lib/utils/logger';
 
 // ============================================
 // INTERFACES
@@ -189,11 +189,7 @@ export function cerrarCorte(
   };
 
   if (discrepancia) {
-    logger.warn('Discrepancia en corte de caja', {
-      banco: corte.banco,
-      diferencia,
-      severidad: discrepancia.severidad
-    });
+    logger.warn(`Discrepancia en corte de caja: ${corte.banco}, diferencia: ${diferencia}, severidad: ${discrepancia.severidad}`);
   }
 
   return {

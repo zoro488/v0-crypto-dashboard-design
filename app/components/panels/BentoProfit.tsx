@@ -14,8 +14,8 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
 } from "recharts"
+import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from "@/app/components/ui/SafeChartContainer"
 import { useVentasData, useBancoData } from "@/app/lib/firebase/firestore-hooks.service"
 import { Skeleton } from "@/app/components/ui/skeleton"
 import CasaCambioWidget from "@/app/components/widgets/CasaCambioWidget"
@@ -250,7 +250,7 @@ export default function BentoProfit() {
               {/* Monthly Profit Trend */}
               <div className="glass p-6 rounded-2xl border border-white/5">
                 <h3 className="text-lg font-semibold text-white mb-4">Tendencia de Utilidades (6 Meses)</h3>
-                <ResponsiveContainer width="100%" height={300}>
+                <SafeChartContainer height={300} minHeight={250}>
                   <AreaChart data={monthlyProfitData}>
                     <defs>
                       <linearGradient id="colorUtilidadBruta" x1="0" y1="0" x2="0" y2="1">
@@ -278,6 +278,7 @@ export default function BentoProfit() {
                       stroke="#3b82f6"
                       fillOpacity={1}
                       fill="url(#colorUtilidadBruta)"
+                      {...SAFE_ANIMATION_PROPS}
                     />
                     <Area
                       type="monotone"
@@ -285,15 +286,16 @@ export default function BentoProfit() {
                       stroke="#10b981"
                       fillOpacity={1}
                       fill="url(#colorUtilidadNeta)"
+                      {...SAFE_ANIMATION_PROPS}
                     />
                   </AreaChart>
-                </ResponsiveContainer>
+                </SafeChartContainer>
               </div>
 
               {/* Profit Distribution */}
               <div className="glass p-6 rounded-2xl border border-white/5">
                 <h3 className="text-lg font-semibold text-white mb-4">Distribución de Utilidades</h3>
-                <ResponsiveContainer width="100%" height={300}>
+                <SafeChartContainer height={300} minHeight={250}>
                   <RePieChart>
                     <Pie
                       data={profitByCategory}
@@ -304,6 +306,7 @@ export default function BentoProfit() {
                       outerRadius={100}
                       fill="#8884d8"
                       dataKey="value"
+                      {...SAFE_PIE_PROPS}
                     >
                       {profitByCategory.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
@@ -317,7 +320,7 @@ export default function BentoProfit() {
                       }}
                     />
                   </RePieChart>
-                </ResponsiveContainer>
+                </SafeChartContainer>
               </div>
             </div>
           )}

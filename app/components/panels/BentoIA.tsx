@@ -6,7 +6,8 @@ import { useState, useEffect, useRef, useMemo, useCallback, lazy, Suspense } fro
 import { useVoiceAgent } from "@/app/hooks/useVoiceAgent"
 import { useAppStore } from "@/app/lib/store/useAppStore"
 import { AIAnalyticsOverlay } from "@/app/components/3d/AIAnalyticsOverlay"
-import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, RadarChart, PolarGrid, PolarAngleAxis, Radar, PieChart, Pie, Cell } from "recharts"
+import { AreaChart, Area, XAxis, YAxis, Tooltip, RadarChart, PolarGrid, PolarAngleAxis, Radar, PieChart, Pie, Cell } from "recharts"
+import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from "@/app/components/ui/SafeChartContainer"
 import { AIBrainVisualizer } from "@/app/components/visualizations/AIBrainVisualizer"
 import { QuickStatWidget } from "@/app/components/widgets/QuickStatWidget"
 import { MiniChartWidget } from "@/app/components/widgets/MiniChartWidget"
@@ -542,7 +543,7 @@ export default function BentoIA() {
           <div className="lg:col-span-2">
             <h4 className="text-white font-medium mb-4">Predicción de Ventas</h4>
             <div style={{ width: '100%', minWidth: 200, height: 250, minHeight: 250 }}>
-            <ResponsiveContainer width="100%" height="100%">
+            <SafeChartContainer height={250} minHeight={200}>
               <AreaChart data={analysisData}>
                 <defs>
                   <linearGradient id="colorVentas" x1="0" y1="0" x2="0" y2="1">
@@ -563,7 +564,7 @@ export default function BentoIA() {
                     borderRadius: "12px",
                   }}
                 />
-                <Area type="monotone" dataKey="ventas" stroke="#3b82f6" fillOpacity={1} fill="url(#colorVentas)" />
+                <Area type="monotone" dataKey="ventas" stroke="#3b82f6" fillOpacity={1} fill="url(#colorVentas)" {...SAFE_ANIMATION_PROPS} />
                 <Area
                   type="monotone"
                   dataKey="prediccion"
@@ -571,9 +572,10 @@ export default function BentoIA() {
                   fillOpacity={1}
                   fill="url(#colorPrediccion)"
                   strokeDasharray="5 5"
+                  {...SAFE_ANIMATION_PROPS}
                 />
               </AreaChart>
-            </ResponsiveContainer>
+            </SafeChartContainer>
             </div>
           </div>
 
@@ -669,13 +671,13 @@ export default function BentoIA() {
             </div>
           </div>
           <div style={{ width: '100%', minWidth: 150, height: 200, minHeight: 200 }}>
-          <ResponsiveContainer width="100%" height="100%">
+          <SafeChartContainer height={200} minHeight={150}>
             <RadarChart data={aiCapabilities}>
               <PolarGrid stroke="rgba(255,255,255,0.1)" />
               <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 10 }} />
-              <Radar name="Capacidad" dataKey="A" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.3} strokeWidth={2} />
+              <Radar name="Capacidad" dataKey="A" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.3} strokeWidth={2} {...SAFE_ANIMATION_PROPS} />
             </RadarChart>
-          </ResponsiveContainer>
+          </SafeChartContainer>
           </div>
         </motion.div>
 

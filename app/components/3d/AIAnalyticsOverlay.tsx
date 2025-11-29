@@ -2,7 +2,8 @@
 
 import { motion, AnimatePresence } from "framer-motion"
 import { TrendingUp, TrendingDown, DollarSign, Package, Users, Activity } from "lucide-react"
-import { AreaChart, Area, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts"
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts"
+import { SafeChartContainer, SAFE_ANIMATION_PROPS } from "@/app/components/ui/SafeChartContainer"
 
 interface AIAnalyticsOverlayProps {
   isVisible: boolean
@@ -150,7 +151,7 @@ export function AIAnalyticsOverlay({
                 {/* Chart */}
                 <div className="h-[180px] bg-white/5 backdrop-blur-xl rounded-xl p-4 border border-white/10">
                   {type === "inventory" ? (
-                    <ResponsiveContainer width="100%" height="100%">
+                    <SafeChartContainer height={150} minHeight={120}>
                       <BarChart data={currentMetric.data}>
                         <XAxis 
                           dataKey="product" 
@@ -175,6 +176,7 @@ export function AIAnalyticsOverlay({
                           dataKey="stock" 
                           fill="url(#colorGradient)" 
                           radius={[8, 8, 0, 0]}
+                          {...SAFE_ANIMATION_PROPS}
                         />
                         <defs>
                           <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
@@ -183,9 +185,9 @@ export function AIAnalyticsOverlay({
                           </linearGradient>
                         </defs>
                       </BarChart>
-                    </ResponsiveContainer>
+                    </SafeChartContainer>
                   ) : (
-                    <ResponsiveContainer width="100%" height="100%">
+                    <SafeChartContainer height={150} minHeight={120}>
                       <AreaChart data={currentMetric.data}>
                         <defs>
                           <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
@@ -223,6 +225,7 @@ export function AIAnalyticsOverlay({
                           fillOpacity={1} 
                           fill="url(#colorPrev)"
                           strokeWidth={2}
+                          {...SAFE_ANIMATION_PROPS}
                         />
                         <Area 
                           type="monotone" 
@@ -231,9 +234,10 @@ export function AIAnalyticsOverlay({
                           fillOpacity={1} 
                           fill="url(#colorValue)"
                           strokeWidth={3}
+                          {...SAFE_ANIMATION_PROPS}
                         />
                       </AreaChart>
-                    </ResponsiveContainer>
+                    </SafeChartContainer>
                   )}
                 </div>
 

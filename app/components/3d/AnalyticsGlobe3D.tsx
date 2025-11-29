@@ -1,9 +1,9 @@
 'use client';
 
 import { useRef, useEffect, useState, useCallback } from 'react';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card } from '@/app/components/ui/card';
+import { Badge } from '@/app/components/ui/badge';
+import { Button } from '@/app/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Globe, 
@@ -17,12 +17,12 @@ import {
   ZoomOut,
   RotateCcw
 } from 'lucide-react';
-import logger from '@/app/lib/utils/logger';
+import { logger } from '@/app/lib/utils/logger';
 
 // ============================================
 // INTERFACES Y TIPOS
 // ============================================
-interface DataPoint {
+export interface DataPoint {
   id: string;
   country: string;
   city: string;
@@ -34,7 +34,7 @@ interface DataPoint {
   trend?: 'up' | 'down' | 'stable';
 }
 
-interface AnalyticsGlobe3DProps {
+export interface AnalyticsGlobe3DProps {
   data: DataPoint[];
   title?: string;
   height?: number;

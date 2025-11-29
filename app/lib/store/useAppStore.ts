@@ -15,6 +15,8 @@ interface Distribuidor {
   telefono: string
   email: string
   deudaTotal: number
+  totalPagado: number
+  ordenesActivas: number
   ordenesCompra: string[]
   historialPagos: Array<{
     fecha: string
@@ -29,6 +31,12 @@ interface Cliente {
   telefono: string
   email: string
   deudaTotal: number
+  pendiente: number           // deuda - abonos (campo calculado)
+  deuda: number               // Deuda total acumulada
+  abonos: number              // Total de abonos realizados
+  actual: number              // Saldo actual
+  totalVentas: number         // Suma histórica de ventas
+  totalPagado: number         // Total que ha pagado
   ventas: string[]
   historialPagos: Array<{
     fecha: string
@@ -271,6 +279,8 @@ export const useAppStore = create<AppState>()(
               telefono: "",
               email: "",
               deudaTotal: data.deuda,
+              totalPagado: data.pagoInicial || 0,
+              ordenesActivas: 1,
               ordenesCompra: [id],
               historialPagos: [],
             }
@@ -334,6 +344,12 @@ export const useAppStore = create<AppState>()(
               telefono: "",
               email: "",
               deudaTotal: data.montoRestante,
+              pendiente: data.montoRestante,
+              deuda: data.precioTotalVenta,
+              abonos: data.montoPagado || 0,
+              actual: data.montoRestante,
+              totalVentas: data.precioTotalVenta,
+              totalPagado: data.montoPagado || 0,
               ventas: [id],
               historialPagos: [],
             }

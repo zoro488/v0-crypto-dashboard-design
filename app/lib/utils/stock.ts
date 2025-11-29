@@ -10,7 +10,7 @@
  */
 
 import { Timestamp } from 'firebase/firestore';
-import logger from '@/app/lib/utils/logger';
+import { logger } from '@/app/lib/utils/logger';
 
 // ============================================
 // INTERFACES
@@ -100,7 +100,7 @@ export function calcularNuevoStock(
   }
 
   if (nuevoStock < 0) {
-    logger.warn('Stock negativo detectado', { stockActual, movimiento, nuevoStock });
+    logger.warn('Stock negativo detectado', { data: { stockActual, movimiento, nuevoStock } });
     throw new Error(`Stock no puede ser negativo. Actual: ${stockActual}, Movimiento: ${movimiento.cantidad}`);
   }
 

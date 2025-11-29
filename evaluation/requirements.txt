@@ -1,0 +1,27 @@
+# Azure AI Evaluation SDK
+azure-ai-evaluation>=1.0.0
+
+# Prompt Flow for custom evaluators
+promptflow>=1.10.0
+promptflow-tools>=1.4.0
+
+# Azure Identity for authentication
+azure-identity>=1.15.0
+
+# Data processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# JSON/CSV handling
+jsonlines>=4.0.0
+
+# Testing utilities
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+
+# Utilities
+python-dotenv>=1.0.0
+tqdm>=4.66.0
+
+# Type checking
+pydantic>=2.5.0

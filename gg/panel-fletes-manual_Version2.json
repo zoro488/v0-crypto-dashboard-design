@@ -1,0 +1,1442 @@
+{
+  "fleteSur": {
+    "gastos": [
+      {
+        "concepto": "gasto franco werito",
+        "destino": "NA",
+        "fecha": "2025-08-18",
+        "gasto": 2724,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 49985.4,
+        "tc": 18.35
+      },
+      {
+        "concepto": "gasolina brayan",
+        "destino": "NA",
+        "fecha": "2025-08-18",
+        "gasto": 136,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 2495.6,
+        "tc": 18.35
+      },
+      {
+        "concepto": "servicio nissan frontier",
+        "destino": "NA",
+        "fecha": "2025-08-18",
+        "gasto": 321,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 5890.35,
+        "tc": 18.35
+      },
+      {
+        "concepto": "renta equipo corte",
+        "destino": "NA",
+        "fecha": "2025-08-18",
+        "gasto": 215,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 3945.25,
+        "tc": 18.35
+      },
+      {
+        "concepto": "cfe gaviota",
+        "destino": "NA",
+        "fecha": "2025-08-18",
+        "gasto": 126,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 2312.1,
+        "tc": 18.35
+      },
+      {
+        "concepto": "placas veracruz",
+        "destino": "NA",
+        "fecha": "2025-08-18",
+        "gasto": 299,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 5486.65,
+        "tc": 18.35
+      },
+      {
+        "concepto": "celular werito",
+        "destino": "NA",
+        "fecha": "2025-08-20",
+        "gasto": 1089,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 19983.15,
+        "tc": 18.35
+      },
+      {
+        "concepto": "fierros chavis",
+        "destino": "NA",
+        "fecha": "2025-08-20",
+        "gasto": 13400,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 0,
+        "tc": 0
+      },
+      {
+        "concepto": "equipos gallos",
+        "destino": "NA",
+        "fecha": "2025-08-22",
+        "gasto": 819,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 14987.7,
+        "tc": 18.3
+      },
+      {
+        "concepto": "gastos franco",
+        "destino": "NA",
+        "fecha": "2025-08-22",
+        "gasto": 273,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 4995.9,
+        "tc": 18.3
+      },
+      {
+        "concepto": "gastos flete#423 gaviota",
+        "destino": "NA",
+        "fecha": "2025-08-23",
+        "gasto": 16052,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 304988,
+        "tc": 19
+      },
+      {
+        "concepto": "brinco salsa,jaiba#423",
+        "destino": "NA",
+        "fecha": "2025-08-23",
+        "gasto": 25000,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 0,
+        "tc": 0
+      },
+      {
+        "concepto": "gastos jr",
+        "destino": "NA",
+        "fecha": "2025-08-23",
+        "gasto": 1089,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 19928.7,
+        "tc": 18.3
+      },
+      {
+        "concepto": "factura playa azul #50",
+        "destino": "NA",
+        "fecha": "2025-08-25",
+        "gasto": 874,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 15994.2,
+        "tc": 18.3
+      },
+      {
+        "concepto": "pago fito (werito)",
+        "destino": "NA",
+        "fecha": "2025-08-25",
+        "gasto": 437,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 7997.1,
+        "tc": 18.3
+      },
+      {
+        "concepto": "gasolina brayan",
+        "destino": "NA",
+        "fecha": "2025-08-25",
+        "gasto": 136,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 2488.8,
+        "tc": 18.3
+      },
+      {
+        "concepto": "material pistones (werito)",
+        "destino": "NA",
+        "fecha": "2025-08-26",
+        "gasto": 382,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 6990.6,
+        "tc": 18.3
+      },
+      {
+        "concepto": "pago vuelta playa azul#50",
+        "destino": "NA",
+        "fecha": "2025-08-28",
+        "gasto": 3835,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 70180.5,
+        "tc": 18.3
+      },
+      {
+        "concepto": "gastos franco (werito)",
+        "destino": "NA",
+        "fecha": "2025-08-28",
+        "gasto": 81,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 1482.3,
+        "tc": 18.3
+      },
+      {
+        "concepto": "cel jr (werito)",
+        "destino": "NA",
+        "fecha": "2025-08-28",
+        "gasto": 1366,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 24997.8,
+        "tc": 18.3
+      },
+      {
+        "concepto": "2 cuentas radio (werito)",
+        "destino": "NA",
+        "fecha": "2025-08-28",
+        "gasto": 273,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 4995.9,
+        "tc": 18.3
+      },
+      {
+        "concepto": "deposito material pistones (werito)",
+        "destino": "NA",
+        "fecha": "2025-08-30",
+        "gasto": 2465,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 44986.25,
+        "tc": 18.25
+      },
+      {
+        "concepto": "gastos flete#487 gabiota",
+        "destino": "NA",
+        "fecha": "2025-08-30",
+        "gasto": 17368,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 329992,
+        "tc": 19
+      },
+      {
+        "concepto": "brinco salsa,jaiba#487",
+        "destino": "NA",
+        "fecha": "2025-08-30",
+        "gasto": 25000,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 0,
+        "tc": 0
+      },
+      {
+        "concepto": "RENTA LIC SEPTIEMBRE",
+        "destino": "NA",
+        "fecha": "2025-09-01",
+        "gasto": 50000,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 0,
+        "tc": 0
+      },
+      {
+        "concepto": "RENTA SIERRA ALPHA,SANTI",
+        "destino": "NA",
+        "fecha": "2025-09-01",
+        "gasto": 13223,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 239997.45,
+        "tc": 18.15
+      },
+      {
+        "concepto": "CAJA TRAMITES USA SEPTIEMBRE",
+        "destino": "NA",
+        "fecha": "2025-09-01",
+        "gasto": 2500,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 0,
+        "tc": 0
+      },
+      {
+        "concepto": "RENTA GUARDIA SEPTIEMBRE (JR,CHAVIS)",
+        "destino": "NA",
+        "fecha": "2025-09-01",
+        "gasto": 2500,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 0,
+        "tc": 0
+      },
+      {
+        "concepto": "gasolina brayan",
+        "destino": "NA",
+        "fecha": "2025-09-01",
+        "gasto": 138,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 2497.8,
+        "tc": 18.1
+      },
+      {
+        "concepto": "mes gaviota (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-01",
+        "gasto": 2209,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 39982.9,
+        "tc": 18.1
+      },
+      {
+        "concepto": "renta bodega atongo",
+        "destino": "NA",
+        "fecha": "2025-09-02",
+        "gasto": 3591,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 64997.1,
+        "tc": 18.1
+      },
+      {
+        "concepto": "renta bodega gabiota (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-02",
+        "gasto": 4000,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 72400,
+        "tc": 18.1
+      },
+      {
+        "concepto": "material hector",
+        "destino": "NA",
+        "fecha": "2025-09-05",
+        "gasto": 848,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 15348.8,
+        "tc": 18.1
+      },
+      {
+        "concepto": "gastos flete gaviota#513",
+        "destino": "NA",
+        "fecha": "2025-09-06",
+        "gasto": 18333,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 329994,
+        "tc": 18
+      },
+      {
+        "concepto": "brincos salsa,jaiba #513",
+        "destino": "NA",
+        "fecha": "2025-09-06",
+        "gasto": 25000,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 0,
+        "tc": 0
+      },
+      {
+        "concepto": "reparacion camion (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-06",
+        "gasto": 2876,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 51768,
+        "tc": 18
+      },
+      {
+        "concepto": "renta oficina atongo (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-06",
+        "gasto": 583,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 10494,
+        "tc": 18
+      },
+      {
+        "concepto": "factura playa azul (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-08",
+        "gasto": 888,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 15984,
+        "tc": 18
+      },
+      {
+        "concepto": "facura frontier (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-09",
+        "gasto": 250,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 4500,
+        "tc": 18
+      },
+      {
+        "concepto": "placas y tarjeta ram (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-09",
+        "gasto": 2083,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 37494,
+        "tc": 18
+      },
+      {
+        "concepto": "flete tocallo 500x44",
+        "destino": "Profit",
+        "fecha": "2025-09-10",
+        "gasto": 22000,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 0,
+        "tc": 0
+      },
+      {
+        "concepto": "pago carlos 2 vueltas playa azul (12-50)",
+        "destino": "NA",
+        "fecha": "2025-09-12",
+        "gasto": 2000,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 0,
+        "tc": 0
+      },
+      {
+        "concepto": "gasolina franco",
+        "destino": "NA",
+        "fecha": "2025-09-12",
+        "gasto": 111,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 1998,
+        "tc": 18
+      },
+      {
+        "concepto": "pago werito vuelta playa #232",
+        "destino": "NA",
+        "fecha": "2025-09-12",
+        "gasto": 3888,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 69984,
+        "tc": 18
+      },
+      {
+        "concepto": "internet atongo y gaviota (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-13",
+        "gasto": 312,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 5616,
+        "tc": 18
+      },
+      {
+        "concepto": "deposito werito",
+        "destino": "NA",
+        "fecha": "2025-09-13",
+        "gasto": 555,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 9990,
+        "tc": 18
+      },
+      {
+        "concepto": "gasolina brayan",
+        "destino": "NA",
+        "fecha": "2025-09-16",
+        "gasto": 138,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 2484,
+        "tc": 18
+      },
+      {
+        "concepto": "remolque (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-16",
+        "gasto": 1638,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 29484,
+        "tc": 18
+      },
+      {
+        "concepto": "gastos franco",
+        "destino": "NA",
+        "fecha": "2025-09-16",
+        "gasto": 2777,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 49986,
+        "tc": 18
+      },
+      {
+        "concepto": "brinco 4 cortas playa azul",
+        "destino": "NA",
+        "fecha": "2025-09-16",
+        "gasto": 600,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 0,
+        "tc": 0
+      },
+      {
+        "concepto": "winche rebanada (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-19",
+        "gasto": 1658,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 29844,
+        "tc": 18
+      },
+      {
+        "concepto": "liquidacion rebanada (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-19",
+        "gasto": 2927,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 52686,
+        "tc": 18
+      },
+      {
+        "concepto": "pintura camion 6x6 (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-19",
+        "gasto": 1111,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 19998,
+        "tc": 18
+      },
+      {
+        "concepto": "pistones  (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-19",
+        "gasto": 2006,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 36108,
+        "tc": 18
+      },
+      {
+        "concepto": "gastos carlos vueltas playa roja-azul (papel dany1)",
+        "destino": "NA",
+        "fecha": "2025-09-19",
+        "gasto": 1000,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 0,
+        "tc": 0
+      },
+      {
+        "concepto": "llantas mercedez (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-20",
+        "gasto": 833,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 14994,
+        "tc": 18
+      },
+      {
+        "concepto": "publicacion montacargas (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-20",
+        "gasto": 500,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 9000,
+        "tc": 18
+      },
+      {
+        "concepto": "bateria y amortiguadores ram (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-20",
+        "gasto": 650,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 11700,
+        "tc": 18
+      },
+      {
+        "concepto": "reposision gastos werito",
+        "destino": "NA",
+        "fecha": "2025-09-20",
+        "gasto": 722,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 12996,
+        "tc": 18
+      },
+      {
+        "concepto": "vuelos muchachos mexico",
+        "destino": "NA",
+        "fecha": "2025-09-20",
+        "gasto": 555,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 9990,
+        "tc": 18
+      },
+      {
+        "concepto": "reparacion ram dany (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-20",
+        "gasto": 527,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 9486,
+        "tc": 18
+      },
+      {
+        "concepto": "gastos boletos ranchero y gastos tarimas werito",
+        "destino": "NA",
+        "fecha": "2025-09-23",
+        "gasto": 3660,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 65880,
+        "tc": 18
+      },
+      {
+        "concepto": "gasolina brayan",
+        "destino": "NA",
+        "fecha": "2025-09-23",
+        "gasto": 138,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 2484,
+        "tc": 18
+      },
+      {
+        "concepto": "gastos muchachos mexico (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-23",
+        "gasto": 388,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 6984,
+        "tc": 18
+      },
+      {
+        "concepto": "gastos gallos (470)",
+        "destino": "NA",
+        "fecha": "2025-09-25",
+        "gasto": 833,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 14994,
+        "tc": 18
+      },
+      {
+        "concepto": "pago fito (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-25",
+        "gasto": 444,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 7992,
+        "tc": 18
+      },
+      {
+        "concepto": "cargadores y tiros (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-27",
+        "gasto": 1288,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 23184,
+        "tc": 18
+      },
+      {
+        "concepto": "llevada camion gaviota (werito)",
+        "destino": "NA",
+        "fecha": "2025-09-27",
+        "gasto": 2777,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 49986,
+        "tc": 18
+      },
+      {
+        "concepto": "gasolina brayan",
+        "destino": "NA",
+        "fecha": "2025-09-30",
+        "gasto": 138,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 2484,
+        "tc": 18
+      },
+      {
+        "concepto": "renta,porton,vuelos y gastos panaderia",
+        "destino": "NA",
+        "fecha": "2025-09-30",
+        "gasto": 9800,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 0,
+        "tc": 0
+      },
+      {
+        "concepto": "RENTA LIC OCTUBRE",
+        "destino": "NA",
+        "fecha": "2025-10-01",
+        "gasto": 50000,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 0,
+        "tc": 0
+      },
+      {
+        "concepto": "RENTA ALPHA,SANTI",
+        "destino": "NA",
+        "fecha": "2025-10-01",
+        "gasto": 13333,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 239994,
+        "tc": 18
+      },
+      {
+        "concepto": "gastos mes gaviota",
+        "destino": "NA",
+        "fecha": "2025-10-01",
+        "gasto": 2222,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 39996,
+        "tc": 18
+      },
+      {
+        "concepto": "renta bodega gaviota",
+        "destino": "NA",
+        "fecha": "2025-10-01",
+        "gasto": 4022,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 72396,
+        "tc": 18
+      },
+      {
+        "concepto": "RENTA GUARDIA OCTUBRE (JR,CHAVIS)",
+        "destino": "NA",
+        "fecha": "2025-10-02",
+        "gasto": 3000,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 0,
+        "tc": 0
+      },
+      {
+        "concepto": "GASTOS CAJA USA OCTUBRE",
+        "destino": "NA",
+        "fecha": "2025-10-02",
+        "gasto": 2500,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 0,
+        "tc": 0
+      },
+      {
+        "concepto": "renta bodega atongo (werito)",
+        "destino": "NA",
+        "fecha": "2025-10-02",
+        "gasto": 3611,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 64998,
+        "tc": 18
+      },
+      {
+        "concepto": "renta bodega allende (470)",
+        "destino": "NA",
+        "fecha": "2025-10-02",
+        "gasto": 1666,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 29988,
+        "tc": 18
+      },
+      {
+        "concepto": "gastos paquteria #42 a/x",
+        "destino": "NA",
+        "fecha": "2025-10-04",
+        "gasto": 2061,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 37098,
+        "tc": 18
+      },
+      {
+        "concepto": "gastos flete gaviota#688",
+        "destino": "NA",
+        "fecha": "2025-10-04",
+        "gasto": 16111,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 289998,
+        "tc": 18
+      },
+      {
+        "concepto": "brincos salsa,jaiba #688",
+        "destino": "NA",
+        "fecha": "2025-10-04",
+        "gasto": 25000,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 0,
+        "tc": 0
+      },
+      {
+        "concepto": "gasolina brayan",
+        "destino": "NA",
+        "fecha": "2025-10-06",
+        "gasto": 139,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 2488.1,
+        "tc": 17.9
+      },
+      {
+        "concepto": "boleto avion compa",
+        "destino": "NA",
+        "fecha": "2025-10-07",
+        "gasto": 949,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 16987.1,
+        "tc": 17.9
+      },
+      {
+        "concepto": "gastos compa guate",
+        "destino": "NA",
+        "fecha": "2025-10-07",
+        "gasto": 1000,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 0,
+        "tc": 0
+      },
+      {
+        "concepto": "Carpinteria cruces (werito)",
+        "destino": "NA",
+        "fecha": "2025-10-11",
+        "gasto": 7262,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 129989.8,
+        "tc": 17.9
+      },
+      {
+        "concepto": "llevada grua gaviota (werito)",
+        "destino": "NA",
+        "fecha": "2025-10-11",
+        "gasto": 2793,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 49994.7,
+        "tc": 17.9
+      },
+      {
+        "concepto": "factura playa (werito)",
+        "destino": "NA",
+        "fecha": "2025-10-11",
+        "gasto": 1787,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 31987.3,
+        "tc": 17.9
+      },
+      {
+        "concepto": "gps camion (werito)",
+        "destino": "NA",
+        "fecha": "2025-10-11",
+        "gasto": 418,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 7482.2,
+        "tc": 17.9
+      },
+      {
+        "concepto": "renta oficina  (a/x)",
+        "destino": "NA",
+        "fecha": "2025-10-13",
+        "gasto": 6703,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 119983.7,
+        "tc": 17.9
+      },
+      {
+        "concepto": "pago vuelta playa azul (werito)",
+        "destino": "NA",
+        "fecha": "2025-10-13",
+        "gasto": 3910,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 69989,
+        "tc": 17.9
+      },
+      {
+        "concepto": "gasolina brayan",
+        "destino": "NA",
+        "fecha": "2025-10-13",
+        "gasto": 139,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 2488.1,
+        "tc": 17.9
+      },
+      {
+        "concepto": "gasolina camion hector",
+        "destino": "NA",
+        "fecha": "2025-10-13",
+        "gasto": 167,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 2989.3,
+        "tc": 17.9
+      },
+      {
+        "concepto": "llanta panadera (werito)",
+        "destino": "NA",
+        "fecha": "2025-10-14",
+        "gasto": 64,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 1145.6,
+        "tc": 17.9
+      },
+      {
+        "concepto": "pila montacargas (werito)",
+        "destino": "NA",
+        "fecha": "2025-10-14",
+        "gasto": 178,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 3186.2,
+        "tc": 17.9
+      },
+      {
+        "concepto": "mtto correctivo np300 (werito)",
+        "destino": "NA",
+        "fecha": "2025-10-14",
+        "gasto": 751,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 13442.9,
+        "tc": 17.9
+      },
+      {
+        "concepto": "placas np300 chiapas (werito)",
+        "destino": "NA",
+        "fecha": "2025-10-14",
+        "gasto": 614,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 10990.6,
+        "tc": 17.9
+      },
+      {
+        "concepto": "camaras cabo (hector)",
+        "destino": "NA",
+        "fecha": "2025-10-16",
+        "gasto": 2709,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 48491.1,
+        "tc": 17.9
+      },
+      {
+        "concepto": "vuelta llevadas cajas a laredo (werito)",
+        "destino": "NA",
+        "fecha": "2025-10-18",
+        "gasto": 1675,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 29982.5,
+        "tc": 17.9
+      },
+      {
+        "concepto": "traida trocas playa azul (werito)",
+        "destino": "NA",
+        "fecha": "2025-10-18",
+        "gasto": 1117,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 19994.3,
+        "tc": 17.9
+      },
+      {
+        "concepto": " revisada trocas gps (werito)",
+        "destino": "NA",
+        "fecha": "2025-10-18",
+        "gasto": 446,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 7983.4,
+        "tc": 17.9
+      },
+      {
+        "concepto": "renta bodega atongo (werito)",
+        "destino": "NA",
+        "fecha": "2025-10-18",
+        "gasto": 586,
+        "observaciones": "",
+        "origen": "Gasto Flete Sur",
+        "pesos": 10489.4,
+        "tc": 17.9
+      }
+    ],
+    "gastosList": [
+      {
+        "corte": 255121,
+        "fecha": "2025-08-25"
+      },
+      {
+        "corte": 218020,
+        "fecha": "2025-09-08"
+      },
+      {
+        "corte": 216291,
+        "fecha": "2025-09-22"
+      },
+      {
+        "corte": 168199,
+        "fecha": "2025-10-06"
+      },
+      {
+        "corte": 185792,
+        "fecha": "2025-10-20"
+      }
+    ],
+    "ingresos": 652512,
+    "ingresosList": [
+      {
+        "cliente": "Corte",
+        "concepto": "Corte",
+        "fecha": "2025-08-18",
+        "ingreso": 230112
+      },
+      {
+        "cliente": "Ax",
+        "concepto": "",
+        "fecha": "2025-08-23",
+        "ingreso": 25000
+      },
+      {
+        "cliente": "Negrito",
+        "concepto": "",
+        "fecha": "2025-08-23",
+        "ingreso": 12500
+      },
+      {
+        "cliente": "Valle",
+        "concepto": "",
+        "fecha": "2025-08-23",
+        "ingreso": 30000
+      },
+      {
+        "cliente": "Galvan",
+        "concepto": "",
+        "fecha": "2025-08-25",
+        "ingreso": 1500
+      },
+      {
+        "cliente": "Valle Local",
+        "concepto": "",
+        "fecha": "2025-08-25",
+        "ingreso": 1000
+      },
+      {
+        "cliente": "Tocayo",
+        "concepto": "",
+        "fecha": "2025-08-25",
+        "ingreso": 10000
+      },
+      {
+        "cliente": "Sierra47",
+        "concepto": "",
+        "fecha": "2025-08-25",
+        "ingreso": 7500
+      },
+      {
+        "cliente": "Chucho",
+        "concepto": "venta local monte#15",
+        "fecha": "2025-08-30",
+        "ingreso": 7500
+      },
+      {
+        "cliente": "Ax",
+        "concepto": "venta local monte #14",
+        "fecha": "2025-09-01",
+        "ingreso": 7000
+      },
+      {
+        "cliente": "Valle",
+        "concepto": "flete valle#75 panaderia",
+        "fecha": "2025-09-01",
+        "ingreso": 37500
+      },
+      {
+        "cliente": "Galvan",
+        "concepto": "venta local monte rafa#1",
+        "fecha": "2025-09-02",
+        "ingreso": 500
+      },
+      {
+        "cliente": "Galvan",
+        "concepto": "venta local galvan #1",
+        "fecha": "2025-09-02",
+        "ingreso": 500
+      },
+      {
+        "cliente": "Sierra47",
+        "concepto": "venta local monte #8",
+        "fecha": "2025-09-02",
+        "ingreso": 4000
+      },
+      {
+        "cliente": "470",
+        "concepto": "venta local monte #1",
+        "fecha": "2025-09-03",
+        "ingreso": 500
+      },
+      {
+        "cliente": "Valle Local",
+        "concepto": "venta local monte#5",
+        "fecha": "2025-09-03",
+        "ingreso": 2500
+      },
+      {
+        "cliente": "Chucho",
+        "concepto": "venta local monte#22",
+        "fecha": "2025-09-04",
+        "ingreso": 11000
+      },
+      {
+        "cliente": "Galvan",
+        "concepto": "venta local monte#1",
+        "fecha": "2025-09-05",
+        "ingreso": 500
+      },
+      {
+        "cliente": "Negrito",
+        "concepto": "venta local monte#10",
+        "fecha": "2025-09-05",
+        "ingreso": 5000
+      },
+      {
+        "cliente": "Robalo",
+        "concepto": "flete#60 robalo-gaviota",
+        "fecha": "2025-09-06",
+        "ingreso": 30000
+      },
+      {
+        "cliente": "Ax",
+        "concepto": "pago flete #25 a/x panaderia",
+        "fecha": "2025-09-08",
+        "ingreso": 12500
+      },
+      {
+        "cliente": "Tocayo",
+        "concepto": "pago flete tocallo #44",
+        "fecha": "2025-09-08",
+        "ingreso": 22000
+      },
+      {
+        "cliente": "Sierra47",
+        "concepto": "venta local monte #5",
+        "fecha": "2025-09-09",
+        "ingreso": 2500
+      },
+      {
+        "cliente": "Chucho",
+        "concepto": "venta local monte #9",
+        "fecha": "2025-09-10",
+        "ingreso": 4500
+      },
+      {
+        "cliente": "Galvan",
+        "concepto": "venta local monte#1",
+        "fecha": "2025-09-10",
+        "ingreso": 500
+      },
+      {
+        "cliente": "Chucho",
+        "concepto": "venta local monte#16",
+        "fecha": "2025-09-11",
+        "ingreso": 8000
+      },
+      {
+        "cliente": "Negrito",
+        "concepto": "venta local monte#10",
+        "fecha": "2025-09-11",
+        "ingreso": 5000
+      },
+      {
+        "cliente": "Galvan",
+        "concepto": "venta local monte#1 rafa",
+        "fecha": "2025-09-12",
+        "ingreso": 500
+      },
+      {
+        "cliente": "tx8",
+        "concepto": "venta local monte#5",
+        "fecha": "2025-09-13",
+        "ingreso": 2500
+      },
+      {
+        "cliente": "Galvan",
+        "concepto": "venta local monte#1",
+        "fecha": "2025-09-16",
+        "ingreso": 500
+      },
+      {
+        "cliente": "Tocayo",
+        "concepto": "venta local monte#3",
+        "fecha": "2025-09-16",
+        "ingreso": 1500
+      },
+      {
+        "cliente": "Galvan",
+        "concepto": "venta local monte#1",
+        "fecha": "2025-09-17",
+        "ingreso": 500
+      },
+      {
+        "cliente": "Tocayo",
+        "concepto": "venta local monte#20",
+        "fecha": "2025-09-18",
+        "ingreso": 10000
+      },
+      {
+        "cliente": "Ax",
+        "concepto": "venta local monte#1 (psico bunny)",
+        "fecha": "2025-09-18",
+        "ingreso": 0
+      },
+      {
+        "cliente": "Negrito",
+        "concepto": "venta local monte#5",
+        "fecha": "2025-09-19",
+        "ingreso": 2500
+      },
+      {
+        "cliente": "Don Rafa",
+        "concepto": "venta local monte#1",
+        "fecha": "2025-09-19",
+        "ingreso": 500
+      },
+      {
+        "cliente": "Sierra47",
+        "concepto": "venta local monte#12",
+        "fecha": "2025-09-20",
+        "ingreso": 6000
+      },
+      {
+        "cliente": "Rojo",
+        "concepto": "venta local monte#2",
+        "fecha": "2025-09-20",
+        "ingreso": 1000
+      },
+      {
+        "cliente": "Ax",
+        "concepto": "venta local monte#3",
+        "fecha": "2025-09-20",
+        "ingreso": 1500
+      },
+      {
+        "cliente": "Galvan",
+        "concepto": "venta local monte#1",
+        "fecha": "2025-09-20",
+        "ingreso": 500
+      },
+      {
+        "cliente": "Abono",
+        "concepto": "flete paqueteria #72 a/x",
+        "fecha": "2025-09-23",
+        "ingreso": 7200
+      },
+      {
+        "cliente": "Ax",
+        "concepto": "psico bunny (wero a/x)",
+        "fecha": "2025-09-25",
+        "ingreso": 0
+      },
+      {
+        "cliente": "Sierra47",
+        "concepto": "venta local monte#20",
+        "fecha": "2025-09-29",
+        "ingreso": 0
+      },
+      {
+        "cliente": "Abono",
+        "concepto": "flete paqueteria#42 a/x",
+        "fecha": "2025-10-04",
+        "ingreso": 4200
+      },
+      {
+        "cliente": "Abono",
+        "concepto": "flete valle#60 gaviota",
+        "fecha": "2025-10-05",
+        "ingreso": 30000
+      },
+      {
+        "cliente": "Abono",
+        "concepto": "flete valle#30 pacman",
+        "fecha": "2025-10-05",
+        "ingreso": 15000
+      },
+      {
+        "cliente": "Valle Local",
+        "concepto": "venta local monte valle#2",
+        "fecha": "2025-10-06",
+        "ingreso": 1000
+      },
+      {
+        "cliente": "Abono",
+        "concepto": "flete a/x#25 pacman",
+        "fecha": "2025-10-06",
+        "ingreso": 12500
+      },
+      {
+        "cliente": "Abono",
+        "concepto": "flete tocallo#50 pacman",
+        "fecha": "2025-10-06",
+        "ingreso": 25000
+      },
+      {
+        "cliente": "tx8",
+        "concepto": "venta local monte#10",
+        "fecha": "2025-10-07",
+        "ingreso": 5000
+      },
+      {
+        "cliente": "Valle Local",
+        "concepto": "venta local monte#30",
+        "fecha": "2025-10-07",
+        "ingreso": 15000
+      },
+      {
+        "cliente": "Sierra47",
+        "concepto": "venta local monte#3",
+        "fecha": "2025-10-07",
+        "ingreso": 1500
+      },
+      {
+        "cliente": "Tocayo",
+        "concepto": "venta local monte#3",
+        "fecha": "2025-10-07",
+        "ingreso": 1500
+      },
+      {
+        "cliente": "Abono",
+        "concepto": "flete  robalo #40 gaviota",
+        "fecha": "2025-10-07",
+        "ingreso": 20000
+      },
+      {
+        "cliente": "cabo",
+        "concepto": "venta local monte#1",
+        "fecha": "2025-10-09",
+        "ingreso": 500
+      },
+      {
+        "cliente": "Ax",
+        "concepto": "venta local monte psico bunny #1",
+        "fecha": "2025-10-09",
+        "ingreso": 0
+      },
+      {
+        "cliente": "Galvan",
+        "concepto": "venta local monte#1 (tito)",
+        "fecha": "2025-10-09",
+        "ingreso": 500
+      },
+      {
+        "cliente": "Galvan",
+        "concepto": "venta local monte #1 (rafa)",
+        "fecha": "2025-10-11",
+        "ingreso": 500
+      },
+      {
+        "cliente": "tx8",
+        "concepto": "venta local monte#1",
+        "fecha": "2025-10-14",
+        "ingreso": 500
+      },
+      {
+        "cliente": "Rojo",
+        "concepto": "venta local monte#1",
+        "fecha": "2025-10-15",
+        "ingreso": 500
+      },
+      {
+        "cliente": "compa",
+        "concepto": "venta local monte#2 psico bunny",
+        "fecha": "2025-10-16",
+        "ingreso": 0
+      },
+      {
+        "cliente": "Sierra47",
+        "concepto": "venta local monte#10",
+        "fecha": "2025-10-17",
+        "ingreso": 5000
+      },
+      {
+        "cliente": "Galvan",
+        "concepto": "venta local monte#1👁️",
+        "fecha": "2025-10-17",
+        "ingreso": 500
+      }
+    ],
+    "rfActual": 185792,
+    "rfCortes": [
+      {
+        "corte": 255121,
+        "fecha": "2025-08-25"
+      },
+      {
+        "corte": 218020,
+        "fecha": "2025-09-08"
+      },
+      {
+        "corte": 216291,
+        "fecha": "2025-09-22"
+      },
+      {
+        "corte": 168199,
+        "fecha": "2025-10-06"
+      },
+      {
+        "corte": 185792,
+        "fecha": "2025-10-20"
+      }
+    ]
+  }
+}

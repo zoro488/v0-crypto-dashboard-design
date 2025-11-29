@@ -10,6 +10,8 @@ import { Toaster } from "@/app/components/ui/toaster"
 import { ErrorBoundary } from "@/app/components/ErrorBoundary"
 import ImmersiveWrapper from "@/app/components/layout/ImmersiveWrapper"
 import { SplashScreen } from "@/app/components/splash"
+import { TracingProvider } from "@/app/lib/tracing/TracingProvider"
+import { QueryProvider } from "@/app/providers/QueryProvider"
 // FloatingAIWidget removido - usar FloatingSplineAIWidget desde page.tsx
 // para evitar widgets duplicados
 
@@ -102,24 +104,28 @@ export default function RootLayout({
           }}
         />
         <ErrorBoundary>
-          <AppProvider>
-            {/* 🎬 SPLASH SCREEN - Partículas CHRONOS */}
-            <SplashScreen duration={5500} enabled={true}>
-              {/* <PerformanceMonitor /> */}
-              
-              {/* 🌌 FONDO 3D GLOBAL - Siempre visible */}
-              <ImmersiveWrapper />
-              
-              {/* 📦 CONTENIDO PRINCIPAL - Con z-index superior */}
-              <div className="relative z-10 min-h-screen w-full overflow-auto">
-                {children}
-              </div>
-              
-              {/* 🤖 AGENTE IA FLOTANTE - Manejado en page.tsx con FloatingSplineAIWidget */}
-              
-              <Toaster />
-            </SplashScreen>
-          </AppProvider>
+          <TracingProvider enabled={process.env.NODE_ENV === 'development'}>
+            <QueryProvider>
+              <AppProvider>
+                {/* 🎬 SPLASH SCREEN - Partículas CHRONOS */}
+                <SplashScreen duration={5500} enabled={true}>
+                  {/* <PerformanceMonitor /> */}
+                  
+                  {/* 🌌 FONDO 3D GLOBAL - Siempre visible */}
+                  <ImmersiveWrapper />
+                  
+                  {/* 📦 CONTENIDO PRINCIPAL - Con z-index superior */}
+                  <div className="relative z-10 min-h-screen w-full overflow-auto">
+                    {children}
+                  </div>
+                  
+                  {/* 🤖 AGENTE IA FLOTANTE - Manejado en page.tsx con FloatingSplineAIWidget */}
+                  
+                  <Toaster />
+                </SplashScreen>
+              </AppProvider>
+            </QueryProvider>
+          </TracingProvider>
         </ErrorBoundary>
         <Analytics />
         <SpeedInsights />

@@ -3,6 +3,7 @@
 import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion"
 import { TrendingUp, Sparkles } from "lucide-react"
 import { AreaChart, Area, ResponsiveContainer, Tooltip } from "recharts"
+import { SafeChartContainer, SAFE_ANIMATION_PROPS } from "@/app/components/ui/SafeChartContainer"
 import { useState } from "react"
 
 interface RevenueWidgetProps {
@@ -91,7 +92,7 @@ export default function RevenueWidget({ value, change, data, sparkle = true }: R
 
         {/* Mini Chart */}
         <div className="h-20 w-full -mb-6 -mx-6">
-          <ResponsiveContainer width="100%" height="100%">
+          <SafeChartContainer height={80} minHeight={60}>
             <AreaChart data={data}>
               <defs>
                 <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
@@ -111,9 +112,9 @@ export default function RevenueWidget({ value, change, data, sparkle = true }: R
                   return null
                 }}
               />
-              <Area type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} fill="url(#revenueGradient)" />
+              <Area type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} fill="url(#revenueGradient)" {...SAFE_ANIMATION_PROPS} />
             </AreaChart>
-          </ResponsiveContainer>
+          </SafeChartContainer>
         </div>
 
         {/* Change Badge */}

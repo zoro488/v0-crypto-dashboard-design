@@ -14,6 +14,7 @@
 
 import { useRef, useMemo, useEffect, useState, useCallback } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
+import { logger } from '@/app/lib/utils/logger'
 import { 
   EffectComposer, 
   Bloom, 
@@ -466,7 +467,7 @@ export default function ChronosParticles({
               const canvas = gl.domElement
               canvas.addEventListener('webglcontextlost', (e) => {
                 e.preventDefault()
-                console.warn('WebGL context lost - triggering completion')
+                logger.warn('WebGL context lost - triggering completion', { context: 'ChronosParticles' })
                 handleComplete()
               }, false)
             }}

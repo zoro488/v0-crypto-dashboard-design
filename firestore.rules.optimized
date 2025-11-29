@@ -1,0 +1,367 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 🔒 REGLAS OPTIMIZADAS - CHRONOS SYSTEM v2.0
+    // Última actualización: 2025-01-27
+    // Validaciones estrictas con Zod-like checks
+    
+    // ===================================================================
+    // FUNCIONES DE VALIDACIÓN MEJORADAS
+    // ===================================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+    
+    // Validaciones numéricas estrictas
+    function isValidMonto() {
+      return request.resource.data.monto is number 
+        && request.resource.data.monto >= 0 
+        && request.resource.data.monto <= 999999999;
+    }
+    
+    function isValidCantidad() {
+      return request.resource.data.cantidad is number 
+        && request.resource.data.cantidad > 0 
+        && request.resource.data.cantidad <= 100000
+        && request.resource.data.cantidad == int(request.resource.data.cantidad); // Entero
+    }
+    
+    function isValidPorcentaje() {
+      return request.resource.data.porcentaje is number
+        && request.resource.data.porcentaje >= 0
+        && request.resource.data.porcentaje <= 100;
+    }
+    
+    // Validación de BancoId (7 bancos definidos)
+    function isValidBancoId(bancoId) {
+      return bancoId in [
+        'boveda_monte', 
+        'boveda_usa', 
+        'profit', 
+        'leftie', 
+        'azteca', 
+        'flete_sur', 
+        'utilidades'
+      ];
+    }
+    
+    // Validación de estados de pago
+    function isValidEstadoPago() {
+      return request.resource.data.estadoPago in ['pendiente', 'parcial', 'completo'];
+    }
+    
+    // Validación de tipos de movimiento
+    function isValidTipoMovimiento() {
+      return request.resource.data.tipoMovimiento in [
+        'ingreso', 
+        'gasto', 
+        'transferencia_entrada', 
+        'transferencia_salida', 
+        'abono_cliente', 
+        'pago_distribuidor',
+        'venta',
+        'compra'
+      ];
+    }
+    
+    // Validación de strings no vacíos con longitud
+    function isValidString(field, minLength, maxLength) {
+      return request.resource.data[field] is string
+        && request.resource.data[field].size() >= minLength
+        && request.resource.data[field].size() <= maxLength;
+    }
+    
+    // Validación de email básica
+    function isValidEmail() {
+      return request.resource.data.email is string
+        && request.resource.data.email.matches('.*@.*\\..*');
+    }
+    
+    // Validación de teléfono (10 dígitos)
+    function isValidPhone() {
+      return request.resource.data.telefono is string
+        && request.resource.data.telefono.matches('^[0-9]{10}$');
+    }
+    
+    // Validación de fecha (timestamp o Firestore Timestamp)
+    function isValidFecha() {
+      return request.resource.data.fecha is timestamp;
+    }
+
+    // ===================================================================
+    // COLECCIÓN: BANCOS (Configuración de los 7 bancos/bóvedas)
+    // ===================================================================
+    match /bancos/{bancoId} {
+      allow read: if isAuthenticated();
+      
+      allow create: if isAuthenticated() 
+        && isValidBancoId(bancoId)
+        && hasRequiredFields(['nombre', 'tipo', 'capitalActual', 'historicoIngresos', 'historicoGastos'])
+        && isValidString('nombre', 3, 50)
+        && request.resource.data.tipo in ['boveda', 'banco', 'fondo']
+        && request.resource.data.capitalActual is number
+        && request.resource.data.historicoIngresos is number
+        && request.resource.data.historicoGastos is number
+        && request.resource.data.historicoIngresos >= 0
+        && request.resource.data.historicoGastos >= 0;
+      
+      allow update: if isAuthenticated()
+        && request.resource.data.capitalActual is number
+        && request.resource.data.historicoIngresos >= resource.data.historicoIngresos // Solo puede aumentar
+        && request.resource.data.historicoGastos >= resource.data.historicoGastos; // Solo puede aumentar
+      
+      allow delete: if false; // Los bancos no se pueden eliminar
+    }
+
+    // ===================================================================
+    // COLECCIÓN: MOVIMIENTOS (Unificado para todos los bancos)
+    // ===================================================================
+    match /movimientos/{movimientoId} {
+      allow read: if isAuthenticated();
+      
+      allow create: if isAuthenticated() 
+        && hasRequiredFields(['bancoId', 'tipoMovimiento', 'monto', 'fecha', 'concepto']) 
+        && isValidBancoId(request.resource.data.bancoId)
+        && isValidMonto()
+        && isValidTipoMovimiento()
+        && isValidFecha()
+        && isValidString('concepto', 3, 200);
+      
+      allow update: if isAuthenticated() 
+        && isValidMonto()
+        && request.resource.data.fecha == resource.data.fecha; // No cambiar fecha
+      
+      allow delete: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // COLECCIÓN: VENTAS (Con validaciones de distribución de capital)
+    // ===================================================================
+    match /ventas/{ventaId} {
+      allow read: if isAuthenticated();
+      
+      allow create: if isAuthenticated() 
+        && hasRequiredFields([
+          'clienteId', 
+          'fecha', 
+          'cantidad', 
+          'precioVentaUnidad',
+          'precioCompraUnidad',
+          'precioFlete',
+          'estadoPago',
+          'distribuciones'
+        ])
+        && isValidCantidad()
+        && isValidFecha()
+        && isValidEstadoPago()
+        && request.resource.data.precioVentaUnidad is number && request.resource.data.precioVentaUnidad > 0
+        && request.resource.data.precioCompraUnidad is number && request.resource.data.precioCompraUnidad > 0
+        && request.resource.data.precioFlete is number && request.resource.data.precioFlete >= 0
+        && request.resource.data.precioVentaUnidad > request.resource.data.precioCompraUnidad // Debe haber ganancia
+        && request.resource.data.distribuciones is map
+        && request.resource.data.distribuciones.keys().hasAll(['boveda_monte', 'flete_sur', 'utilidades']);
+      
+      allow update: if isAuthenticated()
+        && isValidEstadoPago()
+        && (
+          // Solo permitir cambiar estadoPago y montos distribuidos
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'estadoPago', 
+            'distribuciones',
+            'updatedAt'
+          ])
+        );
+      
+      allow delete: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // COLECCIÓN: CLIENTES (Con validaciones de contacto)
+    // ===================================================================
+    match /clientes/{clienteId} {
+      allow read: if isAuthenticated();
+      
+      allow create: if isAuthenticated() 
+        && hasRequiredFields(['nombre', 'email', 'telefono'])
+        && isValidString('nombre', 2, 100)
+        && isValidEmail()
+        && isValidPhone();
+      
+      allow update: if isAuthenticated()
+        && isValidString('nombre', 2, 100)
+        && isValidEmail()
+        && isValidPhone();
+      
+      allow delete: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // COLECCIÓN: DISTRIBUIDORES (Con validaciones de empresa)
+    // ===================================================================
+    match /distribuidores/{distribuidorId} {
+      allow read: if isAuthenticated();
+      
+      allow create: if isAuthenticated() 
+        && hasRequiredFields(['nombre', 'empresa', 'telefono', 'email'])
+        && isValidString('nombre', 2, 100)
+        && isValidString('empresa', 2, 100)
+        && isValidEmail()
+        && isValidPhone();
+      
+      allow update: if isAuthenticated()
+        && isValidString('nombre', 2, 100)
+        && isValidEmail()
+        && isValidPhone();
+      
+      allow delete: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // COLECCIÓN: ORDENES_COMPRA (Con validaciones de costos)
+    // ===================================================================
+    match /ordenes_compra/{ordenId} {
+      allow read: if isAuthenticated();
+      
+      allow create: if isAuthenticated() 
+        && hasRequiredFields([
+          'distribuidorId',
+          'fecha',
+          'cantidad',
+          'costoDistribuidor',
+          'costoTransporte',
+          'costoPorUnidad',
+          'costoTotal',
+          'estadoPago'
+        ])
+        && isValidCantidad()
+        && isValidFecha()
+        && isValidEstadoPago()
+        && request.resource.data.costoDistribuidor is number && request.resource.data.costoDistribuidor > 0
+        && request.resource.data.costoTransporte is number && request.resource.data.costoTransporte >= 0
+        && request.resource.data.costoPorUnidad is number
+        && request.resource.data.costoTotal is number
+        // Validar fórmulas correctas
+        && request.resource.data.costoPorUnidad == (request.resource.data.costoDistribuidor + request.resource.data.costoTransporte)
+        && request.resource.data.costoTotal == (request.resource.data.costoPorUnidad * request.resource.data.cantidad);
+      
+      allow update: if isAuthenticated()
+        && isValidEstadoPago();
+      
+      allow delete: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // COLECCIÓN: ALMACEN PRODUCTOS (Inventario)
+    // ===================================================================
+    match /almacen_productos/{productoId} {
+      allow read: if isAuthenticated();
+      
+      allow create: if isAuthenticated() 
+        && hasRequiredFields(['nombre', 'stock', 'stockMinimo'])
+        && isValidString('nombre', 2, 100)
+        && request.resource.data.stock is number && request.resource.data.stock >= 0
+        && request.resource.data.stockMinimo is number && request.resource.data.stockMinimo >= 0;
+      
+      allow update: if isAuthenticated()
+        && request.resource.data.stock >= 0;
+      
+      allow delete: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // COLECCIÓN: TRANSFERENCIAS (Entre bancos con validaciones)
+    // ===================================================================
+    match /transferencias/{transferenciaId} {
+      allow read: if isAuthenticated();
+      
+      allow create: if isAuthenticated() 
+        && hasRequiredFields(['bancoOrigenId', 'bancoDestinoId', 'monto', 'fecha', 'concepto'])
+        && isValidBancoId(request.resource.data.bancoOrigenId)
+        && isValidBancoId(request.resource.data.bancoDestinoId)
+        && request.resource.data.bancoOrigenId != request.resource.data.bancoDestinoId // No transferir al mismo banco
+        && isValidMonto()
+        && isValidFecha()
+        && isValidString('concepto', 3, 200);
+      
+      allow update, delete: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // COLECCIÓN: ABONOS (Pagos de clientes/distribuidores)
+    // ===================================================================
+    match /abonos/{abonoId} {
+      allow read: if isAuthenticated();
+      
+      allow create: if isAuthenticated() 
+        && hasRequiredFields(['tipo', 'entidadId', 'monto', 'bancoDestino', 'fecha'])
+        && request.resource.data.tipo in ['cliente', 'distribuidor']
+        && isValidBancoId(request.resource.data.bancoDestino)
+        && isValidMonto()
+        && isValidFecha();
+      
+      allow update, delete: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // COLECCIÓN: LOGS (Auditoría - INMUTABLE)
+    // ===================================================================
+    match /logs/{logId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && hasRequiredFields(['timestamp', 'action', 'userId']);
+      allow update, delete: if false; // ⚠️ Los logs son INMUTABLES
+    }
+
+    // ===================================================================
+    // COLECCIÓN: USUARIOS (Perfil - Solo propietario)
+    // ===================================================================
+    match /usuarios/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // ===================================================================
+    // COLECCIONES DEL DASHBOARD
+    // ===================================================================
+    match /dashboard_totales/{docId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    match /dashboard_paneles/{docId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    match /configuracion/{docId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // COLECCIONES LEGACY (Solo lectura para migración)
+    // ===================================================================
+    match /gastos_abonos/{gastoId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Migrado a 'movimientos'
+    }
+    
+    match /almacen/{itemId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Migrado a 'almacen_productos'
+    }
+
+    // ===================================================================
+    // REGLA POR DEFECTO - DENEGAR TODO
+    // ⚠️ CRÍTICO: No cambiar esta regla
+    // ===================================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

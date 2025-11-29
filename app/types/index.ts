@@ -109,6 +109,7 @@ export interface Distribuidor {
   ultimaOrden?: FirestoreTimestamp
   // Referencias
   ordenesCompra?: string[]     // IDs de órdenes de compra
+  ordenesActivas?: OrdenCompra[]  // Órdenes de compra activas (con stock)
   historialPagos?: HistorialPago[]
   // Keywords para búsqueda
   keywords: string[]

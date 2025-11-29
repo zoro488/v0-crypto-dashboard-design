@@ -6,11 +6,12 @@ import { Button } from "@/app/components/ui/button"
 import { Badge } from "@/app/components/ui/badge"
 import { useClientes } from "@/app/lib/firebase/firestore-hooks.service"
 import CreateClienteModalSmart from "@/app/components/modals/CreateClienteModalSmart"
-import CreateAbonoModalSmart from "@/app/components/modals/CreateAbonoModalSmart"
+import CreateAbonoClienteModal from "@/app/components/modals/CreateAbonoClienteModal"
 import { useState, useMemo } from "react"
 import { Skeleton } from "@/app/components/ui/skeleton"
 import { ClientNetworkGraph } from "@/app/components/visualizations/ClientNetworkGraph"
-import { AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from "recharts"
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from "recharts"
+import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from "@/app/components/ui/SafeChartContainer"
 import { QuickStatWidget } from "@/app/components/widgets/QuickStatWidget"
 import { MiniChartWidget } from "@/app/components/widgets/MiniChartWidget"
 import { ActivityFeedWidget, ActivityItem } from "@/app/components/widgets/ActivityFeedWidget"
@@ -194,7 +195,7 @@ export default function BentoClientes() {
                 <Activity className="w-3 h-3 mr-1" /> En vivo
               </Badge>
             </div>
-            <ResponsiveContainer width="100%" height={220}>
+            <SafeChartContainer height={220} minHeight={180}>
               <AreaChart data={trendData}>
                 <defs>
                   <linearGradient id="colorVentasC" x1="0" y1="0" x2="0" y2="1">
@@ -216,10 +217,10 @@ export default function BentoClientes() {
                   }}
                   formatter={(value: number) => [`$${value.toLocaleString()}`, '']}
                 />
-                <Area type="monotone" dataKey="ventas" stroke="#06b6d4" strokeWidth={2} fillOpacity={1} fill="url(#colorVentasC)" name="Ventas" />
-                <Area type="monotone" dataKey="cobros" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorCobros)" name="Cobros" />
+                <Area type="monotone" dataKey="ventas" stroke="#06b6d4" strokeWidth={2} fillOpacity={1} fill="url(#colorVentasC)" name="Ventas" {...SAFE_ANIMATION_PROPS} />
+                <Area type="monotone" dataKey="cobros" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorCobros)" name="Cobros" {...SAFE_ANIMATION_PROPS} />
               </AreaChart>
-            </ResponsiveContainer>
+            </SafeChartContainer>
           </div>
         </motion.div>
 
@@ -241,7 +242,7 @@ export default function BentoClientes() {
                 <p className="text-xs text-zinc-400">Por cartera</p>
               </div>
             </div>
-            <ResponsiveContainer width="100%" height={150}>
+            <SafeChartContainer height={150} minHeight={120}>
               <PieChart>
                 <Pie
                   data={clientesPorEstado}
@@ -251,6 +252,7 @@ export default function BentoClientes() {
                   outerRadius={60}
                   paddingAngle={4}
                   dataKey="value"
+                  {...SAFE_PIE_PROPS}
                 >
                   {clientesPorEstado.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
@@ -258,7 +260,7 @@ export default function BentoClientes() {
                 </Pie>
                 <Tooltip />
               </PieChart>
-            </ResponsiveContainer>
+            </SafeChartContainer>
             <div className="flex justify-center gap-6 mt-2">
               {clientesPorEstado.map((item, i) => (
                 <div key={i} className="flex items-center gap-2 text-sm">
@@ -386,7 +388,7 @@ export default function BentoClientes() {
         isOpen={showCreateModal} 
         onClose={() => setShowCreateModal(false)} 
       />
-      <CreateAbonoModalSmart isOpen={showAbonoModal} onClose={() => setShowAbonoModal(false)} /> {/* Add Abono Modal */}
+      <CreateAbonoClienteModal isOpen={showAbonoModal} onClose={() => setShowAbonoModal(false)} /> {/* Add Abono Modal */}
 
       {/* Client Network Graph - Premium Visualization */}
       <motion.div
