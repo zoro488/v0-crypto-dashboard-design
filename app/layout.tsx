@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import localFont from "next/font/local"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import Script from "next/script"
@@ -15,16 +15,31 @@ import { QueryProvider } from "@/app/providers/QueryProvider"
 // FloatingAIWidget removido - usar FloatingSplineAIWidget desde page.tsx
 // para evitar widgets duplicados
 
-const geist = Geist({ 
-  subsets: ["latin"],
+// Usar fuentes locales para evitar problemas de red con Google Fonts
+const geist = localFont({
+  src: [
+    {
+      path: "../public/fonts/GeistVF.woff2",
+      weight: "100 900",
+      style: "normal",
+    },
+  ],
   variable: "--font-sans",
-  display: "swap"
+  display: "swap",
+  fallback: ["system-ui", "Arial", "sans-serif"],
 })
 
-const geistMono = Geist_Mono({ 
-  subsets: ["latin"],
+const geistMono = localFont({
+  src: [
+    {
+      path: "../public/fonts/GeistMonoVF.woff2",
+      weight: "100 900",
+      style: "normal",
+    },
+  ],
   variable: "--font-mono",
-  display: "swap"
+  display: "swap",
+  fallback: ["ui-monospace", "Menlo", "Monaco", "Consolas", "monospace"],
 })
 
 export const viewport: Viewport = {

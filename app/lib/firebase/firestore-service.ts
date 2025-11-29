@@ -1528,6 +1528,9 @@ export const addAbono = async (data: AbonoData): Promise<string | null> => {
   }
 }
 
+// Alias para compatibilidad - crearVenta ya implementa distribución GYA
+export const crearVentaConDistribucion = crearVenta
+
 export const firestoreService = {
   // Bancos
   suscribirBancos,
@@ -1538,6 +1541,7 @@ export const firestoreService = {
   suscribirOrdenesCompra,
   // Ventas
   crearVenta,
+  crearVentaConDistribucion, // Alias explícito que distribuye a 3 bancos
   suscribirVentas,
   // Distribuidores
   crearDistribuidor,
