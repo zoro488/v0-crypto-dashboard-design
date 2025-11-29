@@ -1,6 +1,5 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import Script from "next/script"
@@ -15,17 +14,8 @@ import { QueryProvider } from "@/app/providers/QueryProvider"
 // FloatingAIWidget removido - usar FloatingSplineAIWidget desde page.tsx
 // para evitar widgets duplicados
 
-const geist = Geist({ 
-  subsets: ["latin"],
-  variable: "--font-sans",
-  display: "swap"
-})
-
-const geistMono = Geist_Mono({ 
-  subsets: ["latin"],
-  variable: "--font-mono",
-  display: "swap"
-})
+// Usar fuentes del sistema como variables CSS - evita depender de Google Fonts
+// Las fuentes se definen en globals.css
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -74,7 +64,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning className="dark" style={{ backgroundColor: 'hsl(240 10% 3.9%)', colorScheme: 'dark' }}>
-      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground`} suppressHydrationWarning style={{ backgroundColor: 'hsl(240 10% 3.9%)', color: 'hsl(0 0% 98%)', minHeight: '100vh' }}>
+      <body className="font-sans antialiased bg-background text-foreground" suppressHydrationWarning style={{ backgroundColor: 'hsl(240 10% 3.9%)', color: 'hsl(0 0% 98%)', minHeight: '100vh' }}>
         <Script
           id="disable-devtools"
           strategy="beforeInteractive"

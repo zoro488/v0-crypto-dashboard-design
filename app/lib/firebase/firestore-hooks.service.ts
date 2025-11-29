@@ -239,8 +239,9 @@ function useRealtimeQuery<T extends DocumentData>(
     mockData: T[]
   }
 ): HookResult<T> {
-  const [data, setData] = useState<T[]>([])
-  const [loading, setLoading] = useState(true)
+  // Siempre inicializar con mock data - se actualizará cuando Firestore conecte
+  const [data, setData] = useState<T[]>(options.mockData)
+  const [loading, setLoading] = useState(false) // No loading si tenemos mock data
   const [error, setError] = useState<string | null>(null)
   const isMountedRef = useRef(true)
   const unsubscribeRef = useRef<Unsubscribe | null>(null)
@@ -252,15 +253,18 @@ function useRealtimeQuery<T extends DocumentData>(
   useEffect(() => {
     isMountedRef.current = true
 
-    // Modo mock
-    if (USE_MOCK_DATA || !isFirebaseConfigured || !db) {
+    // Verificar si debemos usar modo mock
+    const shouldUseMock = USE_MOCK_DATA || !isFirebaseConfigured || !db
+    
+    // Modo mock - ya inicializado en useState, pero asegurar
+    if (shouldUseMock || !db) {
       setData(options.mockData)
       setLoading(false)
       return
     }
 
     try {
-      const collRef = collection(db, collectionName)
+      const collRef = collection(db!, collectionName)
       const constraints: Parameters<typeof query>[1][] = []
 
       if (options.whereField && options.whereValue) {
