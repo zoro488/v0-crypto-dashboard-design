@@ -100,7 +100,7 @@ export default function CreateClienteModal({ isOpen, onClose, onSubmit }: Create
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl border border-gray-700/50 shadow-2xl z-50 overflow-hidden"
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl border border-gray-700/50 shadow-2xl z-50"
           >
             <div className="relative p-8 border-b border-gray-700/50 bg-gradient-to-r from-cyan-900/20 to-blue-900/20">
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-blue-500/5" />

@@ -7,7 +7,7 @@ import { Badge } from "@/frontend/app/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/frontend/app/components/ui/tabs"
 import { useState, useEffect, useMemo, useRef } from "react"
 import { useVentasData } from "@/frontend/app/lib/firebase/firestore-hooks.service"
-import { CreateVentaModal } from "@/frontend/app/components/modals/CreateVentaModal"
+import { CreateVentaModal } from "@/frontend/app/components/modals/CreateVentaModalSmart"
 import { SalesFlowDiagram } from "@/frontend/app/components/visualizations/SalesFlowDiagram"
 import { 
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, 

@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/frontend/app/compone
 import { useState, useEffect, useMemo } from "react"
 import { suscribirOrdenesCompra } from "@/frontend/app/lib/firebase/firestore-service"
 import type { OrdenCompra, FirestoreTimestamp } from "@/frontend/app/types"
-import { CreateOrdenCompraModal } from "@/frontend/app/components/modals/CreateOrdenCompraModal"
+import { CreateOrdenCompraModal } from "@/frontend/app/components/modals/CreateOrdenCompraModalSmart"
 
 // Función auxiliar para formatear fecha
 function formatearFecha(fecha: string | FirestoreTimestamp): string {

@@ -24,9 +24,9 @@ import {
 import { useState, useMemo } from "react"
 import { BANCOS } from "@/frontend/app/lib/constants"
 import SimpleCurrencyWidget from "@/frontend/app/components/widgets/SimpleCurrencyWidget"
-import CreateGastoModal from "@/frontend/app/components/modals/CreateGastoModal"
-import CreateTransferenciaModal from "@/frontend/app/components/modals/CreateTransferenciaModal"
-import CreateIngresoModal from "@/frontend/app/components/modals/CreateIngresoModal"
+import CreateGastoModalSmart from "@/frontend/app/components/modals/CreateGastoModalSmart"
+import CreateTransferenciaModalSmart from "@/frontend/app/components/modals/CreateTransferenciaModalSmart"
+import CreateIngresoModalSmart from "@/frontend/app/components/modals/CreateIngresoModalSmart"
 import { FinancialRiverFlow } from "@/frontend/app/components/visualizations/FinancialRiverFlow"
 import {
   useIngresosBanco,
@@ -809,10 +809,10 @@ export default function BentoBanco() {
       </motion.div>
 
       {/* Modals */}
-      {showIngresoModal && <CreateIngresoModal isOpen={showIngresoModal} onClose={() => setShowIngresoModal(false)} />}
-      {showGastoModal && <CreateGastoModal isOpen={showGastoModal} onClose={() => setShowGastoModal(false)} />}
+      {showIngresoModal && <CreateIngresoModalSmart isOpen={showIngresoModal} onClose={() => setShowIngresoModal(false)} />}
+      {showGastoModal && <CreateGastoModalSmart isOpen={showGastoModal} onClose={() => setShowGastoModal(false)} />}
       {showTransferenciaModal && (
-        <CreateTransferenciaModal isOpen={showTransferenciaModal} onClose={() => setShowTransferenciaModal(false)} />
+        <CreateTransferenciaModalSmart isOpen={showTransferenciaModal} onClose={() => setShowTransferenciaModal(false)} />
       )}
 
       {/* Financial River Flow - Premium Visualization */}

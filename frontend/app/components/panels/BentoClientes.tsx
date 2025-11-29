@@ -5,8 +5,8 @@ import { Users, AlertTriangle, CheckCircle2, Clock, DollarSign, Plus, TrendingUp
 import { Button } from "@/frontend/app/components/ui/button"
 import { Badge } from "@/frontend/app/components/ui/badge"
 import { useClientes } from "@/frontend/app/lib/firebase/firestore-hooks.service"
-import CreateClienteModal from "@/frontend/app/components/modals/CreateClienteModal"
-import CreateAbonoModal from "@/frontend/app/components/modals/CreateAbonoModal"
+import CreateClienteModalSmart from "@/frontend/app/components/modals/CreateClienteModalSmart"
+import CreateAbonoModalSmart from "@/frontend/app/components/modals/CreateAbonoModalSmart"
 import { useState, useMemo } from "react"
 import { Skeleton } from "@/frontend/app/components/ui/skeleton"
 import { ClientNetworkGraph } from "@/frontend/app/components/visualizations/ClientNetworkGraph"
@@ -382,12 +382,11 @@ export default function BentoClientes() {
         </div>
       </motion.div>
       {/* Create Cliente Modal */}
-      <CreateClienteModal 
+      <CreateClienteModalSmart 
         isOpen={showCreateModal} 
         onClose={() => setShowCreateModal(false)} 
-        onSubmit={() => {}} 
       />
-      <CreateAbonoModal isOpen={showAbonoModal} onClose={() => setShowAbonoModal(false)} /> {/* Add Abono Modal */}
+      <CreateAbonoModalSmart isOpen={showAbonoModal} onClose={() => setShowAbonoModal(false)} /> {/* Add Abono Modal */}
 
       {/* Client Network Graph - Premium Visualization */}
       <motion.div

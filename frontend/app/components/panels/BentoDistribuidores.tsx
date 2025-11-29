@@ -6,8 +6,8 @@ import { Building2, AlertCircle, CheckCircle2, Clock, DollarSign, Package, Plus,
 import { Button } from "@/frontend/app/components/ui/button"
 import { Badge } from "@/frontend/app/components/ui/badge"
 import { useDistribuidores, useOrdenesCompra } from "@/frontend/app/lib/firebase/firestore-hooks.service"
-import CreateDistribuidorModal from "@/frontend/app/components/modals/CreateDistribuidorModal"
-import CreateAbonoModal from "@/frontend/app/components/modals/CreateAbonoModal"
+import CreateDistribuidorModalSmart from "@/frontend/app/components/modals/CreateDistribuidorModalSmart"
+import CreateAbonoModalSmart from "@/frontend/app/components/modals/CreateAbonoModalSmart"
 import { Skeleton } from "@/frontend/app/components/ui/skeleton"
 import { Alert, AlertDescription, AlertTitle } from "@/frontend/app/components/ui/alert"
 import { AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from "recharts"
@@ -430,12 +430,11 @@ export default function BentoDistribuidores() {
       </motion.div>
 
       {/* Create Distribuidor Modal */}
-      <CreateDistribuidorModal 
+      <CreateDistribuidorModalSmart 
         isOpen={showCreateModal} 
         onClose={() => setShowCreateModal(false)} 
-        onSubmit={() => {}} 
       />
-      <CreateAbonoModal isOpen={showAbonoModal} onClose={() => setShowAbonoModal(false)} />
+      <CreateAbonoModalSmart isOpen={showAbonoModal} onClose={() => setShowAbonoModal(false)} />
     </div>
   )
 }
