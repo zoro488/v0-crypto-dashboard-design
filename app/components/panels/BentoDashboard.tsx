@@ -113,6 +113,13 @@ export default memo(function BentoDashboard() {
   const productos = productosRaw as ProductoData[] | undefined
   // Siempre usar datos de los hooks de Firebase/mock, estos ya tienen los datos reales
   const bancos = bancosRaw as BancoData[]
+  
+  // Debug: verificar datos de bancos
+  useEffect(() => {
+    if (bancosRaw && bancosRaw.length > 0) {
+      console.log('[BentoDashboard] Bancos recibidos:', bancosRaw.length, bancosRaw[0])
+    }
+  }, [bancosRaw])
 
   const [mounted, setMounted] = useState(false)
   const [showChronos, setShowChronos] = useState(true)

@@ -239,12 +239,20 @@ function useRealtimeQuery<T extends DocumentData>(
     mockData: T[]
   }
 ): HookResult<T> {
+  // Guardar referencia estable del mockData
+  const mockDataRef = useRef(options.mockData)
+  
   // Siempre inicializar con mock data - se actualizará cuando Firestore conecte
-  const [data, setData] = useState<T[]>(options.mockData)
+  const [data, setData] = useState<T[]>(() => mockDataRef.current)
   const [loading, setLoading] = useState(false) // No loading si tenemos mock data
   const [error, setError] = useState<string | null>(null)
   const isMountedRef = useRef(true)
   const unsubscribeRef = useRef<Unsubscribe | null>(null)
+  
+  // Log para debug
+  useEffect(() => {
+    logger.info(`[Firestore RT] ${collectionName}: inicializado con ${mockDataRef.current.length} registros mock`)
+  }, [collectionName])
 
   const refresh = useCallback(async () => {
     // No-op para tiempo real, los datos se actualizan automáticamente
@@ -258,7 +266,8 @@ function useRealtimeQuery<T extends DocumentData>(
     
     // Modo mock - ya inicializado en useState, pero asegurar
     if (shouldUseMock || !db) {
-      setData(options.mockData)
+      logger.info(`[Firestore RT] ${collectionName}: usando modo mock con ${mockDataRef.current.length} registros`)
+      setData(mockDataRef.current)
       setLoading(false)
       return
     }
@@ -295,7 +304,7 @@ function useRealtimeQuery<T extends DocumentData>(
         (err) => {
           if (!isMountedRef.current) return
           logger.error(`[Firestore RT] Error en ${collectionName}:`, err.message)
-          setData(options.mockData)
+          setData(mockDataRef.current)
           setLoading(false)
           setError(err.message)
         }
@@ -303,7 +312,7 @@ function useRealtimeQuery<T extends DocumentData>(
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : "Error desconocido"
       logger.error(`[Firestore RT] Error configurando ${collectionName}:`, errMsg)
-      setData(options.mockData)
+      setData(mockDataRef.current)
       setLoading(false)
       setError(errMsg)
     }
@@ -314,7 +323,7 @@ function useRealtimeQuery<T extends DocumentData>(
         unsubscribeRef.current()
       }
     }
-  }, [collectionName, options.whereField, options.whereValue, options.orderByField, options.orderDirection, options.mockData])
+  }, [collectionName, options.whereField, options.whereValue, options.orderByField, options.orderDirection])
 
   return { data, loading, error, refresh }
 }
