@@ -167,16 +167,16 @@ jobs:
         if: steps.check_changes.outputs.has_changes == 'true'
         run: |
           git add -A
-          git commit -m "fix: auto-fix para issue #${{ needs.determine-fix.outputs.issue_number }}
-          
-          Tipo de corrección: ${{ needs.determine-fix.outputs.fix_type }}
-          
-          Cambios aplicados:
-          - ESLint fixes
-          - Prettier formatting
-          - Verificación de tipos
-          
-          Ref: #${{ needs.determine-fix.outputs.issue_number }}"
+          ISSUE_NUM="${{ needs.determine-fix.outputs.issue_number }}"
+          FIX_TYPE="${{ needs.determine-fix.outputs.fix_type }}"
+          git commit -m "fix: auto-fix para issue #${ISSUE_NUM}" \
+            -m "Tipo de corrección: ${FIX_TYPE}" \
+            -m "Cambios aplicados:" \
+            -m "- ESLint fixes" \
+            -m "- Prettier formatting" \
+            -m "- Verificación de tipos" \
+            -m "" \
+            -m "Ref: #${ISSUE_NUM}"
 
       - name: 🚀 Push branch
         if: steps.check_changes.outputs.has_changes == 'true'

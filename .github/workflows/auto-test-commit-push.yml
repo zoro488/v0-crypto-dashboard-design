@@ -184,12 +184,13 @@ jobs:
         if: steps.verify_changes.outputs.has_changes == 'true'
         run: |
           git add -A
-          git commit -m "fix: auto-fix - lint y format aplicados [skip ci]" || echo "Nada que commitear"
+          git commit -m "fix: auto-fix lint and format applied [skip ci]" || echo "Nothing to commit"
 
       - name: 🚀 Push cambios
         if: steps.verify_changes.outputs.has_changes == 'true' && github.event_name == 'push'
         run: |
-          git push origin HEAD:${{ github.ref_name }} || echo "Push fallido o no necesario"
+          git push origin HEAD:${{ github.ref_name }}
+        continue-on-error: true
 
       - name: 📝 Crear PR si hay cambios en workflow_dispatch
         if: steps.verify_changes.outputs.has_changes == 'true' && github.event_name == 'workflow_dispatch'

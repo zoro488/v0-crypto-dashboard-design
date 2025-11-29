@@ -186,7 +186,7 @@ jobs:
           
           # Extraer cobertura si existe
           if [ -f coverage/coverage-summary.json ]; then
-            COVERAGE=$(cat coverage/coverage-summary.json | jq '.total.lines.pct' 2>/dev/null || echo "N/A")
+            COVERAGE=$(jq '.total.lines.pct' coverage/coverage-summary.json 2>/dev/null || echo "N/A")
             echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
           else
             echo "coverage=N/A" >> $GITHUB_OUTPUT
@@ -382,7 +382,7 @@ jobs:
         continue-on-error: true
 
       - name: 🔍 Buscar secretos expuestos
-        uses: trufflesecurity/trufflehog@main
+        uses: trufflesecurity/trufflehog@v3.88.2
         with:
           path: ./
           base: ${{ github.event.repository.default_branch }}

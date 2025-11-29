@@ -10,6 +10,8 @@ on:
     types: [submitted]
   check_suite:
     types: [completed]
+  issue_comment:
+    types: [created]
   workflow_dispatch:
     inputs:
       pr_number:
@@ -18,7 +20,7 @@ on:
         type: number
 
 concurrency:
-  group: pr-automation-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+  group: pr-automation-${{ github.event.pull_request.number || github.event.inputs.pr_number || github.event.issue.number || github.run_id }}
   cancel-in-progress: true
 
 env:
@@ -290,6 +292,13 @@ jobs:
             const comment = context.payload.comment.body.trim();
             const prNumber = context.payload.issue.number;
             
+            // Obtener información del PR para comandos
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+            
             // Comando: /auto-fix
             if (comment === '/auto-fix') {
               console.log('Ejecutando auto-fix...');
@@ -306,7 +315,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 workflow_id: 'auto-test-commit-push.yml',
-                ref: context.payload.pull_request?.head?.ref || 'main',
+                ref: pr.head.ref,
                 inputs: {
                   auto_commit: 'true'
                 }
@@ -328,7 +337,7 @@ jobs:
               const { data: checkRuns } = await github.rest.checks.listForRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: context.payload.pull_request?.head?.sha || context.sha
+                ref: pr.head.sha
               });
               
               for (const check of checkRuns.check_runs) {
