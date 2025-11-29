@@ -37,6 +37,8 @@ jobs:
       contains(github.event.label.name, 'copilot-fix') || 
       contains(github.event.label.name, 'auto-fix') ||
       github.event_name == 'workflow_dispatch'
+    permissions:
+      issues: read
     outputs:
       fix_type: ${{ steps.analyze.outputs.fix_type }}
       issue_number: ${{ steps.analyze.outputs.issue_number }}
@@ -294,6 +296,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [determine-fix, apply-fixes]
     if: always()
+    permissions: {}
 
     steps:
       - name: 📊 Generar resumen
