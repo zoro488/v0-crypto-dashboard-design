@@ -272,8 +272,11 @@ function useRealtimeQuery<T extends DocumentData>(
       return
     }
 
+    // Type guard: db está garantizado no-null después del check anterior
+    const firestore = db
+
     try {
-      const collRef = collection(db!, collectionName)
+      const collRef = collection(firestore, collectionName)
       const constraints: Parameters<typeof query>[1][] = []
 
       if (options.whereField && options.whereValue) {
