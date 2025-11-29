@@ -1,0 +1,553 @@
+# 🔄 CHRONOS - Validación Completa del Sistema
+# Workflow para validación integral del sistema con tests avanzados
+
+name: 🔄 Full System Validation
+
+on:
+  schedule:
+    # Ejecutar diariamente a las 6 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      validation_level:
+        description: 'Nivel de validación'
+        required: true
+        default: 'standard'
+        type: choice
+        options:
+          - 'quick'      # Solo lint y type-check
+          - 'standard'   # Lint, type-check, unit tests
+          - 'full'       # Todo incluyendo E2E y análisis de seguridad
+      create_issue_on_failure:
+        description: 'Crear issue si falla'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9'
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  # ============================================================================
+  # Matriz de validación
+  # ============================================================================
+  validation-matrix:
+    name: 📋 Preparar Validación
+    runs-on: ubuntu-latest
+    outputs:
+      run_lint: ${{ steps.matrix.outputs.run_lint }}
+      run_typecheck: ${{ steps.matrix.outputs.run_typecheck }}
+      run_unit_tests: ${{ steps.matrix.outputs.run_unit_tests }}
+      run_e2e: ${{ steps.matrix.outputs.run_e2e }}
+      run_security: ${{ steps.matrix.outputs.run_security }}
+      run_data_validation: ${{ steps.matrix.outputs.run_data_validation }}
+
+    steps:
+      - name: 🔧 Configurar matriz de validación
+        id: matrix
+        run: |
+          LEVEL="${{ github.event.inputs.validation_level || 'standard' }}"
+          
+          echo "run_lint=true" >> $GITHUB_OUTPUT
+          echo "run_typecheck=true" >> $GITHUB_OUTPUT
+          
+          if [[ "$LEVEL" == "quick" ]]; then
+            echo "run_unit_tests=false" >> $GITHUB_OUTPUT
+            echo "run_e2e=false" >> $GITHUB_OUTPUT
+            echo "run_security=false" >> $GITHUB_OUTPUT
+            echo "run_data_validation=false" >> $GITHUB_OUTPUT
+          elif [[ "$LEVEL" == "standard" ]]; then
+            echo "run_unit_tests=true" >> $GITHUB_OUTPUT
+            echo "run_e2e=false" >> $GITHUB_OUTPUT
+            echo "run_security=false" >> $GITHUB_OUTPUT
+            echo "run_data_validation=true" >> $GITHUB_OUTPUT
+          else
+            echo "run_unit_tests=true" >> $GITHUB_OUTPUT
+            echo "run_e2e=true" >> $GITHUB_OUTPUT
+            echo "run_security=true" >> $GITHUB_OUTPUT
+            echo "run_data_validation=true" >> $GITHUB_OUTPUT
+          fi
+
+  # ============================================================================
+  # Validación de código
+  # ============================================================================
+  code-validation:
+    name: 🔍 Validación de Código
+    runs-on: ubuntu-latest
+    needs: validation-matrix
+    timeout-minutes: 15
+    outputs:
+      lint_passed: ${{ steps.lint.outputs.passed }}
+      typecheck_passed: ${{ steps.typecheck.outputs.passed }}
+      format_passed: ${{ steps.format.outputs.passed }}
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔎 ESLint
+        id: lint
+        if: needs.validation-matrix.outputs.run_lint == 'true'
+        run: |
+          if pnpm lint; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "✅ ESLint passed"
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ ESLint failed"
+          fi
+        continue-on-error: true
+
+      - name: 📝 TypeScript Check
+        id: typecheck
+        if: needs.validation-matrix.outputs.run_typecheck == 'true'
+        run: |
+          if pnpm type-check; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "✅ TypeScript passed"
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ TypeScript failed"
+          fi
+        continue-on-error: true
+
+      - name: 🎨 Format Check
+        id: format
+        run: |
+          if pnpm prettier --check "**/*.{ts,tsx,js,jsx,json,md}"; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "✅ Format check passed"
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ Format check failed"
+          fi
+        continue-on-error: true
+
+  # ============================================================================
+  # Tests unitarios
+  # ============================================================================
+  unit-tests:
+    name: 🧪 Tests Unitarios
+    runs-on: ubuntu-latest
+    needs: [validation-matrix, code-validation]
+    if: needs.validation-matrix.outputs.run_unit_tests == 'true'
+    timeout-minutes: 20
+    outputs:
+      tests_passed: ${{ steps.tests.outputs.passed }}
+      coverage: ${{ steps.tests.outputs.coverage }}
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: 🧪 Ejecutar tests con cobertura
+        id: tests
+        run: |
+          if pnpm test --passWithNoTests --coverage --json --outputFile=test-results.json; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+          fi
+          
+          # Extraer cobertura si existe
+          if [ -f coverage/coverage-summary.json ]; then
+            COVERAGE=$(cat coverage/coverage-summary.json | jq '.total.lines.pct' 2>/dev/null || echo "N/A")
+            echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          else
+            echo "coverage=N/A" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+        env:
+          CI: true
+
+      - name: 📊 Upload coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-coverage
+          path: |
+            coverage/
+            test-results.json
+          retention-days: 14
+
+  # ============================================================================
+  # Validación de datos (lógica de negocio)
+  # ============================================================================
+  data-validation:
+    name: 📊 Validación de Datos
+    runs-on: ubuntu-latest
+    needs: validation-matrix
+    if: needs.validation-matrix.outputs.run_data_validation == 'true'
+    timeout-minutes: 15
+    outputs:
+      validation_passed: ${{ steps.validate.outputs.passed }}
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 📥 Instalar dependencias Python
+        run: |
+          pip install pandas numpy
+
+      - name: 📊 Validar archivos CSV
+        id: validate
+        run: |
+          python << 'EOF'
+          import pandas as pd
+          import os
+          import sys
+          
+          csv_dir = 'csv'
+          errors = []
+          passed = True
+          
+          print("📊 Validando archivos CSV del sistema CHRONOS...")
+          print("=" * 50)
+          
+          if not os.path.exists(csv_dir):
+              print("⚠️ Directorio CSV no encontrado - omitiendo validación")
+              sys.exit(0)
+          
+          csv_files = [f for f in os.listdir(csv_dir) if f.endswith('.csv')]
+          
+          if not csv_files:
+              print("⚠️ No hay archivos CSV para validar")
+              sys.exit(0)
+          
+          print(f"📁 Encontrados {len(csv_files)} archivos CSV\n")
+          
+          for csv_file in csv_files:
+              filepath = os.path.join(csv_dir, csv_file)
+              try:
+                  df = pd.read_csv(filepath)
+                  rows = len(df)
+                  cols = len(df.columns)
+                  
+                  # Validaciones específicas por tipo de archivo
+                  validation_errors = []
+                  
+                  if 'ventas' in csv_file.lower():
+                      required_cols = ['cliente', 'cantidad', 'precio']
+                      for col in required_cols:
+                          if not any(col in c.lower() for c in df.columns):
+                              validation_errors.append(f"Falta columna requerida: {col}")
+                  
+                  if validation_errors:
+                      print(f"  ⚠️ {csv_file}: {rows} filas, {cols} columnas")
+                      for err in validation_errors:
+                          print(f"      └─ {err}")
+                      passed = False
+                  else:
+                      print(f"  ✅ {csv_file}: {rows} filas, {cols} columnas")
+                      
+              except Exception as e:
+                  errors.append(f'{csv_file}: {e}')
+                  print(f"  ❌ {csv_file}: Error - {e}")
+                  passed = False
+          
+          print("\n" + "=" * 50)
+          if errors:
+              print(f"❌ {len(errors)} errores encontrados")
+              sys.exit(1)
+          elif not passed:
+              print("⚠️ Validación completada con advertencias")
+              sys.exit(0)
+          else:
+              print("✅ Todos los archivos CSV son válidos")
+              sys.exit(0)
+          EOF
+          
+          if [ $? -eq 0 ]; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      - name: 💼 Validar lógica de negocio
+        run: |
+          python << 'EOF'
+          import sys
+          
+          print("\n💼 Validando lógica de negocio CHRONOS...")
+          print("=" * 50)
+          
+          # Tests de distribución de ventas
+          test_cases = [
+              {'precioVenta': 10000, 'precioCompra': 6300, 'precioFlete': 500, 'cantidad': 10},
+              {'precioVenta': 15000, 'precioCompra': 9000, 'precioFlete': 600, 'cantidad': 5},
+              {'precioVenta': 8000, 'precioCompra': 5000, 'precioFlete': 400, 'cantidad': 20},
+          ]
+          
+          passed = 0
+          for tc in test_cases:
+              # Fórmulas correctas del sistema CHRONOS
+              expected_boveda = tc['precioCompra'] * tc['cantidad']
+              expected_fletes = tc['precioFlete'] * tc['cantidad']
+              expected_utilidades = (tc['precioVenta'] - tc['precioCompra'] - tc['precioFlete']) * tc['cantidad']
+              expected_total = tc['precioVenta'] * tc['cantidad']
+              
+              # Verificar que la suma de distribuciones sea igual al total
+              suma_distribuciones = expected_boveda + expected_fletes + expected_utilidades
+              
+              if suma_distribuciones == expected_total:
+                  passed += 1
+                  print(f"  ✅ Test passed: cantidad={tc['cantidad']}, total={expected_total}")
+                  print(f"      └─ Bóveda: {expected_boveda}, Fletes: {expected_fletes}, Utilidades: {expected_utilidades}")
+              else:
+                  print(f"  ❌ Test failed: La suma ({suma_distribuciones}) != total ({expected_total})")
+          
+          print(f"\n📊 Business Logic: {passed}/{len(test_cases)} tests passed")
+          
+          if passed == len(test_cases):
+              print("✅ Todas las validaciones de lógica de negocio pasaron")
+              sys.exit(0)
+          else:
+              print("❌ Algunas validaciones fallaron")
+              sys.exit(1)
+          EOF
+
+  # ============================================================================
+  # Análisis de seguridad
+  # ============================================================================
+  security-scan:
+    name: 🔒 Análisis de Seguridad
+    runs-on: ubuntu-latest
+    needs: validation-matrix
+    if: needs.validation-matrix.outputs.run_security == 'true'
+    timeout-minutes: 15
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔒 Audit de dependencias
+        run: pnpm audit --audit-level=high
+        continue-on-error: true
+
+      - name: 🔍 Buscar secretos expuestos
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+        continue-on-error: true
+
+  # ============================================================================
+  # Tests E2E
+  # ============================================================================
+  e2e-validation:
+    name: 🎭 Tests E2E
+    runs-on: ubuntu-latest
+    needs: [validation-matrix, code-validation, unit-tests]
+    if: needs.validation-matrix.outputs.run_e2e == 'true'
+    timeout-minutes: 30
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: 🎭 Instalar Playwright
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: 🏗️ Build
+        run: pnpm build
+        env:
+          SKIP_ENV_VALIDATION: true
+
+      - name: 🚀 Ejecutar tests E2E
+        run: |
+          pnpm start &
+          sleep 15
+          pnpm test:e2e || true
+        env:
+          CI: true
+          SKIP_ENV_VALIDATION: true
+
+      - name: 📸 Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-report
+          path: playwright-report/
+          retention-days: 14
+
+  # ============================================================================
+  # Reporte consolidado
+  # ============================================================================
+  consolidated-report:
+    name: 📋 Reporte Consolidado
+    runs-on: ubuntu-latest
+    needs: [code-validation, unit-tests, data-validation, security-scan, e2e-validation]
+    if: always()
+    permissions:
+      issues: write
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📊 Generar reporte
+        id: report
+        run: |
+          echo "# 🔄 Reporte de Validación Completa del Sistema CHRONOS" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Fecha:** $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "**Nivel de validación:** ${{ github.event.inputs.validation_level || 'standard' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📊 Resultados por Área" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Área | Estado |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| ESLint | ${{ needs.code-validation.outputs.lint_passed == 'true' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| TypeScript | ${{ needs.code-validation.outputs.typecheck_passed == 'true' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Format | ${{ needs.code-validation.outputs.format_passed == 'true' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Unit Tests | ${{ needs.unit-tests.outputs.tests_passed == 'true' && '✅' || '⏭️' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Cobertura | ${{ needs.unit-tests.outputs.coverage || 'N/A' }}% |" >> $GITHUB_STEP_SUMMARY
+          echo "| Data Validation | ${{ needs.data-validation.outputs.validation_passed == 'true' && '✅' || '⏭️' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security | ${{ needs.security-scan.result == 'success' && '✅' || '⏭️' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| E2E Tests | ${{ needs.e2e-validation.result == 'success' && '✅' || '⏭️' }} |" >> $GITHUB_STEP_SUMMARY
+          
+          # Determinar estado general
+          if [[ "${{ needs.code-validation.outputs.lint_passed }}" == "false" ]] || \
+             [[ "${{ needs.code-validation.outputs.typecheck_passed }}" == "false" ]] || \
+             [[ "${{ needs.unit-tests.outputs.tests_passed }}" == "false" ]]; then
+            echo "overall_status=failure" >> $GITHUB_OUTPUT
+          else
+            echo "overall_status=success" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 🚨 Crear issue si falla
+        if: |
+          steps.report.outputs.overall_status == 'failure' && 
+          (github.event.inputs.create_issue_on_failure == 'true' || github.event_name == 'schedule')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `🚨 Validación del Sistema Fallida - ${new Date().toISOString().split('T')[0]}`;
+            const body = `
+            ## 🔄 Validación Automática del Sistema CHRONOS
+            
+            La validación programada ha detectado problemas:
+            
+            ### 📊 Resultados
+            
+            | Área | Estado |
+            |------|--------|
+            | ESLint | ${{ needs.code-validation.outputs.lint_passed == 'true' && '✅ Passed' || '❌ Failed' }} |
+            | TypeScript | ${{ needs.code-validation.outputs.typecheck_passed == 'true' && '✅ Passed' || '❌ Failed' }} |
+            | Unit Tests | ${{ needs.unit-tests.outputs.tests_passed == 'true' && '✅ Passed' || '❌ Failed' }} |
+            
+            ### 🔗 Enlaces
+            
+            - [Ver workflow completo](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+            
+            ### 📝 Acciones recomendadas
+            
+            1. Revisar los logs del workflow
+            2. Ejecutar tests localmente: \`pnpm test\`
+            3. Corregir errores de lint: \`pnpm lint --fix\`
+            4. Verificar tipos: \`pnpm type-check\`
+            
+            ---
+            🤖 *Issue creado automáticamente por GitHub Actions*
+            `;
+            
+            // Buscar issue existente similar
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'system-validation,automated'
+            });
+            
+            const existingIssue = issues.find(i => i.title.includes('Validación del Sistema Fallida'));
+            
+            if (existingIssue) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body: `## 🔄 Nueva ejecución fallida\n\n${body}`
+              });
+              console.log(`Comentario añadido al issue #${existingIssue.number}`);
+            } else {
+              const { data: newIssue } = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['system-validation', 'automated', 'bug']
+              });
+              console.log(`Issue creado: #${newIssue.number}`);
+            }

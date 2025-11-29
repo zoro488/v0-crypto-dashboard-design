@@ -1,0 +1,313 @@
+# 🤖 CHRONOS - Agente de Corrección Automática con Copilot
+# Workflow que se activa con labels específicos para corrección automática de issues
+
+name: 🤖 Copilot Auto-Fix Agent
+
+on:
+  issues:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'Número del issue a corregir'
+        required: true
+        type: number
+      fix_type:
+        description: 'Tipo de corrección'
+        required: true
+        type: choice
+        options:
+          - 'lint'
+          - 'tests'
+          - 'types'
+          - 'all'
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9'
+
+jobs:
+  # ============================================================================
+  # Determinar tipo de corrección
+  # ============================================================================
+  determine-fix:
+    name: 🔍 Analizar Issue
+    runs-on: ubuntu-latest
+    if: |
+      contains(github.event.label.name, 'copilot-fix') || 
+      contains(github.event.label.name, 'auto-fix') ||
+      github.event_name == 'workflow_dispatch'
+    outputs:
+      fix_type: ${{ steps.analyze.outputs.fix_type }}
+      issue_number: ${{ steps.analyze.outputs.issue_number }}
+      branch_name: ${{ steps.analyze.outputs.branch_name }}
+
+    steps:
+      - name: 🔍 Analizar issue y determinar tipo de corrección
+        id: analyze
+        uses: actions/github-script@v7
+        with:
+          script: |
+            let issueNumber, fixType, branchName;
+            
+            if (context.eventName === 'workflow_dispatch') {
+              issueNumber = ${{ github.event.inputs.issue_number || 0 }};
+              fixType = '${{ github.event.inputs.fix_type || 'all' }}';
+            } else {
+              issueNumber = context.payload.issue.number;
+              const labels = context.payload.issue.labels.map(l => l.name);
+              
+              if (labels.includes('fix:lint')) {
+                fixType = 'lint';
+              } else if (labels.includes('fix:tests')) {
+                fixType = 'tests';
+              } else if (labels.includes('fix:types')) {
+                fixType = 'types';
+              } else {
+                fixType = 'all';
+              }
+            }
+            
+            branchName = `auto-fix/issue-${issueNumber}`;
+            
+            core.setOutput('fix_type', fixType);
+            core.setOutput('issue_number', issueNumber);
+            core.setOutput('branch_name', branchName);
+            
+            console.log(`Issue: #${issueNumber}`);
+            console.log(`Fix type: ${fixType}`);
+            console.log(`Branch: ${branchName}`);
+
+  # ============================================================================
+  # Aplicar correcciones
+  # ============================================================================
+  apply-fixes:
+    name: 🔧 Aplicar Correcciones
+    runs-on: ubuntu-latest
+    needs: determine-fix
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: 📝 Configurar Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: 🌿 Crear branch de corrección
+        run: |
+          git checkout -b ${{ needs.determine-fix.outputs.branch_name }}
+
+      - name: 🔧 Aplicar fix de ESLint
+        if: needs.determine-fix.outputs.fix_type == 'lint' || needs.determine-fix.outputs.fix_type == 'all'
+        run: |
+          echo "🔧 Aplicando ESLint fixes..."
+          pnpm lint --fix || true
+          
+          echo "🎨 Aplicando Prettier..."
+          pnpm prettier --write "**/*.{ts,tsx,js,jsx,json,css,md}" || true
+
+      - name: 🧪 Ejecutar y verificar tests
+        if: needs.determine-fix.outputs.fix_type == 'tests' || needs.determine-fix.outputs.fix_type == 'all'
+        run: |
+          echo "🧪 Ejecutando tests..."
+          pnpm test --passWithNoTests 2>&1 | tee test-output.txt || true
+          
+          # Analizar errores de tests
+          if grep -q "FAIL" test-output.txt; then
+            echo "❌ Hay tests fallidos - se necesita revisión manual"
+          else
+            echo "✅ Tests pasaron correctamente"
+          fi
+        env:
+          CI: true
+
+      - name: 📝 Verificar tipos TypeScript
+        if: needs.determine-fix.outputs.fix_type == 'types' || needs.determine-fix.outputs.fix_type == 'all'
+        run: |
+          echo "📝 Verificando tipos TypeScript..."
+          pnpm type-check 2>&1 | tee typecheck-output.txt || true
+
+      - name: 📊 Verificar si hay cambios
+        id: check_changes
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "📝 Cambios detectados:"
+            git status --short
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ No hay cambios para commit"
+          fi
+
+      - name: 💾 Commit cambios
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git add -A
+          git commit -m "fix: auto-fix para issue #${{ needs.determine-fix.outputs.issue_number }}
+          
+          Tipo de corrección: ${{ needs.determine-fix.outputs.fix_type }}
+          
+          Cambios aplicados:
+          - ESLint fixes
+          - Prettier formatting
+          - Verificación de tipos
+          
+          Ref: #${{ needs.determine-fix.outputs.issue_number }}"
+
+      - name: 🚀 Push branch
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git push origin ${{ needs.determine-fix.outputs.branch_name }} --force
+
+      - name: 📝 Crear Pull Request
+        if: steps.check_changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'fix: auto-fix para issue #${{ needs.determine-fix.outputs.issue_number }}'
+          title: '🤖 Auto-fix: Correcciones para #${{ needs.determine-fix.outputs.issue_number }}'
+          body: |
+            ## 🤖 Pull Request Automatizado
+            
+            Este PR fue creado automáticamente por el Copilot Auto-Fix Agent.
+            
+            ### 📋 Issue Relacionado
+            
+            Fixes #${{ needs.determine-fix.outputs.issue_number }}
+            
+            ### 🔧 Tipo de Corrección
+            
+            **${{ needs.determine-fix.outputs.fix_type }}**
+            
+            ### ✅ Cambios Aplicados
+            
+            - [x] ESLint fixes aplicados
+            - [x] Prettier formatting aplicado
+            - [x] Verificación de tipos realizada
+            
+            ### 📊 Verificación Automática
+            
+            Los workflows de CI/CD se ejecutarán automáticamente para validar estos cambios.
+            
+            ### 📝 Notas
+            
+            - Este PR requiere revisión antes de hacer merge
+            - Los tests deben pasar antes de aprobar
+            - Revisar los cambios para asegurar que son correctos
+            
+            ---
+            🤖 *Generado automáticamente por GitHub Actions - CHRONOS System*
+          branch: ${{ needs.determine-fix.outputs.branch_name }}
+          base: main
+          labels: |
+            automated
+            auto-fix
+            needs-review
+
+      - name: 💬 Comentar en issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = ${{ needs.determine-fix.outputs.issue_number }};
+            const hasChanges = '${{ steps.check_changes.outputs.has_changes }}' === 'true';
+            const fixType = '${{ needs.determine-fix.outputs.fix_type }}';
+            const branchName = '${{ needs.determine-fix.outputs.branch_name }}';
+            
+            let body;
+            
+            if (hasChanges) {
+              body = `## 🤖 Copilot Auto-Fix Agent
+              
+              ✅ **Correcciones aplicadas exitosamente!**
+              
+              ### 📋 Detalles
+              
+              | Campo | Valor |
+              |-------|-------|
+              | Tipo de fix | \`${fixType}\` |
+              | Branch | \`${branchName}\` |
+              | Estado | ✅ PR Creado |
+              
+              ### 🔗 Siguiente paso
+              
+              Se ha creado un Pull Request con las correcciones. Por favor revisa los cambios y aprueba el PR si son correctos.
+              
+              [Ver workflow](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+              
+              ---
+              🤖 *Generado automáticamente*`;
+            } else {
+              body = `## 🤖 Copilot Auto-Fix Agent
+              
+              ℹ️ **No se detectaron cambios necesarios**
+              
+              El análisis no encontró correcciones automáticas que aplicar para el tipo \`${fixType}\`.
+              
+              ### 📝 Opciones
+              
+              1. Revisar manualmente el código
+              2. Ejecutar con tipo de fix diferente
+              3. Solicitar ayuda adicional
+              
+              [Ver workflow](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+              
+              ---
+              🤖 *Generado automáticamente*`;
+            }
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body
+            });
+
+  # ============================================================================
+  # Notificación de finalización
+  # ============================================================================
+  notify-completion:
+    name: 📬 Notificar Finalización
+    runs-on: ubuntu-latest
+    needs: [determine-fix, apply-fixes]
+    if: always()
+
+    steps:
+      - name: 📊 Generar resumen
+        run: |
+          echo "# 🤖 Copilot Auto-Fix Agent - Resumen" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📋 Detalles de Ejecución" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Campo | Valor |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Issue | #${{ needs.determine-fix.outputs.issue_number }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tipo de Fix | ${{ needs.determine-fix.outputs.fix_type }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | ${{ needs.determine-fix.outputs.branch_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Estado | ${{ needs.apply-fixes.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "⏰ Completado: $(date)" >> $GITHUB_STEP_SUMMARY

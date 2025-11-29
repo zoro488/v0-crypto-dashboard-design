@@ -1,0 +1,419 @@
+# 🔁 CHRONOS - Automatización de PRs con Validación Continua
+# Ejecuta validaciones automáticas en cada PR y permite auto-merge si todo pasa
+
+name: 🔁 PR Automation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  pull_request_review:
+    types: [submitted]
+  check_suite:
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'Número de PR a validar'
+        required: true
+        type: number
+
+concurrency:
+  group: pr-automation-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9'
+
+jobs:
+  # ============================================================================
+  # Validación de PR
+  # ============================================================================
+  pr-validation:
+    name: 🔍 Validación de PR
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    timeout-minutes: 20
+    outputs:
+      all_checks_passed: ${{ steps.summary.outputs.all_passed }}
+      lint_status: ${{ steps.lint.outputs.status }}
+      typecheck_status: ${{ steps.typecheck.outputs.status }}
+      test_status: ${{ steps.test.outputs.status }}
+      build_status: ${{ steps.build.outputs.status }}
+
+    steps:
+      - name: 📥 Checkout PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: 📝 TypeScript Check
+        id: typecheck
+        run: |
+          if pnpm type-check; then
+            echo "status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "status=failed" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      - name: 🔎 ESLint
+        id: lint
+        run: |
+          if pnpm lint; then
+            echo "status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "status=failed" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      - name: 🧪 Jest Tests
+        id: test
+        run: |
+          if pnpm test --passWithNoTests --coverage; then
+            echo "status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "status=failed" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+        env:
+          CI: true
+
+      - name: 🏗️ Build Check
+        id: build
+        run: |
+          if pnpm build; then
+            echo "status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "status=failed" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+        env:
+          SKIP_ENV_VALIDATION: true
+
+      - name: 📊 Resumen de validación
+        id: summary
+        run: |
+          LINT="${{ steps.lint.outputs.status }}"
+          TYPE="${{ steps.typecheck.outputs.status }}"
+          TEST="${{ steps.test.outputs.status }}"
+          BUILD="${{ steps.build.outputs.status }}"
+          
+          if [[ "$LINT" == "passed" && "$TYPE" == "passed" && "$TEST" == "passed" && "$BUILD" == "passed" ]]; then
+            echo "all_passed=true" >> $GITHUB_OUTPUT
+            echo "✅ Todas las validaciones pasaron"
+          else
+            echo "all_passed=false" >> $GITHUB_OUTPUT
+            echo "❌ Algunas validaciones fallaron"
+          fi
+
+      - name: 📤 Upload coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pr-coverage-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+          path: coverage/
+          retention-days: 7
+
+  # ============================================================================
+  # Comentario automático en PR
+  # ============================================================================
+  pr-comment:
+    name: 💬 Comentario en PR
+    runs-on: ubuntu-latest
+    needs: pr-validation
+    if: always() && (github.event_name == 'pull_request')
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: 💬 Actualizar comentario de estado
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            
+            const checks = {
+              typecheck: '${{ needs.pr-validation.outputs.typecheck_status }}',
+              lint: '${{ needs.pr-validation.outputs.lint_status }}',
+              test: '${{ needs.pr-validation.outputs.test_status }}',
+              build: '${{ needs.pr-validation.outputs.build_status }}',
+              allPassed: '${{ needs.pr-validation.outputs.all_checks_passed }}'
+            };
+            
+            const getEmoji = (status) => status === 'passed' ? '✅' : '❌';
+            const getStatus = (status) => status === 'passed' ? 'Passed' : 'Failed';
+            
+            const overallStatus = checks.allPassed === 'true' 
+              ? '🎉 **Todas las validaciones pasaron!** El PR está listo para revisión.'
+              : '⚠️ **Algunas validaciones fallaron.** Por favor revisa los errores.';
+            
+            const body = `## 🤖 Reporte Automático de Validación
+            
+            ${overallStatus}
+            
+            ### 📊 Resultados de Validación
+            
+            | Check | Estado | Descripción |
+            |-------|--------|-------------|
+            | TypeScript | ${getEmoji(checks.typecheck)} ${getStatus(checks.typecheck)} | Verificación de tipos |
+            | ESLint | ${getEmoji(checks.lint)} ${getStatus(checks.lint)} | Análisis de código |
+            | Tests | ${getEmoji(checks.test)} ${getStatus(checks.test)} | Tests unitarios |
+            | Build | ${getEmoji(checks.build)} ${getStatus(checks.build)} | Build de producción |
+            
+            ### 🔗 Enlaces útiles
+            
+            - [Ver detalles del workflow](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+            - [Ver cambios](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/pull/${prNumber}/files)
+            
+            ### 📝 Comandos disponibles
+            
+            | Comando | Descripción |
+            |---------|-------------|
+            | \`/auto-fix\` | Aplicar auto-fix de ESLint y Prettier |
+            | \`/rerun-tests\` | Re-ejecutar todos los tests |
+            | \`/skip-e2e\` | Omitir tests E2E |
+            
+            ---
+            🤖 *Generado automáticamente por el sistema de CI/CD de CHRONOS*
+            `;
+            
+            // Buscar comentario existente del bot
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Reporte Automático de Validación')
+            );
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body
+              });
+            }
+
+  # ============================================================================
+  # Auto-merge si todo pasa y está aprobado
+  # ============================================================================
+  auto-merge:
+    name: 🔀 Auto-Merge
+    runs-on: ubuntu-latest
+    needs: pr-validation
+    if: |
+      needs.pr-validation.outputs.all_checks_passed == 'true' &&
+      github.event_name == 'pull_request_review' &&
+      github.event.review.state == 'approved'
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: 🔀 Habilitar auto-merge
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            
+            try {
+              // Intentar habilitar auto-merge
+              await github.rest.pulls.merge({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+                merge_method: 'squash'
+              });
+              
+              console.log(`✅ PR #${prNumber} merged successfully`);
+            } catch (error) {
+              console.log(`ℹ️ Could not auto-merge PR #${prNumber}: ${error.message}`);
+              
+              // Añadir label indicando que está listo para merge manual
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                labels: ['ready-to-merge']
+              });
+            }
+
+  # ============================================================================
+  # Comandos de PR (comentarios)
+  # ============================================================================
+  pr-commands:
+    name: 🎮 PR Commands
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issue_comment' && github.event.issue.pull_request
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🔧 Procesar comando
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comment = context.payload.comment.body.trim();
+            const prNumber = context.payload.issue.number;
+            
+            // Comando: /auto-fix
+            if (comment === '/auto-fix') {
+              console.log('Ejecutando auto-fix...');
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: '🔧 Ejecutando auto-fix de ESLint y Prettier...'
+              });
+              
+              // Trigger auto-fix workflow
+              await github.rest.actions.createWorkflowDispatch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'auto-test-commit-push.yml',
+                ref: context.payload.pull_request?.head?.ref || 'main',
+                inputs: {
+                  auto_commit: 'true'
+                }
+              });
+            }
+            
+            // Comando: /rerun-tests
+            if (comment === '/rerun-tests') {
+              console.log('Re-ejecutando tests...');
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: '🔄 Re-ejecutando todos los tests...'
+              });
+              
+              // Re-run failed checks
+              const { data: checkRuns } = await github.rest.checks.listForRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: context.payload.pull_request?.head?.sha || context.sha
+              });
+              
+              for (const check of checkRuns.check_runs) {
+                if (check.conclusion === 'failure') {
+                  await github.rest.checks.rerequestRun({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    check_run_id: check.id
+                  }).catch(e => console.log(`Could not rerun check: ${e.message}`));
+                }
+              }
+            }
+
+  # ============================================================================
+  # Etiquetado automático de PR
+  # ============================================================================
+  auto-label:
+    name: 🏷️ Auto Label
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🏷️ Añadir labels basados en archivos
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number
+            });
+            
+            const labels = new Set();
+            
+            for (const file of files) {
+              const path = file.filename;
+              
+              // Categorizar por tipo de archivo
+              if (path.includes('__tests__') || path.includes('.test.') || path.includes('.spec.')) {
+                labels.add('tests');
+              }
+              if (path.includes('.github/workflows')) {
+                labels.add('ci/cd');
+              }
+              if (path.includes('app/components')) {
+                labels.add('components');
+              }
+              if (path.includes('app/lib/firebase')) {
+                labels.add('firebase');
+              }
+              if (path.includes('automation')) {
+                labels.add('automation');
+              }
+              if (path.endsWith('.md')) {
+                labels.add('documentation');
+              }
+              if (path.includes('styles') || path.endsWith('.css')) {
+                labels.add('styles');
+              }
+            }
+            
+            // Categorizar por tamaño del PR
+            const totalChanges = files.reduce((sum, f) => sum + f.additions + f.deletions, 0);
+            
+            if (totalChanges < 50) {
+              labels.add('size/small');
+            } else if (totalChanges < 200) {
+              labels.add('size/medium');
+            } else {
+              labels.add('size/large');
+            }
+            
+            // Añadir labels
+            if (labels.size > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                labels: Array.from(labels)
+              });
+              
+              console.log(`Labels añadidos: ${Array.from(labels).join(', ')}`);
+            }

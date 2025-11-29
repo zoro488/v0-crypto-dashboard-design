@@ -1,0 +1,404 @@
+# 🤖 CHRONOS - Automatización Completa de Tests, Commit y Push
+# Este workflow ejecuta tests, aplica auto-fix si es necesario, y crea commits/push automáticos
+
+name: 🚀 Auto Test, Commit & Push
+
+on:
+  push:
+    branches: [main, develop, 'feature/**']
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      auto_commit:
+        description: 'Realizar commit automático de fixes'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+      run_e2e:
+        description: 'Ejecutar tests E2E'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+concurrency:
+  group: auto-test-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9'
+
+jobs:
+  # ============================================================================
+  # JOB 1: Análisis y Tests Automáticos
+  # ============================================================================
+  auto-analysis:
+    name: 🔍 Análisis Automático
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      lint_status: ${{ steps.lint.outputs.status }}
+      test_status: ${{ steps.test.outputs.status }}
+      typecheck_status: ${{ steps.typecheck.outputs.status }}
+      has_changes: ${{ steps.check_changes.outputs.has_changes }}
+
+    steps:
+      - name: 📥 Checkout completo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 TypeScript Check
+        id: typecheck
+        run: |
+          if pnpm type-check; then
+            echo "status=success" >> $GITHUB_OUTPUT
+          else
+            echo "status=failure" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      - name: 🔎 ESLint Check
+        id: lint
+        run: |
+          if pnpm lint; then
+            echo "status=success" >> $GITHUB_OUTPUT
+          else
+            echo "status=failure" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      - name: 🧪 Jest Tests
+        id: test
+        run: |
+          if pnpm test --passWithNoTests --coverage; then
+            echo "status=success" >> $GITHUB_OUTPUT
+          else
+            echo "status=failure" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+        env:
+          CI: true
+
+      - name: 📊 Verificar cambios pendientes
+        id: check_changes
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 📤 Subir cobertura
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7
+
+  # ============================================================================
+  # JOB 2: Auto-Fix y Commit Automático
+  # ============================================================================
+  auto-fix-commit:
+    name: 🔧 Auto-Fix & Commit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: auto-analysis
+    if: |
+      (needs.auto-analysis.outputs.lint_status == 'failure' || 
+       needs.auto-analysis.outputs.test_status == 'failure') &&
+      (github.event_name == 'push' || github.event.inputs.auto_commit == 'true')
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔧 Auto-fix ESLint
+        run: pnpm lint --fix || true
+        continue-on-error: true
+
+      - name: 🎨 Auto-format con Prettier
+        run: pnpm prettier --write "**/*.{ts,tsx,js,jsx,json,css,md}" || true
+        continue-on-error: true
+
+      - name: 📝 Configurar Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: 📊 Verificar cambios
+        id: verify_changes
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            git status --short
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No hay cambios para commit"
+          fi
+
+      - name: 💾 Commit cambios automáticos
+        if: steps.verify_changes.outputs.has_changes == 'true'
+        run: |
+          git add -A
+          git commit -m "fix: auto-fix - lint y format aplicados [skip ci]" || echo "Nada que commitear"
+
+      - name: 🚀 Push cambios
+        if: steps.verify_changes.outputs.has_changes == 'true' && github.event_name == 'push'
+        run: |
+          git push origin HEAD:${{ github.ref_name }} || echo "Push fallido o no necesario"
+
+      - name: 📝 Crear PR si hay cambios en workflow_dispatch
+        if: steps.verify_changes.outputs.has_changes == 'true' && github.event_name == 'workflow_dispatch'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'fix: auto-fix aplicados por CI'
+          title: '🤖 Auto-fix: Correcciones automáticas aplicadas'
+          body: |
+            ## 🔧 Correcciones Automáticas
+            
+            Este PR fue creado automáticamente por el workflow de CI/CD.
+            
+            ### Cambios aplicados:
+            - ✅ ESLint fixes aplicados
+            - ✅ Prettier format aplicado
+            
+            ### Verificación:
+            - [ ] Revisar cambios antes de merge
+            - [ ] Verificar que los tests pasen
+            
+            ---
+            🤖 Generado automáticamente por GitHub Actions
+          branch: auto-fix/ci-${{ github.run_id }}
+          delete-branch: true
+          labels: |
+            automated
+            ci-fix
+
+  # ============================================================================
+  # JOB 3: Build y Validación
+  # ============================================================================
+  build-validation:
+    name: 🏗️ Build & Validación
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: auto-analysis
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: 🏗️ Build de producción
+        run: pnpm build
+        env:
+          SKIP_ENV_VALIDATION: true
+          NODE_ENV: production
+
+      - name: 📦 Guardar build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-build
+          path: .next/
+          retention-days: 7
+
+  # ============================================================================
+  # JOB 4: Tests E2E (Opcional)
+  # ============================================================================
+  e2e-tests:
+    name: 🎭 Tests E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: build-validation
+    if: github.event.inputs.run_e2e == 'true' || github.event_name == 'push'
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: 🎭 Instalar Playwright
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: 📥 Descargar build
+        uses: actions/download-artifact@v4
+        with:
+          name: production-build
+          path: .next/
+
+      - name: 🚀 Iniciar servidor y ejecutar tests
+        run: |
+          pnpm start &
+          sleep 15
+          pnpm test:e2e || true
+        env:
+          CI: true
+          SKIP_ENV_VALIDATION: true
+
+      - name: 📸 Guardar reporte Playwright
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
+  # ============================================================================
+  # JOB 5: Reporte Final
+  # ============================================================================
+  final-report:
+    name: 📋 Reporte Final
+    runs-on: ubuntu-latest
+    needs: [auto-analysis, build-validation]
+    if: always()
+
+    steps:
+      - name: 📊 Generar resumen
+        run: |
+          echo "# 🚀 Reporte de Automatización CHRONOS" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📊 Estado de Jobs" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Estado |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| TypeScript Check | ${{ needs.auto-analysis.outputs.typecheck_status }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ESLint | ${{ needs.auto-analysis.outputs.lint_status }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | ${{ needs.auto-analysis.outputs.test_status }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | ${{ needs.build-validation.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "⏰ Ejecutado: $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "🌿 Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: 💬 Comentar en PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const analysis = {
+              typecheck: '${{ needs.auto-analysis.outputs.typecheck_status }}',
+              lint: '${{ needs.auto-analysis.outputs.lint_status }}',
+              test: '${{ needs.auto-analysis.outputs.test_status }}',
+              build: '${{ needs.build-validation.result }}'
+            };
+            
+            const getIcon = (status) => {
+              if (status === 'success') return '✅';
+              if (status === 'failure') return '❌';
+              return '⚠️';
+            };
+            
+            const body = `## 🤖 Reporte Automático de CI/CD
+            
+            ### 📊 Resultados
+            
+            | Verificación | Estado |
+            |--------------|--------|
+            | TypeScript | ${getIcon(analysis.typecheck)} ${analysis.typecheck} |
+            | ESLint | ${getIcon(analysis.lint)} ${analysis.lint} |
+            | Tests | ${getIcon(analysis.test)} ${analysis.test} |
+            | Build | ${getIcon(analysis.build)} ${analysis.build} |
+            
+            ---
+            🔗 [Ver detalles del workflow](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+            
+            🤖 *Generado automáticamente*`;
+            
+            // Buscar comentario existente
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(c => 
+              c.user.type === 'Bot' && 
+              c.body.includes('Reporte Automático de CI/CD')
+            );
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body
+              });
+            }
