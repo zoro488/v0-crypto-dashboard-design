@@ -59,6 +59,7 @@ import { useToast } from '@/app/hooks/use-toast'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
+import { crearCliente } from '@/app/lib/firebase/firestore-service'
 
 // ============================================
 // SCHEMA ZOD - Basado en clientes.csv
@@ -202,34 +203,38 @@ export function CreateClienteModalPremium({
     setIsSubmitting(true)
 
     try {
-      // TODO: Integrar con Firestore
-      // const clienteDoc = {
-      //   ...data,
-      //   pendiente, // Calculado
-      //   keywords: generarKeywords(data.nombre),
-      //   createdAt: serverTimestamp(),
-      //   updatedAt: serverTimestamp(),
-      // }
+      const clienteData = {
+        nombre: data.nombre,
+        telefono: data.telefono || undefined,
+        email: data.email || undefined,
+        direccion: data.direccion || undefined,
+      }
 
-      logger.info('Cliente creado/actualizado', { 
-        data: { ...data, pendiente },
+      logger.info('Creando cliente en Firestore', { 
+        data: clienteData,
         context: 'CreateClienteModalPremium',
       })
 
-      toast({
-        title: isEdit ? '✅ Cliente Actualizado' : '✅ Cliente Creado',
-        description: `${data.nombre} - Pendiente: ${formatearMonto(pendiente)}`,
-      })
+      const result = await crearCliente(clienteData)
 
-      onClose()
-      onSuccess?.()
-      useAppStore.getState().triggerDataRefresh()
+      if (result) {
+        toast({
+          title: isEdit ? '✅ Cliente Actualizado' : '✅ Cliente Creado',
+          description: `${data.nombre} - Pendiente: ${formatearMonto(pendiente)}`,
+        })
+
+        onClose()
+        onSuccess?.()
+        useAppStore.getState().triggerDataRefresh()
+      } else {
+        throw new Error('No se pudo crear el cliente')
+      }
 
     } catch (error) {
       logger.error('Error al guardar cliente', error)
       toast({
         title: 'Error',
-        description: 'No se pudo guardar el cliente',
+        description: error instanceof Error ? error.message : 'No se pudo guardar el cliente',
         variant: 'destructive',
       })
     } finally {

@@ -58,6 +58,7 @@ import { useToast } from '@/app/hooks/use-toast'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
+import { registrarAbonoCliente } from '@/app/lib/services/business-logic.service'
 
 // ============================================
 // SCHEMA ZOD
@@ -225,30 +226,38 @@ export function CreateAbonoModalPremium({
 
     try {
       const abonoData = {
-        ...data,
-        nuevoSaldoCliente: nuevoSaldo,
-        timestamp: new Date().toISOString(),
+        clienteId: data.clienteId,
+        monto: data.monto,
+        metodo: data.metodoPago,
+        referencia: data.referencia,
+        notas: data.concepto,
       }
 
-      logger.info('Abono registrado', { 
+      logger.info('Registrando abono en Firestore', { 
         data: abonoData,
         context: 'CreateAbonoModalPremium',
       })
 
-      toast({
-        title: '✅ Abono Registrado',
-        description: `${formatearMonto(data.monto)} de ${data.clienteNombre}. Nuevo saldo: ${formatearMonto(nuevoSaldo)}`,
-      })
+      const result = await registrarAbonoCliente(abonoData)
 
-      onClose()
-      onSuccess?.()
-      useAppStore.getState().triggerDataRefresh()
+      if (result) {
+        toast({
+          title: '✅ Abono Registrado',
+          description: `${formatearMonto(data.monto)} de ${data.clienteNombre}. Nuevo saldo: ${formatearMonto(nuevoSaldo)}`,
+        })
+
+        onClose()
+        onSuccess?.()
+        useAppStore.getState().triggerDataRefresh()
+      } else {
+        throw new Error('No se pudo registrar el abono')
+      }
 
     } catch (error) {
       logger.error('Error al registrar abono', error)
       toast({
         title: 'Error',
-        description: 'No se pudo registrar el abono',
+        description: error instanceof Error ? error.message : 'No se pudo registrar el abono',
         variant: 'destructive',
       })
     } finally {
