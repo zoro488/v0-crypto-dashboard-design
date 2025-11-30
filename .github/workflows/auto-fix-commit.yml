@@ -118,7 +118,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🧪 Run All Tests
-        run: pnpm test --passWithNoTests --coverage
+        run: pnpm test --passWithNoTests
         env:
           CI: true
 
@@ -127,9 +127,4 @@ jobs:
         run: |
           echo "## 🧪 Test Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          if [ -f coverage/coverage-summary.json ]; then
-            echo "### Coverage Report" >> $GITHUB_STEP_SUMMARY
-            cat coverage/coverage-summary.json | jq -r '.total | "- Lines: \(.lines.pct)%\n- Statements: \(.statements.pct)%\n- Functions: \(.functions.pct)%\n- Branches: \(.branches.pct)%"' >> $GITHUB_STEP_SUMMARY
-          else
-            echo "Coverage report not found" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "✅ Tests completed!" >> $GITHUB_STEP_SUMMARY

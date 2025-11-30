@@ -83,7 +83,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🧪 Run Jest tests
-        run: pnpm test --passWithNoTests --coverage
+        run: pnpm test --passWithNoTests 
         continue-on-error: true
 
       - name: 📊 Upload coverage

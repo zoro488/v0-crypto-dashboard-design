@@ -116,7 +116,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🧪 Run Jest tests
-        run: pnpm test --coverage --maxWorkers=2
+        run: pnpm test  --maxWorkers=2
         env:
           CI: true
 

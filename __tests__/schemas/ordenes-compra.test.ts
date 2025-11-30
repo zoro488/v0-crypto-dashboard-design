@@ -60,7 +60,7 @@ describe('Órdenes de Compra Schema - Validaciones', () => {
       
       expect(result.success).toBe(false)
       if (!result.success) {
-        expect(result.errors?.some(e => e.includes('costo'))).toBe(true)
+        expect(result.errors?.some((e: string) => e.includes('costo'))).toBe(true)
       }
     })
     
@@ -278,7 +278,7 @@ describe('Órdenes de Compra Schema - Validaciones', () => {
         ''
       )
       
-      const testCount = keywords.filter(k => k === 'test').length
+      const testCount = keywords.filter((k: string) => k === 'test').length
       expect(testCount).toBe(1)
     })
     

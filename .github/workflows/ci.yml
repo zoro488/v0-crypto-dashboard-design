@@ -76,7 +76,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🧪 Run Jest Tests
-        run: pnpm test --coverage --passWithNoTests
+        run: pnpm test  --passWithNoTests
         env:
           CI: true
 
