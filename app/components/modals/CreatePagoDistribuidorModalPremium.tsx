@@ -682,7 +682,7 @@ export function CreatePagoDistribuidorModalPremium({
 
           {/* ===== FOOTER ===== */}
           <div className={cn(
-            "h-20 border-t border-white/10",
+            "shrink-0 h-20 border-t border-white/10",
             "bg-gradient-to-r from-black/50 via-white/5 to-black/50",
             "px-6 flex items-center justify-between"
           )}>
