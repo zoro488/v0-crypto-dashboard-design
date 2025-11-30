@@ -1,12 +1,11 @@
 /**
- * 🚀 SMART FORMS - Índice de Exportaciones
+ * 💎 PREMIUM MODALS - Índice de Exportaciones
  * 
- * Sistema de formularios inteligentes con:
- * - Progressive Disclosure
- * - HybridCombobox (buscar o crear inline)
- * - AI Voice Fill
- * - Glassmorphism futurista
+ * Sistema de modales premium con:
+ * - Glassmorphism design
  * - Animaciones Framer Motion
+ * - Validación Zod
+ * - Formularios completos con botones visibles
  */
 
 // ============================================
@@ -16,10 +15,15 @@
 export { HybridCombobox } from "@/app/components/ui/hybrid-combobox"
 
 // ============================================
-// MODALES SMART
+// MODALES PREMIUM
 // ============================================
 
-// Los modales Smart se exportan desde sus ubicaciones originales
-export { default as CreateVentaModalSmart } from "../CreateVentaModalSmart"
-export { default as CreateOrdenCompraModalSmart } from "../CreateOrdenCompraModalSmart"
-export { default as CreateProductoModalSmart } from "../CreateProductoModalSmart"
+export { CreateVentaModalPremium } from "../CreateVentaModalPremium"
+export { CreateOrdenCompraModalPremium } from "../CreateOrdenCompraModalPremium"
+export { CreateClienteModalPremium } from "../CreateClienteModalPremium"
+export { CreateDistribuidorModalPremium } from "../CreateDistribuidorModalPremium"
+export { CreateGastoModalPremium } from "../CreateGastoModalPremium"
+export { CreateIngresoModalPremium } from "../CreateIngresoModalPremium"
+export { CreateTransferenciaModalPremium } from "../CreateTransferenciaModalPremium"
+export { CreateAbonoModalPremium } from "../CreateAbonoModalPremium"
+export { CreatePagoDistribuidorModalPremium } from "../CreatePagoDistribuidorModalPremium"
