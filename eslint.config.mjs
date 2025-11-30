@@ -153,6 +153,16 @@ export default [
       'dataconnect/**', // Firebase DataConnect
       'e2e/**', // E2E tests con Playwright (reglas diferentes)
       'gg/**', // Assets
+      'hooks/**', // Hooks duplicados en raíz (usar app/hooks)
+      'lib/**', // Lib duplicado en raíz (usar app/lib)
+      'components/ui/**', // shadcn/ui components con formato propio
+      'jest.setup.ts', // Setup de Jest
+      'jest.config.js', // Config de Jest
+      'tailwind.config.ts', // Config de Tailwind
+      'playwright.config.ts', // Config de Playwright
+      'next.config.*.js', // Configs adicionales de Next
+      'sentry.*.config.ts', // Configs de Sentry
+      'evaluation/**', // Evaluación de AI
     ],
   },
   
@@ -171,6 +181,23 @@ export default [
     files: ['app/page.tsx', 'app/layout.tsx', 'app/**/page.tsx'],
     rules: {
       'react/display-name': 'off', // Componentes de Next.js no necesitan displayName
+    },
+  },
+  
+  {
+    files: ['**/*.d.ts'],
+    rules: {
+      'no-unused-vars': 'off', // Tipos declarativos no usan las vars
+      '@typescript-eslint/no-unused-vars': 'off',
+      'no-redeclare': 'off', // Permitir redeclaración para extensión de tipos
+    },
+  },
+  
+  {
+    files: ['app/components/3d/**/*.tsx', 'app/components/visualizations/**/*.tsx'],
+    rules: {
+      '@typescript-eslint/no-non-null-assertion': 'off', // Three.js refs pueden usar !
+      'no-unused-vars': 'warn',
     },
   },
 ]

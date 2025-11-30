@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 📦 PÁGINA DE MIGRACIÓN DE DATOS
@@ -7,17 +7,17 @@
  * directamente desde el navegador.
  */
 
-import { useState } from "react"
-import { Button } from "@/app/components/ui/button"
-import { Badge } from "@/app/components/ui/badge"
+import { useState } from 'react'
+import { Button } from '@/app/components/ui/button'
+import { Badge } from '@/app/components/ui/badge'
 import { 
   collection, 
   doc, 
   setDoc, 
   getDocs,
-  writeBatch
-} from "firebase/firestore"
-import { db, isFirebaseConfigured } from "@/app/lib/firebase/config"
+  writeBatch,
+} from 'firebase/firestore'
+import { db, isFirebaseConfigured } from '@/app/lib/firebase/config'
 import { 
   Upload, 
   CheckCircle2, 
@@ -28,43 +28,43 @@ import {
   ShoppingCart,
   Truck,
   Building2,
-  Banknote
-} from "lucide-react"
+  Banknote,
+} from 'lucide-react'
 
 // Datos iniciales de prueba
 const DATOS_INICIALES = {
   bancos: [
-    { id: "boveda_monte", nombre: "Bóveda Monte", tipo: "boveda", color: "blue", historicoIngresos: 0, historicoGastos: 0, capitalActual: 0 },
-    { id: "boveda_usa", nombre: "Bóveda USA", tipo: "boveda", color: "purple", historicoIngresos: 0, historicoGastos: 0, capitalActual: 0 },
-    { id: "profit", nombre: "Profit", tipo: "banco", color: "green", historicoIngresos: 0, historicoGastos: 0, capitalActual: 0 },
-    { id: "leftie", nombre: "Leftie", tipo: "banco", color: "orange", historicoIngresos: 0, historicoGastos: 0, capitalActual: 0 },
-    { id: "azteca", nombre: "Azteca", tipo: "banco", color: "red", historicoIngresos: 0, historicoGastos: 0, capitalActual: 0 },
-    { id: "flete_sur", nombre: "Flete Sur", tipo: "flete", color: "yellow", historicoIngresos: 0, historicoGastos: 0, capitalActual: 0 },
-    { id: "utilidades", nombre: "Utilidades", tipo: "utilidad", color: "emerald", historicoIngresos: 0, historicoGastos: 0, capitalActual: 0 },
+    { id: 'boveda_monte', nombre: 'Bóveda Monte', tipo: 'boveda', color: 'blue', historicoIngresos: 0, historicoGastos: 0, capitalActual: 0 },
+    { id: 'boveda_usa', nombre: 'Bóveda USA', tipo: 'boveda', color: 'purple', historicoIngresos: 0, historicoGastos: 0, capitalActual: 0 },
+    { id: 'profit', nombre: 'Profit', tipo: 'banco', color: 'green', historicoIngresos: 0, historicoGastos: 0, capitalActual: 0 },
+    { id: 'leftie', nombre: 'Leftie', tipo: 'banco', color: 'orange', historicoIngresos: 0, historicoGastos: 0, capitalActual: 0 },
+    { id: 'azteca', nombre: 'Azteca', tipo: 'banco', color: 'red', historicoIngresos: 0, historicoGastos: 0, capitalActual: 0 },
+    { id: 'flete_sur', nombre: 'Flete Sur', tipo: 'flete', color: 'yellow', historicoIngresos: 0, historicoGastos: 0, capitalActual: 0 },
+    { id: 'utilidades', nombre: 'Utilidades', tipo: 'utilidad', color: 'emerald', historicoIngresos: 0, historicoGastos: 0, capitalActual: 0 },
   ],
   distribuidores: [
-    { id: "dist_pacman", nombre: "PACMAN", telefono: "555-0001", precioCompra: 6100, precioFlete: 200, activo: true, deudaTotal: 0 },
-    { id: "dist_qmaya", nombre: "Q-MAYA", telefono: "555-0002", precioCompra: 6100, precioFlete: 200, activo: true, deudaTotal: 0 },
-    { id: "dist_ax", nombre: "A/X🌶️🦀", telefono: "555-0003", precioCompra: 6100, precioFlete: 200, activo: true, deudaTotal: 0 },
-    { id: "dist_chmonte", nombre: "CH-MONTE", telefono: "555-0004", precioCompra: 6100, precioFlete: 200, activo: true, deudaTotal: 0 },
-    { id: "dist_vallemonte", nombre: "VALLE-MONTE", telefono: "555-0005", precioCompra: 6100, precioFlete: 200, activo: true, deudaTotal: 0 },
+    { id: 'dist_pacman', nombre: 'PACMAN', telefono: '555-0001', precioCompra: 6100, precioFlete: 200, activo: true, deudaTotal: 0 },
+    { id: 'dist_qmaya', nombre: 'Q-MAYA', telefono: '555-0002', precioCompra: 6100, precioFlete: 200, activo: true, deudaTotal: 0 },
+    { id: 'dist_ax', nombre: 'A/X🌶️🦀', telefono: '555-0003', precioCompra: 6100, precioFlete: 200, activo: true, deudaTotal: 0 },
+    { id: 'dist_chmonte', nombre: 'CH-MONTE', telefono: '555-0004', precioCompra: 6100, precioFlete: 200, activo: true, deudaTotal: 0 },
+    { id: 'dist_vallemonte', nombre: 'VALLE-MONTE', telefono: '555-0005', precioCompra: 6100, precioFlete: 200, activo: true, deudaTotal: 0 },
   ],
   clientes: [
-    { id: "cli_bodega_mp", nombre: "Bódega M-P", telefono: "555-1001", pendiente: 945000, totalCompras: 945000 },
-    { id: "cli_valle", nombre: "Valle", telefono: "555-1002", pendiente: 378000, totalCompras: 408000 },
-    { id: "cli_ax", nombre: "Ax", telefono: "555-1003", pendiente: 0, totalCompras: 350000 },
-    { id: "cli_negrito", nombre: "Negrito", telefono: "555-1004", pendiente: 0, totalCompras: 175000 },
-    { id: "cli_primo", nombre: "Primo", telefono: "555-1005", pendiente: 0, totalCompras: 0 },
-    { id: "cli_tavo", nombre: "Tavo", telefono: "555-1006", pendiente: 0, totalCompras: 0 },
-    { id: "cli_robalo", nombre: "Robalo", telefono: "555-1007", pendiente: 234000, totalCompras: 660000 },
+    { id: 'cli_bodega_mp', nombre: 'Bódega M-P', telefono: '555-1001', pendiente: 945000, totalCompras: 945000 },
+    { id: 'cli_valle', nombre: 'Valle', telefono: '555-1002', pendiente: 378000, totalCompras: 408000 },
+    { id: 'cli_ax', nombre: 'Ax', telefono: '555-1003', pendiente: 0, totalCompras: 350000 },
+    { id: 'cli_negrito', nombre: 'Negrito', telefono: '555-1004', pendiente: 0, totalCompras: 175000 },
+    { id: 'cli_primo', nombre: 'Primo', telefono: '555-1005', pendiente: 0, totalCompras: 0 },
+    { id: 'cli_tavo', nombre: 'Tavo', telefono: '555-1006', pendiente: 0, totalCompras: 0 },
+    { id: 'cli_robalo', nombre: 'Robalo', telefono: '555-1007', pendiente: 234000, totalCompras: 660000 },
   ],
   ventas: [
     { 
-      id: "venta_001", 
-      fecha: "2025-08-23", 
-      clienteId: "cli_bodega_mp", 
-      clienteNombre: "Bódega M-P",
-      ocRelacionada: "OC0001",
+      id: 'venta_001', 
+      fecha: '2025-08-23', 
+      clienteId: 'cli_bodega_mp', 
+      clienteNombre: 'Bódega M-P',
+      ocRelacionada: 'OC0001',
       cantidad: 150, 
       precioVenta: 6300,
       precioCompra: 6100,
@@ -73,15 +73,15 @@ const DATOS_INICIALES = {
       bovedaMonte: 915000,
       fletes: 75000,
       utilidad: 0,
-      estadoPago: "pendiente",
-      montoPagado: 0
+      estadoPago: 'pendiente',
+      montoPagado: 0,
     },
     { 
-      id: "venta_002", 
-      fecha: "2025-08-23", 
-      clienteId: "cli_valle", 
-      clienteNombre: "Valle",
-      ocRelacionada: "OC0001",
+      id: 'venta_002', 
+      fecha: '2025-08-23', 
+      clienteId: 'cli_valle', 
+      clienteNombre: 'Valle',
+      ocRelacionada: 'OC0001',
       cantidad: 60, 
       precioVenta: 6800,
       precioCompra: 6100,
@@ -90,15 +90,15 @@ const DATOS_INICIALES = {
       bovedaMonte: 366000,
       fletes: 30000,
       utilidad: 12000,
-      estadoPago: "pendiente",
-      montoPagado: 0
+      estadoPago: 'pendiente',
+      montoPagado: 0,
     },
     { 
-      id: "venta_003", 
-      fecha: "2025-08-23", 
-      clienteId: "cli_ax", 
-      clienteNombre: "Ax",
-      ocRelacionada: "OC0001",
+      id: 'venta_003', 
+      fecha: '2025-08-23', 
+      clienteId: 'cli_ax', 
+      clienteNombre: 'Ax',
+      ocRelacionada: 'OC0001',
       cantidad: 50, 
       precioVenta: 7000,
       precioCompra: 6100,
@@ -107,16 +107,16 @@ const DATOS_INICIALES = {
       bovedaMonte: 305000,
       fletes: 25000,
       utilidad: 20000,
-      estadoPago: "completo",
-      montoPagado: 350000
+      estadoPago: 'completo',
+      montoPagado: 350000,
     },
   ],
   ordenes_compra: [
     {
-      id: "OC0001",
-      fecha: "2025-08-25",
-      distribuidorId: "dist_qmaya",
-      distribuidorNombre: "Q-MAYA",
+      id: 'OC0001',
+      fecha: '2025-08-25',
+      distribuidorId: 'dist_qmaya',
+      distribuidorNombre: 'Q-MAYA',
       cantidad: 423,
       costoDistribuidor: 6100,
       costoTransporte: 200,
@@ -124,14 +124,14 @@ const DATOS_INICIALES = {
       costoTotal: 2664900,
       pagoDistribuidor: 0,
       deuda: 2664900,
-      estado: "pendiente",
-      stockActual: 0
+      estado: 'pendiente',
+      stockActual: 0,
     },
     {
-      id: "OC0002",
-      fecha: "2025-08-25",
-      distribuidorId: "dist_qmaya",
-      distribuidorNombre: "Q-MAYA",
+      id: 'OC0002',
+      fecha: '2025-08-25',
+      distribuidorId: 'dist_qmaya',
+      distribuidorNombre: 'Q-MAYA',
       cantidad: 32,
       costoDistribuidor: 6100,
       costoTransporte: 200,
@@ -139,14 +139,14 @@ const DATOS_INICIALES = {
       costoTotal: 201600,
       pagoDistribuidor: 0,
       deuda: 201600,
-      estado: "pendiente",
-      stockActual: 0
+      estado: 'pendiente',
+      stockActual: 0,
     },
     {
-      id: "OC0003",
-      fecha: "2025-08-25",
-      distribuidorId: "dist_ax",
-      distribuidorNombre: "A/X🌶️🦀",
+      id: 'OC0003',
+      fecha: '2025-08-25',
+      distribuidorId: 'dist_ax',
+      distribuidorNombre: 'A/X🌶️🦀',
       cantidad: 33,
       costoDistribuidor: 6100,
       costoTransporte: 200,
@@ -154,14 +154,14 @@ const DATOS_INICIALES = {
       costoTotal: 207900,
       pagoDistribuidor: 0,
       deuda: 207900,
-      estado: "pendiente",
-      stockActual: 0
+      estado: 'pendiente',
+      stockActual: 0,
     },
     {
-      id: "OC0004",
-      fecha: "2025-08-30",
-      distribuidorId: "dist_pacman",
-      distribuidorNombre: "PACMAN",
+      id: 'OC0004',
+      fecha: '2025-08-30',
+      distribuidorId: 'dist_pacman',
+      distribuidorNombre: 'PACMAN',
       cantidad: 487,
       costoDistribuidor: 6100,
       costoTransporte: 200,
@@ -169,13 +169,13 @@ const DATOS_INICIALES = {
       costoTotal: 3068100,
       pagoDistribuidor: 0,
       deuda: 3068100,
-      estado: "pendiente",
-      stockActual: 0
+      estado: 'pendiente',
+      stockActual: 0,
     },
   ],
 }
 
-type MigrationStatus = "idle" | "running" | "success" | "error"
+type MigrationStatus = 'idle' | 'running' | 'success' | 'error'
 
 interface CollectionStatus {
   name: string
@@ -188,28 +188,28 @@ interface CollectionStatus {
 export default function MigratePage() {
   const [isRunning, setIsRunning] = useState(false)
   const [collections, setCollections] = useState<CollectionStatus[]>([
-    { name: "bancos", icon: <Banknote className="w-4 h-4" />, status: "idle", count: 0 },
-    { name: "distribuidores", icon: <Truck className="w-4 h-4" />, status: "idle", count: 0 },
-    { name: "clientes", icon: <Users className="w-4 h-4" />, status: "idle", count: 0 },
-    { name: "ventas", icon: <ShoppingCart className="w-4 h-4" />, status: "idle", count: 0 },
-    { name: "ordenes_compra", icon: <Building2 className="w-4 h-4" />, status: "idle", count: 0 },
+    { name: 'bancos', icon: <Banknote className="w-4 h-4" />, status: 'idle', count: 0 },
+    { name: 'distribuidores', icon: <Truck className="w-4 h-4" />, status: 'idle', count: 0 },
+    { name: 'clientes', icon: <Users className="w-4 h-4" />, status: 'idle', count: 0 },
+    { name: 'ventas', icon: <ShoppingCart className="w-4 h-4" />, status: 'idle', count: 0 },
+    { name: 'ordenes_compra', icon: <Building2 className="w-4 h-4" />, status: 'idle', count: 0 },
   ])
 
   const updateCollectionStatus = (name: string, update: Partial<CollectionStatus>) => {
     setCollections(prev => prev.map(c => 
-      c.name === name ? { ...c, ...update } : c
+      c.name === name ? { ...c, ...update } : c,
     ))
   }
 
   const migrateCollection = async (
     collectionName: string, 
-    data: Array<{ id: string; [key: string]: unknown }>
+    data: Array<{ id: string; [key: string]: unknown }>,
   ) => {
     if (!db) {
-      throw new Error("Firestore no disponible")
+      throw new Error('Firestore no disponible')
     }
 
-    updateCollectionStatus(collectionName, { status: "running" })
+    updateCollectionStatus(collectionName, { status: 'running' })
 
     try {
       const batch = writeBatch(db)
@@ -220,22 +220,22 @@ export default function MigratePage() {
         batch.set(docRef, {
           ...docData,
           createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toISOString(),
         })
       }
 
       await batch.commit()
-      updateCollectionStatus(collectionName, { status: "success", count: data.length })
+      updateCollectionStatus(collectionName, { status: 'success', count: data.length })
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : "Error desconocido"
-      updateCollectionStatus(collectionName, { status: "error", error: errorMsg })
+      const errorMsg = error instanceof Error ? error.message : 'Error desconocido'
+      updateCollectionStatus(collectionName, { status: 'error', error: errorMsg })
       throw error
     }
   }
 
   const runMigration = async () => {
     if (!isFirebaseConfigured || !db) {
-      alert("Firebase no está configurado. Verifica las variables de entorno.")
+      alert('Firebase no está configurado. Verifica las variables de entorno.')
       return
     }
 
@@ -243,16 +243,16 @@ export default function MigratePage() {
     
     try {
       // Migrar en orden
-      await migrateCollection("bancos", DATOS_INICIALES.bancos)
-      await migrateCollection("distribuidores", DATOS_INICIALES.distribuidores)
-      await migrateCollection("clientes", DATOS_INICIALES.clientes)
-      await migrateCollection("ventas", DATOS_INICIALES.ventas)
-      await migrateCollection("ordenes_compra", DATOS_INICIALES.ordenes_compra)
+      await migrateCollection('bancos', DATOS_INICIALES.bancos)
+      await migrateCollection('distribuidores', DATOS_INICIALES.distribuidores)
+      await migrateCollection('clientes', DATOS_INICIALES.clientes)
+      await migrateCollection('ventas', DATOS_INICIALES.ventas)
+      await migrateCollection('ordenes_compra', DATOS_INICIALES.ordenes_compra)
       
-      alert("✅ Migración completada exitosamente!")
+      alert('✅ Migración completada exitosamente!')
     } catch (error) {
-      console.error("Error en migración:", error)
-      alert(`❌ Error en migración: ${error instanceof Error ? error.message : "Error desconocido"}`)
+      console.error('Error en migración:', error)
+      alert(`❌ Error en migración: ${error instanceof Error ? error.message : 'Error desconocido'}`)
     } finally {
       setIsRunning(false)
     }
@@ -312,29 +312,29 @@ export default function MigratePage() {
                   {col.icon}
                 </div>
                 <div>
-                  <p className="font-medium capitalize">{col.name.replace("_", " ")}</p>
+                  <p className="font-medium capitalize">{col.name.replace('_', ' ')}</p>
                   <p className="text-xs text-zinc-500">
-                    {col.count > 0 ? `${col.count} registros` : "Sin datos"}
+                    {col.count > 0 ? `${col.count} registros` : 'Sin datos'}
                   </p>
                 </div>
               </div>
               <div>
-                {col.status === "idle" && (
+                {col.status === 'idle' && (
                   <Badge variant="outline" className="text-zinc-400">Pendiente</Badge>
                 )}
-                {col.status === "running" && (
+                {col.status === 'running' && (
                   <Badge className="bg-blue-500/20 text-blue-400">
                     <Loader2 className="w-3 h-3 mr-1 animate-spin" />
                     Migrando...
                   </Badge>
                 )}
-                {col.status === "success" && (
+                {col.status === 'success' && (
                   <Badge className="bg-green-500/20 text-green-400">
                     <CheckCircle2 className="w-3 h-3 mr-1" />
                     Completado
                   </Badge>
                 )}
-                {col.status === "error" && (
+                {col.status === 'error' && (
                   <Badge className="bg-red-500/20 text-red-400">
                     <XCircle className="w-3 h-3 mr-1" />
                     Error

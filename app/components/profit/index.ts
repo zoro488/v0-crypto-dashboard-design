@@ -5,10 +5,10 @@
  */
 
 // Componentes principales
-export { ProfitCommandCenter } from './ProfitCommandCenter';
-export { ArbitrageGauge } from './ArbitrageGauge';
-export { HoldCalculator } from './HoldCalculator';
-export { TrendForecastChart } from './TrendForecastChart';
+export { ProfitCommandCenter } from './ProfitCommandCenter'
+export { ArbitrageGauge } from './ArbitrageGauge'
+export { HoldCalculator } from './HoldCalculator'
+export { TrendForecastChart } from './TrendForecastChart'
 
 // Re-exportar tipos
 export type {
@@ -18,4 +18,4 @@ export type {
   StrategyMode,
   TreasuryAlert,
   TreasuryHealthMetrics,
-} from '@/app/lib/profit-engine/types/profit-engine.types';
+} from '@/app/lib/profit-engine/types/profit-engine.types'

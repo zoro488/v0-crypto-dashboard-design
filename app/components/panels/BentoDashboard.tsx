@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { motion, AnimatePresence } from "framer-motion"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { TrendingUp, DollarSign, Package, ShoppingCart, Zap, PieChart, Filter, Users, Activity, ArrowUpRight, ArrowDownRight, Sparkles, Clock, Bell } from "lucide-react"
+import { motion, AnimatePresence } from 'framer-motion'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { TrendingUp, DollarSign, Package, ShoppingCart, Zap, PieChart, Filter, Users, Activity, ArrowUpRight, ArrowDownRight, Sparkles, Clock, Bell } from 'lucide-react'
 // InteractiveMetricsOrb eliminado - causaba problemas de layout y scroll excesivo
 import {
   AreaChart,
@@ -21,18 +21,18 @@ import {
   PieChart as RechartsPieChart,
   Pie,
   Cell,
-} from "recharts"
-import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from "@/app/components/ui/SafeChartContainer"
-import { useState, useEffect, useMemo, useCallback, memo } from "react"
-import { useVentas, useOrdenesCompra, useProductos, useClientes } from "@/app/lib/firebase/firestore-hooks.service"
-import { Skeleton } from "@/app/components/ui/skeleton"
-import { CreateOrdenCompraModalPremium } from "@/app/components/modals/CreateOrdenCompraModalPremium"
-import { CreateVentaModalPremium } from "@/app/components/modals/CreateVentaModalPremium"
-import { CreateTransferenciaModalPremium } from "@/app/components/modals/CreateTransferenciaModalPremium"
-import { QuickStatWidget, QuickStatsGrid } from "@/app/components/widgets/QuickStatWidget"
-import { ActivityFeedWidget, ActivityItem } from "@/app/components/widgets/ActivityFeedWidget"
-import { MiniChartWidget } from "@/app/components/widgets/MiniChartWidget"
-import { PremiumSplineOrb } from "@/app/components/3d/PremiumSplineOrb"
+} from 'recharts'
+import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/components/ui/SafeChartContainer'
+import { useState, useEffect, useMemo, useCallback, memo } from 'react'
+import { useVentas, useOrdenesCompra, useProductos, useClientes } from '@/app/lib/firebase/firestore-hooks.service'
+import { Skeleton } from '@/app/components/ui/skeleton'
+import { CreateOrdenCompraModalPremium } from '@/app/components/modals/CreateOrdenCompraModalPremium'
+import { CreateVentaModalPremium } from '@/app/components/modals/CreateVentaModalPremium'
+import { CreateTransferenciaModalPremium } from '@/app/components/modals/CreateTransferenciaModalPremium'
+import { QuickStatWidget, QuickStatsGrid } from '@/app/components/widgets/QuickStatWidget'
+import { ActivityFeedWidget, ActivityItem } from '@/app/components/widgets/ActivityFeedWidget'
+import { MiniChartWidget } from '@/app/components/widgets/MiniChartWidget'
+import { PremiumSplineOrb } from '@/app/components/3d/PremiumSplineOrb'
 
 // Interfaces para tipado
 interface VentaData {
@@ -100,7 +100,7 @@ export default memo(function BentoDashboard() {
 
   const [mounted, setMounted] = useState(false)
   const [showChronos, setShowChronos] = useState(true)
-  const [timeRange, setTimeRange] = useState("1M")
+  const [timeRange, setTimeRange] = useState('1M')
 
   const [isOrdenModalOpen, setIsOrdenModalOpen] = useState(false)
   const [isVentaModalOpen, setIsVentaModalOpen] = useState(false)
@@ -122,21 +122,21 @@ export default memo(function BentoDashboard() {
     const capitalTotal = bancos?.reduce((acc, b) => acc + (b?.saldo || 0), 0) || 0
     const ventasMes = ventas?.reduce((acc, v) => acc + (v?.montoTotal ?? 0), 0) ?? 0
     const stockActual = productos?.reduce((acc, p) => acc + (p?.stock ?? 0), 0) ?? 0
-    const ordenesActivas = ordenesCompra?.filter((oc) => oc?.estado === "pendiente")?.length ?? 0
+    const ordenesActivas = ordenesCompra?.filter((oc) => oc?.estado === 'pendiente')?.length ?? 0
     
     return { capitalTotal, ventasMes, stockActual, ordenesActivas }
   }, [bancos, ventas, productos, ordenesCompra])
 
   // Helper para formatear fecha de Firestore
-  const formatVentaDate = (fecha: VentaData["fecha"]): string => {
-    if (!fecha) return "N/A"
-    if (typeof fecha === "object" && "seconds" in fecha) {
-      return new Date(fecha.seconds * 1000).toLocaleDateString("es-MX", { month: "short" })
+  const formatVentaDate = (fecha: VentaData['fecha']): string => {
+    if (!fecha) return 'N/A'
+    if (typeof fecha === 'object' && 'seconds' in fecha) {
+      return new Date(fecha.seconds * 1000).toLocaleDateString('es-MX', { month: 'short' })
     }
     if (fecha instanceof Date) {
-      return fecha.toLocaleDateString("es-MX", { month: "short" })
+      return fecha.toLocaleDateString('es-MX', { month: 'short' })
     }
-    return new Date(fecha).toLocaleDateString("es-MX", { month: "short" })
+    return new Date(fecha).toLocaleDateString('es-MX', { month: 'short' })
   }
 
   const mockChartData = useMemo(() => 
@@ -149,46 +149,46 @@ export default memo(function BentoDashboard() {
   , [ventas])
 
   const radarData = useMemo(() => [
-    { subject: "Ventas", A: 120, fullMark: 150 },
-    { subject: "Compras", A: 98, fullMark: 150 },
-    { subject: "Stock", A: 86, fullMark: 150 },
-    { subject: "Distribución", A: 99, fullMark: 150 },
-    { subject: "Profit", A: 85, fullMark: 150 },
-    { subject: "Clientes", A: 65, fullMark: 150 },
+    { subject: 'Ventas', A: 120, fullMark: 150 },
+    { subject: 'Compras', A: 98, fullMark: 150 },
+    { subject: 'Stock', A: 86, fullMark: 150 },
+    { subject: 'Distribución', A: 99, fullMark: 150 },
+    { subject: 'Profit', A: 85, fullMark: 150 },
+    { subject: 'Clientes', A: 65, fullMark: 150 },
   ], [])
 
   const stats = useMemo(() => [
     {
-      title: "Capital Total",
+      title: 'Capital Total',
       value: `$${metrics.capitalTotal.toLocaleString()}`,
-      change: "+12.5%",
-      trend: "up",
+      change: '+12.5%',
+      trend: 'up',
       icon: DollarSign,
-      color: "from-blue-500 via-cyan-400 to-teal-400",
+      color: 'from-blue-500 via-cyan-400 to-teal-400',
     },
     {
-      title: "Ventas del Mes",
+      title: 'Ventas del Mes',
       value: `$${metrics.ventasMes.toLocaleString()}`,
-      change: "+8.3%",
-      trend: "up",
+      change: '+8.3%',
+      trend: 'up',
       icon: TrendingUp,
-      color: "from-emerald-500 via-green-400 to-lime-400",
+      color: 'from-emerald-500 via-green-400 to-lime-400',
     },
     {
-      title: "Stock Actual",
+      title: 'Stock Actual',
       value: metrics.stockActual.toString(),
-      change: "-3.2%",
-      trend: "down",
+      change: '-3.2%',
+      trend: 'down',
       icon: Package,
-      color: "from-violet-500 via-purple-400 to-fuchsia-400",
+      color: 'from-violet-500 via-purple-400 to-fuchsia-400',
     },
     {
-      title: "Órdenes Activas",
+      title: 'Órdenes Activas',
       value: metrics.ordenesActivas.toString(),
-      change: "+15.8%",
-      trend: "up",
+      change: '+15.8%',
+      trend: 'up',
       icon: ShoppingCart,
-      color: "from-amber-500 via-orange-400 to-red-400",
+      color: 'from-amber-500 via-orange-400 to-red-400',
     },
   ], [metrics])
 
@@ -232,7 +232,7 @@ export default memo(function BentoDashboard() {
                   <motion.h1
                     className="text-display-xl text-white mb-4"
                     style={{
-                      textShadow: "0 0 60px rgba(10, 132, 255, 0.3)",
+                      textShadow: '0 0 60px rgba(10, 132, 255, 0.3)',
                     }}
                   >
                     CHRONOS
@@ -293,13 +293,13 @@ export default memo(function BentoDashboard() {
           <motion.div 
             className="apple-card h-full group cursor-pointer relative overflow-hidden"
             whileHover={{ y: -4, scale: 1.02 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
           >
             {/* Animated background glow */}
             <motion.div
               className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
               style={{
-                background: `radial-gradient(circle at 50% 50%, ${stat.color.includes('blue') ? 'rgba(59, 130, 246, 0.1)' : stat.color.includes('emerald') ? 'rgba(16, 185, 129, 0.1)' : stat.color.includes('purple') ? 'rgba(168, 85, 247, 0.1)' : 'rgba(249, 115, 22, 0.1)'}, transparent 70%)`
+                background: `radial-gradient(circle at 50% 50%, ${stat.color.includes('blue') ? 'rgba(59, 130, 246, 0.1)' : stat.color.includes('emerald') ? 'rgba(16, 185, 129, 0.1)' : stat.color.includes('purple') ? 'rgba(168, 85, 247, 0.1)' : 'rgba(249, 115, 22, 0.1)'}, transparent 70%)`,
               }}
             />
             
@@ -308,14 +308,14 @@ export default memo(function BentoDashboard() {
                 <motion.div 
                   className={`p-3 rounded-2xl bg-gradient-to-br ${stat.color} shadow-lg`}
                   whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 10 }}
                 >
                   <stat.icon className="w-5 h-5 text-white" />
                 </motion.div>
                 <motion.div
                   className={`
                   px-3 py-1 rounded-full text-xs font-semibold
-                  ${stat.trend === "up" ? "bg-emerald-500/15 text-emerald-400" : "bg-rose-500/15 text-rose-400"}
+                  ${stat.trend === 'up' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'}
                 `}
                   whileHover={{ scale: 1.05 }}
                 >
@@ -345,7 +345,7 @@ export default memo(function BentoDashboard() {
           transition={{
             duration: 8,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: 'easeInOut',
           }}
         />
 
@@ -356,7 +356,7 @@ export default memo(function BentoDashboard() {
           </div>
 
           <div className="flex gap-1 p-1 bg-white/5 backdrop-blur-md rounded-xl border border-white/10">
-            {["1D", "1W", "1M", "1Y"].map((range) => (
+            {['1D', '1W', '1M', '1Y'].map((range) => (
               <motion.button
                 key={range}
                 onClick={() => setTimeRange(range)}
@@ -364,8 +364,8 @@ export default memo(function BentoDashboard() {
                   px-5 py-2 rounded-lg text-caption font-semibold transition-all duration-300
                   ${
                     timeRange === range
-                      ? "bg-blue-500 text-white shadow-lg shadow-blue-500/30"
-                      : "text-white/50 hover:text-white hover:bg-white/5"
+                      ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30'
+                      : 'text-white/50 hover:text-white hover:bg-white/5'
                   }
                 `}
                 whileHover={{ scale: 1.05 }}
@@ -402,7 +402,7 @@ export default memo(function BentoDashboard() {
               />
               <Tooltip
                 content={<CustomTooltip />}
-                cursor={{ stroke: "rgba(255,255,255,0.2)", strokeWidth: 1, strokeDasharray: "4 4" }}
+                cursor={{ stroke: 'rgba(255,255,255,0.2)', strokeWidth: 1, strokeDasharray: '4 4' }}
               />
               <Area
                 type="monotone"
@@ -410,7 +410,7 @@ export default memo(function BentoDashboard() {
                 stroke="#3b82f6"
                 strokeWidth={3}
                 fill="url(#colorValue)"
-                activeDot={{ r: 6, strokeWidth: 0, fill: "#fff" }}
+                activeDot={{ r: 6, strokeWidth: 0, fill: '#fff' }}
                 {...SAFE_ANIMATION_PROPS}
               />
               <Area
@@ -419,7 +419,7 @@ export default memo(function BentoDashboard() {
                 stroke="#10b981"
                 strokeWidth={3}
                 fill="url(#colorProfit)"
-                activeDot={{ r: 6, strokeWidth: 0, fill: "#fff" }}
+                activeDot={{ r: 6, strokeWidth: 0, fill: '#fff' }}
                 {...SAFE_ANIMATION_PROPS}
               />
             </AreaChart>
@@ -544,7 +544,7 @@ export default memo(function BentoDashboard() {
               <BarChart data={mockChartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
                 <XAxis dataKey="name" stroke="#ffffff40" fontSize={10} tickLine={false} axisLine={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.05)" }} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
                 <Bar dataKey="sales" name="Ventas" fill="#ec4899" radius={[8, 8, 0, 0]} stackId="a" {...SAFE_ANIMATION_PROPS} />
                 <Bar dataKey="profit" name="Profit" fill="#3b82f6" radius={[8, 8, 0, 0]} stackId="a" {...SAFE_ANIMATION_PROPS} />
               </BarChart>
@@ -593,7 +593,7 @@ export default memo(function BentoDashboard() {
           <motion.button
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => useAppStore.getState().setCurrentPanel("reportes")}
+            onClick={() => useAppStore.getState().setCurrentPanel('reportes')}
             className="px-6 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg transition-all bg-white/5 hover:bg-white/10 border border-white/5"
           >
             Reporte Rápido
@@ -618,13 +618,13 @@ export default memo(function BentoDashboard() {
           type="area"
           color="blue"
           data={[
-            { name: "L", value: 45000 },
-            { name: "M", value: 52000 },
-            { name: "X", value: 48000 },
-            { name: "J", value: 61000 },
-            { name: "V", value: 58000 },
-            { name: "S", value: 72000 },
-            { name: "D", value: 65000 },
+            { name: 'L', value: 45000 },
+            { name: 'M', value: 52000 },
+            { name: 'X', value: 48000 },
+            { name: 'J', value: 61000 },
+            { name: 'V', value: 58000 },
+            { name: 'S', value: 72000 },
+            { name: 'D', value: 65000 },
           ]}
           height={140}
           delay={0.5}
@@ -646,7 +646,7 @@ export default memo(function BentoDashboard() {
           data={bancos?.slice(0, 4).map((b, i) => ({
             name: b.nombre,
             value: b.saldo,
-            color: ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b'][i]
+            color: ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b'][i],
           })) || []}
           height={140}
           delay={0.6}
@@ -665,10 +665,10 @@ export default memo(function BentoDashboard() {
           type="bar"
           color="green"
           data={[
-            { name: "Ene", value: 180000, value2: 120000 },
-            { name: "Feb", value: 220000, value2: 150000 },
-            { name: "Mar", value: 195000, value2: 140000 },
-            { name: "Abr", value: 280000, value2: 180000 },
+            { name: 'Ene', value: 180000, value2: 120000 },
+            { name: 'Feb', value: 220000, value2: 150000 },
+            { name: 'Mar', value: 195000, value2: 140000 },
+            { name: 'Abr', value: 280000, value2: 180000 },
           ]}
           height={140}
           delay={0.7}
@@ -691,7 +691,7 @@ export default memo(function BentoDashboard() {
               'radial-gradient(circle at 70% 70%, rgba(139,92,246,0.1) 0%, transparent 50%)',
               'radial-gradient(circle at 30% 70%, rgba(236,72,153,0.1) 0%, transparent 50%)',
               'radial-gradient(circle at 30% 30%, rgba(59,130,246,0.1) 0%, transparent 50%)',
-            ]
+            ],
           }}
           transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
         />

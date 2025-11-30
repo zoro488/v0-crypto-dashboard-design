@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { motion } from "framer-motion"
-import { AlertCircle, Database, Lock, CheckCircle } from "lucide-react"
-import { useState } from "react"
+import { motion } from 'framer-motion'
+import { AlertCircle, Database, Lock, CheckCircle } from 'lucide-react'
+import { useState } from 'react'
 
 export function FirestoreSetupAlert() {
   const [isDismissed, setIsDismissed] = useState(false)
@@ -36,7 +36,7 @@ export function FirestoreSetupAlert() {
                 <div>
                   <p className="text-white text-sm font-medium">1. Ve a Firebase Console</p>
                   <p className="text-white/60 text-xs">
-                    Accede a{" "}
+                    Accede a{' '}
                     <a
                       href="https://console.firebase.google.com"
                       target="_blank"
@@ -54,7 +54,7 @@ export function FirestoreSetupAlert() {
                 <div>
                   <p className="text-white text-sm font-medium">2. Configura las reglas de Firestore</p>
                   <p className="text-white/60 text-xs">
-                    En Firestore {">"} Rules, agrega las reglas de seguridad para permitir lectura/escritura
+                    En Firestore {'>'} Rules, agrega las reglas de seguridad para permitir lectura/escritura
                   </p>
                 </div>
               </div>

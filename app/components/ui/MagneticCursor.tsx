@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import { useState, useEffect, useCallback, useRef } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface MagneticCursorProps {
   /** Color principal del cursor */
@@ -40,10 +40,10 @@ export function useMousePosition() {
       }, 100)
     }
 
-    window.addEventListener("mousemove", handleMouseMove)
+    window.addEventListener('mousemove', handleMouseMove)
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove)
+      window.removeEventListener('mousemove', handleMouseMove)
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current)
       }
@@ -56,7 +56,7 @@ export function useMousePosition() {
 /**
  * Hook para detectar elementos interactivos bajo el cursor
  */
-export function useHoveredElement(selector = "button, a, [data-magnetic]") {
+export function useHoveredElement(selector = 'button, a, [data-magnetic]') {
   const [hoveredElement, setHoveredElement] = useState<HTMLElement | null>(null)
   const [isOverInteractive, setIsOverInteractive] = useState(false)
 
@@ -74,10 +74,10 @@ export function useHoveredElement(selector = "button, a, [data-magnetic]") {
       }
     }
 
-    document.addEventListener("mouseover", handleMouseOver)
+    document.addEventListener('mouseover', handleMouseOver)
 
     return () => {
-      document.removeEventListener("mouseover", handleMouseOver)
+      document.removeEventListener('mouseover', handleMouseOver)
     }
   }, [selector])
 
@@ -88,11 +88,11 @@ export function useHoveredElement(selector = "button, a, [data-magnetic]") {
  * Componente de cursor magnético personalizado
  */
 export function MagneticCursor({
-  color = "#4a90d9",
-  glowColor = "rgba(74, 144, 217, 0.3)",
+  color = '#4a90d9',
+  glowColor = 'rgba(74, 144, 217, 0.3)',
   size = 20,
   magneticStrength = 0.3,
-  magneticSelector = "button, a, [data-magnetic], [data-cursor-expand]",
+  magneticSelector = 'button, a, [data-magnetic], [data-cursor-expand]',
   enabled = true,
 }: MagneticCursorProps) {
   const { position, isMoving } = useMousePosition()
@@ -122,25 +122,25 @@ export function MagneticCursor({
     const handleMouseDown = () => setIsClicking(true)
     const handleMouseUp = () => setIsClicking(false)
 
-    window.addEventListener("mousedown", handleMouseDown)
-    window.addEventListener("mouseup", handleMouseUp)
+    window.addEventListener('mousedown', handleMouseDown)
+    window.addEventListener('mouseup', handleMouseUp)
 
     return () => {
-      window.removeEventListener("mousedown", handleMouseDown)
-      window.removeEventListener("mouseup", handleMouseUp)
+      window.removeEventListener('mousedown', handleMouseDown)
+      window.removeEventListener('mouseup', handleMouseUp)
     }
   }, [])
 
   // Ocultar cursor nativo
   useEffect(() => {
     if (enabled) {
-      document.body.style.cursor = "none"
+      document.body.style.cursor = 'none'
     } else {
-      document.body.style.cursor = "auto"
+      document.body.style.cursor = 'auto'
     }
 
     return () => {
-      document.body.style.cursor = "auto"
+      document.body.style.cursor = 'auto'
     }
   }, [enabled])
 
@@ -166,15 +166,15 @@ export function MagneticCursor({
           scale: isClicking ? 0.8 : 1,
         }}
         transition={{
-          type: "spring",
+          type: 'spring',
           stiffness: 500,
           damping: 28,
           mass: 0.5,
         }}
         style={{
-          borderRadius: "50%",
-          backgroundColor: isOverInteractive ? "transparent" : color,
-          border: isOverInteractive ? `2px solid ${color}` : "none",
+          borderRadius: '50%',
+          backgroundColor: isOverInteractive ? 'transparent' : color,
+          border: isOverInteractive ? `2px solid ${color}` : 'none',
         }}
       />
 
@@ -190,13 +190,13 @@ export function MagneticCursor({
           scale: isClicking ? 0.9 : 1,
         }}
         transition={{
-          type: "spring",
+          type: 'spring',
           stiffness: 150,
           damping: 15,
           mass: 0.1,
         }}
         style={{
-          borderRadius: "50%",
+          borderRadius: '50%',
           border: `1px solid ${color}`,
           boxShadow: `0 0 20px ${glowColor}, inset 0 0 10px ${glowColor}`,
         }}
@@ -211,15 +211,15 @@ export function MagneticCursor({
           scale: isClicking ? 1.5 : 1,
         }}
         transition={{
-          type: "spring",
+          type: 'spring',
           stiffness: 1000,
           damping: 35,
         }}
         style={{
           width: 4,
           height: 4,
-          borderRadius: "50%",
-          backgroundColor: "#ffffff",
+          borderRadius: '50%',
+          backgroundColor: '#ffffff',
         }}
       />
 
@@ -237,11 +237,11 @@ export function MagneticCursor({
               scale: 2,
             }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
             style={{
               width: 30,
               height: 30,
-              borderRadius: "50%",
+              borderRadius: '50%',
               background: `radial-gradient(circle, ${glowColor} 0%, transparent 70%)`,
             }}
           />
@@ -276,13 +276,13 @@ export function useMagneticCursor(enabled = true) {
 interface MagneticWrapperProps {
   children: React.ReactNode
   className?: string
-  intensity?: "low" | "medium" | "high"
+  intensity?: 'low' | 'medium' | 'high'
 }
 
 export function MagneticWrapper({
   children,
-  className = "",
-  intensity = "medium",
+  className = '',
+  intensity = 'medium',
 }: MagneticWrapperProps) {
   return (
     <div

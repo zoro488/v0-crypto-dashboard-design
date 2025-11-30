@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import { useState, lazy, Suspense } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { TrendingUp, PieChart, BarChart3, Download, ArrowUpRight, Target, Zap, DollarSign, Activity, Gauge } from "lucide-react"
-import { ProfitWaterfallChart } from "@/app/components/visualizations/ProfitWaterfallChart"
+import { useState, lazy, Suspense } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { TrendingUp, PieChart, BarChart3, Download, ArrowUpRight, Target, Zap, DollarSign, Activity, Gauge } from 'lucide-react'
+import { ProfitWaterfallChart } from '@/app/components/visualizations/ProfitWaterfallChart'
 import {
   AreaChart,
   Area,
@@ -14,46 +14,46 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-} from "recharts"
-import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from "@/app/components/ui/SafeChartContainer"
-import { useVentasData, useBancoData } from "@/app/lib/firebase/firestore-hooks.service"
-import { Skeleton } from "@/app/components/ui/skeleton"
-import CasaCambioWidget from "@/app/components/widgets/CasaCambioWidget"
+} from 'recharts'
+import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/components/ui/SafeChartContainer'
+import { useVentasData, useBancoData } from '@/app/lib/firebase/firestore-hooks.service'
+import { Skeleton } from '@/app/components/ui/skeleton'
+import CasaCambioWidget from '@/app/components/widgets/CasaCambioWidget'
 
 // Importar el nuevo sistema de arbitraje Panel Profit
 const ProfitCommandCenter = lazy(() => 
-  import("@/app/components/profit/ProfitCommandCenter").then(mod => ({ default: mod.ProfitCommandCenter }))
+  import('@/app/components/profit/ProfitCommandCenter').then(mod => ({ default: mod.ProfitCommandCenter })),
 )
 
 const monthlyProfitData = [
-  { mes: "Ene", utilidadBruta: 450000, utilidadNeta: 320000, gastos: 130000 },
-  { mes: "Feb", utilidadBruta: 520000, utilidadNeta: 380000, gastos: 140000 },
-  { mes: "Mar", utilidadBruta: 680000, utilidadNeta: 510000, gastos: 170000 },
-  { mes: "Abr", utilidadBruta: 750000, utilidadNeta: 580000, gastos: 170000 },
-  { mes: "May", utilidadBruta: 820000, utilidadNeta: 640000, gastos: 180000 },
-  { mes: "Jun", utilidadBruta: 950000, utilidadNeta: 760000, gastos: 190000 },
+  { mes: 'Ene', utilidadBruta: 450000, utilidadNeta: 320000, gastos: 130000 },
+  { mes: 'Feb', utilidadBruta: 520000, utilidadNeta: 380000, gastos: 140000 },
+  { mes: 'Mar', utilidadBruta: 680000, utilidadNeta: 510000, gastos: 170000 },
+  { mes: 'Abr', utilidadBruta: 750000, utilidadNeta: 580000, gastos: 170000 },
+  { mes: 'May', utilidadBruta: 820000, utilidadNeta: 640000, gastos: 180000 },
+  { mes: 'Jun', utilidadBruta: 950000, utilidadNeta: 760000, gastos: 190000 },
 ]
 
 const profitByCategory = [
-  { name: "Ventas Directas", value: 4500000, color: "#3b82f6" },
-  { name: "Tipo de Cambio", value: 2800000, color: "#10b981" },
-  { name: "Fletes", value: 1200000, color: "#f59e0b" },
-  { name: "Otros", value: 850000, color: "#8b5cf6" },
+  { name: 'Ventas Directas', value: 4500000, color: '#3b82f6' },
+  { name: 'Tipo de Cambio', value: 2800000, color: '#10b981' },
+  { name: 'Fletes', value: 1200000, color: '#f59e0b' },
+  { name: 'Otros', value: 850000, color: '#8b5cf6' },
 ]
 
 const roiData = [
-  { producto: "Producto A", inversion: 250000, ganancia: 480000, roi: 92 },
-  { producto: "Producto B", inversion: 180000, ganancia: 320000, roi: 77 },
-  { producto: "Producto C", inversion: 320000, ganancia: 580000, roi: 81 },
-  { producto: "Producto D", inversion: 150000, ganancia: 290000, roi: 93 },
+  { producto: 'Producto A', inversion: 250000, ganancia: 480000, roi: 92 },
+  { producto: 'Producto B', inversion: 180000, ganancia: 320000, roi: 77 },
+  { producto: 'Producto C', inversion: 320000, ganancia: 580000, roi: 81 },
+  { producto: 'Producto D', inversion: 150000, ganancia: 290000, roi: 93 },
 ]
 
 export default function BentoProfit() {
-  const [activeTab, setActiveTab] = useState("overview")
-  const [timeRange, setTimeRange] = useState("6m")
+  const [activeTab, setActiveTab] = useState('overview')
+  const [timeRange, setTimeRange] = useState('6m')
 
   const { data: ventasRaw, loading: loadingVentas, error: errorVentas } = useVentasData()
-  const { data: bancoProfitData, loading: loadingBanco, stats } = useBancoData("profit")
+  const { data: bancoProfitData, loading: loadingBanco, stats } = useBancoData('profit')
 
   interface VentaProfit {
     precioVentaUnidad?: number
@@ -92,12 +92,12 @@ export default function BentoProfit() {
   }
 
   const tabs = [
-    { id: "overview", label: "Resumen", icon: PieChart },
-    { id: "arbitrage", label: "Panel Profit", icon: Activity },
-    { id: "analysis", label: "Análisis Detallado", icon: BarChart3 },
-    { id: "casa-cambio", label: "Casa de Cambio", icon: DollarSign },
-    { id: "roi", label: "ROI por Producto", icon: Target },
-    { id: "projections", label: "Proyecciones", icon: TrendingUp },
+    { id: 'overview', label: 'Resumen', icon: PieChart },
+    { id: 'arbitrage', label: 'Panel Profit', icon: Activity },
+    { id: 'analysis', label: 'Análisis Detallado', icon: BarChart3 },
+    { id: 'casa-cambio', label: 'Casa de Cambio', icon: DollarSign },
+    { id: 'roi', label: 'ROI por Producto', icon: Target },
+    { id: 'projections', label: 'Proyecciones', icon: TrendingUp },
   ]
 
   return (
@@ -140,14 +140,14 @@ export default function BentoProfit() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, type: "spring", stiffness: 100 }}
+          transition={{ delay: 0.1, type: 'spring', stiffness: 100 }}
           className="glass p-6 rounded-2xl border border-white/5 bg-gradient-to-br from-green-500/10 to-emerald-500/5 hover:scale-105 transition-transform duration-300"
         >
           <div className="flex items-center justify-between mb-4">
             <span className="text-white/60 text-sm font-medium">Utilidad Neta</span>
             <motion.div
               animate={{ rotate: [0, 360] }}
-              transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+              transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: 'linear' }}
             >
               <TrendingUp className="w-5 h-5 text-green-400" />
             </motion.div>
@@ -162,7 +162,7 @@ export default function BentoProfit() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
+          transition={{ delay: 0.2, type: 'spring', stiffness: 100 }}
           className="glass p-6 rounded-2xl border border-white/5 bg-gradient-to-br from-blue-500/10 to-cyan-500/5 hover:scale-105 transition-transform duration-300"
         >
           <div className="flex items-center justify-between mb-4">
@@ -174,7 +174,7 @@ export default function BentoProfit() {
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${Math.min(margenPromedio, 100)}%` }}
-              transition={{ duration: 1, ease: "easeOut" }}
+              transition={{ duration: 1, ease: 'easeOut' }}
               className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full"
             />
           </div>
@@ -223,13 +223,13 @@ export default function BentoProfit() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-medium transition-all whitespace-nowrap relative ${
-              activeTab === tab.id ? "text-white" : "text-white/40 hover:text-white hover:bg-white/5"
+              activeTab === tab.id ? 'text-white' : 'text-white/40 hover:text-white hover:bg-white/5'
             }`}
           >
             {activeTab === tab.id && (
               <motion.div layoutId="activeProfitTab" className="absolute inset-0 bg-white/10 rounded-2xl" />
             )}
-            <tab.icon className={`w-4 h-4 relative z-10 ${activeTab === tab.id ? "text-cyan-400" : ""}`} />
+            <tab.icon className={`w-4 h-4 relative z-10 ${activeTab === tab.id ? 'text-cyan-400' : ''}`} />
             <span className="relative z-10">{tab.label}</span>
           </motion.button>
         ))}
@@ -245,7 +245,7 @@ export default function BentoProfit() {
           transition={{ duration: 0.4 }}
           className="min-h-[600px]"
         >
-          {activeTab === "overview" && (
+          {activeTab === 'overview' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Monthly Profit Trend */}
               <div className="glass p-6 rounded-2xl border border-white/5">
@@ -267,9 +267,9 @@ export default function BentoProfit() {
                     <YAxis stroke="#ffffff40" />
                     <Tooltip
                       contentStyle={{
-                        background: "rgba(0,0,0,0.8)",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        borderRadius: "12px",
+                        background: 'rgba(0,0,0,0.8)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '12px',
                       }}
                     />
                     <Area
@@ -314,9 +314,9 @@ export default function BentoProfit() {
                     </Pie>
                     <Tooltip
                       contentStyle={{
-                        background: "rgba(0,0,0,0.8)",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        borderRadius: "12px",
+                        background: 'rgba(0,0,0,0.8)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '12px',
                       }}
                     />
                   </RePieChart>
@@ -325,7 +325,7 @@ export default function BentoProfit() {
             </div>
           )}
 
-          {activeTab === "arbitrage" && (
+          {activeTab === 'arbitrage' && (
             <Suspense fallback={
               <div className="space-y-6">
                 <Skeleton className="h-12 w-64" />
@@ -341,11 +341,11 @@ export default function BentoProfit() {
             </Suspense>
           )}
 
-          {activeTab === "casa-cambio" && (
+          {activeTab === 'casa-cambio' && (
             <CasaCambioWidget />
           )}
 
-          {activeTab === "roi" && (
+          {activeTab === 'roi' && (
             <div className="glass p-6 rounded-2xl border border-white/5">
               <h3 className="text-lg font-semibold text-white mb-6">ROI por Producto</h3>
               <div className="space-y-4">

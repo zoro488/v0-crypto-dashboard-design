@@ -1,13 +1,13 @@
-"use client"
+'use client'
 
-import type React from "react"
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { X, Package, DollarSign, Tag } from "lucide-react"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { firestoreService } from "@/app/lib/firebase/firestore-service"
-import { useToast } from "@/app/hooks/use-toast"
-import { logger } from "@/app/lib/utils/logger"
+import type React from 'react'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { X, Package, DollarSign, Tag } from 'lucide-react'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { firestoreService } from '@/app/lib/firebase/firestore-service'
+import { useToast } from '@/app/hooks/use-toast'
+import { logger } from '@/app/lib/utils/logger'
 
 interface CreateProductoModalProps {
   isOpen: boolean
@@ -20,11 +20,11 @@ export default function CreateProductoModal({ isOpen, onClose }: CreateProductoM
   // const addProducto = useAppStore((state) => state.addProducto) // TODO: Implement in store
 
   const [formData, setFormData] = useState({
-    nombre: "",
-    descripcion: "",
-    precioCompra: "",
-    precioVenta: "",
-    sku: "",
+    nombre: '',
+    descripcion: '',
+    precioCompra: '',
+    precioVenta: '',
+    sku: '',
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -32,15 +32,15 @@ export default function CreateProductoModal({ isOpen, onClose }: CreateProductoM
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
-    if (!formData.nombre.trim()) newErrors.nombre = "El nombre es requerido"
+    if (!formData.nombre.trim()) newErrors.nombre = 'El nombre es requerido'
     if (!formData.precioCompra || Number.parseFloat(formData.precioCompra) <= 0) {
-      newErrors.precioCompra = "El precio de compra debe ser mayor a 0"
+      newErrors.precioCompra = 'El precio de compra debe ser mayor a 0'
     }
     if (!formData.precioVenta || Number.parseFloat(formData.precioVenta) <= 0) {
-      newErrors.precioVenta = "El precio de venta debe ser mayor a 0"
+      newErrors.precioVenta = 'El precio de venta debe ser mayor a 0'
     }
     if (Number.parseFloat(formData.precioVenta) <= Number.parseFloat(formData.precioCompra)) {
-      newErrors.precioVenta = "El precio de venta debe ser mayor al precio de compra"
+      newErrors.precioVenta = 'El precio de venta debe ser mayor al precio de compra'
     }
 
     setErrors(newErrors)
@@ -59,24 +59,24 @@ export default function CreateProductoModal({ isOpen, onClose }: CreateProductoM
         descripcion: formData.descripcion,
         valorUnitario: Number.parseFloat(formData.precioVenta),
         stockInicial: 0,
-        categoria: "General",
+        categoria: 'General',
       })
 
       // 🔄 Trigger para actualizar hooks de datos
       triggerDataRefresh()
 
       toast({
-        title: "Producto Creado",
+        title: 'Producto Creado',
         description: `"${formData.nombre}" ha sido agregado al catálogo correctamente.`,
       })
       onClose()
-      setFormData({ nombre: "", descripcion: "", precioCompra: "", precioVenta: "", sku: "" })
+      setFormData({ nombre: '', descripcion: '', precioCompra: '', precioVenta: '', sku: '' })
     } catch (error) {
-      logger.error("Error creating producto", error, { context: "CreateProductoModal" })
+      logger.error('Error creating producto', error, { context: 'CreateProductoModal' })
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Error al crear el producto. Por favor intenta de nuevo.",
-        variant: "destructive",
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Error al crear el producto. Por favor intenta de nuevo.',
+        variant: 'destructive',
       })
     }
   }
@@ -98,7 +98,7 @@ export default function CreateProductoModal({ isOpen, onClose }: CreateProductoM
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          transition={{ type: "spring", damping: 25, stiffness: 300 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           className="relative w-full max-w-2xl glass-card border border-white/10 rounded-3xl p-8 shadow-2xl"
         >
           <button

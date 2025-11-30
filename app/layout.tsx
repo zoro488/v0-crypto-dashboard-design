@@ -1,69 +1,69 @@
-import type React from "react"
-import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
-import { Analytics } from "@vercel/analytics/react"
-import { SpeedInsights } from "@vercel/speed-insights/next"
-import Script from "next/script"
-import "./globals.css"
-import { AppProvider } from "@/app/lib/context/AppContext"
-import { Toaster } from "@/app/components/ui/toaster"
-import { ErrorBoundary } from "@/app/components/ErrorBoundary"
-import ImmersiveWrapper from "@/app/components/layout/ImmersiveWrapper"
-import { SplashScreen } from "@/app/components/splash"
-import { TracingProvider } from "@/app/lib/tracing/TracingProvider"
-import { QueryProvider } from "@/app/providers/QueryProvider"
+import type React from 'react'
+import type { Metadata, Viewport } from 'next'
+import { Geist, Geist_Mono } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/next'
+import Script from 'next/script'
+import './globals.css'
+import { AppProvider } from '@/app/lib/context/AppContext'
+import { Toaster } from '@/app/components/ui/toaster'
+import { ErrorBoundary } from '@/app/components/ErrorBoundary'
+import ImmersiveWrapper from '@/app/components/layout/ImmersiveWrapper'
+import { SplashScreen } from '@/app/components/splash'
+import { TracingProvider } from '@/app/lib/tracing/TracingProvider'
+import { QueryProvider } from '@/app/providers/QueryProvider'
 // FloatingAIWidget removido - usar FloatingSplineAIWidget desde page.tsx
 // para evitar widgets duplicados
 
 const geist = Geist({ 
-  subsets: ["latin"],
-  variable: "--font-sans",
-  display: "swap"
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
 })
 
 const geistMono = Geist_Mono({ 
-  subsets: ["latin"],
-  variable: "--font-mono",
-  display: "swap"
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
 })
 
 export const viewport: Viewport = {
-  width: "device-width",
+  width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#3b82f6" },
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+    { media: '(prefers-color-scheme: light)', color: '#3b82f6' },
+    { media: '(prefers-color-scheme: dark)', color: '#000000' },
   ],
 }
 
 export const metadata: Metadata = {
-  title: "Chronos - Sistema de Gestión Empresarial Premium",
-  description: "Sistema completo de gestión de flujos de capital con arquitectura 3D y AI",
-  generator: "v0.app",
-  manifest: "/manifest.json",
+  title: 'Chronos - Sistema de Gestión Empresarial Premium',
+  description: 'Sistema completo de gestión de flujos de capital con arquitectura 3D y AI',
+  generator: 'v0.app',
+  manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
-    title: "Chronos",
+    statusBarStyle: 'black-translucent',
+    title: 'Chronos',
   },
   icons: {
     icon: [
       {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
+        url: '/icon-light-32x32.png',
+        media: '(prefers-color-scheme: light)',
       },
       {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
+        url: '/icon-dark-32x32.png',
+        media: '(prefers-color-scheme: dark)',
       },
       {
-        url: "/icon.svg",
-        type: "image/svg+xml",
+        url: '/icon.svg',
+        type: 'image/svg+xml',
       },
     ],
-    apple: "/apple-icon.png",
+    apple: '/apple-icon.png',
   },
 }
 
@@ -107,8 +107,8 @@ export default function RootLayout({
           <TracingProvider enabled={process.env.NODE_ENV === 'development'}>
             <QueryProvider>
               <AppProvider>
-                {/* 🎬 SPLASH SCREEN - Partículas CHRONOS */}
-                <SplashScreen duration={5500} enabled={true}>
+                {/* 🎬 SPLASH SCREEN - Partículas CHRONOS (deshabilitado temporalmente para testing) */}
+                <SplashScreen duration={5500} enabled={false}>
                   {/* <PerformanceMonitor /> */}
                   
                   {/* 🌌 FONDO 3D GLOBAL - Siempre visible */}

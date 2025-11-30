@@ -1,30 +1,30 @@
-"use client"
+'use client'
 
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   TrendingUp, Plus, DollarSign, Users, Package, CheckCircle2, Clock, 
   ArrowUpRight, ArrowDownRight, Sparkles, Target, Zap, BarChart3, 
   PieChart as PieChartIcon, Eye, Edit, Trash2, CreditCard, Wallet,
-  ShoppingBag, Receipt, Calendar, Search, Filter, X
-} from "lucide-react"
-import { Button } from "@/app/components/ui/button"
-import { Badge } from "@/app/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/app/components/ui/dialog"
-import { useState, useMemo, useCallback, memo } from "react"
-import { useVentasData, useClientesData } from "@/app/lib/firebase/firestore-hooks.service"
-import { CreateVentaModalPremium } from "@/app/components/modals/CreateVentaModalPremium"
-import { SalesFlowDiagram } from "@/app/components/visualizations/SalesFlowDiagram"
-import { PremiumDataTable, Column, TableAction } from "@/app/components/ui/PremiumDataTable"
-import { QuickStatWidget } from "@/app/components/widgets/QuickStatWidget"
-import { MiniChartWidget } from "@/app/components/widgets/MiniChartWidget"
-import { ActivityFeedWidget, ActivityItem } from "@/app/components/widgets/ActivityFeedWidget"
+  ShoppingBag, Receipt, Calendar, Search, Filter, X,
+} from 'lucide-react'
+import { Button } from '@/app/components/ui/button'
+import { Badge } from '@/app/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/components/ui/tabs'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog'
+import { useState, useMemo, useCallback, memo } from 'react'
+import { useVentasData, useClientesData } from '@/app/lib/firebase/firestore-hooks.service'
+import { CreateVentaModalPremium } from '@/app/components/modals/CreateVentaModalPremium'
+import { SalesFlowDiagram } from '@/app/components/visualizations/SalesFlowDiagram'
+import { PremiumDataTable, Column, TableAction } from '@/app/components/ui/PremiumDataTable'
+import { QuickStatWidget } from '@/app/components/widgets/QuickStatWidget'
+import { MiniChartWidget } from '@/app/components/widgets/MiniChartWidget'
+import { ActivityFeedWidget, ActivityItem } from '@/app/components/widgets/ActivityFeedWidget'
 import { 
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, 
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
-} from "recharts"
-import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from "@/app/components/ui/SafeChartContainer"
-import { logger } from "@/app/lib/utils/logger"
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+} from 'recharts'
+import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/components/ui/SafeChartContainer'
+import { logger } from '@/app/lib/utils/logger'
 
 // ============================================================================
 // INTERFACES
@@ -34,7 +34,7 @@ interface VentaData {
   precioTotalVenta?: number
   montoPagado?: number
   montoRestante?: number
-  estadoPago?: "completo" | "parcial" | "pendiente"
+  estadoPago?: 'completo' | 'parcial' | 'pendiente'
   cliente?: string
   clienteId?: string
   fecha?: string
@@ -55,19 +55,19 @@ interface VentaProfileModalProps {
 // COMPONENTE: Modal de Perfil de Venta
 // ============================================================================
 const VentaProfileModal = memo(function VentaProfileModal({ 
-  venta, isOpen, onClose 
+  venta, isOpen, onClose, 
 }: VentaProfileModalProps) {
-  const [activeTab, setActiveTab] = useState("detalles")
+  const [activeTab, setActiveTab] = useState('detalles')
 
   if (!venta) return null
 
   const estadoConfig = {
-    completo: { color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30", icon: CheckCircle2, label: "Completo" },
-    parcial: { color: "bg-amber-500/20 text-amber-400 border-amber-500/30", icon: Clock, label: "Parcial" },
-    pendiente: { color: "bg-rose-500/20 text-rose-400 border-rose-500/30", icon: Clock, label: "Pendiente" },
+    completo: { color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30', icon: CheckCircle2, label: 'Completo' },
+    parcial: { color: 'bg-amber-500/20 text-amber-400 border-amber-500/30', icon: Clock, label: 'Parcial' },
+    pendiente: { color: 'bg-rose-500/20 text-rose-400 border-rose-500/30', icon: Clock, label: 'Pendiente' },
   }
 
-  const estado = venta.estadoPago || "pendiente"
+  const estado = venta.estadoPago || 'pendiente'
   const config = estadoConfig[estado] || estadoConfig.pendiente
   const porcentajePago = venta.precioTotalVenta ? 
     Math.round((venta.montoPagado || 0) / venta.precioTotalVenta * 100) : 0
@@ -93,12 +93,12 @@ const VentaProfileModal = memo(function VentaProfileModal({
               <div className="flex items-center gap-3 mb-1">
                 <h2 className="text-2xl font-bold">{venta.id}</h2>
                 <Badge className={config.color}>
-                  {React.createElement(config.icon, { className: "w-3 h-3 mr-1" })}
+                  {React.createElement(config.icon, { className: 'w-3 h-3 mr-1' })}
                   {config.label}
                 </Badge>
               </div>
-              <p className="text-white/60">Cliente: {venta.cliente || "Sin asignar"}</p>
-              <p className="text-white/40 text-sm mt-1">{venta.fecha || "Sin fecha"}</p>
+              <p className="text-white/60">Cliente: {venta.cliente || 'Sin asignar'}</p>
+              <p className="text-white/40 text-sm mt-1">{venta.fecha || 'Sin fecha'}</p>
             </div>
             <div className="text-right">
               <p className="text-3xl font-bold text-green-400">
@@ -113,17 +113,17 @@ const VentaProfileModal = memo(function VentaProfileModal({
         <div className="px-6 border-b border-zinc-800/50">
           <div className="flex gap-4">
             {[
-              { id: "detalles", label: "Detalles", icon: Receipt },
-              { id: "pagos", label: "Pagos", icon: CreditCard },
-              { id: "distribucion", label: "Distribución", icon: PieChartIcon },
+              { id: 'detalles', label: 'Detalles', icon: Receipt },
+              { id: 'pagos', label: 'Pagos', icon: CreditCard },
+              { id: 'distribucion', label: 'Distribución', icon: PieChartIcon },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-all ${
                   activeTab === tab.id
-                    ? "text-green-400 border-green-400"
-                    : "text-white/60 border-transparent hover:text-white"
+                    ? 'text-green-400 border-green-400'
+                    : 'text-white/60 border-transparent hover:text-white'
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
@@ -135,7 +135,7 @@ const VentaProfileModal = memo(function VentaProfileModal({
 
         {/* Content */}
         <div className="p-6 max-h-[50vh] overflow-y-auto">
-          {activeTab === "detalles" && (
+          {activeTab === 'detalles' && (
             <div className="grid grid-cols-2 gap-6">
               {/* Info de Venta */}
               <div className="space-y-4">
@@ -145,13 +145,13 @@ const VentaProfileModal = memo(function VentaProfileModal({
                 </h4>
                 <div className="space-y-3 bg-zinc-900/50 rounded-xl p-4 border border-zinc-800/50">
                   <InfoRow label="ID Venta" value={venta.id} />
-                  <InfoRow label="Producto" value={venta.producto || "Producto estándar"} />
+                  <InfoRow label="Producto" value={venta.producto || 'Producto estándar'} />
                   <InfoRow label="Cantidad" value={`${venta.cantidad || 0} unidades`} />
                   <InfoRow 
                     label="Precio Unitario" 
                     value={`$${(venta.precioVentaUnidad || 0).toLocaleString()}`} 
                   />
-                  <InfoRow label="Distribuidor" value={venta.distribuidor || "Sin asignar"} />
+                  <InfoRow label="Distribuidor" value={venta.distribuidor || 'Sin asignar'} />
                 </div>
               </div>
 
@@ -162,15 +162,15 @@ const VentaProfileModal = memo(function VentaProfileModal({
                   Cliente
                 </h4>
                 <div className="space-y-3 bg-zinc-900/50 rounded-xl p-4 border border-zinc-800/50">
-                  <InfoRow label="Cliente" value={venta.cliente || "Sin asignar"} />
-                  <InfoRow label="ID Cliente" value={venta.clienteId || "-"} />
-                  <InfoRow label="Fecha Venta" value={venta.fecha || "-"} />
+                  <InfoRow label="Cliente" value={venta.cliente || 'Sin asignar'} />
+                  <InfoRow label="ID Cliente" value={venta.clienteId || '-'} />
+                  <InfoRow label="Fecha Venta" value={venta.fecha || '-'} />
                 </div>
               </div>
             </div>
           )}
 
-          {activeTab === "pagos" && (
+          {activeTab === 'pagos' && (
             <div className="space-y-6">
               {/* Barra de progreso de pago */}
               <div className="bg-zinc-900/50 rounded-xl p-6 border border-zinc-800/50">
@@ -182,13 +182,13 @@ const VentaProfileModal = memo(function VentaProfileModal({
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${porcentajePago}%` }}
-                    transition={{ duration: 1, ease: "easeOut" }}
+                    transition={{ duration: 1, ease: 'easeOut' }}
                     className={`h-full ${
                       porcentajePago >= 100 
-                        ? "bg-gradient-to-r from-emerald-500 to-green-400" 
+                        ? 'bg-gradient-to-r from-emerald-500 to-green-400' 
                         : porcentajePago > 0 
-                          ? "bg-gradient-to-r from-amber-500 to-yellow-400"
-                          : "bg-gradient-to-r from-rose-500 to-red-400"
+                          ? 'bg-gradient-to-r from-amber-500 to-yellow-400'
+                          : 'bg-gradient-to-r from-rose-500 to-red-400'
                     }`}
                   />
                 </div>
@@ -212,13 +212,13 @@ const VentaProfileModal = memo(function VentaProfileModal({
                   label="Monto Restante"
                   value={`$${(venta.montoRestante || 0).toLocaleString()}`}
                   icon={Clock}
-                  color={venta.montoRestante && venta.montoRestante > 0 ? "amber" : "green"}
+                  color={venta.montoRestante && venta.montoRestante > 0 ? 'amber' : 'green'}
                 />
               </div>
             </div>
           )}
 
-          {activeTab === "distribucion" && (
+          {activeTab === 'distribucion' && (
             <div className="space-y-6">
               <p className="text-white/60 text-sm">
                 Distribución automática de fondos según la lógica del sistema CHRONOS.
@@ -228,22 +228,22 @@ const VentaProfileModal = memo(function VentaProfileModal({
               <div className="space-y-3">
                 {[
                   { 
-                    label: "Bóveda Monte (Costo)", 
+                    label: 'Bóveda Monte (Costo)', 
                     value: (venta.cantidad || 0) * 6300, 
-                    color: "from-blue-500 to-cyan-500",
-                    desc: "Precio compra × cantidad"
+                    color: 'from-blue-500 to-cyan-500',
+                    desc: 'Precio compra × cantidad',
                   },
                   { 
-                    label: "Flete Sur", 
+                    label: 'Flete Sur', 
                     value: (venta.cantidad || 0) * 500, 
-                    color: "from-orange-500 to-amber-500",
-                    desc: "Flete × cantidad"
+                    color: 'from-orange-500 to-amber-500',
+                    desc: 'Flete × cantidad',
                   },
                   { 
-                    label: "Utilidades (Ganancia)", 
+                    label: 'Utilidades (Ganancia)', 
                     value: ((venta.precioVentaUnidad || 10000) - 6300 - 500) * (venta.cantidad || 0), 
-                    color: "from-green-500 to-emerald-500",
-                    desc: "(Precio venta - costo - flete) × cantidad"
+                    color: 'from-green-500 to-emerald-500',
+                    desc: '(Precio venta - costo - flete) × cantidad',
                   },
                 ].map((item, i) => (
                   <div key={i} className="bg-zinc-900/50 rounded-xl p-4 border border-zinc-800/50">
@@ -253,7 +253,7 @@ const VentaProfileModal = memo(function VentaProfileModal({
                     </div>
                     <p className="text-xs text-white/40">{item.desc}</p>
                     <div className="h-2 bg-zinc-800 rounded-full mt-2 overflow-hidden">
-                      <div className={`h-full bg-gradient-to-r ${item.color}`} style={{ width: "100%" }} />
+                      <div className={`h-full bg-gradient-to-r ${item.color}`} style={{ width: '100%' }} />
                     </div>
                   </div>
                 ))}
@@ -277,22 +277,22 @@ const InfoRow = ({ label, value }: { label: string; value: string }) => (
 )
 
 const StatCard = ({ 
-  label, value, icon: Icon, color 
+  label, value, icon: Icon, color, 
 }: { 
-  label: string; value: string; icon: React.ElementType; color: "cyan" | "green" | "amber" | "red" 
+  label: string; value: string; icon: React.ElementType; color: 'cyan' | 'green' | 'amber' | 'red' 
 }) => {
-  type ColorKey = "cyan" | "green" | "amber" | "red"
+  type ColorKey = 'cyan' | 'green' | 'amber' | 'red'
   const colorMap: Record<ColorKey, string> = {
-    cyan: "from-cyan-500/20 to-blue-500/20 border-cyan-500/30",
-    green: "from-green-500/20 to-emerald-500/20 border-green-500/30",
-    amber: "from-amber-500/20 to-yellow-500/20 border-amber-500/30",
-    red: "from-rose-500/20 to-red-500/20 border-rose-500/30",
+    cyan: 'from-cyan-500/20 to-blue-500/20 border-cyan-500/30',
+    green: 'from-green-500/20 to-emerald-500/20 border-green-500/30',
+    amber: 'from-amber-500/20 to-yellow-500/20 border-amber-500/30',
+    red: 'from-rose-500/20 to-red-500/20 border-rose-500/30',
   }
   const iconColorMap: Record<ColorKey, string> = {
-    cyan: "text-cyan-400",
-    green: "text-green-400",
-    amber: "text-amber-400",
-    red: "text-rose-400",
+    cyan: 'text-cyan-400',
+    green: 'text-green-400',
+    amber: 'text-amber-400',
+    red: 'text-rose-400',
   }
   
   return (
@@ -326,9 +326,9 @@ export default memo(function BentoVentasPremium() {
     const totalVentas = ventasData.reduce((acc, v) => acc + (v.precioTotalVenta || 0), 0)
     const totalCobrado = ventasData.reduce((acc, v) => acc + (v.montoPagado || 0), 0)
     const totalPendiente = ventasData.reduce((acc, v) => acc + (v.montoRestante || 0), 0)
-    const ventasPendientes = ventasData.filter((v) => v.estadoPago === "pendiente").length
-    const ventasCompletas = ventasData.filter((v) => v.estadoPago === "completo").length
-    const ventasParciales = ventasData.filter((v) => v.estadoPago === "parcial").length
+    const ventasPendientes = ventasData.filter((v) => v.estadoPago === 'pendiente').length
+    const ventasCompletas = ventasData.filter((v) => v.estadoPago === 'completo').length
+    const ventasParciales = ventasData.filter((v) => v.estadoPago === 'parcial').length
     const promedioVenta = ventasData.length > 0 ? totalVentas / ventasData.length : 0
     const tasaCobro = totalVentas > 0 ? (totalCobrado / totalVentas) * 100 : 0
     
@@ -369,7 +369,7 @@ export default memo(function BentoVentasPremium() {
       title: `Venta ${venta.id}`,
       description: `${venta.cliente || 'Cliente'} - $${(venta.precioTotalVenta || 0).toLocaleString()}`,
       timestamp: venta.fecha ? new Date(venta.fecha) : new Date(),
-      status: venta.estadoPago === 'completo' ? 'success' : venta.estadoPago === 'parcial' ? 'pending' : 'pending'
+      status: venta.estadoPago === 'completo' ? 'success' : venta.estadoPago === 'parcial' ? 'pending' : 'pending',
     }))
   }, [ventasData])
 
@@ -383,56 +383,56 @@ export default memo(function BentoVentasPremium() {
       header: 'ID Venta', 
       sortable: true,
       type: 'badge',
-      width: '120px'
+      width: '120px',
     },
     { 
       key: 'fecha', 
       header: 'Fecha', 
       sortable: true,
       type: 'date',
-      width: '120px'
+      width: '120px',
     },
     { 
       key: 'cliente', 
       header: 'Cliente', 
       sortable: true,
       type: 'avatar',
-      width: '180px'
+      width: '180px',
     },
     { 
       key: 'cantidad', 
       header: 'Cantidad', 
       sortable: true,
       type: 'number',
-      width: '100px'
+      width: '100px',
     },
     { 
       key: 'precioTotalVenta', 
       header: 'Total', 
       sortable: true,
       type: 'currency',
-      width: '140px'
+      width: '140px',
     },
     { 
       key: 'montoPagado', 
       header: 'Pagado', 
       sortable: true,
       type: 'currency',
-      width: '140px'
+      width: '140px',
     },
     { 
       key: 'montoRestante', 
       header: 'Pendiente', 
       sortable: true,
       type: 'currency',
-      width: '140px'
+      width: '140px',
     },
     { 
       key: 'estadoPago', 
       header: 'Estado', 
       sortable: true,
       type: 'status',
-      width: '120px'
+      width: '120px',
     },
   ], [])
 
@@ -445,7 +445,7 @@ export default memo(function BentoVentasPremium() {
         setSelectedVenta(venta)
         setIsProfileOpen(true)
         logger.info('Ver venta', { context: 'BentoVentasPremium', data: { ventaId: venta.id } })
-      }
+      },
     },
     {
       id: 'edit',
@@ -453,7 +453,7 @@ export default memo(function BentoVentasPremium() {
       icon: Edit,
       onClick: (venta) => {
         logger.info('Editar venta', { context: 'BentoVentasPremium', data: { ventaId: venta.id } })
-      }
+      },
     },
     {
       id: 'delete',
@@ -462,8 +462,8 @@ export default memo(function BentoVentasPremium() {
       variant: 'danger',
       onClick: (venta) => {
         logger.info('Eliminar venta', { context: 'BentoVentasPremium', data: { ventaId: venta.id } })
-      }
-    }
+      },
+    },
   ], [])
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -631,7 +631,7 @@ export default memo(function BentoVentasPremium() {
                     contentStyle={{ 
                       backgroundColor: 'rgba(0,0,0,0.9)', 
                       border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '12px'
+                      borderRadius: '12px',
                     }}
                     formatter={(value: number) => [`$${value.toLocaleString()}`, '']}
                   />
@@ -797,4 +797,4 @@ export default memo(function BentoVentasPremium() {
 })
 
 // Importación necesaria para React.createElement
-import React from "react"
+import React from 'react'

@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 /**
  * GlassButton3D - Botón 3D de cristal estilo Reijo Palmiste
@@ -11,8 +11,8 @@
  * - Post-processing (bloom, chromatic aberration)
  */
 
-import { useRef, useState, Suspense, useMemo } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { useRef, useState, Suspense, useMemo } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import {
   MeshTransmissionMaterial,
   Environment,
@@ -22,11 +22,11 @@ import {
   useTexture,
   PerspectiveCamera,
   OrbitControls,
-} from '@react-three/drei';
-import { EffectComposer, Bloom, ChromaticAberration, Vignette, Noise } from '@react-three/postprocessing';
-import { BlendFunction } from 'postprocessing';
-import * as THREE from 'three';
-import { motion } from 'framer-motion';
+} from '@react-three/drei'
+import { EffectComposer, Bloom, ChromaticAberration, Vignette, Noise } from '@react-three/postprocessing'
+import { BlendFunction } from 'postprocessing'
+import * as THREE from 'three'
+import { motion } from 'framer-motion'
 
 // Tipos
 export interface GlassButtonProps {
@@ -55,7 +55,7 @@ const COLOR_MAP = {
   purple: '#8b5cf6',
   green: '#22c55e',
   cyan: '#06b6d4',
-};
+}
 
 // Iconos SVG como paths (para usar en 3D)
 const ICON_PATHS: Record<string, string> = {
@@ -69,11 +69,11 @@ const ICON_PATHS: Record<string, string> = {
   menu: 'M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z',
   plus: 'M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z',
   minus: 'M19 13H5v-2h14v2z',
-};
+}
 
 // Componente de icono 3D
 function Icon3D({ icon, color, scale = 1 }: { icon: string; color: string; scale?: number }) {
-  const iconRef = useRef<THREE.Group>(null);
+  const iconRef = useRef<THREE.Group>(null)
 
   // Crear geometría del icono basada en formas básicas
   const iconGeometry = useMemo(() => {
@@ -92,7 +92,7 @@ function Icon3D({ icon, color, scale = 1 }: { icon: string; color: string; scale
               <meshStandardMaterial color={color} metalness={0.8} roughness={0.2} />
             </mesh>
           </group>
-        );
+        )
       case 'chart':
         return (
           <group scale={scale * 0.12}>
@@ -110,7 +110,7 @@ function Icon3D({ icon, color, scale = 1 }: { icon: string; color: string; scale
               <meshStandardMaterial color={color} metalness={0.8} roughness={0.2} />
             </mesh>
           </group>
-        );
+        )
       case 'wallet':
         return (
           <group scale={scale * 0.15}>
@@ -123,7 +123,7 @@ function Icon3D({ icon, color, scale = 1 }: { icon: string; color: string; scale
               <meshStandardMaterial color="#fff" metalness={0.9} roughness={0.1} />
             </mesh>
           </group>
-        );
+        )
       case 'settings':
         return (
           <group scale={scale * 0.12}>
@@ -137,7 +137,7 @@ function Icon3D({ icon, color, scale = 1 }: { icon: string; color: string; scale
               <meshStandardMaterial color={color} metalness={0.9} roughness={0.1} />
             </mesh>
           </group>
-        );
+        )
       case 'user':
         return (
           <group scale={scale * 0.12}>
@@ -152,7 +152,7 @@ function Icon3D({ icon, color, scale = 1 }: { icon: string; color: string; scale
               <meshStandardMaterial color={color} metalness={0.8} roughness={0.2} />
             </mesh>
           </group>
-        );
+        )
       case 'bell':
         return (
           <group scale={scale * 0.12}>
@@ -165,7 +165,7 @@ function Icon3D({ icon, color, scale = 1 }: { icon: string; color: string; scale
               <meshStandardMaterial color={color} metalness={0.9} roughness={0.1} />
             </mesh>
           </group>
-        );
+        )
       case 'search':
         return (
           <group scale={scale * 0.12}>
@@ -178,7 +178,7 @@ function Icon3D({ icon, color, scale = 1 }: { icon: string; color: string; scale
               <meshStandardMaterial color={color} metalness={0.8} roughness={0.2} />
             </mesh>
           </group>
-        );
+        )
       case 'menu':
         return (
           <group scale={scale * 0.12}>
@@ -189,7 +189,7 @@ function Icon3D({ icon, color, scale = 1 }: { icon: string; color: string; scale
               </mesh>
             ))}
           </group>
-        );
+        )
       case 'plus':
         return (
           <group scale={scale * 0.12}>
@@ -202,60 +202,60 @@ function Icon3D({ icon, color, scale = 1 }: { icon: string; color: string; scale
               <meshStandardMaterial color={color} metalness={0.8} roughness={0.2} />
             </mesh>
           </group>
-        );
+        )
       case 'minus':
         return (
           <mesh scale={scale * 0.12}>
             <boxGeometry args={[0.6, 0.12, 0.08]} />
             <meshStandardMaterial color={color} metalness={0.8} roughness={0.2} />
           </mesh>
-        );
+        )
       default:
         return (
           <mesh scale={scale * 0.12}>
             <sphereGeometry args={[0.3, 16, 16]} />
             <meshStandardMaterial color={color} metalness={0.8} roughness={0.2} />
           </mesh>
-        );
+        )
     }
-  }, [icon, color, scale]);
+  }, [icon, color, scale])
 
-  return <group ref={iconRef}>{iconGeometry}</group>;
+  return <group ref={iconRef}>{iconGeometry}</group>
 }
 
 // Componente del botón de cristal
 function GlassButtonMesh({ icon, color, isHovered, isPressed, isActive }: GlassButtonMeshProps) {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const platformRef = useRef<THREE.Mesh>(null);
-  const [hoverY, setHoverY] = useState(0);
-  const [pressScale, setPressScale] = useState(1);
-  const [rotationY, setRotationY] = useState(0);
+  const meshRef = useRef<THREE.Mesh>(null)
+  const platformRef = useRef<THREE.Mesh>(null)
+  const [hoverY, setHoverY] = useState(0)
+  const [pressScale, setPressScale] = useState(1)
+  const [rotationY, setRotationY] = useState(0)
 
   // Animación continua
   useFrame((state, delta) => {
     if (meshRef.current) {
       // Animación de hover (subir/bajar)
-      const targetY = isHovered ? 0.15 : 0;
-      setHoverY(THREE.MathUtils.lerp(hoverY, targetY, 0.1));
-      meshRef.current.position.y = hoverY;
+      const targetY = isHovered ? 0.15 : 0
+      setHoverY(THREE.MathUtils.lerp(hoverY, targetY, 0.1))
+      meshRef.current.position.y = hoverY
 
       // Animación de press (escala)
-      const targetScale = isPressed ? 0.9 : 1;
-      setPressScale(THREE.MathUtils.lerp(pressScale, targetScale, 0.15));
-      meshRef.current.scale.setScalar(pressScale);
+      const targetScale = isPressed ? 0.9 : 1
+      setPressScale(THREE.MathUtils.lerp(pressScale, targetScale, 0.15))
+      meshRef.current.scale.setScalar(pressScale)
 
       // Rotación suave cuando está activo
       if (isActive || isHovered) {
-        setRotationY(rotationY + delta * 0.5);
-        meshRef.current.rotation.y = Math.sin(rotationY) * 0.1;
+        setRotationY(rotationY + delta * 0.5)
+        meshRef.current.rotation.y = Math.sin(rotationY) * 0.1
       }
     }
 
     // Animación de la plataforma
     if (platformRef.current) {
-      platformRef.current.rotation.y += delta * 0.2;
+      platformRef.current.rotation.y += delta * 0.2
     }
-  });
+  })
 
   return (
     <group>
@@ -322,7 +322,7 @@ function GlassButtonMesh({ icon, color, isHovered, isPressed, isActive }: GlassB
         />
       </mesh>
     </group>
-  );
+  )
 }
 
 // Luces del sistema (estilo Reijo Palmiste)
@@ -360,7 +360,7 @@ function SceneLights({ primaryColor }: { primaryColor: string }) {
         castShadow
       />
     </>
-  );
+  )
 }
 
 // Post-processing effects
@@ -380,7 +380,7 @@ function PostProcessing() {
       <Vignette darkness={0.4} offset={0.3} />
       <Noise opacity={0.02} blendFunction={BlendFunction.OVERLAY} />
     </EffectComposer>
-  );
+  )
 }
 
 // Componente principal exportado
@@ -393,18 +393,18 @@ export function GlassButton3D({
   isActive = false,
   className = '',
 }: GlassButtonProps) {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isPressed, setIsPressed] = useState(false);
+  const [isHovered, setIsHovered] = useState(false)
+  const [isPressed, setIsPressed] = useState(false)
 
   // Tamaños
   const sizeMap = {
     sm: { width: 80, height: 80 },
     md: { width: 120, height: 120 },
     lg: { width: 160, height: 160 },
-  };
+  }
 
-  const dimensions = sizeMap[size];
-  const colorHex = COLOR_MAP[color];
+  const dimensions = sizeMap[size]
+  const colorHex = COLOR_MAP[color]
 
   return (
     <motion.div
@@ -414,8 +414,8 @@ export function GlassButton3D({
       whileTap={{ scale: 0.95 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
-        setIsHovered(false);
-        setIsPressed(false);
+        setIsHovered(false)
+        setIsPressed(false)
       }}
       onMouseDown={() => setIsPressed(true)}
       onMouseUp={() => setIsPressed(false)}
@@ -463,7 +463,7 @@ export function GlassButton3D({
         </motion.p>
       )}
     </motion.div>
-  );
+  )
 }
 
 // Exportar componente de grupo de botones para el header
@@ -492,7 +492,7 @@ export function GlassButtonGroup({
         />
       ))}
     </div>
-  );
+  )
 }
 
-export default GlassButton3D;
+export default GlassButton3D

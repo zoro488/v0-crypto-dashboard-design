@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 /**
  * 🤖 FloatingAIOrb - Widget Flotante de Asistente IA con Orbe 3D
@@ -13,23 +13,23 @@
  * - Historial de conversación
  */
 
-import { useState, useCallback, useRef, useEffect, Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { Environment, ContactShadows, PerspectiveCamera } from '@react-three/drei';
-import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing';
-import { BlendFunction } from 'postprocessing';
-import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
+import { useState, useCallback, useRef, useEffect, Suspense } from 'react'
+import { Canvas } from '@react-three/fiber'
+import { Environment, ContactShadows, PerspectiveCamera } from '@react-three/drei'
+import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing'
+import { BlendFunction } from 'postprocessing'
+import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion'
 import { 
   X, Send, Minimize2, Maximize2, Sparkles, Bot, User, 
   Zap, Brain, Activity, MessageSquare, Mic, MicOff,
-  ChevronUp, BarChart3, FileText, Calculator, Package
-} from 'lucide-react';
-import * as THREE from 'three';
+  ChevronUp, BarChart3, FileText, Calculator, Package,
+} from 'lucide-react'
+import * as THREE from 'three'
 
-import { AIVoiceOrb, OrbState } from './models/AIVoiceOrb';
-import { Button } from '@/app/components/ui/button';
-import { Input } from '@/app/components/ui/input';
-import { ScrollArea } from '@/app/components/ui/scroll-area';
+import { AIVoiceOrb, OrbState } from './models/AIVoiceOrb'
+import { Button } from '@/app/components/ui/button'
+import { Input } from '@/app/components/ui/input'
+import { ScrollArea } from '@/app/components/ui/scroll-area'
 
 // ============================================================================
 // TIPOS
@@ -65,80 +65,80 @@ const QUICK_ACTIONS: QuickAction[] = [
   { id: 'inventory', label: 'Inventario', icon: Package, prompt: 'Dame un resumen del inventario actual', color: '#22c55e' },
   { id: 'report', label: 'Generar reporte', icon: FileText, prompt: 'Genera un reporte financiero del mes', color: '#a855f7' },
   { id: 'calculate', label: 'Calcular utilidades', icon: Calculator, prompt: 'Calcula las utilidades de esta semana', color: '#f59e0b' },
-];
+]
 
 // ============================================================================
 // HOOK DE IA (Conectar con tu backend real)
 // ============================================================================
 
 function useAI() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [status, setStatus] = useState<OrbState>('idle');
-  const [audioLevel, setAudioLevel] = useState(0);
-  const [isListening, setIsListening] = useState(false);
+  const [isLoading, setIsLoading] = useState(false)
+  const [status, setStatus] = useState<OrbState>('idle')
+  const [audioLevel, setAudioLevel] = useState(0)
+  const [isListening, setIsListening] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       role: 'assistant',
       content: '¡Hola! Soy tu asistente de Chronos. Puedo ayudarte a analizar datos, generar reportes, automatizar registros y más. ¿En qué te puedo ayudar?',
       timestamp: new Date(),
-      type: 'text'
-    }
-  ]);
+      type: 'text',
+    },
+  ])
 
   // Simular nivel de audio cuando habla
   useEffect(() => {
     if (status === 'speaking') {
       const interval = setInterval(() => {
-        setAudioLevel(Math.random() * 0.8 + 0.2);
-      }, 100);
-      return () => clearInterval(interval);
+        setAudioLevel(Math.random() * 0.8 + 0.2)
+      }, 100)
+      return () => clearInterval(interval)
     } else {
-      setAudioLevel(0);
+      setAudioLevel(0)
     }
-  }, [status]);
+  }, [status])
 
   const askAgent = useCallback(async (query: string) => {
-    setIsLoading(true);
-    setStatus('listening');
+    setIsLoading(true)
+    setStatus('listening')
     
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
       content: query,
       timestamp: new Date(),
-      type: 'text'
-    };
-    setMessages(prev => [...prev, userMessage]);
+      type: 'text',
+    }
+    setMessages(prev => [...prev, userMessage])
     
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setStatus('thinking');
+    await new Promise(resolve => setTimeout(resolve, 500))
+    setStatus('thinking')
     
     // Simular procesamiento (reemplazar con llamada real a API)
-    await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
+    await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000))
     
-    setStatus('speaking');
+    setStatus('speaking')
     
     // Determinar tipo de respuesta basado en la consulta
-    let responseType: Message['type'] = 'text';
-    let metadata: Message['metadata'] = undefined;
+    let responseType: Message['type'] = 'text'
+    let metadata: Message['metadata'] = undefined
     
     if (query.toLowerCase().includes('ventas') || query.toLowerCase().includes('gráfico')) {
-      responseType = 'chart';
-      metadata = { chartType: 'bar' };
+      responseType = 'chart'
+      metadata = { chartType: 'bar' }
     } else if (query.toLowerCase().includes('registro') || query.toLowerCase().includes('formulario')) {
-      responseType = 'form';
-      metadata = { formFields: ['Producto', 'Cantidad', 'Precio', 'Cliente'] };
+      responseType = 'form'
+      metadata = { formFields: ['Producto', 'Cantidad', 'Precio', 'Cliente'] }
     } else if (query.toLowerCase().includes('inventario') || query.toLowerCase().includes('stock')) {
-      responseType = 'data';
-      metadata = { dataPreview: { total: 1234, lowStock: 15, categories: 8 } };
+      responseType = 'data'
+      metadata = { dataPreview: { total: 1234, lowStock: 15, categories: 8 } }
     }
     
     const responses = [
       `He analizado tu consulta sobre "${query}". Basándome en los datos del sistema, aquí tienes la información solicitada.`,
       `Perfecto, procesando "${query}". Los datos muestran tendencias positivas este período.`,
       `Entendido. Respecto a "${query}", he preparado un análisis detallado para ti.`,
-    ];
+    ]
     
     const aiMessage: Message = {
       id: (Date.now() + 1).toString(),
@@ -146,29 +146,29 @@ function useAI() {
       content: responses[Math.floor(Math.random() * responses.length)],
       timestamp: new Date(),
       type: responseType,
-      metadata
-    };
+      metadata,
+    }
     
-    setMessages(prev => [...prev, aiMessage]);
+    setMessages(prev => [...prev, aiMessage])
     
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setStatus('success');
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    setStatus('success')
     
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setStatus('idle');
-    setIsLoading(false);
-  }, []);
+    await new Promise(resolve => setTimeout(resolve, 500))
+    setStatus('idle')
+    setIsLoading(false)
+  }, [])
 
   const toggleListening = useCallback(() => {
     setIsListening(prev => {
       if (!prev) {
-        setStatus('listening');
+        setStatus('listening')
       } else {
-        setStatus('idle');
+        setStatus('idle')
       }
-      return !prev;
-    });
-  }, []);
+      return !prev
+    })
+  }, [])
 
   return { 
     isLoading, 
@@ -177,8 +177,8 @@ function useAI() {
     askAgent, 
     audioLevel,
     isListening,
-    toggleListening
-  };
+    toggleListening,
+  }
 }
 
 // ============================================================================
@@ -186,7 +186,7 @@ function useAI() {
 // ============================================================================
 
 function MessageBubble({ message }: { message: Message }) {
-  const isAssistant = message.role === 'assistant';
+  const isAssistant = message.role === 'assistant'
   
   return (
     <motion.div
@@ -209,7 +209,7 @@ function MessageBubble({ message }: { message: Message }) {
       </motion.div>
       
       {/* Contenido */}
-      <div className={`max-w-[80%] space-y-2`}>
+      <div className={'max-w-[80%] space-y-2'}>
         {/* Texto */}
         <motion.div 
           className={`
@@ -314,7 +314,7 @@ function MessageBubble({ message }: { message: Message }) {
         </div>
       </div>
     </motion.div>
-  );
+  )
 }
 
 // ============================================================================
@@ -328,10 +328,10 @@ function StatusIndicator({ status }: { status: OrbState }) {
     thinking: { color: 'bg-purple-500', label: 'Procesando...', icon: Brain },
     speaking: { color: 'bg-cyan-500', label: 'Respondiendo...', icon: Zap },
     success: { color: 'bg-green-500', label: 'Completado', icon: Sparkles },
-    error: { color: 'bg-red-500', label: 'Error', icon: X }
-  };
+    error: { color: 'bg-red-500', label: 'Error', icon: X },
+  }
   
-  const { color, label, icon: Icon } = config[status];
+  const { color, label, icon: Icon } = config[status]
   
   return (
     <motion.div className="flex items-center gap-2" key={status} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -342,7 +342,7 @@ function StatusIndicator({ status }: { status: OrbState }) {
       />
       <span className="text-xs text-white/50">{label}</span>
     </motion.div>
-  );
+  )
 }
 
 // ============================================================================
@@ -350,49 +350,49 @@ function StatusIndicator({ status }: { status: OrbState }) {
 // ============================================================================
 
 export function FloatingAIOrb() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
-  const [query, setQuery] = useState('');
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [isOpen, setIsOpen] = useState(false)
+  const [isMinimized, setIsMinimized] = useState(false)
+  const [query, setQuery] = useState('')
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   
-  const { isLoading, status, messages, askAgent, audioLevel, isListening, toggleListening } = useAI();
+  const { isLoading, status, messages, askAgent, audioLevel, isListening, toggleListening } = useAI()
   
   // Motion para el orbe
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const orbX = useSpring(mouseX, { damping: 25, stiffness: 150 });
-  const orbY = useSpring(mouseY, { damping: 25, stiffness: 150 });
+  const mouseX = useMotionValue(0)
+  const mouseY = useMotionValue(0)
+  const orbX = useSpring(mouseX, { damping: 25, stiffness: 150 })
+  const orbY = useSpring(mouseY, { damping: 25, stiffness: 150 })
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
-  }, [messages]);
+  }, [messages])
   
   useEffect(() => {
     if (isOpen && !isMinimized && inputRef.current) {
-      setTimeout(() => inputRef.current?.focus(), 300);
+      setTimeout(() => inputRef.current?.focus(), 300)
     }
-  }, [isOpen, isMinimized]);
+  }, [isOpen, isMinimized])
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!query.trim() || isLoading) return;
-    await askAgent(query);
-    setQuery('');
-  };
+    e.preventDefault()
+    if (!query.trim() || isLoading) return
+    await askAgent(query)
+    setQuery('')
+  }
 
   const handleQuickAction = (action: QuickAction) => {
-    setQuery(action.prompt);
-    askAgent(action.prompt);
-  };
+    setQuery(action.prompt)
+    askAgent(action.prompt)
+  }
 
   const handleOrbMouseMove = (e: React.MouseEvent) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    mouseX.set((e.clientX - rect.left - rect.width / 2) * 0.15);
-    mouseY.set((e.clientY - rect.top - rect.height / 2) * 0.15);
-  };
+    const rect = e.currentTarget.getBoundingClientRect()
+    mouseX.set((e.clientX - rect.left - rect.width / 2) * 0.15)
+    mouseY.set((e.clientY - rect.top - rect.height / 2) * 0.15)
+  }
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4">
@@ -566,9 +566,9 @@ export function FloatingAIOrb() {
         style={{ x: orbX, y: orbY }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
-        onClick={() => { setIsOpen(!isOpen); setIsMinimized(false); }}
+        onClick={() => { setIsOpen(!isOpen); setIsMinimized(false) }}
         onMouseMove={handleOrbMouseMove}
-        onMouseLeave={() => { mouseX.set(0); mouseY.set(0); }}
+        onMouseLeave={() => { mouseX.set(0); mouseY.set(0) }}
       >
         <Canvas
           gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
@@ -623,7 +623,7 @@ export function FloatingAIOrb() {
         )}
       </motion.div>
     </div>
-  );
+  )
 }
 
-export default FloatingAIOrb;
+export default FloatingAIOrb

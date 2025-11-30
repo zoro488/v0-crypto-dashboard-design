@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 🎭 ADVANCED TRANSITIONS - Sistema de Animaciones Premium
@@ -23,12 +23,12 @@ export const fadeVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { 
     opacity: 1,
-    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] }
+    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
   },
   exit: { 
     opacity: 0,
-    transition: { duration: 0.3 }
-  }
+    transition: { duration: 0.3 },
+  },
 }
 
 /** Animación slide desde abajo */
@@ -39,14 +39,14 @@ export const slideUpVariants: Variants = {
     y: 0,
     transition: { 
       duration: 0.6, 
-      ease: [0.16, 1, 0.3, 1] 
-    }
+      ease: [0.16, 1, 0.3, 1], 
+    },
   },
   exit: { 
     opacity: 0, 
     y: -20,
-    transition: { duration: 0.3 }
-  }
+    transition: { duration: 0.3 },
+  },
 }
 
 /** Animación slide desde la derecha */
@@ -57,14 +57,14 @@ export const slideRightVariants: Variants = {
     x: 0,
     transition: { 
       duration: 0.6, 
-      ease: [0.16, 1, 0.3, 1] 
-    }
+      ease: [0.16, 1, 0.3, 1], 
+    },
   },
   exit: { 
     opacity: 0, 
     x: 30,
-    transition: { duration: 0.3 }
-  }
+    transition: { duration: 0.3 },
+  },
 }
 
 /** Animación scale con blur */
@@ -72,7 +72,7 @@ export const scaleBlurVariants: Variants = {
   hidden: { 
     opacity: 0, 
     scale: 0.9,
-    filter: 'blur(10px)'
+    filter: 'blur(10px)',
   },
   visible: { 
     opacity: 1, 
@@ -80,15 +80,15 @@ export const scaleBlurVariants: Variants = {
     filter: 'blur(0px)',
     transition: { 
       duration: 0.5, 
-      ease: [0.16, 1, 0.3, 1] 
-    }
+      ease: [0.16, 1, 0.3, 1], 
+    },
   },
   exit: { 
     opacity: 0, 
     scale: 0.95,
     filter: 'blur(5px)',
-    transition: { duration: 0.2 }
-  }
+    transition: { duration: 0.2 },
+  },
 }
 
 /** Animación spring bouncy */
@@ -101,36 +101,36 @@ export const springVariants: Variants = {
     transition: { 
       type: 'spring',
       stiffness: 300,
-      damping: 25
-    }
+      damping: 25,
+    },
   },
   exit: { 
     opacity: 0, 
     y: -10, 
     scale: 0.98,
-    transition: { duration: 0.2 }
-  }
+    transition: { duration: 0.2 },
+  },
 }
 
 /** Animación de revelación desde un lado */
 export const revealVariants: Variants = {
   hidden: { 
     opacity: 0,
-    clipPath: 'inset(0 100% 0 0)'
+    clipPath: 'inset(0 100% 0 0)',
   },
   visible: { 
     opacity: 1,
     clipPath: 'inset(0 0% 0 0)',
     transition: { 
       duration: 0.8, 
-      ease: [0.16, 1, 0.3, 1] 
-    }
+      ease: [0.16, 1, 0.3, 1], 
+    },
   },
   exit: { 
     opacity: 0,
     clipPath: 'inset(0 0 0 100%)',
-    transition: { duration: 0.4 }
-  }
+    transition: { duration: 0.4 },
+  },
 }
 
 /** Animación de lista stagger */
@@ -140,16 +140,16 @@ export const staggerContainerVariants: Variants = {
     opacity: 1,
     transition: {
       staggerChildren: 0.1,
-      delayChildren: 0.1
-    }
+      delayChildren: 0.1,
+    },
   },
   exit: {
     opacity: 0,
     transition: {
       staggerChildren: 0.05,
-      staggerDirection: -1
-    }
-  }
+      staggerDirection: -1,
+    },
+  },
 }
 
 export const staggerItemVariants: Variants = {
@@ -160,14 +160,14 @@ export const staggerItemVariants: Variants = {
     scale: 1,
     transition: { 
       duration: 0.4,
-      ease: [0.16, 1, 0.3, 1]
-    }
+      ease: [0.16, 1, 0.3, 1],
+    },
   },
   exit: { 
     opacity: 0, 
     y: -10,
-    transition: { duration: 0.2 }
-  }
+    transition: { duration: 0.2 },
+  },
 }
 
 /** Animación de rotación 3D */
@@ -175,42 +175,42 @@ export const flip3DVariants: Variants = {
   hidden: { 
     opacity: 0, 
     rotateX: -90,
-    transformPerspective: 1000
+    transformPerspective: 1000,
   },
   visible: { 
     opacity: 1, 
     rotateX: 0,
     transition: { 
       duration: 0.6, 
-      ease: [0.16, 1, 0.3, 1] 
-    }
+      ease: [0.16, 1, 0.3, 1], 
+    },
   },
   exit: { 
     opacity: 0, 
     rotateX: 90,
-    transition: { duration: 0.3 }
-  }
+    transition: { duration: 0.3 },
+  },
 }
 
 /** Animación de glow pulse */
 export const glowPulseVariants: Variants = {
   hidden: { 
     opacity: 0,
-    boxShadow: '0 0 0 rgba(59, 130, 246, 0)'
+    boxShadow: '0 0 0 rgba(59, 130, 246, 0)',
   },
   visible: { 
     opacity: 1,
     boxShadow: [
       '0 0 0 rgba(59, 130, 246, 0)',
       '0 0 30px rgba(59, 130, 246, 0.4)',
-      '0 0 0 rgba(59, 130, 246, 0)'
+      '0 0 0 rgba(59, 130, 246, 0)',
     ],
     transition: { 
       duration: 2,
       repeat: Infinity,
-      ease: 'easeInOut'
-    }
-  }
+      ease: 'easeInOut',
+    },
+  },
 }
 
 // ============================================================================
@@ -235,7 +235,7 @@ export const TransitionWrapper = forwardRef<HTMLDivElement, TransitionWrapperPro
       scaleBlur: scaleBlurVariants,
       spring: springVariants,
       reveal: revealVariants,
-      flip3D: flip3DVariants
+      flip3D: flip3DVariants,
     }
     
     const selectedVariants = variantsMap[variant]
@@ -248,9 +248,9 @@ export const TransitionWrapper = forwardRef<HTMLDivElement, TransitionWrapperPro
         transition: {
           ...((selectedVariants.visible as { transition?: object }).transition || {}),
           delay,
-          ...(duration && { duration })
-        }
-      }
+          ...(duration && { duration }),
+        },
+      },
     } : selectedVariants
     
     return (
@@ -266,7 +266,7 @@ export const TransitionWrapper = forwardRef<HTMLDivElement, TransitionWrapperPro
         {children}
       </motion.div>
     )
-  }
+  },
 )
 TransitionWrapper.displayName = 'TransitionWrapper'
 
@@ -290,12 +290,12 @@ export function ViewportReveal({
   threshold = 0.2,
   once = true,
   delay = 0,
-  className = ''
+  className = '',
 }: ViewportRevealProps) {
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { 
     amount: threshold,
-    once 
+    once, 
   })
   
   const variantsMap: Record<string, Variants> = {
@@ -303,7 +303,7 @@ export function ViewportReveal({
     slideUp: slideUpVariants,
     slideRight: slideRightVariants,
     scaleBlur: scaleBlurVariants,
-    spring: springVariants
+    spring: springVariants,
   }
   
   return (
@@ -334,12 +334,12 @@ interface ParallaxScrollProps {
 export function ParallaxScroll({
   children,
   speed = 0.5,
-  className = ''
+  className = '',
 }: ParallaxScrollProps) {
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ['start end', 'end start']
+    offset: ['start end', 'end start'],
   })
   
   const y = useTransform(scrollYProgress, [0, 1], [100 * speed, -100 * speed])
@@ -410,7 +410,7 @@ export function HoverLift({
   const intensityMap = {
     subtle: { y: -2, scale: 1.01 },
     medium: { y: -4, scale: 1.02 },
-    strong: { y: -8, scale: 1.03 }
+    strong: { y: -8, scale: 1.03 },
   }
   
   return (
@@ -444,7 +444,7 @@ export function HoverGlow({
   return (
     <motion.div
       whileHover={{
-        boxShadow: `0 0 ${30 * intensity}px ${color}, 0 0 ${60 * intensity}px ${color}40`
+        boxShadow: `0 0 ${30 * intensity}px ${color}, 0 0 ${60 * intensity}px ${color}40`,
       }}
       transition={{ duration: 0.3 }}
       className={className}
@@ -492,7 +492,7 @@ export function HoverTilt({
       onMouseLeave={handleMouseLeave}
       style={{ 
         transformStyle: 'preserve-3d',
-        transition: 'transform 0.1s ease-out'
+        transition: 'transform 0.1s ease-out',
       }}
       className={className}
       {...props}
@@ -519,7 +519,7 @@ export const transitionPresets = {
   slow: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
   spring: { type: 'spring', stiffness: 300, damping: 25 },
   springBouncy: { type: 'spring', stiffness: 400, damping: 15 },
-  springStiff: { type: 'spring', stiffness: 500, damping: 30 }
+  springStiff: { type: 'spring', stiffness: 500, damping: 30 },
 }
 
 export default {
@@ -541,5 +541,5 @@ export default {
   flip3DVariants,
   glowPulseVariants,
   generateStaggerDelay,
-  transitionPresets
+  transitionPresets,
 }

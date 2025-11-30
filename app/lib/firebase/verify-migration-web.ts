@@ -7,8 +7,8 @@
  * @author CHRONOS Data Engineering Team
  */
 
-import { collection, getDocs, query, orderBy, limit } from "firebase/firestore"
-import { db } from "./config"
+import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore'
+import { db } from './config'
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPOS
@@ -55,7 +55,7 @@ const COLLECTIONS_TO_VERIFY = [
  */
 export async function verifyCollection(
   collectionName: string,
-  moneyField: string
+  moneyField: string,
 ): Promise<CollectionStats> {
   const stats: CollectionStats = {
     name: collectionName,
@@ -285,7 +285,7 @@ export async function generateFullReport(): Promise<void> {
       Documentos: c.documentCount,
       [`Total (${c.moneyField})`]: `$${c.totalMoney.toLocaleString()}`,
       Estado: c.status === 'OK' ? '✅' : c.status === 'EMPTY' ? '⚠️ Vacía' : '❌ Error',
-    }))
+    })),
   )
 
   // Verificar integridad de ventas

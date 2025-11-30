@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { useEffect, useRef, useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Box, Package, AlertTriangle, TrendingUp } from "lucide-react"
+import { useEffect, useRef, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Box, Package, AlertTriangle, TrendingUp } from 'lucide-react'
 
 interface InventoryItem {
   id: string
@@ -27,7 +27,7 @@ export function InventoryHeatGrid({
   items,
   gridSize = 8,
   cellSize = 80,
-  className = ""
+  className = '',
 }: InventoryHeatGridProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationFrameRef = useRef<number | null>(null)
@@ -52,9 +52,9 @@ export function InventoryHeatGrid({
         minStock,
         maxStock,
         movement: Math.random() * 10 + 1,
-        category: ["Electrónica", "Ropa", "Alimentos", "Hogar"][Math.floor(Math.random() * 4)],
+        category: ['Electrónica', 'Ropa', 'Alimentos', 'Hogar'][Math.floor(Math.random() * 4)],
         gridX: x,
-        gridY: y
+        gridY: y,
       })
     }
   }
@@ -64,10 +64,10 @@ export function InventoryHeatGrid({
   // Calcular color según stock
   const getStockColor = (item: InventoryItem) => {
     const ratio = item.stock / item.maxStock
-    if (ratio < 0.2) return "#ef4444" // Rojo - stock crítico
-    if (ratio < 0.5) return "#f59e0b" // Amarillo - stock bajo
-    if (ratio < 0.8) return "#10b981" // Verde - stock normal
-    return "#3b82f6" // Azul - stock alto
+    if (ratio < 0.2) return '#ef4444' // Rojo - stock crítico
+    if (ratio < 0.5) return '#f59e0b' // Amarillo - stock bajo
+    if (ratio < 0.8) return '#10b981' // Verde - stock normal
+    return '#3b82f6' // Azul - stock alto
   }
 
   // Calcular altura isométrica
@@ -79,7 +79,7 @@ export function InventoryHeatGrid({
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const ctx = canvas.getContext("2d")
+    const ctx = canvas.getContext('2d')
     if (!ctx) return
 
     let time = 0
@@ -90,8 +90,8 @@ export function InventoryHeatGrid({
 
       // Gradiente de fondo
       const bgGradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
-      bgGradient.addColorStop(0, "rgba(15, 15, 30, 1)")
-      bgGradient.addColorStop(1, "rgba(30, 20, 50, 1)")
+      bgGradient.addColorStop(0, 'rgba(15, 15, 30, 1)')
+      bgGradient.addColorStop(1, 'rgba(30, 20, 50, 1)')
       ctx.fillStyle = bgGradient
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -111,7 +111,7 @@ export function InventoryHeatGrid({
         const pulseScale = isHovered ? 1 + Math.sin(time * 5) * 0.05 : 1
 
         // Sombra
-        ctx.fillStyle = "rgba(0, 0, 0, 0.4)"
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)'
         ctx.beginPath()
         ctx.ellipse(x, y + height, cellSize * 0.3 * pulseScale, cellSize * 0.15 * pulseScale, 0, 0, Math.PI * 2)
         ctx.fill()
@@ -158,7 +158,7 @@ export function InventoryHeatGrid({
 
         // Borde brillante si hover
         if (isHovered) {
-          ctx.strokeStyle = "#ffffff"
+          ctx.strokeStyle = '#ffffff'
           ctx.lineWidth = 3
           ctx.shadowBlur = 20
           ctx.shadowColor = color
@@ -176,9 +176,9 @@ export function InventoryHeatGrid({
 
             ctx.beginPath()
             ctx.arc(px, py, 2, 0, Math.PI * 2)
-            ctx.fillStyle = "#ef4444"
+            ctx.fillStyle = '#ef4444'
             ctx.shadowBlur = 10
-            ctx.shadowColor = "#ef4444"
+            ctx.shadowColor = '#ef4444'
             ctx.fill()
             ctx.shadowBlur = 0
           }
@@ -186,9 +186,9 @@ export function InventoryHeatGrid({
 
         // Label si hover
         if (isHovered) {
-          ctx.fillStyle = "#ffffff"
-          ctx.font = "bold 10px sans-serif"
-          ctx.textAlign = "center"
+          ctx.fillStyle = '#ffffff'
+          ctx.font = 'bold 10px sans-serif'
+          ctx.textAlign = 'center'
           ctx.fillText(`${item.stock}`, x, y - height - cellSize * 0.5)
         }
       })
@@ -246,7 +246,7 @@ export function InventoryHeatGrid({
         animate={{ opacity: 1 }}
         className="rounded-2xl cursor-pointer"
         style={{
-          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)"
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
         }}
         onMouseMove={handleMouseMove}
       />
@@ -259,10 +259,10 @@ export function InventoryHeatGrid({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             style={{
-              position: "absolute",
+              position: 'absolute',
               left: mousePos.x,
               top: mousePos.y - 100,
-              transform: "translate(-50%, 0)"
+              transform: 'translate(-50%, 0)',
             }}
             className="z-20 pointer-events-none"
           >
@@ -291,19 +291,19 @@ export function InventoryHeatGrid({
         <p className="text-white text-xs font-semibold mb-2">Niveles de Stock</p>
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded" style={{ backgroundColor: "#ef4444" }} />
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#ef4444' }} />
             <p className="text-white/80 text-xs">Crítico (&lt;20%)</p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded" style={{ backgroundColor: "#f59e0b" }} />
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#f59e0b' }} />
             <p className="text-white/80 text-xs">Bajo (20-50%)</p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded" style={{ backgroundColor: "#10b981" }} />
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#10b981' }} />
             <p className="text-white/80 text-xs">Normal (50-80%)</p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded" style={{ backgroundColor: "#3b82f6" }} />
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#3b82f6' }} />
             <p className="text-white/80 text-xs">Alto (&gt;80%)</p>
           </div>
         </div>

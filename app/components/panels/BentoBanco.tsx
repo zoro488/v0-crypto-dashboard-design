@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Building2,
   TrendingUp,
@@ -23,26 +23,29 @@ import {
   Edit2,
   Trash2,
   MoreHorizontal,
-} from "lucide-react"
-import { useState, useMemo } from "react"
-import { BANCOS } from "@/app/lib/constants"
-import SimpleCurrencyWidget from "@/app/components/widgets/SimpleCurrencyWidget"
-import { CreateGastoModalPremium } from "@/app/components/modals/CreateGastoModalPremium"
-import { CreateTransferenciaModalPremium } from "@/app/components/modals/CreateTransferenciaModalPremium"
-import { CreateIngresoModalPremium } from "@/app/components/modals/CreateIngresoModalPremium"
-import { FinancialRiverFlow } from "@/app/components/visualizations/FinancialRiverFlow"
+} from 'lucide-react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
+import { BANCOS } from '@/app/lib/constants'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import SimpleCurrencyWidget from '@/app/components/widgets/SimpleCurrencyWidget'
+import { CreateGastoModalPremium } from '@/app/components/modals/CreateGastoModalPremium'
+import { CreateTransferenciaModalPremium } from '@/app/components/modals/CreateTransferenciaModalPremium'
+import { CreateIngresoModalPremium } from '@/app/components/modals/CreateIngresoModalPremium'
+import { useToast } from '@/app/hooks/use-toast'
+import { logger } from '@/app/lib/utils/logger'
+import { FinancialRiverFlow } from '@/app/components/visualizations/FinancialRiverFlow'
 import {
   useIngresosBanco,
   useGastos,
   useTransferencias,
   useCorteBancario,
-} from "@/app/lib/firebase/firestore-hooks.service"
-import { Skeleton } from "@/app/components/ui/skeleton"
-import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from "recharts"
-import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from "@/app/components/ui/SafeChartContainer"
-import { QuickStatWidget } from "@/app/components/widgets/QuickStatWidget"
-import { MiniChartWidget } from "@/app/components/widgets/MiniChartWidget"
-import { ActivityFeedWidget, ActivityItem } from "@/app/components/widgets/ActivityFeedWidget"
+} from '@/app/lib/firebase/firestore-hooks.service'
+import { Skeleton } from '@/app/components/ui/skeleton'
+import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from 'recharts'
+import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/components/ui/SafeChartContainer'
+import { QuickStatWidget } from '@/app/components/widgets/QuickStatWidget'
+import { MiniChartWidget } from '@/app/components/widgets/MiniChartWidget'
+import { ActivityFeedWidget, ActivityItem } from '@/app/components/widgets/ActivityFeedWidget'
 
 // Interfaces para tipado - Actualizadas con campos del JSON migrado
 interface IngresoBanco {
@@ -96,7 +99,7 @@ interface TransferenciaBanco {
 
 // Helper para formatear fecha - Maneja Timestamps de Firestore
 const formatDate = (date: string | Date | { seconds: number } | undefined): string => {
-  if (!date) return "-"
+  if (!date) return '-'
   try {
     // Manejar Timestamp de Firestore
     if (typeof date === 'object' && 'seconds' in date) {
@@ -104,7 +107,7 @@ const formatDate = (date: string | Date | { seconds: number } | undefined): stri
     }
     return new Date(date as string | Date).toLocaleDateString('es-MX')
   } catch {
-    return "-"
+    return '-'
   }
 }
 
@@ -114,17 +117,28 @@ const formatNumber = (value: number | undefined): string => {
 }
 
 const tabs = [
-  { id: "ingresos", label: "Ingresos", icon: TrendingUp },
-  { id: "gastos", label: "Gastos", icon: TrendingDown },
-  { id: "cortes", label: "Cortes", icon: Scissors },
-  { id: "transferencias", label: "Transferencias", icon: ArrowLeftRight },
+  { id: 'ingresos', label: 'Ingresos', icon: TrendingUp },
+  { id: 'gastos', label: 'Gastos', icon: TrendingDown },
+  { id: 'cortes', label: 'Cortes', icon: Scissors },
+  { id: 'transferencias', label: 'Transferencias', icon: ArrowLeftRight },
 ]
 
 export default function BentoBanco() {
-  const [activeTab, setActiveTab] = useState("ingresos")
+  const { toast } = useToast()
+  const { currentPanel } = useAppStore()
+  const [activeTab, setActiveTab] = useState('ingresos')
   const [selectedBanco, setSelectedBanco] = useState(BANCOS[0])
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState('')
   const [filterOpen, setFilterOpen] = useState(false)
+
+  // Sincronizar banco seleccionado con el panel actual del store
+  useEffect(() => {
+    // Si el currentPanel es un ID de banco específico, seleccionarlo
+    const bancoFromPanel = BANCOS.find(b => b.id === currentPanel)
+    if (bancoFromPanel) {
+      setSelectedBanco(bancoFromPanel)
+    }
+  }, [currentPanel])
 
   const [showIngresoModal, setShowIngresoModal] = useState(false)
   const [showGastoModal, setShowGastoModal] = useState(false)
@@ -145,6 +159,87 @@ export default function BentoBanco() {
   const totalIngresos = ingresos.reduce((sum, i) => sum + (i.ingreso ?? 0), 0)
   const totalGastos = gastos.reduce((sum, g) => sum + (g.gasto ?? 0), 0)
   const saldoActual = totalIngresos - totalGastos
+
+  // ============================================
+  // HANDLERS PARA ACCIONES DE TABLA
+  // ============================================
+
+  const handleEditIngreso = useCallback((ingreso: IngresoBanco) => {
+    logger.info('Edit ingreso requested', { context: 'BentoBanco', data: { id: ingreso.id } })
+    toast({
+      title: '⚙️ Función en desarrollo',
+      description: `Editar ingreso de ${ingreso.cliente || 'cliente'} - Próximamente disponible`,
+    })
+  }, [toast])
+
+  const handleDeleteIngreso = useCallback((ingreso: IngresoBanco) => {
+    logger.info('Delete ingreso requested', { context: 'BentoBanco', data: { id: ingreso.id } })
+    toast({
+      title: '🗑️ Confirmar eliminación',
+      description: `¿Eliminar ingreso de $${formatNumber(ingreso.ingreso)}? Esta función estará disponible próximamente.`,
+      variant: 'destructive',
+    })
+  }, [toast])
+
+  const handleEditGasto = useCallback((gasto: GastoBanco) => {
+    logger.info('Edit gasto requested', { context: 'BentoBanco', data: { id: gasto.id } })
+    toast({
+      title: '⚙️ Función en desarrollo',
+      description: `Editar gasto de ${gasto.origen || 'varios'} - Próximamente disponible`,
+    })
+  }, [toast])
+
+  const handleDeleteGasto = useCallback((gasto: GastoBanco) => {
+    logger.info('Delete gasto requested', { context: 'BentoBanco', data: { id: gasto.id } })
+    toast({
+      title: '🗑️ Confirmar eliminación',
+      description: `¿Eliminar gasto de $${formatNumber(gasto.gasto)}? Esta función estará disponible próximamente.`,
+      variant: 'destructive',
+    })
+  }, [toast])
+
+  const handleEditTransferencia = useCallback((trans: TransferenciaBanco) => {
+    logger.info('Edit transferencia requested', { context: 'BentoBanco', data: { id: trans.id } })
+    toast({
+      title: '⚙️ Función en desarrollo',
+      description: `Editar transferencia ${trans.origen} → ${trans.destino} - Próximamente disponible`,
+    })
+  }, [toast])
+
+  const handleDeleteTransferencia = useCallback((trans: TransferenciaBanco) => {
+    logger.info('Delete transferencia requested', { context: 'BentoBanco', data: { id: trans.id } })
+    toast({
+      title: '🗑️ Confirmar eliminación',
+      description: `¿Eliminar transferencia de $${formatNumber(trans.monto)}? Esta función estará disponible próximamente.`,
+      variant: 'destructive',
+    })
+  }, [toast])
+
+  const handleExportData = useCallback(() => {
+    const data = {
+      banco: selectedBanco.nombre,
+      fecha: new Date().toISOString(),
+      ingresos,
+      gastos,
+      transferencias,
+      cortes,
+      totales: { totalIngresos, totalGastos, saldoActual },
+    }
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${selectedBanco.id}_${new Date().toISOString().split('T')[0]}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    
+    logger.info('Data exported', { context: 'BentoBanco', data: { banco: selectedBanco.id } })
+    toast({
+      title: '✅ Datos exportados',
+      description: `Se descargó el archivo de ${selectedBanco.nombre}`,
+    })
+  }, [selectedBanco, ingresos, gastos, transferencias, cortes, totalIngresos, totalGastos, saldoActual, toast])
 
   // Datos para gráficos - DEBE estar antes de cualquier return condicional
   const trendData = useMemo(() => {
@@ -177,7 +272,7 @@ export default function BentoBanco() {
         title: `Ingreso de ${ing.cliente || 'Cliente'}`,
         description: `+$${(ing.ingreso ?? 0).toLocaleString()} - ${ing.concepto || 'Sin concepto'}`,
         timestamp: fecha,
-        status: 'success'
+        status: 'success',
       })
     })
     
@@ -192,7 +287,7 @@ export default function BentoBanco() {
         title: `Gasto - ${g.origen || 'Varios'}`,
         description: `-$${(g.gasto ?? 0).toLocaleString()} - ${g.concepto || g.observaciones || 'Sin concepto'}`,
         timestamp: fecha,
-        status: 'error'
+        status: 'error',
       })
     })
     
@@ -251,8 +346,8 @@ export default function BentoBanco() {
                   relative px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300
                   ${
                     selectedBanco.id === banco.id
-                      ? "bg-white/10 text-white shadow-lg shadow-black/10 ring-1 ring-white/20"
-                      : "glass text-white/40 hover:text-white hover:bg-white/5"
+                      ? 'bg-white/10 text-white shadow-lg shadow-black/10 ring-1 ring-white/20'
+                      : 'glass text-white/40 hover:text-white hover:bg-white/5'
                   }
                 `}
               >
@@ -263,7 +358,7 @@ export default function BentoBanco() {
                   />
                 )}
                 <span className="relative z-10 flex items-center gap-2">
-                  {selectedBanco.id === banco.id && <div className={`w-1.5 h-1.5 rounded-full bg-white`} />}
+                  {selectedBanco.id === banco.id && <div className={'w-1.5 h-1.5 rounded-full bg-white'} />}
                   {banco.nombre}
                 </span>
               </motion.button>
@@ -284,7 +379,7 @@ export default function BentoBanco() {
                 <span className="text-white/60 text-sm font-medium">Saldo Disponible</span>
                 <Wallet className="w-5 h-5 text-emerald-400" />
               </div>
-              <p className="text-4xl font-bold text-white tracking-tight">${saldoActual.toLocaleString("en-US")}</p>
+              <p className="text-4xl font-bold text-white tracking-tight">${saldoActual.toLocaleString('en-US')}</p>
               <div className="flex items-center gap-2 mt-2 text-sm text-emerald-400">
                 <TrendingUp className="w-4 h-4" />
                 <span>+12.5% vs mes anterior</span>
@@ -301,7 +396,7 @@ export default function BentoBanco() {
                 <span className="text-white/60 text-sm font-medium">Ingresos Totales</span>
                 <TrendingUp className="w-5 h-5 text-blue-400" />
               </div>
-              <p className="text-3xl font-bold text-white tracking-tight">${totalIngresos.toLocaleString("en-US")}</p>
+              <p className="text-3xl font-bold text-white tracking-tight">${totalIngresos.toLocaleString('en-US')}</p>
               <div className="w-full h-1 bg-white/10 rounded-full mt-4 overflow-hidden">
                 <div className="h-full w-[75%] bg-blue-500 rounded-full" />
               </div>
@@ -317,14 +412,14 @@ export default function BentoBanco() {
                 <span className="text-white/60 text-sm font-medium">Gastos Totales</span>
                 <TrendingDown className="w-5 h-5 text-red-400" />
               </div>
-              <p className="text-3xl font-bold text-white tracking-tight">${totalGastos.toLocaleString("en-US")}</p>
+              <p className="text-3xl font-bold text-white tracking-tight">${totalGastos.toLocaleString('en-US')}</p>
               <div className="w-full h-1 bg-white/10 rounded-full mt-4 overflow-hidden">
                 <div className="h-full w-[35%] bg-red-500 rounded-full" />
               </div>
             </motion.div>
           </div>
 
-          {selectedBanco.id === "profit" && (
+          {selectedBanco.id === 'profit' && (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
               <SimpleCurrencyWidget />
             </motion.div>
@@ -423,7 +518,7 @@ export default function BentoBanco() {
                   contentStyle={{ 
                     background: 'rgba(15, 23, 42, 0.95)', 
                     border: '1px solid rgba(255,255,255,0.1)', 
-                    borderRadius: '12px' 
+                    borderRadius: '12px', 
                   }}
                   formatter={(value: number) => [`$${value.toLocaleString()}`, '']}
                 />
@@ -535,7 +630,7 @@ export default function BentoBanco() {
                 whileTap={{ scale: 0.98 }}
                 className={`
                   flex items-center gap-2 px-6 py-3 rounded-2xl font-medium transition-all whitespace-nowrap relative
-                  ${activeTab === tab.id ? "text-white" : "text-white/40 hover:text-white hover:bg-white/5"}
+                  ${activeTab === tab.id ? 'text-white' : 'text-white/40 hover:text-white hover:bg-white/5'}
                 `}
               >
                 {activeTab === tab.id && (
@@ -544,7 +639,7 @@ export default function BentoBanco() {
                     className="absolute inset-0 bg-white/10 rounded-2xl shadow-inner shadow-white/5"
                   />
                 )}
-                <tab.icon className={`w-4 h-4 relative z-10 ${activeTab === tab.id ? "text-cyan-400" : ""}`} />
+                <tab.icon className={`w-4 h-4 relative z-10 ${activeTab === tab.id ? 'text-cyan-400' : ''}`} />
                 <span className="relative z-10">{tab.label}</span>
               </motion.button>
             ))}
@@ -565,14 +660,16 @@ export default function BentoBanco() {
               onClick={() => setFilterOpen(!filterOpen)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className={`p-2.5 rounded-xl border transition-all ${filterOpen ? "bg-cyan-500/20 border-cyan-500/50 text-cyan-400" : "bg-black/20 border-white/5 text-white/40 hover:text-white"}`}
+              className={`p-2.5 rounded-xl border transition-all ${filterOpen ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-400' : 'bg-black/20 border-white/5 text-white/40 hover:text-white'}`}
             >
               <Filter className="w-4 h-4" />
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={handleExportData}
               className="p-2.5 rounded-xl bg-black/20 border border-white/5 text-white/40 hover:text-white transition-colors"
+              title="Exportar datos"
             >
               <Download className="w-4 h-4" />
             </motion.button>
@@ -584,7 +681,7 @@ export default function BentoBanco() {
           {filterOpen && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
+              animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden"
             >
@@ -616,7 +713,7 @@ export default function BentoBanco() {
           transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
           className="bento-full min-h-[500px]"
         >
-          {activeTab === "ingresos" && (
+          {activeTab === 'ingresos' && (
             <div className="crystal-card p-1 relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
@@ -626,7 +723,7 @@ export default function BentoBanco() {
                   <p className="text-white/40 text-sm mt-1">Registro detallado de entradas de capital</p>
                 </div>
                 <motion.button
-                  whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(16, 185, 129, 0.3)" }}
+                  whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(16, 185, 129, 0.3)' }}
                   whileTap={{ scale: 0.95 }}
                   className="btn-premium bg-emerald-500 hover:bg-emerald-400 text-white border-none flex items-center gap-2 shadow-lg shadow-emerald-900/20"
                   onClick={() => setShowIngresoModal(true)}
@@ -667,18 +764,26 @@ export default function BentoBanco() {
                           className="group/row hover:bg-white/[0.02] transition-colors"
                         >
                           <td className="px-6 py-4 text-white/60 text-sm">{formatDate(ingreso.fecha)}</td>
-                          <td className="px-6 py-4 text-white/80 font-medium">{ingreso.cliente ?? "-"}</td>
+                          <td className="px-6 py-4 text-white/80 font-medium">{ingreso.cliente ?? '-'}</td>
                           <td className="px-6 py-4 text-emerald-400 font-semibold">${formatNumber(ingreso.ingreso)}</td>
-                          <td className="px-6 py-4 text-white/60">{ingreso.concepto ?? "-"}</td>
-                          <td className="px-6 py-4 text-cyan-400 font-mono text-sm">{ingreso.tc ? `$${ingreso.tc.toFixed(2)}` : "-"}</td>
-                          <td className="px-6 py-4 text-amber-400 font-mono">{ingreso.dolares ? `$${formatNumber(ingreso.dolares)}` : "-"}</td>
-                          <td className="px-6 py-4 text-white/40 text-sm max-w-[200px] truncate">{ingreso.observaciones ?? "-"}</td>
+                          <td className="px-6 py-4 text-white/60">{ingreso.concepto ?? '-'}</td>
+                          <td className="px-6 py-4 text-cyan-400 font-mono text-sm">{ingreso.tc ? `$${ingreso.tc.toFixed(2)}` : '-'}</td>
+                          <td className="px-6 py-4 text-amber-400 font-mono">{ingreso.dolares ? `$${formatNumber(ingreso.dolares)}` : '-'}</td>
+                          <td className="px-6 py-4 text-white/40 text-sm max-w-[200px] truncate">{ingreso.observaciones ?? '-'}</td>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
-                              <button className="p-1.5 rounded-lg hover:bg-blue-500/20 text-blue-400 transition-colors" title="Editar">
+                              <button 
+                                onClick={() => handleEditIngreso(ingreso)}
+                                className="p-1.5 rounded-lg hover:bg-blue-500/20 text-blue-400 transition-colors" 
+                                title="Editar"
+                              >
                                 <Edit2 className="w-4 h-4" />
                               </button>
-                              <button className="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-400 transition-colors" title="Eliminar">
+                              <button 
+                                onClick={() => handleDeleteIngreso(ingreso)}
+                                className="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-400 transition-colors" 
+                                title="Eliminar"
+                              >
                                 <Trash2 className="w-4 h-4" />
                               </button>
                             </div>
@@ -702,7 +807,7 @@ export default function BentoBanco() {
             </div>
           )}
 
-          {activeTab === "gastos" && (
+          {activeTab === 'gastos' && (
             <div className="crystal-card p-1 relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-b from-rose-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
@@ -712,7 +817,7 @@ export default function BentoBanco() {
                   <p className="text-white/40 text-sm mt-1">Registro detallado de salidas de capital</p>
                 </div>
                 <motion.button
-                  whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(244, 63, 94, 0.3)" }}
+                  whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(244, 63, 94, 0.3)' }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setShowGastoModal(true)}
                   className="btn-premium bg-rose-500 hover:bg-rose-400 text-white border-none flex items-center gap-2 shadow-lg shadow-rose-900/20"
@@ -754,19 +859,27 @@ export default function BentoBanco() {
                           className="group/row hover:bg-white/[0.02] transition-colors"
                         >
                           <td className="px-6 py-4 text-white/60 text-sm">{formatDate(gasto.fecha)}</td>
-                          <td className="px-6 py-4 text-white/80 font-medium">{gasto.origen ?? "-"}</td>
+                          <td className="px-6 py-4 text-white/80 font-medium">{gasto.origen ?? '-'}</td>
                           <td className="px-6 py-4 text-rose-400 font-semibold">${formatNumber(gasto.gasto)}</td>
-                          <td className="px-6 py-4 text-cyan-400 font-mono text-sm">{gasto.tc ? `$${gasto.tc.toFixed(2)}` : "-"}</td>
-                          <td className="px-6 py-4 text-amber-400 font-mono">{gasto.pesos ? `$${formatNumber(gasto.pesos)}` : "-"}</td>
-                          <td className="px-6 py-4 text-white/60">{gasto.destino ?? "-"}</td>
-                          <td className="px-6 py-4 text-white/60">{gasto.concepto ?? "-"}</td>
-                          <td className="px-6 py-4 text-white/40 text-sm max-w-[200px] truncate">{gasto.observaciones ?? "-"}</td>
+                          <td className="px-6 py-4 text-cyan-400 font-mono text-sm">{gasto.tc ? `$${gasto.tc.toFixed(2)}` : '-'}</td>
+                          <td className="px-6 py-4 text-amber-400 font-mono">{gasto.pesos ? `$${formatNumber(gasto.pesos)}` : '-'}</td>
+                          <td className="px-6 py-4 text-white/60">{gasto.destino ?? '-'}</td>
+                          <td className="px-6 py-4 text-white/60">{gasto.concepto ?? '-'}</td>
+                          <td className="px-6 py-4 text-white/40 text-sm max-w-[200px] truncate">{gasto.observaciones ?? '-'}</td>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
-                              <button className="p-1.5 rounded-lg hover:bg-blue-500/20 text-blue-400 transition-colors" title="Editar">
+                              <button 
+                                onClick={() => handleEditGasto(gasto)}
+                                className="p-1.5 rounded-lg hover:bg-blue-500/20 text-blue-400 transition-colors" 
+                                title="Editar"
+                              >
                                 <Edit2 className="w-4 h-4" />
                               </button>
-                              <button className="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-400 transition-colors" title="Eliminar">
+                              <button 
+                                onClick={() => handleDeleteGasto(gasto)}
+                                className="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-400 transition-colors" 
+                                title="Eliminar"
+                              >
                                 <Trash2 className="w-4 h-4" />
                               </button>
                             </div>
@@ -790,7 +903,7 @@ export default function BentoBanco() {
             </div>
           )}
 
-          {activeTab === "cortes" && (
+          {activeTab === 'cortes' && (
             <div className="crystal-card p-1 relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="flex items-center justify-between p-6 relative z-10">
@@ -858,7 +971,7 @@ export default function BentoBanco() {
             </div>
           )}
 
-          {activeTab === "transferencias" && (
+          {activeTab === 'transferencias' && (
             <div className="crystal-card p-1 relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="flex items-center justify-between p-6 relative z-10">
@@ -910,25 +1023,33 @@ export default function BentoBanco() {
                           <td className="py-4 px-6 text-white/60 text-sm">{formatDate(trans.fecha)}</td>
                           <td className="py-4 px-6">
                             <span className="px-2 py-1 rounded-lg bg-rose-500/10 text-rose-400 text-xs font-medium">
-                              {trans.origen ?? "-"}
+                              {trans.origen ?? '-'}
                             </span>
                           </td>
                           <td className="py-4 px-6">
                             <span className="px-2 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-medium">
-                              {trans.destino ?? "-"}
+                              {trans.destino ?? '-'}
                             </span>
                           </td>
                           <td className="py-4 px-6 text-right text-purple-400 font-bold font-mono">
                             ${formatNumber(trans.monto)}
                           </td>
-                          <td className="py-4 px-6 text-white/60 text-sm">{trans.concepto ?? "-"}</td>
-                          <td className="py-4 px-6 text-white/40 text-sm max-w-[200px] truncate">{trans.observaciones ?? "-"}</td>
+                          <td className="py-4 px-6 text-white/60 text-sm">{trans.concepto ?? '-'}</td>
+                          <td className="py-4 px-6 text-white/40 text-sm max-w-[200px] truncate">{trans.observaciones ?? '-'}</td>
                           <td className="py-4 px-6">
                             <div className="flex items-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
-                              <button className="p-1.5 rounded-lg hover:bg-blue-500/20 text-blue-400 transition-colors" title="Editar">
+                              <button 
+                                onClick={() => handleEditTransferencia(trans)}
+                                className="p-1.5 rounded-lg hover:bg-blue-500/20 text-blue-400 transition-colors" 
+                                title="Editar"
+                              >
                                 <Edit2 className="w-4 h-4" />
                               </button>
-                              <button className="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-400 transition-colors" title="Eliminar">
+                              <button 
+                                onClick={() => handleDeleteTransferencia(trans)}
+                                className="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-400 transition-colors" 
+                                title="Eliminar"
+                              >
                                 <Trash2 className="w-4 h-4" />
                               </button>
                             </div>
@@ -986,13 +1107,13 @@ const TableHeader = ({ children }: { children: React.ReactNode }) => (
 // Helper component for Status Badges
 const StatusBadge = ({
   status,
-  type = "info",
-}: { status: string; type?: "success" | "warning" | "error" | "info" }) => {
+  type = 'info',
+}: { status: string; type?: 'success' | 'warning' | 'error' | 'info' }) => {
   const styles = {
-    success: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-    warning: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-    error: "bg-rose-500/10 text-rose-400 border-rose-500/20",
-    info: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    success: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+    warning: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+    error: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
+    info: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
   }
 
   return (

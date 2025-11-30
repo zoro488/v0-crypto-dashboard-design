@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 🛡️ SAFE VIEW - Cortafuegos de UI
@@ -40,7 +40,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     // Log del error
     logger.error(`Error en ${this.props.componentName || 'componente'}`, error, {
       context: 'SafeView',
-      data: { componentStack: errorInfo.componentStack }
+      data: { componentStack: errorInfo.componentStack },
     })
     
     // Callback opcional
@@ -108,7 +108,7 @@ export function SafeView({ children, name, fallback }: SafeViewProps) {
 // Wrapper para componentes lazy
 export function withSafeView<P extends object>(
   WrappedComponent: React.ComponentType<P>,
-  componentName?: string
+  componentName?: string,
 ) {
   return function SafeWrappedComponent(props: P) {
     return (

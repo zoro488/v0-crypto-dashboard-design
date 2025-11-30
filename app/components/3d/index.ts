@@ -58,7 +58,7 @@ export { WorkflowVisualizer3D } from './WorkflowVisualizer3D'
 export type { 
   WorkflowNode, 
   WorkflowConnection, 
-  WorkflowVisualizer3DProps 
+  WorkflowVisualizer3DProps, 
 } from './WorkflowVisualizer3D'
 
 // Fondos premium con orbes animados
@@ -66,11 +66,11 @@ export {
   PremiumOrbBackground, 
   DashboardBackground, 
   LoginBackground, 
-  CyberpunkBackground 
+  CyberpunkBackground, 
 } from './PremiumOrbBackground'
 export type { 
   PremiumOrbBackgroundProps, 
-  ColorScheme as OrbColorScheme 
+  ColorScheme as OrbColorScheme, 
 } from './PremiumOrbBackground'
 
 // Orbe Spline Premium con AI integrado

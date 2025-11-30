@@ -1,20 +1,20 @@
-'use client';
+'use client'
 
 /**
  * 🎮 Demo de Componentes 3D Chronos
  * Página para visualizar y probar todos los componentes 3D
  */
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useState } from 'react'
+import { motion } from 'framer-motion'
 import { 
   Sparkles, Cpu, Eye, Flame, MessageCircle, 
-  ChevronRight, Play, Pause, RotateCcw
-} from 'lucide-react';
+  ChevronRight, Play, Pause, RotateCcw,
+} from 'lucide-react'
 
-import { Button } from '@/app/components/ui/button';
-import { FloatingAIOrb } from '@/app/components/3d/FloatingAIOrb';
-import { FirePortal3D, PortalLoadingOverlay } from '@/app/components/3d/FirePortal3D';
+import { Button } from '@/app/components/ui/button'
+import { FloatingAIOrb } from '@/app/components/3d/FloatingAIOrb'
+import { FirePortal3D, PortalLoadingOverlay } from '@/app/components/3d/FirePortal3D'
 
 // ============================================================================
 // TARJETA DE DEMO
@@ -60,7 +60,7 @@ function DemoCard({ title, description, icon, children, actions }: DemoCardProps
         </div>
       )}
     </motion.div>
-  );
+  )
 }
 
 // ============================================================================
@@ -69,51 +69,51 @@ function DemoCard({ title, description, icon, children, actions }: DemoCardProps
 
 export default function Demo3DPage() {
   // Estados para demos
-  const [portalState, setPortalState] = useState<'idle' | 'opening' | 'active' | 'closing'>('idle');
-  const [portalProgress, setPortalProgress] = useState(0);
-  const [portalColor, setPortalColor] = useState<'fire' | 'ice' | 'void' | 'gold' | 'emerald'>('fire');
-  const [showOverlay, setShowOverlay] = useState(false);
-  const [overlayProgress, setOverlayProgress] = useState(0);
+  const [portalState, setPortalState] = useState<'idle' | 'opening' | 'active' | 'closing'>('idle')
+  const [portalProgress, setPortalProgress] = useState(0)
+  const [portalColor, setPortalColor] = useState<'fire' | 'ice' | 'void' | 'gold' | 'emerald'>('fire')
+  const [showOverlay, setShowOverlay] = useState(false)
+  const [overlayProgress, setOverlayProgress] = useState(0)
   
   // Simular progreso del portal
   const startPortal = () => {
-    setPortalState('opening');
-    setPortalProgress(0);
+    setPortalState('opening')
+    setPortalProgress(0)
     
-    setTimeout(() => setPortalState('active'), 500);
+    setTimeout(() => setPortalState('active'), 500)
     
     const interval = setInterval(() => {
       setPortalProgress(prev => {
         if (prev >= 1) {
-          clearInterval(interval);
-          return 1;
+          clearInterval(interval)
+          return 1
         }
-        return prev + 0.02;
-      });
-    }, 100);
-  };
+        return prev + 0.02
+      })
+    }, 100)
+  }
   
   const stopPortal = () => {
-    setPortalState('closing');
-    setTimeout(() => setPortalState('idle'), 1000);
-  };
+    setPortalState('closing')
+    setTimeout(() => setPortalState('idle'), 1000)
+  }
   
   // Simular overlay de carga
   const showLoadingOverlay = () => {
-    setShowOverlay(true);
-    setOverlayProgress(0);
+    setShowOverlay(true)
+    setOverlayProgress(0)
     
     const interval = setInterval(() => {
       setOverlayProgress(prev => {
         if (prev >= 1) {
-          clearInterval(interval);
-          setTimeout(() => setShowOverlay(false), 500);
-          return 1;
+          clearInterval(interval)
+          setTimeout(() => setShowOverlay(false), 500)
+          return 1
         }
-        return prev + 0.01;
-      });
-    }, 50);
-  };
+        return prev + 0.01
+      })
+    }, 50)
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-8">
@@ -280,7 +280,7 @@ export default function Demo3DPage() {
             'Framer Motion',
             'TypeScript',
             'Tailwind CSS',
-            'shadcn/ui'
+            'shadcn/ui',
           ].map((tech) => (
             <span
               key={tech}
@@ -303,5 +303,5 @@ export default function Demo3DPage() {
         color="void"
       />
     </div>
-  );
+  )
 }

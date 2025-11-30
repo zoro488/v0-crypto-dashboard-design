@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * useVoiceInput - Hook para reconocimiento de voz usando Web Speech API
@@ -146,7 +146,7 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
     onCommand,
     onTranscript,
     onError,
-    maxSilenceMs = 3000
+    maxSilenceMs = 3000,
   } = options
   
   // Estado
@@ -341,7 +341,7 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
         'network': 'Error de red',
         'audio-capture': 'No se encontró micrófono',
         'aborted': 'Reconocimiento abortado',
-        'service-not-allowed': 'Servicio no permitido'
+        'service-not-allowed': 'Servicio no permitido',
       }
       
       const errorMsg = errorMessages[event.error] || `Error: ${event.error}`
@@ -394,7 +394,7 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
     onError,
     startAudioAnalysis,
     stopAudioAnalysis,
-    isListening
+    isListening,
   ])
   
   // ═══════════════════════════════════════════════════════════════════════════════
@@ -518,7 +518,7 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
     // Síntesis
     speak,
     stopSpeaking,
-    isSpeaking
+    isSpeaking,
   }
 }
 

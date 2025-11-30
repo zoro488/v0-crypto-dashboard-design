@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 🔷 MINI CHART WIDGET - Gráficos Compactos Premium
@@ -26,7 +26,7 @@ import {
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis
+  YAxis,
 } from 'recharts'
 import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/components/ui/SafeChartContainer'
 
@@ -68,7 +68,7 @@ const colorConfig = {
   purple: { primary: '#8b5cf6', secondary: '#a855f7', gradient: 'from-purple-500 to-violet-500' },
   orange: { primary: '#f97316', secondary: '#f59e0b', gradient: 'from-orange-500 to-amber-500' },
   cyan: { primary: '#06b6d4', secondary: '#14b8a6', gradient: 'from-cyan-500 to-teal-500' },
-  pink: { primary: '#ec4899', secondary: '#f43f5e', gradient: 'from-pink-500 to-rose-500' }
+  pink: { primary: '#ec4899', secondary: '#f43f5e', gradient: 'from-pink-500 to-rose-500' },
 }
 
 // ============================================================================
@@ -113,7 +113,7 @@ function AreaChartComponent({
   colors, 
   showAxis, 
   showTooltip,
-  height 
+  height, 
 }: { 
   data: DataPoint[]
   colors: { primary: string; secondary: string }
@@ -187,7 +187,7 @@ function LineChartComponent({
   colors, 
   showAxis, 
   showTooltip,
-  height 
+  height, 
 }: { 
   data: DataPoint[]
   colors: { primary: string; secondary: string }
@@ -252,7 +252,7 @@ function BarChartComponent({
   colors, 
   showAxis, 
   showTooltip,
-  height 
+  height, 
 }: { 
   data: DataPoint[]
   colors: { primary: string; secondary: string }
@@ -310,7 +310,7 @@ function DonutChartComponent({
   data, 
   colors, 
   showTooltip,
-  height 
+  height, 
 }: { 
   data: DataPoint[]
   colors: { primary: string; secondary: string }
@@ -376,7 +376,7 @@ export function MiniChartWidget({
   showLegend = false,
   animated = true,
   className = '',
-  delay = 0
+  delay = 0,
 }: MiniChartWidgetProps) {
   const colors = colorConfig[color]
   
@@ -387,7 +387,7 @@ export function MiniChartWidget({
       colors,
       showAxis,
       showTooltip,
-      height
+      height,
     }
     
     switch (type) {
@@ -409,11 +409,11 @@ export function MiniChartWidget({
       transition={{
         duration: 0.5,
         delay,
-        ease: [0.16, 1, 0.3, 1]
+        ease: [0.16, 1, 0.3, 1],
       }}
       whileHover={{ 
         y: -2,
-        transition: { duration: 0.2 }
+        transition: { duration: 0.2 },
       }}
       className={`
         rounded-2xl bg-zinc-900/60 backdrop-blur-xl
@@ -465,7 +465,7 @@ export function MiniChartWidget({
                 className="w-2 h-2 rounded-full"
                 style={{ 
                   backgroundColor: item.color || 
-                    (index === 0 ? colors.primary : colors.secondary) 
+                    (index === 0 ? colors.primary : colors.secondary), 
                 }}
               />
               <span className="text-xs text-white/50">{item.name}</span>

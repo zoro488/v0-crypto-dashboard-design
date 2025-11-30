@@ -1,20 +1,20 @@
-"use client"
+'use client'
 
-import { useState, useEffect, useMemo } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Building2, AlertCircle, CheckCircle2, Clock, DollarSign, Package, Plus, TrendingUp, BarChart3, Activity, Truck } from "lucide-react"
-import { Button } from "@/app/components/ui/button"
-import { Badge } from "@/app/components/ui/badge"
-import { useDistribuidores, useOrdenesCompra } from "@/app/lib/firebase/firestore-hooks.service"
-import { CreateDistribuidorModalPremium } from "@/app/components/modals/CreateDistribuidorModalPremium"
-import { CreatePagoDistribuidorModalPremium } from "@/app/components/modals/CreatePagoDistribuidorModalPremium"
-import { Skeleton } from "@/app/components/ui/skeleton"
-import { Alert, AlertDescription, AlertTitle } from "@/app/components/ui/alert"
-import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from "recharts"
-import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from "@/app/components/ui/SafeChartContainer"
-import { QuickStatWidget } from "@/app/components/widgets/QuickStatWidget"
-import { MiniChartWidget } from "@/app/components/widgets/MiniChartWidget"
-import { ActivityFeedWidget, ActivityItem } from "@/app/components/widgets/ActivityFeedWidget"
+import { useState, useEffect, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Building2, AlertCircle, CheckCircle2, Clock, DollarSign, Package, Plus, TrendingUp, BarChart3, Activity, Truck } from 'lucide-react'
+import { Button } from '@/app/components/ui/button'
+import { Badge } from '@/app/components/ui/badge'
+import { useDistribuidores, useOrdenesCompra } from '@/app/lib/firebase/firestore-hooks.service'
+import { CreateDistribuidorModalPremium } from '@/app/components/modals/CreateDistribuidorModalPremium'
+import { CreatePagoDistribuidorModalPremium } from '@/app/components/modals/CreatePagoDistribuidorModalPremium'
+import { Skeleton } from '@/app/components/ui/skeleton'
+import { Alert, AlertDescription, AlertTitle } from '@/app/components/ui/alert'
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from 'recharts'
+import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/components/ui/SafeChartContainer'
+import { QuickStatWidget } from '@/app/components/widgets/QuickStatWidget'
+import { MiniChartWidget } from '@/app/components/widgets/MiniChartWidget'
+import { ActivityFeedWidget, ActivityItem } from '@/app/components/widgets/ActivityFeedWidget'
 
 // Interface para distribuidor
 interface DistribuidorData {
@@ -73,7 +73,7 @@ export default function BentoDistribuidores() {
       name: d.nombre?.substring(0, 6) || `D${i + 1}`,
       compras: d.totalOrdenesCompra ?? 0,
       pagos: d.totalPagado ?? 0,
-      deuda: d.deudaTotal ?? 0
+      deuda: d.deudaTotal ?? 0,
     }))
   }, [topDistribuidores])
 
@@ -95,7 +95,7 @@ export default function BentoDistribuidores() {
       title: d.nombre || 'Distribuidor',
       description: `Compras: $${((d.totalOrdenesCompra ?? 0) / 1000).toFixed(0)}K | Deuda: $${((d.deudaTotal ?? 0) / 1000).toFixed(0)}K`,
       timestamp: new Date(Date.now() - i * 3600000),
-      status: ((d.deudaTotal ?? 0) > 0 ? 'pending' : 'success') as 'pending' | 'success'
+      status: ((d.deudaTotal ?? 0) > 0 ? 'pending' : 'success') as 'pending' | 'success',
     }))
   }, [topDistribuidores])
 
@@ -121,7 +121,7 @@ export default function BentoDistribuidores() {
             <AlertTitle>Error de conexión</AlertTitle>
             <AlertDescription>
               No se pudieron cargar algunos datos. Es posible que falten permisos de Firestore.
-              {(errorDist || errorOC)?.includes("Missing or insufficient permissions") && (
+              {(errorDist || errorOC)?.includes('Missing or insufficient permissions') && (
                 <span className="block mt-1 text-xs opacity-80">
                   Configure las reglas de seguridad en la consola de Firebase.
                 </span>
@@ -254,7 +254,7 @@ export default function BentoDistribuidores() {
                   contentStyle={{ 
                     background: 'rgba(15, 23, 42, 0.95)', 
                     border: '1px solid rgba(255,255,255,0.1)', 
-                    borderRadius: '12px' 
+                    borderRadius: '12px', 
                   }}
                   formatter={(value: number) => [`$${value.toLocaleString()}`, '']}
                 />
@@ -391,7 +391,7 @@ export default function BentoDistribuidores() {
                         </div>
                         <div>
                           <div className="font-medium text-white group-hover/row:text-purple-400 transition-colors">
-                            {dist.nombre ?? "-"}
+                            {dist.nombre ?? '-'}
                           </div>
                           <div className="text-xs text-zinc-500">{dist.id}</div>
                         </div>

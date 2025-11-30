@@ -1,25 +1,27 @@
-"use client"
+'use client'
 
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   ShoppingCart, Plus, TrendingUp, AlertCircle, CheckCircle2, Clock, Package,
   Building2, DollarSign, Calendar, Search, Filter, Download, Eye, Edit,
   ArrowUpRight, ArrowDownRight, Truck, BarChart3, PieChart as PieChartIcon,
   CreditCard, Receipt, RefreshCw, ChevronRight,
-  type LucideIcon
-} from "lucide-react"
-import { Button } from "@/app/components/ui/button"
-import { Badge } from "@/app/components/ui/badge"
-import { Input } from "@/app/components/ui/input"
-import { Skeleton } from "@/app/components/ui/skeleton"
-import { useState, useEffect, useMemo } from "react"
-import { suscribirOrdenesCompra } from "@/app/lib/firebase/firestore-service"
-import type { OrdenCompra, FirestoreTimestamp } from "@/app/types"
-import { CreateOrdenCompraModalPremium } from "@/app/components/modals/CreateOrdenCompraModalPremium"
+  type LucideIcon,
+} from 'lucide-react'
+import { Button } from '@/app/components/ui/button'
+import { Badge } from '@/app/components/ui/badge'
+import { Input } from '@/app/components/ui/input'
+import { Skeleton } from '@/app/components/ui/skeleton'
+import { useState, useEffect, useMemo, useCallback } from 'react'
+import { suscribirOrdenesCompra } from '@/app/lib/firebase/firestore-service'
+import type { OrdenCompra, FirestoreTimestamp } from '@/app/types'
+import { CreateOrdenCompraModalPremium } from '@/app/components/modals/CreateOrdenCompraModalPremium'
+import { useToast } from '@/app/hooks/use-toast'
+import { logger } from '@/app/lib/utils/logger'
 import { 
   AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, 
-  Tooltip, PieChart, Pie, Cell, CartesianGrid, Legend 
-} from "recharts"
+  Tooltip, PieChart, Pie, Cell, CartesianGrid, Legend, 
+} from 'recharts'
 
 // ============================================================================
 // HELPERS
@@ -29,19 +31,19 @@ function formatearFecha(fecha: string | FirestoreTimestamp | undefined): string 
   
   if (typeof fecha === 'string') {
     return new Date(fecha).toLocaleDateString('es-MX', { 
-      day: '2-digit', month: 'short', year: 'numeric' 
+      day: '2-digit', month: 'short', year: 'numeric', 
     })
   }
   
   if (fecha && typeof fecha === 'object' && 'toDate' in fecha) {
     return fecha.toDate().toLocaleDateString('es-MX', { 
-      day: '2-digit', month: 'short', year: 'numeric' 
+      day: '2-digit', month: 'short', year: 'numeric', 
     })
   }
   
   if (fecha instanceof Date) {
     return fecha.toLocaleDateString('es-MX', { 
-      day: '2-digit', month: 'short', year: 'numeric' 
+      day: '2-digit', month: 'short', year: 'numeric', 
     })
   }
   
@@ -56,7 +58,7 @@ const formatCurrency = (value: number | undefined): string => {
   return new Intl.NumberFormat('es-MX', { 
     style: 'currency', 
     currency: 'MXN',
-    minimumFractionDigits: 0 
+    minimumFractionDigits: 0, 
   }).format(value ?? 0)
 }
 
@@ -68,7 +70,7 @@ const CHART_COLORS = ['#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444', '#3
 
 // Tarjeta de estadística animada
 function StatCard({ 
-  title, value, subtitle, icon: Icon, color, trend, trendValue 
+  title, value, subtitle, icon: Icon, color, trend, trendValue, 
 }: { 
   title: string
   value: string | number
@@ -197,10 +199,11 @@ function OrdenCompraCard({ orden, onView }: { orden: OrdenCompra; onView: (oc: O
 // COMPONENTE PRINCIPAL
 // ============================================================================
 export default function BentoOrdenesCompra() {
+  const { toast } = useToast()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [ordenesCompraData, setOrdenesCompraData] = useState<OrdenCompra[]>([])
   const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState('')
   const [filterEstado, setFilterEstado] = useState<string | null>(null)
   const [selectedOrden, setSelectedOrden] = useState<OrdenCompra | null>(null)
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
@@ -214,21 +217,49 @@ export default function BentoOrdenesCompra() {
     return () => unsubscribe()
   }, [])
 
+  // Handler para exportar datos
+  const handleExportOrdenes = useCallback(() => {
+    const data = {
+      fecha: new Date().toISOString(),
+      ordenes: ordenesCompraData,
+      resumen: {
+        total: ordenesCompraData.length,
+        totalCompras: ordenesCompraData.reduce((acc, oc) => acc + oc.costoTotal, 0),
+        totalPagado: ordenesCompraData.reduce((acc, oc) => acc + oc.pagoDistribuidor, 0),
+        totalDeuda: ordenesCompraData.reduce((acc, oc) => acc + oc.deuda, 0),
+      },
+    }
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `ordenes_compra_${new Date().toISOString().split('T')[0]}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    
+    logger.info('Ordenes de compra exportadas', { context: 'BentoOrdenesCompra', data: { count: ordenesCompraData.length } })
+    toast({
+      title: '✅ Datos exportados',
+      description: `Se exportaron ${ordenesCompraData.length} órdenes de compra`,
+    })
+  }, [ordenesCompraData, toast])
+
   // Métricas calculadas
   const totalCompras = useMemo(() => 
-    ordenesCompraData.reduce((acc, oc) => acc + oc.costoTotal, 0), [ordenesCompraData]
+    ordenesCompraData.reduce((acc, oc) => acc + oc.costoTotal, 0), [ordenesCompraData],
   )
   const totalPagado = useMemo(() => 
-    ordenesCompraData.reduce((acc, oc) => acc + oc.pagoDistribuidor, 0), [ordenesCompraData]
+    ordenesCompraData.reduce((acc, oc) => acc + oc.pagoDistribuidor, 0), [ordenesCompraData],
   )
   const totalDeuda = useMemo(() => 
-    ordenesCompraData.reduce((acc, oc) => acc + oc.deuda, 0), [ordenesCompraData]
+    ordenesCompraData.reduce((acc, oc) => acc + oc.deuda, 0), [ordenesCompraData],
   )
   const totalUnidades = useMemo(() => 
-    ordenesCompraData.reduce((acc, oc) => acc + oc.cantidad, 0), [ordenesCompraData]
+    ordenesCompraData.reduce((acc, oc) => acc + oc.cantidad, 0), [ordenesCompraData],
   )
   const stockDisponible = useMemo(() => 
-    ordenesCompraData.reduce((acc, oc) => acc + oc.stockActual, 0), [ordenesCompraData]
+    ordenesCompraData.reduce((acc, oc) => acc + oc.stockActual, 0), [ordenesCompraData],
   )
 
   const ordenesPagadas = ordenesCompraData.filter(oc => oc.estado === 'pagado').length
@@ -244,7 +275,7 @@ export default function BentoOrdenesCompra() {
       result = result.filter(oc => 
         oc.id.toLowerCase().includes(q) ||
         oc.distribuidor?.toLowerCase().includes(q) ||
-        oc.origen?.toLowerCase().includes(q)
+        oc.origen?.toLowerCase().includes(q),
       )
     }
 
@@ -265,7 +296,7 @@ export default function BentoOrdenesCompra() {
     return Object.entries(grouped).map(([name, value], i) => ({
       name,
       value,
-      color: CHART_COLORS[i % CHART_COLORS.length]
+      color: CHART_COLORS[i % CHART_COLORS.length],
     }))
   }, [ordenesCompraData])
 
@@ -372,7 +403,7 @@ export default function BentoOrdenesCompra() {
             subtitle={`${ordenesPendientes + ordenesParciales} OC pendientes`}
             icon={AlertCircle}
             color="from-rose-500/20 to-pink-500/20"
-            trend={totalDeuda > 0 ? "down" : "neutral"}
+            trend={totalDeuda > 0 ? 'down' : 'neutral'}
           />
           <StatCard
             title="Stock Disponible"
@@ -407,7 +438,7 @@ export default function BentoOrdenesCompra() {
                   contentStyle={{ 
                     backgroundColor: 'rgba(0,0,0,0.8)', 
                     border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '8px'
+                    borderRadius: '8px',
                   }}
                   formatter={(value: number) => formatCurrency(value)}
                 />
@@ -490,7 +521,12 @@ export default function BentoOrdenesCompra() {
               Órdenes de Compra ({filteredOrdenes.length})
             </h3>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="border-white/20 text-white/70">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-white/20 text-white/70"
+                onClick={handleExportOrdenes}
+              >
                 <Download size={16} className="mr-2" />
                 Exportar
               </Button>
@@ -536,7 +572,7 @@ export default function BentoOrdenesCompra() {
                 contentStyle={{ 
                   backgroundColor: 'rgba(0,0,0,0.8)', 
                   border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
                 }}
                 formatter={(value: number) => formatCurrency(value)}
               />

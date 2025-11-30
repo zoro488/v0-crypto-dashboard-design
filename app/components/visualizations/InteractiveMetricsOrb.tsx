@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { useEffect, useRef, useState } from "react"
-import { motion, useAnimation } from "framer-motion"
-import { TrendingUp, DollarSign, Percent, Zap } from "lucide-react"
+import { useEffect, useRef, useState } from 'react'
+import { motion, useAnimation } from 'framer-motion'
+import { TrendingUp, DollarSign, Percent, Zap } from 'lucide-react'
 
 interface Particle {
   x: number
@@ -31,13 +31,13 @@ interface InteractiveMetricsOrbProps {
 
 export function InteractiveMetricsOrb({
   metrics = [
-    { label: "Ventas", value: 1250000, change: 12.5, icon: DollarSign, color: "#10b981" },
-    { label: "Ganancias", value: 380000, change: 8.3, icon: TrendingUp, color: "#3b82f6" },
-    { label: "ROI", value: 34.5, change: 4.2, icon: Percent, color: "#f59e0b" },
-    { label: "Eficiencia", value: 92, change: 2.1, icon: Zap, color: "#8b5cf6" }
+    { label: 'Ventas', value: 1250000, change: 12.5, icon: DollarSign, color: '#10b981' },
+    { label: 'Ganancias', value: 380000, change: 8.3, icon: TrendingUp, color: '#3b82f6' },
+    { label: 'ROI', value: 34.5, change: 4.2, icon: Percent, color: '#f59e0b' },
+    { label: 'Eficiencia', value: 92, change: 2.1, icon: Zap, color: '#8b5cf6' },
   ],
   size = 400,
-  className = ""
+  className = '',
 }: InteractiveMetricsOrbProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -49,7 +49,7 @@ export function InteractiveMetricsOrb({
 
   // Formatear números
   const formatValue = (value: number, label: string) => {
-    if (label === "ROI" || label === "Eficiencia") return `${value}%`
+    if (label === 'ROI' || label === 'Eficiencia') return `${value}%`
     return `$${(value / 1000).toFixed(0)}k`
   }
 
@@ -66,7 +66,7 @@ export function InteractiveMetricsOrb({
         radius: 2 + Math.random() * 3,
         life: 100,
         maxLife: 100,
-        color
+        color,
       })
     }
   }
@@ -76,7 +76,7 @@ export function InteractiveMetricsOrb({
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const ctx = canvas.getContext("2d")
+    const ctx = canvas.getContext('2d')
     if (!ctx) return
 
     const centerX = canvas.width / 2
@@ -97,9 +97,9 @@ export function InteractiveMetricsOrb({
         gradient.addColorStop(0.5, `${color}20`)
         gradient.addColorStop(1, `${color}05`)
       } else {
-        gradient.addColorStop(0, "rgba(59, 130, 246, 0.3)")
-        gradient.addColorStop(0.5, "rgba(139, 92, 246, 0.15)")
-        gradient.addColorStop(1, "rgba(16, 185, 129, 0.05)")
+        gradient.addColorStop(0, 'rgba(59, 130, 246, 0.3)')
+        gradient.addColorStop(0.5, 'rgba(139, 92, 246, 0.15)')
+        gradient.addColorStop(1, 'rgba(16, 185, 129, 0.05)')
       }
 
       // Dibujar orbe principal con pulso
@@ -174,9 +174,9 @@ export function InteractiveMetricsOrb({
 
       // Núcleo brillante central
       const coreGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 30)
-      coreGradient.addColorStop(0, "rgba(255, 255, 255, 0.9)")
-      coreGradient.addColorStop(0.5, "rgba(100, 200, 255, 0.6)")
-      coreGradient.addColorStop(1, "rgba(100, 200, 255, 0)")
+      coreGradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)')
+      coreGradient.addColorStop(0.5, 'rgba(100, 200, 255, 0.6)')
+      coreGradient.addColorStop(1, 'rgba(100, 200, 255, 0)')
       
       ctx.beginPath()
       ctx.arc(centerX, centerY, 20 + Math.sin(time * 3) * 5, 0, Math.PI * 2)
@@ -202,7 +202,7 @@ export function InteractiveMetricsOrb({
     if (rect) {
       setMousePos({
         x: event.clientX - rect.left,
-        y: event.clientY - rect.top
+        y: event.clientY - rect.top,
       })
       // Crear explosión de partículas
       const centerX = size / 2
@@ -227,7 +227,7 @@ export function InteractiveMetricsOrb({
         animate={controls}
         className="rounded-3xl"
         style={{
-          filter: "drop-shadow(0 20px 60px rgba(59, 130, 246, 0.3))"
+          filter: 'drop-shadow(0 20px 60px rgba(59, 130, 246, 0.3))',
         }}
       />
 
@@ -246,12 +246,12 @@ export function InteractiveMetricsOrb({
               key={metric.label}
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: index * 0.1, type: "spring", stiffness: 200 }}
+              transition={{ delay: index * 0.1, type: 'spring', stiffness: 200 }}
               style={{
-                position: "absolute",
+                position: 'absolute',
                 left: x,
                 top: y,
-                transform: "translate(-50%, -50%)"
+                transform: 'translate(-50%, -50%)',
               }}
               className="pointer-events-auto"
               onMouseEnter={(e) => handleMetricHover(index, e)}
@@ -261,7 +261,7 @@ export function InteractiveMetricsOrb({
                 if (rect) {
                   setMousePos({
                     x: e.clientX - rect.left,
-                    y: e.clientY - rect.top
+                    y: e.clientY - rect.top,
                   })
                 }
               }}
@@ -270,7 +270,7 @@ export function InteractiveMetricsOrb({
                 whileHover={{ scale: 1.15, rotate: 5 }}
                 whileTap={{ scale: 0.95 }}
                 className={`relative cursor-pointer ${
-                  hoveredMetric === index ? "z-20" : "z-10"
+                  hoveredMetric === index ? 'z-20' : 'z-10'
                 }`}
               >
                 {/* Card de métrica */}
@@ -279,14 +279,14 @@ export function InteractiveMetricsOrb({
                   style={{
                     background: hoveredMetric === index
                       ? `linear-gradient(135deg, ${metric.color}40, ${metric.color}20)`
-                      : "linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))"
+                      : 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
                   }}
                 >
                   {/* Icono */}
                   <motion.div
                     animate={hoveredMetric === index ? {
                       rotate: [0, -10, 10, -10, 0],
-                      transition: { duration: 0.5 }
+                      transition: { duration: 0.5 },
                     } : {}}
                     className="flex items-center justify-center w-10 h-10 rounded-xl mb-2"
                     style={{ backgroundColor: `${metric.color}30` }}
@@ -308,17 +308,17 @@ export function InteractiveMetricsOrb({
                   {/* Cambio */}
                   <div className="flex items-center gap-1">
                     <TrendingUp
-                      className={`w-3 h-3 ${metric.change >= 0 ? "text-green-400" : "text-red-400"}`}
+                      className={`w-3 h-3 ${metric.change >= 0 ? 'text-green-400' : 'text-red-400'}`}
                       style={{
-                        transform: metric.change < 0 ? "rotate(180deg)" : "none"
+                        transform: metric.change < 0 ? 'rotate(180deg)' : 'none',
                       }}
                     />
                     <span
                       className={`text-xs font-semibold ${
-                        metric.change >= 0 ? "text-green-400" : "text-red-400"
+                        metric.change >= 0 ? 'text-green-400' : 'text-red-400'
                       }`}
                     >
-                      {metric.change >= 0 ? "+" : ""}{metric.change}%
+                      {metric.change >= 0 ? '+' : ''}{metric.change}%
                     </span>
                   </div>
 
@@ -330,7 +330,7 @@ export function InteractiveMetricsOrb({
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${Math.abs(metric.change) * 5}%` }}
-                      transition={{ duration: 1, ease: "easeOut" }}
+                      transition={{ duration: 1, ease: 'easeOut' }}
                       className="h-full rounded-full"
                       style={{ backgroundColor: metric.color }}
                     />

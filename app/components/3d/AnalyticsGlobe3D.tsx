@@ -1,10 +1,10 @@
-'use client';
+'use client'
 
-import { useRef, useEffect, useState, useCallback } from 'react';
-import { Card } from '@/app/components/ui/card';
-import { Badge } from '@/app/components/ui/badge';
-import { Button } from '@/app/components/ui/button';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useRef, useEffect, useState, useCallback } from 'react'
+import { Card } from '@/app/components/ui/card'
+import { Badge } from '@/app/components/ui/badge'
+import { Button } from '@/app/components/ui/button'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Globe, 
   RefreshCw, 
@@ -15,9 +15,9 @@ import {
   X,
   ZoomIn,
   ZoomOut,
-  RotateCcw
-} from 'lucide-react';
-import { logger } from '@/app/lib/utils/logger';
+  RotateCcw,
+} from 'lucide-react'
+import { logger } from '@/app/lib/utils/logger'
 
 // ============================================
 // INTERFACES Y TIPOS
@@ -50,84 +50,84 @@ const TYPE_COLORS = {
   venta: {
     primary: '#10b981',
     secondary: '#34d399',
-    glow: 'rgba(16, 185, 129, 0.5)'
+    glow: 'rgba(16, 185, 129, 0.5)',
   },
   cliente: {
     primary: '#3b82f6',
     secondary: '#60a5fa',
-    glow: 'rgba(59, 130, 246, 0.5)'
+    glow: 'rgba(59, 130, 246, 0.5)',
   },
   distribuidor: {
     primary: '#8b5cf6',
     secondary: '#a78bfa',
-    glow: 'rgba(139, 92, 246, 0.5)'
-  }
-};
+    glow: 'rgba(139, 92, 246, 0.5)',
+  },
+}
 
 const TYPE_ICONS = {
   venta: DollarSign,
   cliente: Users,
-  distribuidor: Truck
-};
+  distribuidor: Truck,
+}
 
 // ============================================
 // COMPONENTE PRINCIPAL
 // ============================================
 export const AnalyticsGlobe3D = ({
   data,
-  title = "Distribución Global",
+  title = 'Distribución Global',
   height = 500,
   onPointClick,
   autoRotate = true,
-  showLegend = true
+  showLegend = true,
 }: AnalyticsGlobe3DProps) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number | null>(null);
-  const [selectedPoint, setSelectedPoint] = useState<DataPoint | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [rotation, setRotation] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const animationRef = useRef<number | null>(null)
+  const [selectedPoint, setSelectedPoint] = useState<DataPoint | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [rotation, setRotation] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
 
   // Calcular métricas agregadas
-  const totalValue = data.reduce((sum, p) => sum + p.value, 0);
+  const totalValue = data.reduce((sum, p) => sum + p.value, 0)
   const countByType = {
     venta: data.filter(p => p.type === 'venta').length,
     cliente: data.filter(p => p.type === 'cliente').length,
-    distribuidor: data.filter(p => p.type === 'distribuidor').length
-  };
+    distribuidor: data.filter(p => p.type === 'distribuidor').length,
+  }
 
   // ============================================
   // FUNCIONES DE RENDERIZADO DEL GLOBO
   // ============================================
   const latLngToXY = useCallback((lat: number, lng: number, radius: number, centerX: number, centerY: number) => {
     // Proyección esférica simplificada
-    const latRad = (lat * Math.PI) / 180;
-    const lngRad = (lng * Math.PI) / 180 + rotation.y;
+    const latRad = (lat * Math.PI) / 180
+    const lngRad = (lng * Math.PI) / 180 + rotation.y
 
-    const x = centerX + radius * Math.cos(latRad) * Math.sin(lngRad) * zoom;
-    const y = centerY - radius * Math.sin(latRad) * zoom;
-    const z = Math.cos(latRad) * Math.cos(lngRad);
+    const x = centerX + radius * Math.cos(latRad) * Math.sin(lngRad) * zoom
+    const y = centerY - radius * Math.sin(latRad) * zoom
+    const z = Math.cos(latRad) * Math.cos(lngRad)
 
-    return { x, y, z, visible: z > -0.1 };
-  }, [rotation.y, zoom]);
+    return { x, y, z, visible: z > -0.1 }
+  }, [rotation.y, zoom])
 
   const drawGlobe = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
-    const centerX = width / 2;
-    const centerY = height / 2;
-    const radius = Math.min(width, height) * 0.35;
+    const centerX = width / 2
+    const centerY = height / 2
+    const radius = Math.min(width, height) * 0.35
 
     // Limpiar canvas
-    ctx.clearRect(0, 0, width, height);
+    ctx.clearRect(0, 0, width, height)
 
     // Fondo gradiente espacial
-    const bgGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius * 2);
-    bgGradient.addColorStop(0, 'rgba(15, 23, 42, 0.3)');
-    bgGradient.addColorStop(0.5, 'rgba(15, 23, 42, 0.6)');
-    bgGradient.addColorStop(1, 'rgba(15, 23, 42, 0.9)');
-    ctx.fillStyle = bgGradient;
-    ctx.fillRect(0, 0, width, height);
+    const bgGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius * 2)
+    bgGradient.addColorStop(0, 'rgba(15, 23, 42, 0.3)')
+    bgGradient.addColorStop(0.5, 'rgba(15, 23, 42, 0.6)')
+    bgGradient.addColorStop(1, 'rgba(15, 23, 42, 0.9)')
+    ctx.fillStyle = bgGradient
+    ctx.fillRect(0, 0, width, height)
 
     // Dibujar globo base
     const globeGradient = ctx.createRadialGradient(
@@ -136,204 +136,204 @@ export const AnalyticsGlobe3D = ({
       0,
       centerX, 
       centerY, 
-      radius
-    );
-    globeGradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
-    globeGradient.addColorStop(0.7, 'rgba(59, 130, 246, 0.1)');
-    globeGradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)');
+      radius,
+    )
+    globeGradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)')
+    globeGradient.addColorStop(0.7, 'rgba(59, 130, 246, 0.1)')
+    globeGradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)')
 
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.fillStyle = globeGradient;
-    ctx.fill();
+    ctx.beginPath()
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2)
+    ctx.fillStyle = globeGradient
+    ctx.fill()
 
     // Borde del globo con glow
-    ctx.shadowColor = 'rgba(59, 130, 246, 0.5)';
-    ctx.shadowBlur = 20;
-    ctx.strokeStyle = 'rgba(59, 130, 246, 0.3)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.shadowBlur = 0;
+    ctx.shadowColor = 'rgba(59, 130, 246, 0.5)'
+    ctx.shadowBlur = 20
+    ctx.strokeStyle = 'rgba(59, 130, 246, 0.3)'
+    ctx.lineWidth = 2
+    ctx.stroke()
+    ctx.shadowBlur = 0
 
     // Dibujar líneas de latitud
-    ctx.strokeStyle = 'rgba(148, 163, 184, 0.1)';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(148, 163, 184, 0.1)'
+    ctx.lineWidth = 1
     for (let lat = -60; lat <= 60; lat += 30) {
-      ctx.beginPath();
+      ctx.beginPath()
       for (let lng = -180; lng <= 180; lng += 5) {
-        const { x, y, visible } = latLngToXY(lat, lng, radius, centerX, centerY);
+        const { x, y, visible } = latLngToXY(lat, lng, radius, centerX, centerY)
         if (visible) {
           if (lng === -180) {
-            ctx.moveTo(x, y);
+            ctx.moveTo(x, y)
           } else {
-            ctx.lineTo(x, y);
+            ctx.lineTo(x, y)
           }
         }
       }
-      ctx.stroke();
+      ctx.stroke()
     }
 
     // Dibujar líneas de longitud
     for (let lng = -180; lng < 180; lng += 30) {
-      ctx.beginPath();
+      ctx.beginPath()
       for (let lat = -90; lat <= 90; lat += 5) {
-        const { x, y, visible } = latLngToXY(lat, lng, radius, centerX, centerY);
+        const { x, y, visible } = latLngToXY(lat, lng, radius, centerX, centerY)
         if (visible) {
           if (lat === -90) {
-            ctx.moveTo(x, y);
+            ctx.moveTo(x, y)
           } else {
-            ctx.lineTo(x, y);
+            ctx.lineTo(x, y)
           }
         }
       }
-      ctx.stroke();
+      ctx.stroke()
     }
 
     // Ordenar puntos por profundidad (z) para renderizado correcto
     const sortedData = [...data].sort((a, b) => {
-      const za = latLngToXY(a.lat, a.lng, radius, centerX, centerY).z;
-      const zb = latLngToXY(b.lat, b.lng, radius, centerX, centerY).z;
-      return za - zb;
-    });
+      const za = latLngToXY(a.lat, a.lng, radius, centerX, centerY).z
+      const zb = latLngToXY(b.lat, b.lng, radius, centerX, centerY).z
+      return za - zb
+    })
 
     // Dibujar puntos de datos
     sortedData.forEach((point) => {
-      const { x, y, z, visible } = latLngToXY(point.lat, point.lng, radius, centerX, centerY);
+      const { x, y, z, visible } = latLngToXY(point.lat, point.lng, radius, centerX, centerY)
 
-      if (!visible) return;
+      if (!visible) return
 
-      const colors = TYPE_COLORS[point.type];
-      const pointRadius = Math.max(4, Math.min(12, point.value / 10000)) * (0.5 + z * 0.5);
-      const alpha = 0.3 + z * 0.7;
+      const colors = TYPE_COLORS[point.type]
+      const pointRadius = Math.max(4, Math.min(12, point.value / 10000)) * (0.5 + z * 0.5)
+      const alpha = 0.3 + z * 0.7
 
       // Glow effect
-      ctx.shadowColor = colors.glow;
-      ctx.shadowBlur = 15;
+      ctx.shadowColor = colors.glow
+      ctx.shadowBlur = 15
 
       // Punto principal
-      ctx.beginPath();
-      ctx.arc(x, y, pointRadius, 0, Math.PI * 2);
-      ctx.fillStyle = `${colors.primary}${Math.floor(alpha * 255).toString(16).padStart(2, '0')}`;
-      ctx.fill();
+      ctx.beginPath()
+      ctx.arc(x, y, pointRadius, 0, Math.PI * 2)
+      ctx.fillStyle = `${colors.primary}${Math.floor(alpha * 255).toString(16).padStart(2, '0')}`
+      ctx.fill()
 
       // Anillo exterior
-      ctx.strokeStyle = colors.secondary;
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
+      ctx.strokeStyle = colors.secondary
+      ctx.lineWidth = 1.5
+      ctx.stroke()
 
       // Pulso animado para puntos seleccionados o con trend up
       if (selectedPoint?.id === point.id || point.trend === 'up') {
-        ctx.beginPath();
-        ctx.arc(x, y, pointRadius * 2, 0, Math.PI * 2);
-        ctx.strokeStyle = `${colors.primary}40`;
-        ctx.lineWidth = 1;
-        ctx.stroke();
+        ctx.beginPath()
+        ctx.arc(x, y, pointRadius * 2, 0, Math.PI * 2)
+        ctx.strokeStyle = `${colors.primary}40`
+        ctx.lineWidth = 1
+        ctx.stroke()
       }
 
-      ctx.shadowBlur = 0;
-    });
+      ctx.shadowBlur = 0
+    })
 
-  }, [data, latLngToXY, selectedPoint]);
+  }, [data, latLngToXY, selectedPoint])
 
   // ============================================
   // ANIMACIÓN Y EFECTOS
   // ============================================
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const canvas = canvasRef.current
+    if (!canvas) return
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
 
     // Configurar tamaño del canvas
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    ctx.scale(dpr, dpr);
+    const dpr = window.devicePixelRatio || 1
+    const rect = canvas.getBoundingClientRect()
+    canvas.width = rect.width * dpr
+    canvas.height = rect.height * dpr
+    ctx.scale(dpr, dpr)
 
-    setIsLoading(false);
+    setIsLoading(false)
 
-    let currentRotation = rotation.y;
+    let currentRotation = rotation.y
 
     const animate = () => {
       if (autoRotate && !isDragging) {
-        currentRotation += 0.002;
-        setRotation(prev => ({ ...prev, y: currentRotation }));
+        currentRotation += 0.002
+        setRotation(prev => ({ ...prev, y: currentRotation }))
       }
 
-      drawGlobe(ctx, rect.width, rect.height);
-      animationRef.current = requestAnimationFrame(animate);
-    };
+      drawGlobe(ctx, rect.width, rect.height)
+      animationRef.current = requestAnimationFrame(animate)
+    }
 
-    animate();
+    animate()
 
     return () => {
       if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
+        cancelAnimationFrame(animationRef.current)
       }
-    };
-  }, [autoRotate, isDragging, drawGlobe, rotation.y]);
+    }
+  }, [autoRotate, isDragging, drawGlobe, rotation.y])
 
   // ============================================
   // HANDLERS DE INTERACCIÓN
   // ============================================
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    setIsDragging(true);
-    setDragStart({ x: e.clientX, y: e.clientY });
-  };
+    setIsDragging(true)
+    setDragStart({ x: e.clientX, y: e.clientY })
+  }
 
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDragging) return;
+    if (!isDragging) return
 
-    const deltaX = (e.clientX - dragStart.x) * 0.01;
-    setRotation(prev => ({ ...prev, y: prev.y + deltaX }));
-    setDragStart({ x: e.clientX, y: e.clientY });
-  };
+    const deltaX = (e.clientX - dragStart.x) * 0.01
+    setRotation(prev => ({ ...prev, y: prev.y + deltaX }))
+    setDragStart({ x: e.clientX, y: e.clientY })
+  }
 
   const handleMouseUp = () => {
-    setIsDragging(false);
-  };
+    setIsDragging(false)
+  }
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const canvas = canvasRef.current
+    if (!canvas) return
 
-    const rect = canvas.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const clickY = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const radius = Math.min(rect.width, rect.height) * 0.35;
+    const rect = canvas.getBoundingClientRect()
+    const clickX = e.clientX - rect.left
+    const clickY = e.clientY - rect.top
+    const centerX = rect.width / 2
+    const centerY = rect.height / 2
+    const radius = Math.min(rect.width, rect.height) * 0.35
 
     // Encontrar el punto más cercano al click
-    let closestPoint: DataPoint | null = null;
-    let minDistance = Infinity;
+    let closestPoint: DataPoint | null = null
+    let minDistance = Infinity
 
     data.forEach(point => {
-      const { x, y, visible } = latLngToXY(point.lat, point.lng, radius, centerX, centerY);
-      if (!visible) return;
+      const { x, y, visible } = latLngToXY(point.lat, point.lng, radius, centerX, centerY)
+      if (!visible) return
 
-      const distance = Math.sqrt((clickX - x) ** 2 + (clickY - y) ** 2);
+      const distance = Math.sqrt((clickX - x) ** 2 + (clickY - y) ** 2)
       if (distance < 20 && distance < minDistance) {
-        minDistance = distance;
-        closestPoint = point;
+        minDistance = distance
+        closestPoint = point
       }
-    });
+    })
 
     if (closestPoint) {
-      setSelectedPoint(closestPoint);
-      onPointClick?.(closestPoint);
+      setSelectedPoint(closestPoint)
+      onPointClick?.(closestPoint)
     }
-  };
+  }
 
-  const handleZoomIn = () => setZoom(prev => Math.min(2, prev + 0.2));
-  const handleZoomOut = () => setZoom(prev => Math.max(0.5, prev - 0.2));
+  const handleZoomIn = () => setZoom(prev => Math.min(2, prev + 0.2))
+  const handleZoomOut = () => setZoom(prev => Math.max(0.5, prev - 0.2))
   const handleReset = () => {
-    setZoom(1);
-    setRotation({ x: 0, y: 0 });
-    setSelectedPoint(null);
-  };
+    setZoom(1)
+    setRotation({ x: 0, y: 0 })
+    setSelectedPoint(null)
+  }
 
   // ============================================
   // RENDER
@@ -365,8 +365,8 @@ export const AnalyticsGlobe3D = ({
         {/* Stats rápidos por tipo */}
         <div className="grid grid-cols-3 gap-3 mt-4">
           {Object.entries(countByType).map(([type, count]) => {
-            const Icon = TYPE_ICONS[type as keyof typeof TYPE_ICONS];
-            const colors = TYPE_COLORS[type as keyof typeof TYPE_COLORS];
+            const Icon = TYPE_ICONS[type as keyof typeof TYPE_ICONS]
+            const colors = TYPE_COLORS[type as keyof typeof TYPE_COLORS]
             return (
               <div 
                 key={type}
@@ -380,7 +380,7 @@ export const AnalyticsGlobe3D = ({
                 <span className="text-sm text-slate-300 capitalize">{type}s:</span>
                 <span className="text-sm font-semibold text-white">{count}</span>
               </div>
-            );
+            )
           })}
         </div>
       </div>
@@ -479,7 +479,7 @@ export const AnalyticsGlobe3D = ({
                   className="text-white"
                   style={{ 
                     backgroundColor: TYPE_COLORS[selectedPoint.type].primary,
-                    borderColor: TYPE_COLORS[selectedPoint.type].secondary
+                    borderColor: TYPE_COLORS[selectedPoint.type].secondary,
                   }}
                 >
                   {selectedPoint.type}
@@ -513,7 +513,7 @@ export const AnalyticsGlobe3D = ({
         </div>
       )}
     </Card>
-  );
-};
+  )
+}
 
-export default AnalyticsGlobe3D;
+export default AnalyticsGlobe3D

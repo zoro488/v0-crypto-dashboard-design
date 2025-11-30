@@ -3,7 +3,7 @@
  * Manejo automático de listeners y limpieza de memoria
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   collection,
   query,
@@ -17,8 +17,8 @@ import {
   QuerySnapshot,
   Unsubscribe,
   doc,
-} from 'firebase/firestore';
-import { db, isFirebaseConfigured } from '@/app/lib/firebase/config';
+} from 'firebase/firestore'
+import { db, isFirebaseConfigured } from '@/app/lib/firebase/config'
 
 // Tipos para configuración de suscripción
 interface RealtimeConfig<T> {
@@ -37,7 +37,7 @@ interface RealtimeState<T> {
 }
 
 // Cache para evitar re-suscripciones innecesarias
-const subscriptionCache = new Map<string, { unsubscribe: Unsubscribe; listeners: number }>();
+const subscriptionCache = new Map<string, { unsubscribe: Unsubscribe; listeners: number }>()
 
 /**
  * Hook principal para suscripciones en tiempo real
@@ -54,19 +54,19 @@ export function useRealtime<T extends { id: string }>({
     loading: true,
     error: null,
     lastUpdated: null,
-  });
+  })
 
-  const refreshRef = useRef(0);
+  const refreshRef = useRef(0)
 
   const refresh = useCallback(() => {
-    refreshRef.current += 1;
-    setState(prev => ({ ...prev, loading: true }));
-  }, []);
+    refreshRef.current += 1
+    setState(prev => ({ ...prev, loading: true }))
+  }, [])
 
   useEffect(() => {
     if (!enabled || !collectionName) {
-      setState(prev => ({ ...prev, loading: false }));
-      return;
+      setState(prev => ({ ...prev, loading: false }))
+      return
     }
 
     // Guard: verificar que Firestore está disponible
@@ -74,49 +74,49 @@ export function useRealtime<T extends { id: string }>({
       setState(prev => ({ 
         ...prev, 
         loading: false,
-        error: new Error('Firestore no configurado')
-      }));
-      return;
+        error: new Error('Firestore no configurado'),
+      }))
+      return
     }
 
-    const collectionRef = collection(db!, collectionName);
+    const collectionRef = collection(db!, collectionName)
     const q = constraints.length > 0 
       ? query(collectionRef, ...constraints)
-      : query(collectionRef);
+      : query(collectionRef)
 
     const unsubscribe = onSnapshot(
       q,
       (snapshot: QuerySnapshot<DocumentData>) => {
         try {
           const documents = snapshot.docs.map(doc => {
-            const data = { id: doc.id, ...doc.data() };
-            return transform ? transform(data) : (data as T);
-          });
+            const data = { id: doc.id, ...doc.data() }
+            return transform ? transform(data) : (data as T)
+          })
 
           setState({
             data: documents,
             loading: false,
             error: null,
             lastUpdated: new Date(),
-          });
+          })
         } catch (error) {
-          const err = error instanceof Error ? error : new Error('Error transformando datos');
-          setState(prev => ({ ...prev, loading: false, error: err }));
-          onError?.(err);
+          const err = error instanceof Error ? error : new Error('Error transformando datos')
+          setState(prev => ({ ...prev, loading: false, error: err }))
+          onError?.(err)
         }
       },
       (error) => {
-        const err = error instanceof Error ? error : new Error('Error de suscripción');
-        setState(prev => ({ ...prev, loading: false, error: err }));
-        onError?.(err);
-      }
-    );
+        const err = error instanceof Error ? error : new Error('Error de suscripción')
+        setState(prev => ({ ...prev, loading: false, error: err }))
+        onError?.(err)
+      },
+    )
 
     // Limpieza al desmontar
-    return () => unsubscribe();
-  }, [collectionName, enabled, refreshRef.current]);
+    return () => unsubscribe()
+  }, [collectionName, enabled, refreshRef.current])
 
-  return { ...state, refresh };
+  return { ...state, refresh }
 }
 
 /**
@@ -135,42 +135,42 @@ export function useRealtimeDocument<T extends { id: string }>({
   onError?: (error: Error) => void;
   enabled?: boolean;
 }): { data: T | null; loading: boolean; error: Error | null } {
-  const [data, setData] = useState<T | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [data, setData] = useState<T | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
     if (!enabled || !collectionName || !documentId) {
-      setLoading(false);
-      return;
+      setLoading(false)
+      return
     }
 
-    const docRef = doc(db!, collectionName, documentId);
+    const docRef = doc(db!, collectionName, documentId)
 
     const unsubscribe = onSnapshot(
       docRef,
       (snapshot) => {
         if (snapshot.exists()) {
-          const docData = { id: snapshot.id, ...snapshot.data() };
-          const transformed = transform ? transform(docData) : (docData as T);
-          setData(transformed);
+          const docData = { id: snapshot.id, ...snapshot.data() }
+          const transformed = transform ? transform(docData) : (docData as T)
+          setData(transformed)
         } else {
-          setData(null);
+          setData(null)
         }
-        setLoading(false);
-        setError(null);
+        setLoading(false)
+        setError(null)
       },
       (err) => {
-        setError(err);
-        setLoading(false);
-        onError?.(err);
-      }
-    );
+        setError(err)
+        setLoading(false)
+        onError?.(err)
+      },
+    )
 
-    return () => unsubscribe();
-  }, [collectionName, documentId, enabled]);
+    return () => unsubscribe()
+  }, [collectionName, documentId, enabled])
 
-  return { data, loading, error };
+  return { data, loading, error }
 }
 
 // ============================================
@@ -187,18 +187,18 @@ export function useRealtimeVentas(options?: {
 }) {
   const constraints: QueryConstraint[] = [
     orderBy('fecha', 'desc'),
-  ];
+  ]
 
   if (options?.limit) {
-    constraints.push(limit(options.limit));
+    constraints.push(limit(options.limit))
   }
 
   if (options?.startDate) {
-    constraints.push(where('fecha', '>=', Timestamp.fromDate(options.startDate)));
+    constraints.push(where('fecha', '>=', Timestamp.fromDate(options.startDate)))
   }
 
   if (options?.endDate) {
-    constraints.push(where('fecha', '<=', Timestamp.fromDate(options.endDate)));
+    constraints.push(where('fecha', '<=', Timestamp.fromDate(options.endDate)))
   }
 
   return useRealtime({
@@ -213,7 +213,7 @@ export function useRealtimeVentas(options?: {
       estado: data.estado,
       formaPago: data.formaPago,
     }),
-  });
+  })
 }
 
 /**
@@ -225,14 +225,14 @@ export function useRealtimeOrdenes(options?: {
 }) {
   const constraints: QueryConstraint[] = [
     orderBy('fechaCreacion', 'desc'),
-  ];
+  ]
 
   if (options?.limit) {
-    constraints.push(limit(options.limit));
+    constraints.push(limit(options.limit))
   }
 
   if (options?.estado) {
-    constraints.push(where('estado', '==', options.estado));
+    constraints.push(where('estado', '==', options.estado))
   }
 
   return useRealtime({
@@ -248,7 +248,7 @@ export function useRealtimeOrdenes(options?: {
       estado: data.estado,
       productos: data.productos,
     }),
-  });
+  })
 }
 
 /**
@@ -258,14 +258,14 @@ export function useRealtimeClientes(options?: {
   limit?: number;
   conDeuda?: boolean;
 }) {
-  const constraints: QueryConstraint[] = [];
+  const constraints: QueryConstraint[] = []
 
   if (options?.limit) {
-    constraints.push(limit(options.limit));
+    constraints.push(limit(options.limit))
   }
 
   if (options?.conDeuda) {
-    constraints.push(where('deuda', '>', 0));
+    constraints.push(where('deuda', '>', 0))
   }
 
   return useRealtime({
@@ -280,7 +280,7 @@ export function useRealtimeClientes(options?: {
       totalCompras: data.totalCompras || 0,
       ultimaCompra: data.ultimaCompra?.toDate?.() || null,
     }),
-  });
+  })
 }
 
 /**
@@ -298,7 +298,7 @@ export function useRealtimeDistribuidores() {
       deudaTotal: data.deudaTotal || 0,
       ordenesActivas: data.ordenesActivas || 0,
     }),
-  });
+  })
 }
 
 /**
@@ -308,10 +308,10 @@ export function useRealtimeBancos(bancoId?: string) {
   const constraints: QueryConstraint[] = [
     orderBy('fecha', 'desc'),
     limit(50),
-  ];
+  ]
 
   if (bancoId) {
-    constraints.push(where('bancoId', '==', bancoId));
+    constraints.push(where('bancoId', '==', bancoId))
   }
 
   return useRealtime({
@@ -326,7 +326,7 @@ export function useRealtimeBancos(bancoId?: string) {
       fecha: data.fecha?.toDate?.() || new Date(data.fecha),
       referencia: data.referencia,
     }),
-  });
+  })
 }
 
 /**
@@ -342,7 +342,7 @@ export function useRealtimeSaldosBancos() {
       tipo: data.tipo,
       color: data.color,
     }),
-  });
+  })
 }
 
 /**
@@ -360,7 +360,7 @@ export function useRealtimeAlmacen() {
       costo: data.costo || 0,
       ubicacion: data.ubicacion,
     }),
-  });
+  })
 }
 
 /**
@@ -371,10 +371,10 @@ export function useRealtimeNotificaciones(userId?: string) {
     orderBy('createdAt', 'desc'),
     limit(20),
     where('leida', '==', false),
-  ];
+  ]
 
   if (userId) {
-    constraints.push(where('userId', '==', userId));
+    constraints.push(where('userId', '==', userId))
   }
 
   return useRealtime({
@@ -390,7 +390,7 @@ export function useRealtimeNotificaciones(userId?: string) {
       createdAt: data.createdAt?.toDate?.() || new Date(data.createdAt),
       accion: data.accion,
     }),
-  });
+  })
 }
 
 /**
@@ -406,81 +406,81 @@ export function useRealtimeStats() {
     deudaClientes: 0,
     deudaProveedores: 0,
     utilidadesMes: 0,
-  });
-  const [loading, setLoading] = useState(true);
+  })
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsubscribers: Unsubscribe[] = [];
+    const unsubscribers: Unsubscribe[] = []
 
     // Ventas de hoy
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
+    const hoy = new Date()
+    hoy.setHours(0, 0, 0, 0)
     
     const ventasHoyQuery = query(
       collection(db!, 'ventas'),
-      where('fecha', '>=', Timestamp.fromDate(hoy))
-    );
+      where('fecha', '>=', Timestamp.fromDate(hoy)),
+    )
 
     unsubscribers.push(
       onSnapshot(ventasHoyQuery, (snapshot) => {
-        const total = snapshot.docs.reduce((sum, doc) => sum + (doc.data().monto || 0), 0);
-        setStats(prev => ({ ...prev, ventasHoy: total }));
-      })
-    );
+        const total = snapshot.docs.reduce((sum, doc) => sum + (doc.data().monto || 0), 0)
+        setStats(prev => ({ ...prev, ventasHoy: total }))
+      }),
+    )
 
     // Clientes activos
-    const clientesQuery = query(collection(db!, 'clientes'));
+    const clientesQuery = query(collection(db!, 'clientes'))
     unsubscribers.push(
       onSnapshot(clientesQuery, (snapshot) => {
-        setStats(prev => ({ ...prev, clientesActivos: snapshot.size }));
-        const deuda = snapshot.docs.reduce((sum, doc) => sum + (doc.data().deuda || 0), 0);
-        setStats(prev => ({ ...prev, deudaClientes: deuda }));
-      })
-    );
+        setStats(prev => ({ ...prev, clientesActivos: snapshot.size }))
+        const deuda = snapshot.docs.reduce((sum, doc) => sum + (doc.data().deuda || 0), 0)
+        setStats(prev => ({ ...prev, deudaClientes: deuda }))
+      }),
+    )
 
     // Órdenes pendientes
     const ordenesPendientesQuery = query(
       collection(db!, 'ordenesCompra'),
-      where('estado', '==', 'pendiente')
-    );
+      where('estado', '==', 'pendiente'),
+    )
     unsubscribers.push(
       onSnapshot(ordenesPendientesQuery, (snapshot) => {
-        setStats(prev => ({ ...prev, ordenesPendientes: snapshot.size }));
-        const deuda = snapshot.docs.reduce((sum, doc) => sum + (doc.data().deuda || 0), 0);
-        setStats(prev => ({ ...prev, deudaProveedores: deuda }));
-      })
-    );
+        setStats(prev => ({ ...prev, ordenesPendientes: snapshot.size }))
+        const deuda = snapshot.docs.reduce((sum, doc) => sum + (doc.data().deuda || 0), 0)
+        setStats(prev => ({ ...prev, deudaProveedores: deuda }))
+      }),
+    )
 
     // Stock bajo
     const stockBajoQuery = query(
       collection(db!, 'almacen'),
-      where('cantidad', '<', 10)
-    );
+      where('cantidad', '<', 10),
+    )
     unsubscribers.push(
       onSnapshot(stockBajoQuery, (snapshot) => {
-        setStats(prev => ({ ...prev, stockBajo: snapshot.size }));
-      })
-    );
+        setStats(prev => ({ ...prev, stockBajo: snapshot.size }))
+      }),
+    )
 
-    setLoading(false);
+    setLoading(false)
 
     return () => {
-      unsubscribers.forEach(unsub => unsub());
-    };
-  }, []);
+      unsubscribers.forEach(unsub => unsub())
+    }
+  }, [])
 
-  return { stats, loading };
+  return { stats, loading }
 }
 
 /**
  * Hook combinado para dashboard principal
  */
 export function useRealtimeDashboard() {
-  const ventas = useRealtimeVentas({ limit: 10 });
-  const ordenes = useRealtimeOrdenes({ limit: 10 });
-  const clientes = useRealtimeClientes({ limit: 10 });
-  const saldos = useRealtimeSaldosBancos();
-  const { stats, loading: statsLoading } = useRealtimeStats();
+  const ventas = useRealtimeVentas({ limit: 10 })
+  const ordenes = useRealtimeOrdenes({ limit: 10 })
+  const clientes = useRealtimeClientes({ limit: 10 })
+  const saldos = useRealtimeSaldosBancos()
+  const { stats, loading: statsLoading } = useRealtimeStats()
 
   return {
     ventas: ventas.data,
@@ -490,7 +490,7 @@ export function useRealtimeDashboard() {
     stats,
     loading: ventas.loading || ordenes.loading || clientes.loading || saldos.loading || statsLoading,
     lastUpdated: ventas.lastUpdated,
-  };
+  }
 }
 
-export default useRealtime;
+export default useRealtime

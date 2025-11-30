@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 💎 CREATE TRANSFERENCIA MODAL PREMIUM - Transferencias entre Bancos
@@ -10,22 +10,22 @@
  * 4. Registro de historial
  */
 
-import * as React from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
+import * as React from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from "@/app/components/ui/dialog"
-import { Button } from "@/app/components/ui/button"
-import { Input } from "@/app/components/ui/input"
-import { Label } from "@/app/components/ui/label"
-import { Badge } from "@/app/components/ui/badge"
-import { Textarea } from "@/app/components/ui/textarea"
+} from '@/app/components/ui/dialog'
+import { Button } from '@/app/components/ui/button'
+import { Input } from '@/app/components/ui/input'
+import { Label } from '@/app/components/ui/label'
+import { Badge } from '@/app/components/ui/badge'
+import { Textarea } from '@/app/components/ui/textarea'
 import {
   ArrowLeftRight,
   Building2,
@@ -44,12 +44,13 @@ import {
   ArrowDown,
   Lock,
   Unlock,
-} from "lucide-react"
-import { cn } from "@/app/lib/utils"
-import { useToast } from "@/app/hooks/use-toast"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { logger } from "@/app/lib/utils/logger"
-import { formatearMonto } from "@/app/lib/validations/smart-forms-schemas"
+} from 'lucide-react'
+import { cn } from '@/app/lib/utils'
+import { useToast } from '@/app/hooks/use-toast'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { logger } from '@/app/lib/utils/logger'
+import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
+import { crearTransferencia } from '@/app/lib/firebase/firestore-service'
 
 // ============================================
 // SCHEMA ZOD
@@ -57,20 +58,20 @@ import { formatearMonto } from "@/app/lib/validations/smart-forms-schemas"
 
 const transferenciaSchema = z.object({
   bancoOrigen: z.enum([
-    "boveda_monte", "boveda_usa", "profit", "leftie", 
-    "azteca", "flete_sur", "utilidades"
+    'boveda_monte', 'boveda_usa', 'profit', 'leftie', 
+    'azteca', 'flete_sur', 'utilidades',
   ]),
   bancoDestino: z.enum([
-    "boveda_monte", "boveda_usa", "profit", "leftie", 
-    "azteca", "flete_sur", "utilidades"
+    'boveda_monte', 'boveda_usa', 'profit', 'leftie', 
+    'azteca', 'flete_sur', 'utilidades',
   ]),
-  monto: z.number().min(1, "El monto debe ser mayor a 0"),
-  fecha: z.string().min(1, "La fecha es requerida"),
+  monto: z.number().min(1, 'El monto debe ser mayor a 0'),
+  fecha: z.string().min(1, 'La fecha es requerida'),
   concepto: z.string().optional(),
   referencia: z.string().optional(),
 }).refine(data => data.bancoOrigen !== data.bancoDestino, {
-  message: "El banco origen y destino deben ser diferentes",
-  path: ["bancoDestino"],
+  message: 'El banco origen y destino deben ser diferentes',
+  path: ['bancoDestino'],
 })
 
 type TransferenciaInput = z.infer<typeof transferenciaSchema>
@@ -87,23 +88,23 @@ interface CreateTransferenciaModalProps {
 
 // 7 Bancos con sus capitales
 const BANCOS = [
-  { id: "boveda_monte", nombre: "Bóveda Monte", icono: "🏦", color: "purple", capital: 2500000 },
-  { id: "boveda_usa", nombre: "Bóveda USA", icono: "🇺🇸", color: "blue", capital: 850000 },
-  { id: "profit", nombre: "Profit", icono: "💰", color: "green", capital: 1200000 },
-  { id: "leftie", nombre: "Leftie", icono: "🎯", color: "orange", capital: 450000 },
-  { id: "azteca", nombre: "Azteca", icono: "🌮", color: "yellow", capital: 320000 },
-  { id: "flete_sur", nombre: "Flete Sur", icono: "🚚", color: "cyan", capital: 180000 },
-  { id: "utilidades", nombre: "Utilidades", icono: "💎", color: "pink", capital: 750000 },
+  { id: 'boveda_monte', nombre: 'Bóveda Monte', icono: '🏦', color: 'purple', capital: 2500000 },
+  { id: 'boveda_usa', nombre: 'Bóveda USA', icono: '🇺🇸', color: 'blue', capital: 850000 },
+  { id: 'profit', nombre: 'Profit', icono: '💰', color: 'green', capital: 1200000 },
+  { id: 'leftie', nombre: 'Leftie', icono: '🎯', color: 'orange', capital: 450000 },
+  { id: 'azteca', nombre: 'Azteca', icono: '🌮', color: 'yellow', capital: 320000 },
+  { id: 'flete_sur', nombre: 'Flete Sur', icono: '🚚', color: 'cyan', capital: 180000 },
+  { id: 'utilidades', nombre: 'Utilidades', icono: '💎', color: 'pink', capital: 750000 },
 ]
 
-type BancoId = "boveda_monte" | "boveda_usa" | "profit" | "leftie" | "azteca" | "flete_sur" | "utilidades"
+type BancoId = 'boveda_monte' | 'boveda_usa' | 'profit' | 'leftie' | 'azteca' | 'flete_sur' | 'utilidades'
 
 const containerVariants = {
   hidden: { opacity: 0, scale: 0.95 },
   visible: { 
     opacity: 1, 
     scale: 1,
-    transition: { staggerChildren: 0.03 }
+    transition: { staggerChildren: 0.03 },
   },
 }
 
@@ -118,7 +119,7 @@ const itemVariants = {
 
 interface BancoCardProps {
   banco: typeof BANCOS[0]
-  tipo: "origen" | "destino"
+  tipo: 'origen' | 'destino'
   selected: boolean
   disabled?: boolean
   onClick: () => void
@@ -127,15 +128,15 @@ interface BancoCardProps {
 
 function BancoCard({ banco, tipo, selected, disabled, onClick, cambioMonto }: BancoCardProps) {
   const colorMap: Record<string, string> = {
-    purple: "purple",
-    blue: "blue",
-    green: "green",
-    orange: "orange",
-    yellow: "amber",
-    cyan: "cyan",
-    pink: "pink",
+    purple: 'purple',
+    blue: 'blue',
+    green: 'green',
+    orange: 'orange',
+    yellow: 'amber',
+    cyan: 'cyan',
+    pink: 'pink',
   }
-  const color = colorMap[banco.color] || "gray"
+  const color = colorMap[banco.color] || 'gray'
 
   return (
     <motion.button
@@ -145,12 +146,12 @@ function BancoCard({ banco, tipo, selected, disabled, onClick, cambioMonto }: Ba
       whileHover={{ scale: disabled ? 1 : 1.03 }}
       whileTap={{ scale: disabled ? 1 : 0.97 }}
       className={cn(
-        "relative p-4 rounded-xl border transition-all text-left w-full",
+        'relative p-4 rounded-xl border transition-all text-left w-full',
         selected
           ? `bg-${color}-500/20 border-${color}-500 shadow-lg shadow-${color}-500/20`
           : disabled
-          ? "bg-white/5 border-white/5 opacity-40 cursor-not-allowed"
-          : "bg-white/5 border-white/10 hover:bg-white/10"
+          ? 'bg-white/5 border-white/5 opacity-40 cursor-not-allowed'
+          : 'bg-white/5 border-white/10 hover:bg-white/10',
       )}
       style={{
         background: selected ? `rgba(var(--${color}-rgb), 0.2)` : undefined,
@@ -161,8 +162,8 @@ function BancoCard({ banco, tipo, selected, disabled, onClick, cambioMonto }: Ba
         <span className="text-3xl">{banco.icono}</span>
         <div className="flex-1 min-w-0">
           <p className={cn(
-            "font-bold truncate",
-            selected ? "text-white" : "text-gray-300"
+            'font-bold truncate',
+            selected ? 'text-white' : 'text-gray-300',
           )}>
             {banco.nombre}
           </p>
@@ -178,13 +179,13 @@ function BancoCard({ banco, tipo, selected, disabled, onClick, cambioMonto }: Ba
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           className={cn(
-            "absolute -top-2 -right-2 px-2 py-0.5 rounded-full text-xs font-bold",
+            'absolute -top-2 -right-2 px-2 py-0.5 rounded-full text-xs font-bold',
             cambioMonto > 0 
-              ? "bg-green-500/20 text-green-400 border border-green-500/30"
-              : "bg-red-500/20 text-red-400 border border-red-500/30"
+              ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+              : 'bg-red-500/20 text-red-400 border border-red-500/30',
           )}
         >
-          {cambioMonto > 0 ? "+" : ""}{formatearMonto(cambioMonto)}
+          {cambioMonto > 0 ? '+' : ''}{formatearMonto(cambioMonto)}
         </motion.div>
       )}
 
@@ -194,8 +195,8 @@ function BancoCard({ banco, tipo, selected, disabled, onClick, cambioMonto }: Ba
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           className={cn(
-            "absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center",
-            tipo === "origen" ? "bg-purple-500" : "bg-green-500"
+            'absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center',
+            tipo === 'origen' ? 'bg-purple-500' : 'bg-green-500',
           )}
         >
           <CheckCircle2 className="w-4 h-4 text-white" />
@@ -204,8 +205,8 @@ function BancoCard({ banco, tipo, selected, disabled, onClick, cambioMonto }: Ba
 
       {/* Etiqueta de tipo */}
       <div className={cn(
-        "absolute bottom-2 right-2 text-[10px] uppercase font-bold px-2 py-0.5 rounded",
-        tipo === "origen" ? "bg-purple-500/20 text-purple-400" : "bg-green-500/20 text-green-400"
+        'absolute bottom-2 right-2 text-[10px] uppercase font-bold px-2 py-0.5 rounded',
+        tipo === 'origen' ? 'bg-purple-500/20 text-purple-400' : 'bg-green-500/20 text-green-400',
       )}>
         {tipo}
       </div>
@@ -220,7 +221,7 @@ function BancoCard({ banco, tipo, selected, disabled, onClick, cambioMonto }: Ba
 export function CreateTransferenciaModalPremium({ 
   open, 
   onClose, 
-  onSuccess 
+  onSuccess, 
 }: CreateTransferenciaModalProps) {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
@@ -229,20 +230,20 @@ export function CreateTransferenciaModalPremium({
   const form = useForm<TransferenciaInput>({
     resolver: zodResolver(transferenciaSchema),
     defaultValues: {
-      bancoOrigen: "boveda_monte",
-      bancoDestino: "utilidades",
+      bancoOrigen: 'boveda_monte',
+      bancoDestino: 'utilidades',
       monto: 0,
       fecha: new Date().toISOString().split('T')[0],
-      concepto: "",
-      referencia: "",
+      concepto: '',
+      referencia: '',
     },
   })
 
   const { watch, setValue, handleSubmit, reset, formState: { errors } } = form
   
-  const bancoOrigen = watch("bancoOrigen")
-  const bancoDestino = watch("bancoDestino")
-  const monto = watch("monto")
+  const bancoOrigen = watch('bancoOrigen')
+  const bancoDestino = watch('bancoDestino')
+  const monto = watch('monto')
 
   // Bancos seleccionados
   const origenData = React.useMemo(() => BANCOS.find(b => b.id === bancoOrigen), [bancoOrigen])
@@ -258,8 +259,8 @@ export function CreateTransferenciaModalPremium({
   // Intercambiar bancos
   const intercambiarBancos = () => {
     const tempOrigen = bancoOrigen
-    setValue("bancoOrigen", bancoDestino)
-    setValue("bancoDestino", tempOrigen)
+    setValue('bancoOrigen', bancoDestino)
+    setValue('bancoDestino', tempOrigen)
   }
 
   // Reset al abrir
@@ -274,9 +275,9 @@ export function CreateTransferenciaModalPremium({
   const onSubmit = async (data: TransferenciaInput) => {
     if (!saldoSuficiente || bancosIguales) {
       toast({
-        title: "Error de Validación",
-        description: !saldoSuficiente ? "Saldo insuficiente" : "Los bancos deben ser diferentes",
-        variant: "destructive",
+        title: 'Error de Validación',
+        description: !saldoSuficiente ? 'Saldo insuficiente' : 'Los bancos deben ser diferentes',
+        variant: 'destructive',
       })
       return
     }
@@ -284,37 +285,47 @@ export function CreateTransferenciaModalPremium({
     setIsSubmitting(true)
     setShowAnimation(true)
 
-    // Simular animación de transferencia
+    // Animación de transferencia
     await new Promise(resolve => setTimeout(resolve, 2000))
 
     try {
-      const transferData = {
-        ...data,
-        nuevoSaldoOrigen: origenData!.capital - data.monto,
-        nuevoSaldoDestino: destinoData!.capital + data.monto,
-        timestamp: new Date().toISOString(),
+      logger.info('Creando transferencia en Firestore', { 
+        data: {
+          bancoOrigen: data.bancoOrigen,
+          bancoDestino: data.bancoDestino,
+          monto: data.monto,
+          concepto: data.concepto,
+        },
+        context: 'CreateTransferenciaModalPremium',
+      })
+
+      // Llamar al servicio de Firestore
+      const result = await crearTransferencia(
+        data.bancoOrigen,
+        data.bancoDestino,
+        data.monto,
+        data.concepto || `Transferencia de ${origenData?.nombre} a ${destinoData?.nombre}`
+      )
+
+      if (result) {
+        toast({
+          title: '✅ Transferencia Completada',
+          description: `${formatearMonto(data.monto)} de ${origenData?.nombre} a ${destinoData?.nombre}`,
+        })
+
+        onClose()
+        onSuccess?.()
+        useAppStore.getState().triggerDataRefresh()
+      } else {
+        throw new Error('No se pudo completar la transferencia')
       }
 
-      logger.info("Transferencia registrada", { 
-        data: transferData,
-        context: "CreateTransferenciaModalPremium"
-      })
-
-      toast({
-        title: "✅ Transferencia Completada",
-        description: `${formatearMonto(data.monto)} de ${origenData?.nombre} a ${destinoData?.nombre}`,
-      })
-
-      onClose()
-      onSuccess?.()
-      useAppStore.getState().triggerDataRefresh()
-
     } catch (error) {
-      logger.error("Error en transferencia", error)
+      logger.error('Error en transferencia', error)
       toast({
-        title: "Error",
-        description: "No se pudo completar la transferencia",
-        variant: "destructive",
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'No se pudo completar la transferencia',
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -327,11 +338,11 @@ export function CreateTransferenciaModalPremium({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          "max-w-3xl h-[85vh] p-0 overflow-hidden",
-          "bg-black/60 backdrop-blur-2xl",
-          "border border-white/10",
-          "text-white",
-          "shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(16,185,129,0.15)]"
+          'max-w-3xl h-[85vh] p-0 overflow-hidden',
+          'bg-black/60 backdrop-blur-2xl',
+          'border border-white/10',
+          'text-white',
+          'shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(16,185,129,0.15)]',
         )}
       >
         <DialogTitle className="sr-only">Transferencia entre Bancos</DialogTitle>
@@ -364,7 +375,7 @@ export function CreateTransferenciaModalPremium({
             >
               <motion.div
                 animate={{ rotate: 360 }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
               >
                 <RefreshCw className="w-16 h-16 text-green-400" />
               </motion.div>
@@ -471,7 +482,7 @@ export function CreateTransferenciaModalPremium({
                         tipo="origen"
                         selected={bancoOrigen === banco.id}
                         disabled={banco.id === bancoDestino}
-                        onClick={() => setValue("bancoOrigen", banco.id as BancoId)}
+                        onClick={() => setValue('bancoOrigen', banco.id as BancoId)}
                         cambioMonto={bancoOrigen === banco.id && monto > 0 ? -monto : undefined}
                       />
                     ))}
@@ -492,7 +503,7 @@ export function CreateTransferenciaModalPremium({
                         tipo="destino"
                         selected={bancoDestino === banco.id}
                         disabled={banco.id === bancoOrigen}
-                        onClick={() => setValue("bancoDestino", banco.id as BancoId)}
+                        onClick={() => setValue('bancoDestino', banco.id as BancoId)}
                         cambioMonto={bancoDestino === banco.id && monto > 0 ? monto : undefined}
                       />
                     ))}
@@ -524,9 +535,9 @@ export function CreateTransferenciaModalPremium({
               </div>
 
               <div className={cn(
-                "p-5 rounded-2xl border",
-                "bg-gradient-to-br from-white/5 to-transparent",
-                "border-white/10"
+                'p-5 rounded-2xl border',
+                'bg-gradient-to-br from-white/5 to-transparent',
+                'border-white/10',
               )}>
                 {/* Capital disponible */}
                 {origenData && (
@@ -551,13 +562,13 @@ export function CreateTransferenciaModalPremium({
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-3xl text-gray-500">$</span>
                   <Input
                     type="number"
-                    {...form.register("monto", { valueAsNumber: true })}
+                    {...form.register('monto', { valueAsNumber: true })}
                     className={cn(
-                      "pl-12 h-16 text-3xl font-bold text-center",
-                      "bg-green-500/5 border-green-500/20 text-green-300",
-                      "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
-                      !saldoSuficiente && "border-red-500",
-                      errors.monto && "border-red-500/50"
+                      'pl-12 h-16 text-3xl font-bold text-center',
+                      'bg-green-500/5 border-green-500/20 text-green-300',
+                      '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+                      !saldoSuficiente && 'border-red-500',
+                      errors.monto && 'border-red-500/50',
                     )}
                     placeholder="0"
                   />
@@ -567,17 +578,17 @@ export function CreateTransferenciaModalPremium({
                 {origenData && (
                   <div className="flex gap-2">
                     {[
-                      { label: "10%", value: 0.1 },
-                      { label: "25%", value: 0.25 },
-                      { label: "50%", value: 0.5 },
-                      { label: "100%", value: 1 },
+                      { label: '10%', value: 0.1 },
+                      { label: '25%', value: 0.25 },
+                      { label: '50%', value: 0.5 },
+                      { label: '100%', value: 1 },
                     ].map((opt) => (
                       <Button
                         key={opt.label}
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => setValue("monto", Math.round(origenData.capital * opt.value))}
+                        onClick={() => setValue('monto', Math.round(origenData.capital * opt.value))}
                         className="flex-1 border-white/10 hover:bg-white/10"
                       >
                         {opt.label}
@@ -616,7 +627,7 @@ export function CreateTransferenciaModalPremium({
                   <Label className="text-sm text-gray-400">Fecha</Label>
                   <Input
                     type="date"
-                    {...form.register("fecha")}
+                    {...form.register('fecha')}
                     className="h-11 bg-white/5 border-white/10 text-white [color-scheme:dark]"
                   />
                 </div>
@@ -624,7 +635,7 @@ export function CreateTransferenciaModalPremium({
                 <div className="space-y-2">
                   <Label className="text-sm text-gray-400">Referencia (opcional)</Label>
                   <Input
-                    {...form.register("referencia")}
+                    {...form.register('referencia')}
                     placeholder="REF-001..."
                     className="h-11 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
                   />
@@ -634,7 +645,7 @@ export function CreateTransferenciaModalPremium({
               <div className="space-y-2">
                 <Label className="text-sm text-gray-400">Concepto (opcional)</Label>
                 <Textarea
-                  {...form.register("concepto")}
+                  {...form.register('concepto')}
                   placeholder="Motivo de la transferencia..."
                   rows={2}
                   className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 resize-none"
@@ -647,9 +658,9 @@ export function CreateTransferenciaModalPremium({
               <motion.div 
                 variants={itemVariants}
                 className={cn(
-                  "p-5 rounded-2xl border",
-                  "bg-gradient-to-br from-green-500/10 to-cyan-500/10",
-                  "border-green-500/30"
+                  'p-5 rounded-2xl border',
+                  'bg-gradient-to-br from-green-500/10 to-cyan-500/10',
+                  'border-green-500/30',
                 )}
               >
                 <div className="flex items-center justify-between mb-4">
@@ -681,7 +692,7 @@ export function CreateTransferenciaModalPremium({
                     <motion.div
                       animate={{ 
                         x: [0, 10, 0],
-                        opacity: [0.5, 1, 0.5] 
+                        opacity: [0.5, 1, 0.5], 
                       }}
                       transition={{ duration: 1.5, repeat: Infinity }}
                       className="relative"
@@ -721,9 +732,9 @@ export function CreateTransferenciaModalPremium({
 
           {/* ===== FOOTER ===== */}
           <div className={cn(
-            "shrink-0 h-20 border-t border-white/10",
-            "bg-gradient-to-r from-black/50 via-white/5 to-black/50",
-            "px-6 flex items-center justify-between"
+            'shrink-0 h-20 border-t border-white/10',
+            'bg-gradient-to-r from-black/50 via-white/5 to-black/50',
+            'px-6 flex items-center justify-between',
           )}>
             <Button
               type="button"
@@ -739,12 +750,12 @@ export function CreateTransferenciaModalPremium({
               type="submit"
               disabled={isSubmitting || bancosIguales || monto <= 0 || !saldoSuficiente}
               className={cn(
-                "min-w-[180px]",
-                "bg-gradient-to-r from-green-600 to-cyan-600",
-                "hover:from-green-500 hover:to-cyan-500",
-                "text-white font-bold",
-                "shadow-[0_0_30px_rgba(16,185,129,0.4)]",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
+                'min-w-[180px]',
+                'bg-gradient-to-r from-green-600 to-cyan-600',
+                'hover:from-green-500 hover:to-cyan-500',
+                'text-white font-bold',
+                'shadow-[0_0_30px_rgba(16,185,129,0.4)]',
+                'disabled:opacity-50 disabled:cursor-not-allowed',
               )}
             >
               {isSubmitting ? (

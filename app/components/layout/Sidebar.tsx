@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import { motion } from "framer-motion"
+import { motion } from 'framer-motion'
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -16,14 +16,14 @@ import {
   PiggyBank,
   Wallet,
   Loader2,
-} from "lucide-react"
-import { Button } from "@/app/components/ui/button"
-import { Badge } from "@/app/components/ui/badge"
-import { ScrollArea } from "@/app/components/ui/scroll-area"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/app/components/ui/collapsible"
-import { useState } from "react"
-import type { Banco } from "@/app/types"
-import { useBancosData } from "@/app/lib/firebase/firestore-hooks.service"
+} from 'lucide-react'
+import { Button } from '@/app/components/ui/button'
+import { Badge } from '@/app/components/ui/badge'
+import { ScrollArea } from '@/app/components/ui/scroll-area'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/components/ui/collapsible'
+import { useState } from 'react'
+import type { Banco } from '@/app/types'
+import { useBancosData } from '@/app/lib/firebase/firestore-hooks.service'
 
 interface SidebarProps {
   collapsed: boolean
@@ -33,18 +33,18 @@ interface SidebarProps {
   onBancoChange: (banco: Banco) => void
 }
 
-const MENU_ITEMS = [{ id: "dashboard", label: "Dashboard", icon: LayoutDashboard, badge: "NEW" }]
+const MENU_ITEMS = [{ id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: 'NEW' }]
 
 const OPERACIONES = [
-  { id: "ordenes", label: "Órdenes de Compra", icon: ShoppingCart, badge: "23" },
-  { id: "ventas", label: "Ventas", icon: TrendingUp, badge: "47" },
-  { id: "almacen", label: "Almacén", icon: Warehouse, badge: null },
+  { id: 'ordenes', label: 'Órdenes de Compra', icon: ShoppingCart, badge: '23' },
+  { id: 'ventas', label: 'Ventas', icon: TrendingUp, badge: '47' },
+  { id: 'almacen', label: 'Almacén', icon: Warehouse, badge: null },
 ]
 
 const GESTION = [
-  { id: "distribuidores", label: "Distribuidores", icon: Users, badge: null },
-  { id: "clientes", label: "Clientes", icon: UserCheck, badge: null },
-  { id: "reportes", label: "Reportes", icon: BarChart3, badge: "AI" },
+  { id: 'distribuidores', label: 'Distribuidores', icon: Users, badge: null },
+  { id: 'clientes', label: 'Clientes', icon: UserCheck, badge: null },
+  { id: 'reportes', label: 'Reportes', icon: BarChart3, badge: 'AI' },
 ]
 
 export default function Sidebar({
@@ -99,13 +99,13 @@ export default function Sidebar({
               <Button
                 variant="ghost"
                 className={`w-full justify-between text-slate-400 hover:text-white hover:bg-white/5 ${
-                  collapsed ? "px-2" : "px-3"
+                  collapsed ? 'px-2' : 'px-3'
                 }`}
               >
                 {!collapsed && (
                   <>
                     <span className="text-xs font-semibold uppercase tracking-wider">Bancos</span>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${bancosOpen ? "rotate-180" : ""}`} />
+                    <ChevronDown className={`h-4 w-4 transition-transform ${bancosOpen ? 'rotate-180' : ''}`} />
                   </>
                 )}
                 {collapsed && <Building2 className="h-5 w-5" />}
@@ -116,7 +116,7 @@ export default function Sidebar({
                 collapsed={collapsed}
                 selectedBanco={selectedBanco}
                 onBancoChange={onBancoChange}
-                onViewBanco={() => onPanelChange("banco")}
+                onViewBanco={() => onPanelChange('banco')}
               />
             </CollapsibleContent>
           </Collapsible>
@@ -152,8 +152,8 @@ export default function Sidebar({
               <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                 <motion.div
                   className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
-                  initial={{ width: "0%" }}
-                  animate={{ width: "75%" }}
+                  initial={{ width: '0%' }}
+                  animate={{ width: '75%' }}
                   transition={{ duration: 1, delay: 0.5 }}
                 />
               </div>
@@ -179,12 +179,12 @@ function SidebarItem({ label, icon: Icon, badge, collapsed, active, onClick }: S
   return (
     <motion.div whileHover={{ x: collapsed ? 0 : 4 }} whileTap={{ scale: 0.98 }}>
       <Button
-        variant={active ? "default" : "ghost"}
+        variant={active ? 'default' : 'ghost'}
         className={`w-full justify-start gap-3 transition-all duration-300 ${
           active
-            ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/30"
-            : "text-slate-400 hover:text-white hover:bg-white/5"
-        } ${collapsed ? "px-2" : "px-3"}`}
+            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/30'
+            : 'text-slate-400 hover:text-white hover:bg-white/5'
+        } ${collapsed ? 'px-2' : 'px-3'}`}
         onClick={onClick}
       >
         <Icon className="h-5 w-5 flex-shrink-0" />
@@ -193,8 +193,8 @@ function SidebarItem({ label, icon: Icon, badge, collapsed, active, onClick }: S
             <span className="flex-1 text-left text-apple">{label}</span>
             {badge && (
               <Badge
-                variant={badge === "AI" ? "default" : "secondary"}
-                className={`${badge === "AI" ? "bg-gradient-to-r from-purple-600 to-pink-600 animate-gradient-flow" : ""} text-[10px]`}
+                variant={badge === 'AI' ? 'default' : 'secondary'}
+                className={`${badge === 'AI' ? 'bg-gradient-to-r from-purple-600 to-pink-600 animate-gradient-flow' : ''} text-[10px]`}
               >
                 {badge}
               </Badge>
@@ -220,18 +220,18 @@ function BancoSelector({ collapsed, selectedBanco, onBancoChange, onViewBanco }:
   // Mapear datos de Firestore a tipo Banco
   const bancos: Banco[] = bancosData.map((banco) => ({
     id: banco.id,
-    nombre: banco.nombre || "Sin nombre",
-    icon: banco.icon || "building",
-    color: banco.color || "from-slate-500 to-slate-700",
-    tipo: banco.tipo || "operativo",
-    descripcion: banco.descripcion || "",
-    moneda: banco.moneda || "MXN",
+    nombre: banco.nombre || 'Sin nombre',
+    icon: banco.icon || 'building',
+    color: banco.color || 'from-slate-500 to-slate-700',
+    tipo: banco.tipo || 'operativo',
+    descripcion: banco.descripcion || '',
+    moneda: banco.moneda || 'MXN',
     capitalActual: banco.capitalActual ?? 0,
     capitalInicial: banco.capitalInicial ?? 0,
     historicoIngresos: banco.historicoIngresos ?? 0,
     historicoGastos: banco.historicoGastos ?? 0,
     historicoTransferencias: banco.historicoTransferencias ?? 0,
-    estado: banco.estado || "activo",
+    estado: banco.estado || 'activo',
     createdAt: banco.createdAt?.toDate?.() || new Date(),
     updatedAt: banco.updatedAt?.toDate?.() || new Date(),
   }))
@@ -250,10 +250,10 @@ function BancoSelector({ collapsed, selectedBanco, onBancoChange, onViewBanco }:
         <Button
           key={banco.id}
           variant="ghost"
-          className={`w-full ${collapsed ? "px-2" : "px-3"} py-6 ${
+          className={`w-full ${collapsed ? 'px-2' : 'px-3'} py-6 ${
             selectedBanco.id === banco.id
-              ? "bg-white/10 text-white"
-              : "text-slate-400 hover:text-white hover:bg-white/5"
+              ? 'bg-white/10 text-white'
+              : 'text-slate-400 hover:text-white hover:bg-white/5'
           }`}
           onClick={() => {
             onBancoChange(banco)
@@ -263,26 +263,26 @@ function BancoSelector({ collapsed, selectedBanco, onBancoChange, onViewBanco }:
           <div
             className={`h-8 w-8 rounded-lg bg-gradient-to-br ${banco.color} flex items-center justify-center flex-shrink-0`}
           >
-            {banco.icon === "building" && <Building2 className="h-4 w-4 text-white" />}
-            {banco.icon === "flag" && <DollarSign className="h-4 w-4 text-white" />}
-            {banco.icon === "diamond" && <PiggyBank className="h-4 w-4 text-white" />}
-            {banco.icon === "truck" && <Truck className="h-4 w-4 text-white" />}
-            {banco.icon === "store" && <Building2 className="h-4 w-4 text-white" />}
-            {banco.icon === "briefcase" && <Wallet className="h-4 w-4 text-white" />}
-            {banco.icon === "trending-up" && <TrendingUp className="h-4 w-4 text-white" />}
+            {banco.icon === 'building' && <Building2 className="h-4 w-4 text-white" />}
+            {banco.icon === 'flag' && <DollarSign className="h-4 w-4 text-white" />}
+            {banco.icon === 'diamond' && <PiggyBank className="h-4 w-4 text-white" />}
+            {banco.icon === 'truck' && <Truck className="h-4 w-4 text-white" />}
+            {banco.icon === 'store' && <Building2 className="h-4 w-4 text-white" />}
+            {banco.icon === 'briefcase' && <Wallet className="h-4 w-4 text-white" />}
+            {banco.icon === 'trending-up' && <TrendingUp className="h-4 w-4 text-white" />}
           </div>
           {!collapsed && (
             <div className="flex-1 text-left ml-3">
               <p className="text-sm font-medium">{banco.nombre}</p>
-              <p className={`text-xs ${banco.capitalActual < 0 ? "text-red-400" : "text-green-400"}`}>
-                {banco.moneda === "USD" ? "$" : "$"}
-                {banco.capitalActual.toLocaleString("es-MX")}
-                {banco.moneda === "USD" && " USD"}
+              <p className={`text-xs ${banco.capitalActual < 0 ? 'text-red-400' : 'text-green-400'}`}>
+                {banco.moneda === 'USD' ? '$' : '$'}
+                {banco.capitalActual.toLocaleString('es-MX')}
+                {banco.moneda === 'USD' && ' USD'}
               </p>
             </div>
           )}
           {!collapsed && (
-            <div className={`h-2 w-2 rounded-full ${banco.estado === "activo" ? "bg-green-500" : "bg-red-500"}`} />
+            <div className={`h-2 w-2 rounded-full ${banco.estado === 'activo' ? 'bg-green-500' : 'bg-red-500'}`} />
           )}
         </Button>
       ))}

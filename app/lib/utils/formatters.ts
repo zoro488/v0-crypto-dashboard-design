@@ -16,16 +16,16 @@ export function formatCurrency(
     currency?: 'MXN' | 'USD';
     decimals?: number;
     compact?: boolean;
-  }
+  },
 ): string {
-  const { currency = 'MXN', decimals = 2, compact = false } = options || {};
+  const { currency = 'MXN', decimals = 2, compact = false } = options || {}
 
   if (compact && Math.abs(amount) >= 1000000) {
-    return `$${(amount / 1000000).toFixed(1)}M`;
+    return `$${(amount / 1000000).toFixed(1)}M`
   }
 
   if (compact && Math.abs(amount) >= 1000) {
-    return `$${(amount / 1000).toFixed(1)}K`;
+    return `$${(amount / 1000).toFixed(1)}K`
   }
 
   const formatter = new Intl.NumberFormat('es-MX', {
@@ -33,39 +33,39 @@ export function formatCurrency(
     currency,
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
-  });
+  })
 
-  return formatter.format(amount);
+  return formatter.format(amount)
 }
 
 /**
  * Formatear como pesos mexicanos
  */
 export function formatMXN(amount: number): string {
-  return formatCurrency(amount, { currency: 'MXN' });
+  return formatCurrency(amount, { currency: 'MXN' })
 }
 
 /**
  * Formatear como dólares americanos
  */
 export function formatUSD(amount: number): string {
-  return formatCurrency(amount, { currency: 'USD' });
+  return formatCurrency(amount, { currency: 'USD' })
 }
 
 /**
  * Formatear cantidad compacta (1K, 1M, etc.)
  */
 export function formatCompact(amount: number): string {
-  return formatCurrency(amount, { compact: true });
+  return formatCurrency(amount, { compact: true })
 }
 
 /**
  * Parsear string de moneda a número
  */
 export function parseCurrency(value: string): number {
-  const cleaned = value.replace(/[$,\s]/g, '');
-  const parsed = parseFloat(cleaned);
-  return isNaN(parsed) ? 0 : parsed;
+  const cleaned = value.replace(/[$,\s]/g, '')
+  const parsed = parseFloat(cleaned)
+  return isNaN(parsed) ? 0 : parsed
 }
 
 // ============================================
@@ -80,14 +80,14 @@ export function formatNumber(
   options?: {
     decimals?: number;
     locale?: string;
-  }
+  },
 ): string {
-  const { decimals = 0, locale = 'es-MX' } = options || {};
+  const { decimals = 0, locale = 'es-MX' } = options || {}
   
   return new Intl.NumberFormat(locale, {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
-  }).format(value);
+  }).format(value)
 }
 
 /**
@@ -98,21 +98,21 @@ export function formatPercent(
   options?: {
     decimals?: number;
     showSign?: boolean;
-  }
+  },
 ): string {
-  const { decimals = 1, showSign = false } = options || {};
+  const { decimals = 1, showSign = false } = options || {}
   
   const formatted = new Intl.NumberFormat('es-MX', {
     style: 'percent',
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
-  }).format(value / 100);
+  }).format(value / 100)
 
   if (showSign && value > 0) {
-    return `+${formatted}`;
+    return `+${formatted}`
   }
 
-  return formatted;
+  return formatted
 }
 
 /**
@@ -128,19 +128,19 @@ export function formatChange(value: number): {
       text: `+${formatPercent(value)}`,
       color: 'text-green-500',
       icon: '↑',
-    };
+    }
   } else if (value < 0) {
     return {
       text: formatPercent(value),
       color: 'text-red-500',
       icon: '↓',
-    };
+    }
   }
   return {
     text: '0%',
     color: 'text-gray-500',
     icon: '→',
-  };
+  }
 }
 
 /**
@@ -149,11 +149,11 @@ export function formatChange(value: number): {
 export function formatQuantity(
   value: number,
   unit: string,
-  options?: { plural?: string }
+  options?: { plural?: string },
 ): string {
-  const { plural = `${unit}s` } = options || {};
-  const formattedValue = formatNumber(value);
-  return `${formattedValue} ${value === 1 ? unit : plural}`;
+  const { plural = `${unit}s` } = options || {}
+  const formattedValue = formatNumber(value)
+  return `${formattedValue} ${value === 1 ? unit : plural}`
 }
 
 // ============================================
@@ -168,13 +168,13 @@ export function formatDate(
   options?: {
     format?: 'short' | 'medium' | 'long' | 'full';
     includeTime?: boolean;
-  }
+  },
 ): string {
-  const { format = 'medium', includeTime = false } = options || {};
-  const d = new Date(date);
+  const { format = 'medium', includeTime = false } = options || {}
+  const d = new Date(date)
 
   if (isNaN(d.getTime())) {
-    return 'Fecha inválida';
+    return 'Fecha inválida'
   }
 
   const formatOptionsMap: Record<string, Intl.DateTimeFormatOptions> = {
@@ -182,16 +182,16 @@ export function formatDate(
     medium: { day: 'numeric', month: 'short', year: 'numeric' },
     long: { day: 'numeric', month: 'long', year: 'numeric' },
     full: { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' },
-  };
-
-  const dateOptions: Intl.DateTimeFormatOptions = { ...formatOptionsMap[format] };
-
-  if (includeTime) {
-    dateOptions.hour = '2-digit';
-    dateOptions.minute = '2-digit';
   }
 
-  return new Intl.DateTimeFormat('es-MX', dateOptions).format(d);
+  const dateOptions: Intl.DateTimeFormatOptions = { ...formatOptionsMap[format] }
+
+  if (includeTime) {
+    dateOptions.hour = '2-digit'
+    dateOptions.minute = '2-digit'
+  }
+
+  return new Intl.DateTimeFormat('es-MX', dateOptions).format(d)
 }
 
 /**
@@ -199,50 +199,50 @@ export function formatDate(
  */
 export function formatTime(
   date: Date | string | number,
-  options?: { seconds?: boolean }
+  options?: { seconds?: boolean },
 ): string {
-  const { seconds = false } = options || {};
-  const d = new Date(date);
+  const { seconds = false } = options || {}
+  const d = new Date(date)
 
   if (isNaN(d.getTime())) {
-    return '--:--';
+    return '--:--'
   }
 
   return new Intl.DateTimeFormat('es-MX', {
     hour: '2-digit',
     minute: '2-digit',
     second: seconds ? '2-digit' : undefined,
-  }).format(d);
+  }).format(d)
 }
 
 /**
  * Formatear fecha relativa (hace 2 horas, mañana, etc.)
  */
 export function formatRelativeTime(date: Date | string | number): string {
-  const d = new Date(date);
-  const now = new Date();
-  const diffMs = d.getTime() - now.getTime();
-  const diffSecs = Math.floor(diffMs / 1000);
-  const diffMins = Math.floor(diffSecs / 60);
-  const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
+  const d = new Date(date)
+  const now = new Date()
+  const diffMs = d.getTime() - now.getTime()
+  const diffSecs = Math.floor(diffMs / 1000)
+  const diffMins = Math.floor(diffSecs / 60)
+  const diffHours = Math.floor(diffMins / 60)
+  const diffDays = Math.floor(diffHours / 24)
 
-  const rtf = new Intl.RelativeTimeFormat('es-MX', { numeric: 'auto' });
+  const rtf = new Intl.RelativeTimeFormat('es-MX', { numeric: 'auto' })
 
   if (Math.abs(diffSecs) < 60) {
-    return rtf.format(Math.floor(diffSecs), 'second');
+    return rtf.format(Math.floor(diffSecs), 'second')
   } else if (Math.abs(diffMins) < 60) {
-    return rtf.format(diffMins, 'minute');
+    return rtf.format(diffMins, 'minute')
   } else if (Math.abs(diffHours) < 24) {
-    return rtf.format(diffHours, 'hour');
+    return rtf.format(diffHours, 'hour')
   } else if (Math.abs(diffDays) < 7) {
-    return rtf.format(diffDays, 'day');
+    return rtf.format(diffDays, 'day')
   } else if (Math.abs(diffDays) < 30) {
-    return rtf.format(Math.floor(diffDays / 7), 'week');
+    return rtf.format(Math.floor(diffDays / 7), 'week')
   } else if (Math.abs(diffDays) < 365) {
-    return rtf.format(Math.floor(diffDays / 30), 'month');
+    return rtf.format(Math.floor(diffDays / 30), 'month')
   } else {
-    return rtf.format(Math.floor(diffDays / 365), 'year');
+    return rtf.format(Math.floor(diffDays / 365), 'year')
   }
 }
 
@@ -251,15 +251,15 @@ export function formatRelativeTime(date: Date | string | number): string {
  */
 export function formatDuration(seconds: number): string {
   if (seconds < 60) {
-    return `${seconds}s`;
+    return `${seconds}s`
   } else if (seconds < 3600) {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`
   } else {
-    const hours = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+    const hours = Math.floor(seconds / 3600)
+    const mins = Math.floor((seconds % 3600) / 60)
+    return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`
   }
 }
 
@@ -267,18 +267,18 @@ export function formatDuration(seconds: number): string {
  * Formatear rango de fechas
  */
 export function formatDateRange(start: Date, end: Date): string {
-  const sameDay = start.toDateString() === end.toDateString();
-  const sameMonth = start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear();
-  const sameYear = start.getFullYear() === end.getFullYear();
+  const sameDay = start.toDateString() === end.toDateString()
+  const sameMonth = start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()
+  const sameYear = start.getFullYear() === end.getFullYear()
 
   if (sameDay) {
-    return `${formatDate(start)} ${formatTime(start)} - ${formatTime(end)}`;
+    return `${formatDate(start)} ${formatTime(start)} - ${formatTime(end)}`
   } else if (sameMonth) {
-    return `${start.getDate()} - ${formatDate(end)}`;
+    return `${start.getDate()} - ${formatDate(end)}`
   } else if (sameYear) {
-    return `${formatDate(start, { format: 'short' })} - ${formatDate(end, { format: 'short' })}`;
+    return `${formatDate(start, { format: 'short' })} - ${formatDate(end, { format: 'short' })}`
   } else {
-    return `${formatDate(start, { format: 'short' })} - ${formatDate(end, { format: 'short' })}`;
+    return `${formatDate(start, { format: 'short' })} - ${formatDate(end, { format: 'short' })}`
   }
 }
 
@@ -290,20 +290,20 @@ export function formatDateRange(start: Date, end: Date): string {
  * Capitalizar primera letra
  */
 export function capitalize(text: string): string {
-  if (!text) return '';
-  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+  if (!text) return ''
+  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
 }
 
 /**
  * Capitalizar cada palabra
  */
 export function titleCase(text: string): string {
-  if (!text) return '';
+  if (!text) return ''
   return text
     .toLowerCase()
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+    .join(' ')
 }
 
 /**
@@ -312,24 +312,24 @@ export function titleCase(text: string): string {
 export function truncate(
   text: string,
   maxLength: number,
-  options?: { ellipsis?: string; wordBoundary?: boolean }
+  options?: { ellipsis?: string; wordBoundary?: boolean },
 ): string {
-  const { ellipsis = '...', wordBoundary = true } = options || {};
+  const { ellipsis = '...', wordBoundary = true } = options || {}
   
   if (!text || text.length <= maxLength) {
-    return text;
+    return text
   }
 
-  let truncated = text.slice(0, maxLength - ellipsis.length);
+  let truncated = text.slice(0, maxLength - ellipsis.length)
   
   if (wordBoundary) {
-    const lastSpace = truncated.lastIndexOf(' ');
+    const lastSpace = truncated.lastIndexOf(' ')
     if (lastSpace > 0) {
-      truncated = truncated.slice(0, lastSpace);
+      truncated = truncated.slice(0, lastSpace)
     }
   }
 
-  return truncated + ellipsis;
+  return truncated + ellipsis
 }
 
 /**
@@ -338,20 +338,20 @@ export function truncate(
 export function formatName(
   firstName?: string,
   lastName?: string,
-  options?: { format?: 'full' | 'initials' | 'short' }
+  options?: { format?: 'full' | 'initials' | 'short' },
 ): string {
-  const { format = 'full' } = options || {};
+  const { format = 'full' } = options || {}
   
-  const first = firstName?.trim() || '';
-  const last = lastName?.trim() || '';
+  const first = firstName?.trim() || ''
+  const last = lastName?.trim() || ''
 
   switch (format) {
     case 'initials':
-      return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
+      return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase()
     case 'short':
-      return `${first} ${last.charAt(0)}.`;
+      return `${first} ${last.charAt(0)}.`
     default:
-      return `${first} ${last}`.trim();
+      return `${first} ${last}`.trim()
   }
 }
 
@@ -359,15 +359,15 @@ export function formatName(
  * Formatear número de teléfono mexicano
  */
 export function formatPhone(phone: string): string {
-  const cleaned = phone.replace(/\D/g, '');
+  const cleaned = phone.replace(/\D/g, '')
   
   if (cleaned.length === 10) {
-    return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+    return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`
   } else if (cleaned.length === 12 && cleaned.startsWith('52')) {
-    return `+52 (${cleaned.slice(2, 5)}) ${cleaned.slice(5, 8)}-${cleaned.slice(8)}`;
+    return `+52 (${cleaned.slice(2, 5)}) ${cleaned.slice(5, 8)}-${cleaned.slice(8)}`
   }
   
-  return phone;
+  return phone
 }
 
 /**
@@ -391,14 +391,14 @@ export function formatStatus(status: string): {
     enviado: { label: 'Enviado', color: 'text-cyan-500', bgColor: 'bg-cyan-500/10' },
     entregado: { label: 'Entregado', color: 'text-green-500', bgColor: 'bg-green-500/10' },
     vencido: { label: 'Vencido', color: 'text-red-500', bgColor: 'bg-red-500/10' },
-  };
+  }
 
-  const normalized = status.toLowerCase();
+  const normalized = status.toLowerCase()
   return statuses[normalized] || {
     label: capitalize(status),
     color: 'text-gray-500',
     bgColor: 'bg-gray-500/10',
-  };
+  }
 }
 
 // ============================================
@@ -409,16 +409,16 @@ export function formatStatus(status: string): {
  * Formatear tamaño de archivo
  */
 export function formatFileSize(bytes: number): string {
-  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-  let unitIndex = 0;
-  let size = bytes;
+  const units = ['B', 'KB', 'MB', 'GB', 'TB']
+  let unitIndex = 0
+  let size = bytes
 
   while (size >= 1024 && unitIndex < units.length - 1) {
-    size /= 1024;
-    unitIndex++;
+    size /= 1024
+    unitIndex++
   }
 
-  return `${size.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
+  return `${size.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`
 }
 
 // ============================================
@@ -430,27 +430,27 @@ export function formatFileSize(bytes: number): string {
  */
 export function formatList(
   items: string[],
-  options?: { conjunction?: string; limit?: number }
+  options?: { conjunction?: string; limit?: number },
 ): string {
-  const { conjunction = 'y', limit } = options || {};
+  const { conjunction = 'y', limit } = options || {}
   
-  if (items.length === 0) return '';
-  if (items.length === 1) return items[0];
+  if (items.length === 0) return ''
+  if (items.length === 1) return items[0]
   
-  let displayItems = items;
-  let overflow = 0;
+  let displayItems = items
+  let overflow = 0
 
   if (limit && items.length > limit) {
-    displayItems = items.slice(0, limit);
-    overflow = items.length - limit;
+    displayItems = items.slice(0, limit)
+    overflow = items.length - limit
   }
 
   if (displayItems.length === 2) {
-    return `${displayItems[0]} ${conjunction} ${displayItems[1]}${overflow ? ` (+${overflow} más)` : ''}`;
+    return `${displayItems[0]} ${conjunction} ${displayItems[1]}${overflow ? ` (+${overflow} más)` : ''}`
   }
 
-  const last = displayItems.pop();
-  return `${displayItems.join(', ')} ${conjunction} ${last}${overflow ? ` (+${overflow} más)` : ''}`;
+  const last = displayItems.pop()
+  return `${displayItems.join(', ')} ${conjunction} ${last}${overflow ? ` (+${overflow} más)` : ''}`
 }
 
 // ============================================
@@ -463,14 +463,14 @@ export const currency = {
   usd: formatUSD,
   compact: formatCompact,
   parse: parseCurrency,
-};
+}
 
 export const number = {
   format: formatNumber,
   percent: formatPercent,
   change: formatChange,
   quantity: formatQuantity,
-};
+}
 
 export const date = {
   format: formatDate,
@@ -478,7 +478,7 @@ export const date = {
   relative: formatRelativeTime,
   duration: formatDuration,
   range: formatDateRange,
-};
+}
 
 export const text = {
   capitalize,
@@ -488,11 +488,11 @@ export const text = {
   phone: formatPhone,
   status: formatStatus,
   list: formatList,
-};
+}
 
 export const file = {
   size: formatFileSize,
-};
+}
 
 export default {
   currency,
@@ -500,4 +500,4 @@ export default {
   date,
   text,
   file,
-};
+}

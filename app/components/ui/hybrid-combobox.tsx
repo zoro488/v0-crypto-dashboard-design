@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { Check, ChevronsUpDown, Plus } from "lucide-react"
-import { cn } from "@/app/lib/utils"
-import { Button } from "@/app/components/ui/button"
+import * as React from 'react'
+import { Check, ChevronsUpDown, Plus } from 'lucide-react'
+import { cn } from '@/app/lib/utils'
+import { Button } from '@/app/components/ui/button'
 import {
   Command,
   CommandEmpty,
@@ -11,12 +11,12 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/app/components/ui/command"
+} from '@/app/components/ui/command'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/app/components/ui/popover"
+} from '@/app/components/ui/popover'
 
 export interface ComboboxOption {
   value: string
@@ -45,9 +45,9 @@ export function HybridCombobox<T = unknown>({
   value,
   onValueChange,
   onSelect,
-  placeholder = "Seleccionar...",
-  searchPlaceholder = "Buscar...",
-  emptyMessage = "No se encontraron resultados.",
+  placeholder = 'Seleccionar...',
+  searchPlaceholder = 'Buscar...',
+  emptyMessage = 'No se encontraron resultados.',
   allowCreate = false,
   onCreateOption,
   disabled = false,
@@ -56,7 +56,7 @@ export function HybridCombobox<T = unknown>({
   collectionName,
 }: HybridComboboxProps<T>) {
   const [open, setOpen] = React.useState(false)
-  const [searchQuery, setSearchQuery] = React.useState("")
+  const [searchQuery, setSearchQuery] = React.useState('')
 
   const selectedOption = options.find((option) => option.value === value)
 
@@ -66,7 +66,7 @@ export function HybridCombobox<T = unknown>({
     return options.filter(
       (option) =>
         option.label.toLowerCase().includes(query) ||
-        option.value.toLowerCase().includes(query)
+        option.value.toLowerCase().includes(query),
     )
   }, [options, searchQuery])
 
@@ -74,20 +74,20 @@ export function HybridCombobox<T = unknown>({
     allowCreate &&
     searchQuery &&
     !filteredOptions.some(
-      (option) => option.label.toLowerCase() === searchQuery.toLowerCase()
+      (option) => option.label.toLowerCase() === searchQuery.toLowerCase(),
     )
 
   const handleSelect = (selectedValue: string) => {
-    onValueChange?.(selectedValue === value ? "" : selectedValue)
+    onValueChange?.(selectedValue === value ? '' : selectedValue)
     setOpen(false)
-    setSearchQuery("")
+    setSearchQuery('')
   }
 
   const handleCreate = () => {
     if (onCreateOption && searchQuery) {
       onCreateOption(searchQuery)
       setOpen(false)
-      setSearchQuery("")
+      setSearchQuery('')
     }
   }
 
@@ -100,9 +100,9 @@ export function HybridCombobox<T = unknown>({
           aria-expanded={open}
           disabled={disabled}
           className={cn(
-            "w-full justify-between",
-            !value && "text-muted-foreground",
-            className
+            'w-full justify-between',
+            !value && 'text-muted-foreground',
+            className,
           )}
         >
           {selectedOption?.label || placeholder}
@@ -140,8 +140,8 @@ export function HybridCombobox<T = unknown>({
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
-                      value === option.value ? "opacity-100" : "opacity-0"
+                      'mr-2 h-4 w-4',
+                      value === option.value ? 'opacity-100' : 'opacity-0',
                     )}
                   />
                   {option.label}

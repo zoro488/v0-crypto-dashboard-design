@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 /**
  * ProfitCommandCenter - Centro de Comando de Rentabilidad
@@ -7,8 +7,8 @@
  * USD/MXN/USDT con datos en tiempo real.
  */
 
-import React, { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -24,23 +24,23 @@ import {
   Target,
   Clock,
   ChevronRight,
-  Sparkles
-} from 'lucide-react';
-import { cn } from '@/app/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card';
-import { Button } from '@/app/components/ui/button';
-import { Badge } from '@/app/components/ui/badge';
-import { Progress } from '@/app/components/ui/progress';
-import { Skeleton } from '@/app/components/ui/skeleton';
+  Sparkles,
+} from 'lucide-react'
+import { cn } from '@/app/lib/utils'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card'
+import { Button } from '@/app/components/ui/button'
+import { Badge } from '@/app/components/ui/badge'
+import { Progress } from '@/app/components/ui/progress'
+import { Skeleton } from '@/app/components/ui/skeleton'
 
 // Hooks del sistema
-import { useMarketData } from '@/app/hooks/useMarketData';
-import { useTreasury } from '@/app/hooks/useTreasury';
+import { useMarketData } from '@/app/hooks/useMarketData'
+import { useTreasury } from '@/app/hooks/useTreasury'
 
 // Componentes del sistema
-import { ArbitrageGauge } from './ArbitrageGauge';
-import { HoldCalculator } from './HoldCalculator';
-import { TrendForecastChart } from './TrendForecastChart';
+import { ArbitrageGauge } from './ArbitrageGauge'
+import { HoldCalculator } from './HoldCalculator'
+import { TrendForecastChart } from './TrendForecastChart'
 
 // ============================================
 // TIPOS
@@ -83,13 +83,13 @@ const PriceTicker: React.FC<PriceTickerProps> = ({
     ? <TrendingUp className="h-4 w-4 text-emerald-500" />
     : trend === 'down'
     ? <TrendingDown className="h-4 w-4 text-red-500" />
-    : <Activity className="h-4 w-4 text-zinc-400" />;
+    : <Activity className="h-4 w-4 text-zinc-400" />
 
   const glowColors = {
     green: 'shadow-emerald-500/20 border-emerald-500/50',
     blue: 'shadow-blue-500/20 border-blue-500/50',
     amber: 'shadow-amber-500/20 border-amber-500/50',
-  };
+  }
 
   return (
     <motion.div
@@ -98,7 +98,7 @@ const PriceTicker: React.FC<PriceTickerProps> = ({
       className={cn(
         'relative rounded-xl border bg-zinc-900/50 p-4 transition-all duration-300',
         isHighlighted && `shadow-lg ${glowColors[highlightColor]}`,
-        !isHighlighted && 'border-zinc-800 hover:border-zinc-700'
+        !isHighlighted && 'border-zinc-800 hover:border-zinc-700',
       )}
     >
       {/* Badge de oportunidad */}
@@ -113,7 +113,7 @@ const PriceTicker: React.FC<PriceTickerProps> = ({
               'text-xs font-semibold',
               highlightColor === 'green' && 'bg-emerald-500 text-white',
               highlightColor === 'blue' && 'bg-blue-500 text-white',
-              highlightColor === 'amber' && 'bg-amber-500 text-black'
+              highlightColor === 'amber' && 'bg-amber-500 text-black',
             )}
           >
             <Sparkles className="h-3 w-3 mr-1" />
@@ -126,7 +126,7 @@ const PriceTicker: React.FC<PriceTickerProps> = ({
         <div className="flex items-center gap-2">
           <div className={cn(
             'p-2 rounded-lg',
-            isHighlighted ? 'bg-emerald-500/10' : 'bg-zinc-800'
+            isHighlighted ? 'bg-emerald-500/10' : 'bg-zinc-800',
           )}>
             {icon}
           </div>
@@ -146,7 +146,7 @@ const PriceTicker: React.FC<PriceTickerProps> = ({
         {premium !== undefined && premium !== 0 && (
           <div className={cn(
             'text-xs font-medium',
-            premium > 0 ? 'text-emerald-400' : 'text-red-400'
+            premium > 0 ? 'text-emerald-400' : 'text-red-400',
           )}>
             {premium > 0 ? '+' : ''}{premium.toFixed(2)} vs mercado
           </div>
@@ -168,8 +168,8 @@ const PriceTicker: React.FC<PriceTickerProps> = ({
         />
       )}
     </motion.div>
-  );
-};
+  )
+}
 
 /**
  * Badge de estrategia recomendada
@@ -194,9 +194,9 @@ const StrategyBadge: React.FC<StrategyBadgeProps> = ({ mode, reason }) => {
       color: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/30',
       description: 'Operar según demanda',
     },
-  };
+  }
 
-  const { label, icon, color, description } = config[mode];
+  const { label, icon, color, description } = config[mode]
 
   return (
     <motion.div
@@ -204,7 +204,7 @@ const StrategyBadge: React.FC<StrategyBadgeProps> = ({ mode, reason }) => {
       animate={{ opacity: 1, x: 0 }}
       className={cn(
         'inline-flex items-center gap-3 px-4 py-2 rounded-lg border',
-        color
+        color,
       )}
     >
       <div className="flex items-center gap-2">
@@ -214,8 +214,8 @@ const StrategyBadge: React.FC<StrategyBadgeProps> = ({ mode, reason }) => {
       <div className="h-4 w-px bg-current opacity-30" />
       <span className="text-xs opacity-80">{description}</span>
     </motion.div>
-  );
-};
+  )
+}
 
 /**
  * Panel de alertas del tesoro
@@ -230,9 +230,9 @@ const TreasuryAlerts: React.FC<{
   }>;
   onAcknowledge: (id: string) => void;
 }> = ({ alerts, onAcknowledge }) => {
-  const activeAlerts = alerts.filter(a => !a.acknowledged);
+  const activeAlerts = alerts.filter(a => !a.acknowledged)
   
-  if (activeAlerts.length === 0) return null;
+  if (activeAlerts.length === 0) return null
 
   return (
     <motion.div
@@ -251,7 +251,7 @@ const TreasuryAlerts: React.FC<{
             'flex items-center justify-between p-3 rounded-lg border',
             alert.type === 'critical' && 'bg-red-500/10 border-red-500/30',
             alert.type === 'warning' && 'bg-amber-500/10 border-amber-500/30',
-            alert.type === 'info' && 'bg-blue-500/10 border-blue-500/30'
+            alert.type === 'info' && 'bg-blue-500/10 border-blue-500/30',
           )}
         >
           <div className="flex items-center gap-3">
@@ -259,7 +259,7 @@ const TreasuryAlerts: React.FC<{
               'h-4 w-4',
               alert.type === 'critical' && 'text-red-500',
               alert.type === 'warning' && 'text-amber-500',
-              alert.type === 'info' && 'text-blue-500'
+              alert.type === 'info' && 'text-blue-500',
             )} />
             <div>
               <p className="text-sm font-medium text-white">{alert.title}</p>
@@ -277,8 +277,8 @@ const TreasuryAlerts: React.FC<{
         </motion.div>
       ))}
     </motion.div>
-  );
-};
+  )
+}
 
 /**
  * Indicador de salud del inventario
@@ -287,13 +287,13 @@ const InventoryHealth: React.FC<{
   score: number;
   status: 'healthy' | 'warning' | 'critical';
 }> = ({ score, status }) => {
-  const percentage = Math.round(score * 100);
+  const percentage = Math.round(score * 100)
   
   const statusConfig = {
     healthy: { color: 'bg-emerald-500', label: 'Saludable' },
     warning: { color: 'bg-amber-500', label: 'Atención' },
     critical: { color: 'bg-red-500', label: 'Crítico' },
-  };
+  }
 
   return (
     <div className="space-y-2">
@@ -303,7 +303,7 @@ const InventoryHealth: React.FC<{
           'text-xs',
           status === 'healthy' && 'border-emerald-500/50 text-emerald-400',
           status === 'warning' && 'border-amber-500/50 text-amber-400',
-          status === 'critical' && 'border-red-500/50 text-red-400'
+          status === 'critical' && 'border-red-500/50 text-red-400',
         )}>
           {statusConfig[status].label}
         </Badge>
@@ -315,16 +315,16 @@ const InventoryHealth: React.FC<{
         </span>
       </div>
     </div>
-  );
-};
+  )
+}
 
 // ============================================
 // COMPONENTE PRINCIPAL
 // ============================================
 
 export const ProfitCommandCenter: React.FC = () => {
-  const [showCalculator, setShowCalculator] = useState(false);
-  const [dollarsToSimulate, setDollarsToSimulate] = useState(10000);
+  const [showCalculator, setShowCalculator] = useState(false)
+  const [dollarsToSimulate, setDollarsToSimulate] = useState(10000)
 
   // Hooks de datos
   const { 
@@ -335,8 +335,8 @@ export const ProfitCommandCenter: React.FC = () => {
     loading: marketLoading, 
     error: marketError,
     refreshData,
-    historicalFeeds
-  } = useMarketData();
+    historicalFeeds,
+  } = useMarketData()
 
   const {
     position,
@@ -344,28 +344,28 @@ export const ProfitCommandCenter: React.FC = () => {
     healthMetrics,
     loading: treasuryLoading,
     acknowledgeAlert,
-  } = useTreasury(prices?.banxico ?? 18.50);
+  } = useTreasury(prices?.banxico ?? 18.50)
 
   // Determinar si hay oportunidad de arbitraje destacada
   const hasArbitrageOpportunity = useMemo(() => {
     return arbitrage?.isProfitable && 
-           arbitrage.opportunity?.opportunity_level !== 'low';
-  }, [arbitrage]);
+           arbitrage.opportunity?.opportunity_level !== 'low'
+  }, [arbitrage])
 
   // Calcular ganancia potencial
   const potentialProfit = useMemo(() => {
-    if (!prices || !arbitrage) return null;
+    if (!prices || !arbitrage) return null
     
-    const physicalSale = dollarsToSimulate * prices.streetAverage;
-    const cryptoSale = dollarsToSimulate * prices.binanceUsdt;
+    const physicalSale = dollarsToSimulate * prices.streetAverage
+    const cryptoSale = dollarsToSimulate * prices.binanceUsdt
     
     return {
       physical: physicalSale,
       crypto: cryptoSale,
       difference: cryptoSale - physicalSale,
       bestOption: cryptoSale > physicalSale ? 'crypto' : 'physical',
-    };
-  }, [prices, arbitrage, dollarsToSimulate]);
+    }
+  }, [prices, arbitrage, dollarsToSimulate])
 
   // Loading state
   if (marketLoading || treasuryLoading) {
@@ -379,7 +379,7 @@ export const ProfitCommandCenter: React.FC = () => {
         </div>
         <Skeleton className="h-64" />
       </div>
-    );
+    )
   }
 
   // Error state
@@ -400,7 +400,7 @@ export const ProfitCommandCenter: React.FC = () => {
           </Button>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   return (
@@ -573,7 +573,7 @@ export const ProfitCommandCenter: React.FC = () => {
                       'font-semibold',
                       potentialProfit.bestOption === 'crypto' 
                         ? 'text-emerald-400' 
-                        : 'text-blue-400'
+                        : 'text-blue-400',
                     )}>
                       {potentialProfit.bestOption === 'crypto' ? 'CRYPTO' : 'FÍSICO'}
                     </span>
@@ -621,7 +621,7 @@ export const ProfitCommandCenter: React.FC = () => {
         )}
       </AnimatePresence>
     </div>
-  );
-};
+  )
+}
 
-export default ProfitCommandCenter;
+export default ProfitCommandCenter

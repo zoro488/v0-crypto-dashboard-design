@@ -18,10 +18,10 @@ import {
   serverTimestamp,
   getDoc,
   Timestamp,
-  increment as firestoreIncrement
-} from "firebase/firestore"
-import { db, isFirebaseConfigured } from "@/app/lib/firebase/config"
-import { logger } from "@/app/lib/utils/logger"
+  increment as firestoreIncrement,
+} from 'firebase/firestore'
+import { db, isFirebaseConfigured } from '@/app/lib/firebase/config'
+import { logger } from '@/app/lib/utils/logger'
 
 // ===================================================================
 // TIPOS
@@ -129,7 +129,7 @@ export async function procesarVentaAtomica(venta: VentaData): Promise<ResultadoT
       }> = []
 
       for (const item of venta.items) {
-        const productRef = doc(db!, "almacen_productos", item.productoId)
+        const productRef = doc(db!, 'almacen_productos', item.productoId)
         const productSnap = await transaction.get(productRef)
 
         if (!productSnap.exists()) {
@@ -142,7 +142,7 @@ export async function procesarVentaAtomica(venta: VentaData): Promise<ResultadoT
         if (stockActual < item.cantidad) {
           throw new Error(
             `Stock insuficiente para "${item.productoNombre}". ` +
-            `Disponible: ${stockActual}, Solicitado: ${item.cantidad}`
+            `Disponible: ${stockActual}, Solicitado: ${item.cantidad}`,
           )
         }
 
@@ -150,13 +150,13 @@ export async function procesarVentaAtomica(venta: VentaData): Promise<ResultadoT
           ref: productRef,
           cantidad: item.cantidad,
           stockActual,
-          nombre: item.productoNombre
+          nombre: item.productoNombre,
         })
       }
 
       // 2. VALIDAR LÍMITE DE CRÉDITO si hay saldo pendiente
       if (venta.montoRestante > 0 && venta.clienteId) {
-        const clienteRef = doc(db!, "clientes", venta.clienteId)
+        const clienteRef = doc(db!, 'clientes', venta.clienteId)
         const clienteSnap = await transaction.get(clienteRef)
         
         if (clienteSnap.exists()) {
@@ -169,10 +169,10 @@ export async function procesarVentaAtomica(venta: VentaData): Promise<ResultadoT
           if (limiteCredito > 0 && nuevaDeuda > limiteCredito) {
             throw new Error(
               `Límite de crédito excedido para "${venta.clienteNombre}". ` +
-              `Límite: $${limiteCredito.toLocaleString("es-MX")}, ` +
-              `Deuda actual: $${deudaActual.toLocaleString("es-MX")}, ` +
-              `Nuevo crédito: $${venta.montoRestante.toLocaleString("es-MX")}, ` +
-              `Deuda total resultante: $${nuevaDeuda.toLocaleString("es-MX")}`
+              `Límite: $${limiteCredito.toLocaleString('es-MX')}, ` +
+              `Deuda actual: $${deudaActual.toLocaleString('es-MX')}, ` +
+              `Nuevo crédito: $${venta.montoRestante.toLocaleString('es-MX')}, ` +
+              `Deuda total resultante: $${nuevaDeuda.toLocaleString('es-MX')}`,
             )
           }
         }
@@ -185,23 +185,23 @@ export async function procesarVentaAtomica(venta: VentaData): Promise<ResultadoT
         transaction.update(prod.ref, {
           stock: prod.stockActual - prod.cantidad,
           stockActual: prod.stockActual - prod.cantidad,
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
         })
       }
 
       // B) Crear documento de Venta
-      const nuevaVentaRef = doc(collection(db!, "ventas"))
+      const nuevaVentaRef = doc(collection(db!, 'ventas'))
       transaction.set(nuevaVentaRef, {
         ...venta,
         fecha: serverTimestamp(),
         estado: venta.montoRestante > 0 ? 'parcial' : 'completada',
         estadoPago: venta.montoRestante > 0 ? 'parcial' : 'completo',
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       })
 
       // C) Registrar salida de almacén
       for (const item of venta.items) {
-        const salidaRef = doc(collection(db!, "almacen_salidas"))
+        const salidaRef = doc(collection(db!, 'almacen_salidas'))
         transaction.set(salidaRef, {
           productoId: item.productoId,
           productoNombre: item.productoNombre,
@@ -211,7 +211,7 @@ export async function procesarVentaAtomica(venta: VentaData): Promise<ResultadoT
           destino: venta.clienteNombre,
           ventaRef: nuevaVentaRef.id,
           fecha: serverTimestamp(),
-          createdAt: serverTimestamp()
+          createdAt: serverTimestamp(),
         })
       }
 
@@ -243,7 +243,7 @@ export async function procesarVentaAtomica(venta: VentaData): Promise<ResultadoT
           flete_sur: 0,
           azteca: 0,
           leftie: 0,
-          profit: 0
+          profit: 0,
         }
 
         // Determinar banco destino según método de pago
@@ -270,7 +270,7 @@ export async function procesarVentaAtomica(venta: VentaData): Promise<ResultadoT
         }
 
         // Registrar ingreso principal con distribución completa
-        const ingresoRef = doc(collection(db!, "ingresos"))
+        const ingresoRef = doc(collection(db!, 'ingresos'))
         transaction.set(ingresoRef, {
           monto: venta.montoPagado,
           concepto: `Venta a ${venta.clienteNombre}`,
@@ -282,23 +282,23 @@ export async function procesarVentaAtomica(venta: VentaData): Promise<ResultadoT
           totalesVenta: {
             costoProducto: totalCostoProducto,
             fletes: totalFletes,
-            utilidades: totalUtilidades
+            utilidades: totalUtilidades,
           },
           fecha: serverTimestamp(),
-          createdAt: serverTimestamp()
+          createdAt: serverTimestamp(),
         })
 
         // Registrar movimientos bancarios para cada banco con monto > 0
         const movimientosData: Array<{ bancoId: BancoId; monto: number; concepto: string }> = [
           { bancoId: bancoCosto, monto: distribucion[bancoCosto], concepto: 'Costo de producto vendido' },
           { bancoId: 'flete_sur', monto: distribucion.flete_sur, concepto: 'Comisión de flete' },
-          { bancoId: 'utilidades', monto: distribucion.utilidades, concepto: 'Utilidad de venta' }
+          { bancoId: 'utilidades', monto: distribucion.utilidades, concepto: 'Utilidad de venta' },
         ]
 
         for (const mov of movimientosData) {
           if (mov.monto > 0) {
             // Crear movimiento
-            const movRef = doc(collection(db!, "movimientos"))
+            const movRef = doc(collection(db!, 'movimientos'))
             transaction.set(movRef, {
               bancoId: mov.bancoId,
               tipo: 'ingreso',
@@ -308,15 +308,15 @@ export async function procesarVentaAtomica(venta: VentaData): Promise<ResultadoT
               moneda: esOperacionUSD ? 'USD' : 'MXN',
               referenciaId: nuevaVentaRef.id,
               fecha: serverTimestamp(),
-              createdAt: serverTimestamp()
+              createdAt: serverTimestamp(),
             })
             
             // CRÍTICO: Actualizar saldo del banco
-            const bancoRef = doc(db!, "bancos", mov.bancoId)
+            const bancoRef = doc(db!, 'bancos', mov.bancoId)
             transaction.update(bancoRef, {
               capitalActual: firestoreIncrement(mov.monto),
               historicoIngresos: firestoreIncrement(mov.monto),
-              updatedAt: serverTimestamp()
+              updatedAt: serverTimestamp(),
             })
           }
         }
@@ -326,29 +326,29 @@ export async function procesarVentaAtomica(venta: VentaData): Promise<ResultadoT
           const totalesParaHistorico = {
             bovedaMonte: totalCostoProducto - distribucion[bancoCosto],
             fletes: totalFletes - distribucion.flete_sur,
-            utilidades: totalUtilidades - distribucion.utilidades
+            utilidades: totalUtilidades - distribucion.utilidades,
           }
           
           // Solo registrar histórico de lo pendiente (sin sumar a capitalActual)
           if (totalesParaHistorico.bovedaMonte > 0) {
-            const bovedaRef = doc(db!, "bancos", bancoCosto)
+            const bovedaRef = doc(db!, 'bancos', bancoCosto)
             transaction.update(bovedaRef, {
               historicoIngresos: firestoreIncrement(totalesParaHistorico.bovedaMonte),
-              updatedAt: serverTimestamp()
+              updatedAt: serverTimestamp(),
             })
           }
           if (totalesParaHistorico.fletes > 0) {
-            const fletesRef = doc(db!, "bancos", "flete_sur")
+            const fletesRef = doc(db!, 'bancos', 'flete_sur')
             transaction.update(fletesRef, {
               historicoIngresos: firestoreIncrement(totalesParaHistorico.fletes),
-              updatedAt: serverTimestamp()
+              updatedAt: serverTimestamp(),
             })
           }
           if (totalesParaHistorico.utilidades > 0) {
-            const utilidadesRef = doc(db!, "bancos", "utilidades")
+            const utilidadesRef = doc(db!, 'bancos', 'utilidades')
             transaction.update(utilidadesRef, {
               historicoIngresos: firestoreIncrement(totalesParaHistorico.utilidades),
-              updatedAt: serverTimestamp()
+              updatedAt: serverTimestamp(),
             })
           }
         }
@@ -356,7 +356,7 @@ export async function procesarVentaAtomica(venta: VentaData): Promise<ResultadoT
 
       // E) Actualizar deuda del cliente si hay saldo pendiente
       if (venta.montoRestante > 0 && venta.clienteId) {
-        const clienteRef = doc(db!, "clientes", venta.clienteId)
+        const clienteRef = doc(db!, 'clientes', venta.clienteId)
         const clienteSnap = await transaction.get(clienteRef)
         
         if (clienteSnap.exists()) {
@@ -364,7 +364,7 @@ export async function procesarVentaAtomica(venta: VentaData): Promise<ResultadoT
           transaction.update(clienteRef, {
             deudaTotal: (clienteData.deudaTotal || 0) + venta.montoRestante,
             ultimaCompra: serverTimestamp(),
-            updatedAt: serverTimestamp()
+            updatedAt: serverTimestamp(),
           })
         }
       }
@@ -376,8 +376,8 @@ export async function procesarVentaAtomica(venta: VentaData): Promise<ResultadoT
     return { success: true, documentId: resultado.ventaId }
 
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : "Error desconocido"
-    logger.error("[Transacción] ❌ Error en venta:", errorMsg)
+    const errorMsg = error instanceof Error ? error.message : 'Error desconocido'
+    logger.error('[Transacción] ❌ Error en venta:', errorMsg)
     return { success: false, error: errorMsg }
   }
 }
@@ -393,7 +393,7 @@ export async function procesarOrdenCompraAtomica(orden: OrdenCompraData): Promis
   try {
     const resultado = await runTransaction(db!, async (transaction) => {
       // 1. Crear orden de compra
-      const ordenRef = doc(collection(db!, "ordenes_compra"))
+      const ordenRef = doc(collection(db!, 'ordenes_compra'))
       transaction.set(ordenRef, {
         distribuidorId: orden.distribuidorId,
         distribuidor: orden.distribuidorNombre,
@@ -407,11 +407,11 @@ export async function procesarOrdenCompraAtomica(orden: OrdenCompraData): Promis
         deuda: orden.deuda,
         estado: orden.deuda > 0 ? 'pendiente' : 'pagada',
         fecha: serverTimestamp(),
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       })
 
       // 2. Registrar entrada al almacén
-      const entradaRef = doc(collection(db!, "almacen_entradas"))
+      const entradaRef = doc(collection(db!, 'almacen_entradas'))
       transaction.set(entradaRef, {
         productoNombre: orden.producto,
         cantidad: orden.cantidad,
@@ -421,24 +421,24 @@ export async function procesarOrdenCompraAtomica(orden: OrdenCompraData): Promis
         origen: orden.distribuidorNombre,
         ordenCompraRef: ordenRef.id,
         fecha: serverTimestamp(),
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       })
 
       // 3. Actualizar o crear producto en almacén
       // Nota: Esto buscaría por nombre, en producción usaríamos ID
-      const productoRef = doc(collection(db!, "almacen_productos"))
+      const productoRef = doc(collection(db!, 'almacen_productos'))
       transaction.set(productoRef, {
         nombre: orden.producto,
         stock: orden.cantidad,
         stockActual: orden.cantidad,
         precioCompra: orden.costoTotal / orden.cantidad,
         createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       }, { merge: true })
 
       // 4. Si hubo pago inicial, registrar movimiento
       if (orden.pagoInicial > 0 && orden.bancoOrigen) {
-        const movimientoRef = doc(collection(db!, "movimientos"))
+        const movimientoRef = doc(collection(db!, 'movimientos'))
         transaction.set(movimientoRef, {
           bancoId: orden.bancoOrigen,
           tipo: 'gasto',
@@ -447,13 +447,13 @@ export async function procesarOrdenCompraAtomica(orden: OrdenCompraData): Promis
           concepto: `Pago inicial OC: ${orden.producto}`,
           referenciaId: ordenRef.id,
           fecha: serverTimestamp(),
-          createdAt: serverTimestamp()
+          createdAt: serverTimestamp(),
         })
       }
 
       // 5. Actualizar deuda del distribuidor
       if (orden.distribuidorId) {
-        const distRef = doc(db!, "distribuidores", orden.distribuidorId)
+        const distRef = doc(db!, 'distribuidores', orden.distribuidorId)
         const distSnap = await transaction.get(distRef)
         
         if (distSnap.exists()) {
@@ -461,7 +461,7 @@ export async function procesarOrdenCompraAtomica(orden: OrdenCompraData): Promis
           transaction.update(distRef, {
             deudaTotal: (distData.deudaTotal || 0) + orden.deuda,
             totalOrdenesCompra: (distData.totalOrdenesCompra || 0) + orden.costoTotal,
-            updatedAt: serverTimestamp()
+            updatedAt: serverTimestamp(),
           })
         }
       }
@@ -473,8 +473,8 @@ export async function procesarOrdenCompraAtomica(orden: OrdenCompraData): Promis
     return { success: true, documentId: resultado.ordenId }
 
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : "Error desconocido"
-    logger.error("[Transacción] ❌ Error en orden de compra:", errorMsg)
+    const errorMsg = error instanceof Error ? error.message : 'Error desconocido'
+    logger.error('[Transacción] ❌ Error en orden de compra:', errorMsg)
     return { success: false, error: errorMsg }
   }
 }
@@ -506,27 +506,27 @@ export async function procesarAbonoAtomico(abono: AbonoData): Promise<ResultadoT
       // Actualizar deuda
       transaction.update(entidadRef, {
         deudaTotal: deudaActual - abono.monto,
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       })
 
       // Registrar abono
-      const abonoRef = doc(collection(db!, "abonos"))
+      const abonoRef = doc(collection(db!, 'abonos'))
       transaction.set(abonoRef, {
         entidadId: abono.entidadId,
         entidadTipo: abono.entidadTipo,
         entidadNombre: entidadData.nombre,
         monto: abono.monto,
-        concepto: abono.concepto || `Abono a deuda`,
+        concepto: abono.concepto || 'Abono a deuda',
         bancoDestino: abono.bancoDestino,
         deudaAnterior: deudaActual,
         deudaNueva: deudaActual - abono.monto,
         fecha: serverTimestamp(),
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       })
 
       // Si es cliente, distribuir el ingreso a bancos
       if (abono.entidadTipo === 'cliente') {
-        const ingresoRef = doc(collection(db!, "ingresos"))
+        const ingresoRef = doc(collection(db!, 'ingresos'))
         transaction.set(ingresoRef, {
           monto: abono.monto,
           concepto: `Abono de ${entidadData.nombre}`,
@@ -534,11 +534,11 @@ export async function procesarAbonoAtomico(abono: AbonoData): Promise<ResultadoT
           clienteId: abono.entidadId,
           abonoRef: abonoRef.id,
           fecha: serverTimestamp(),
-          createdAt: serverTimestamp()
+          createdAt: serverTimestamp(),
         })
 
         // Registrar movimiento en bóveda monte
-        const movRef = doc(collection(db!, "movimientos"))
+        const movRef = doc(collection(db!, 'movimientos'))
         transaction.set(movRef, {
           bancoId: 'boveda_monte',
           tipo: 'ingreso',
@@ -547,13 +547,13 @@ export async function procesarAbonoAtomico(abono: AbonoData): Promise<ResultadoT
           concepto: `Abono cliente: ${entidadData.nombre}`,
           referenciaId: abonoRef.id,
           fecha: serverTimestamp(),
-          createdAt: serverTimestamp()
+          createdAt: serverTimestamp(),
         })
       }
 
       // Si es distribuidor, registrar el gasto desde el banco
       if (abono.entidadTipo === 'distribuidor' && abono.bancoDestino) {
-        const movRef = doc(collection(db!, "movimientos"))
+        const movRef = doc(collection(db!, 'movimientos'))
         transaction.set(movRef, {
           bancoId: abono.bancoDestino,
           tipo: 'gasto',
@@ -562,7 +562,7 @@ export async function procesarAbonoAtomico(abono: AbonoData): Promise<ResultadoT
           concepto: `Pago a ${entidadData.nombre}`,
           referenciaId: abonoRef.id,
           fecha: serverTimestamp(),
-          createdAt: serverTimestamp()
+          createdAt: serverTimestamp(),
         })
       }
 
@@ -573,8 +573,8 @@ export async function procesarAbonoAtomico(abono: AbonoData): Promise<ResultadoT
     return { success: true, documentId: resultado.abonoId }
 
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : "Error desconocido"
-    logger.error("[Transacción] ❌ Error en abono:", errorMsg)
+    const errorMsg = error instanceof Error ? error.message : 'Error desconocido'
+    logger.error('[Transacción] ❌ Error en abono:', errorMsg)
     return { success: false, error: errorMsg }
   }
 }
@@ -583,12 +583,12 @@ export async function procesarAbonoAtomico(abono: AbonoData): Promise<ResultadoT
  * Procesa una transferencia entre bancos
  */
 export async function procesarTransferenciaAtomica(
-  transferencia: TransferenciaData
+  transferencia: TransferenciaData,
 ): Promise<ResultadoTransaccion> {
   try {
     const resultado = await runTransaction(db!, async (transaction) => {
       // Registrar movimiento de salida
-      const salidaRef = doc(collection(db!, "movimientos"))
+      const salidaRef = doc(collection(db!, 'movimientos'))
       transaction.set(salidaRef, {
         bancoId: transferencia.bancoOrigenId,
         tipo: 'gasto',
@@ -597,11 +597,11 @@ export async function procesarTransferenciaAtomica(
         concepto: transferencia.concepto,
         bancoDestino: transferencia.bancoDestinoId,
         fecha: serverTimestamp(),
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       })
 
       // Registrar movimiento de entrada
-      const entradaRef = doc(collection(db!, "movimientos"))
+      const entradaRef = doc(collection(db!, 'movimientos'))
       transaction.set(entradaRef, {
         bancoId: transferencia.bancoDestinoId,
         tipo: 'ingreso',
@@ -611,7 +611,7 @@ export async function procesarTransferenciaAtomica(
         bancoOrigen: transferencia.bancoOrigenId,
         transferenciaRef: salidaRef.id,
         fecha: serverTimestamp(),
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       })
 
       return { transferenciaId: salidaRef.id }
@@ -621,8 +621,8 @@ export async function procesarTransferenciaAtomica(
     return { success: true, documentId: resultado.transferenciaId }
 
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : "Error desconocido"
-    logger.error("[Transacción] ❌ Error en transferencia:", errorMsg)
+    const errorMsg = error instanceof Error ? error.message : 'Error desconocido'
+    logger.error('[Transacción] ❌ Error en transferencia:', errorMsg)
     return { success: false, error: errorMsg }
   }
 }
@@ -635,7 +635,7 @@ export const transactionService = {
   procesarVenta: procesarVentaAtomica,
   procesarOrdenCompra: procesarOrdenCompraAtomica,
   procesarAbono: procesarAbonoAtomico,
-  procesarTransferencia: procesarTransferenciaAtomica
+  procesarTransferencia: procesarTransferenciaAtomica,
 }
 
 export default transactionService

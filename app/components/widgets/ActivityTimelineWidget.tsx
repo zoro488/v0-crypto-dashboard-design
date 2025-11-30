@@ -1,12 +1,12 @@
-"use client"
+'use client'
 
-import { motion, AnimatePresence } from "framer-motion"
-import { Clock, CheckCircle, AlertCircle, XCircle, Zap } from "lucide-react"
-import { useState } from "react"
+import { motion, AnimatePresence } from 'framer-motion'
+import { Clock, CheckCircle, AlertCircle, XCircle, Zap } from 'lucide-react'
+import { useState } from 'react'
 
 interface Activity {
   id: string
-  type: "success" | "warning" | "error" | "info"
+  type: 'success' | 'warning' | 'error' | 'info'
   title: string
   description: string
   time: string
@@ -24,10 +24,10 @@ const iconMap = {
 }
 
 const colorMap = {
-  success: "from-emerald-500 to-green-400",
-  warning: "from-amber-500 to-orange-400",
-  error: "from-rose-500 to-red-400",
-  info: "from-blue-500 to-cyan-400",
+  success: 'from-emerald-500 to-green-400',
+  warning: 'from-amber-500 to-orange-400',
+  error: 'from-rose-500 to-red-400',
+  info: 'from-blue-500 to-cyan-400',
 }
 
 export default function ActivityTimelineWidget({ activities = [] }: ActivityTimelineWidgetProps) {
@@ -98,7 +98,7 @@ export default function ActivityTimelineWidget({ activities = [] }: ActivityTime
                           {isExpanded && (
                             <motion.p
                               initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: "auto", opacity: 1 }}
+                              animate={{ height: 'auto', opacity: 1 }}
                               exit={{ height: 0, opacity: 0 }}
                               className="text-white/60 text-xs mt-1"
                             >

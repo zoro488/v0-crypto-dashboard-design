@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 🎯 QUICK STATS WIDGET - Widget de Estadísticas Rápidas Premium
@@ -44,50 +44,50 @@ const colorConfig = {
     bg: 'bg-blue-500/10',
     text: 'text-blue-400',
     glow: 'rgba(59, 130, 246, 0.3)',
-    spark: '#3b82f6'
+    spark: '#3b82f6',
   },
   green: {
     gradient: 'from-emerald-500 to-green-500',
     bg: 'bg-emerald-500/10',
     text: 'text-emerald-400',
     glow: 'rgba(16, 185, 129, 0.3)',
-    spark: '#10b981'
+    spark: '#10b981',
   },
   purple: {
     gradient: 'from-purple-500 to-violet-500',
     bg: 'bg-purple-500/10',
     text: 'text-purple-400',
     glow: 'rgba(139, 92, 246, 0.3)',
-    spark: '#8b5cf6'
+    spark: '#8b5cf6',
   },
   orange: {
     gradient: 'from-orange-500 to-amber-500',
     bg: 'bg-orange-500/10',
     text: 'text-orange-400',
     glow: 'rgba(249, 115, 22, 0.3)',
-    spark: '#f97316'
+    spark: '#f97316',
   },
   cyan: {
     gradient: 'from-cyan-500 to-teal-500',
     bg: 'bg-cyan-500/10',
     text: 'text-cyan-400',
     glow: 'rgba(6, 182, 212, 0.3)',
-    spark: '#06b6d4'
+    spark: '#06b6d4',
   },
   pink: {
     gradient: 'from-pink-500 to-rose-500',
     bg: 'bg-pink-500/10',
     text: 'text-pink-400',
     glow: 'rgba(236, 72, 153, 0.3)',
-    spark: '#ec4899'
+    spark: '#ec4899',
   },
   red: {
     gradient: 'from-red-500 to-rose-500',
     bg: 'bg-red-500/10',
     text: 'text-red-400',
     glow: 'rgba(239, 68, 68, 0.3)',
-    spark: '#ef4444'
-  }
+    spark: '#ef4444',
+  },
 }
 
 // ============================================================================
@@ -169,7 +169,7 @@ function AnimatedValue({
   value, 
   prefix = '', 
   suffix = '',
-  duration = 1000 
+  duration = 1000, 
 }: { 
   value: number | string
   prefix?: string
@@ -238,7 +238,7 @@ export function QuickStatWidget({
   animated = true,
   onClick,
   className = '',
-  delay = 0
+  delay = 0,
 }: QuickStatWidgetProps) {
   const config = colorConfig[color]
   
@@ -246,7 +246,7 @@ export function QuickStatWidget({
   const sizeConfig = {
     sm: { padding: 'p-3', title: 'text-xs', value: 'text-lg', icon: 'w-8 h-8' },
     md: { padding: 'p-4', title: 'text-xs', value: 'text-2xl', icon: 'w-10 h-10' },
-    lg: { padding: 'p-5', title: 'text-sm', value: 'text-3xl', icon: 'w-12 h-12' }
+    lg: { padding: 'p-5', title: 'text-sm', value: 'text-3xl', icon: 'w-12 h-12' },
   }
   
   const sizes = sizeConfig[size]
@@ -262,12 +262,12 @@ export function QuickStatWidget({
       transition={{
         duration: 0.5,
         delay,
-        ease: [0.16, 1, 0.3, 1]
+        ease: [0.16, 1, 0.3, 1],
       }}
       whileHover={{ 
         y: -4, 
         scale: 1.02,
-        transition: { duration: 0.2 }
+        transition: { duration: 0.2 },
       }}
       whileTap={onClick ? { scale: 0.98 } : undefined}
       onClick={onClick}
@@ -285,7 +285,7 @@ export function QuickStatWidget({
       <motion.div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
         style={{
-          background: `radial-gradient(circle at 50% 50%, ${config.glow} 0%, transparent 70%)`
+          background: `radial-gradient(circle at 50% 50%, ${config.glow} 0%, transparent 70%)`,
         }}
       />
       
@@ -382,7 +382,7 @@ export function QuickStatsGrid({ stats, columns = 4, className = '' }: QuickStat
     2: 'grid-cols-1 sm:grid-cols-2',
     3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
     4: 'grid-cols-2 md:grid-cols-4',
-    5: 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-5'
+    5: 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-5',
   }
   
   return (

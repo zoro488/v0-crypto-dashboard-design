@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 📝 FORMULARIOS CRUD COMPLETOS - CHRONOS SYSTEM
@@ -32,7 +32,7 @@ import {
   AlertCircle,
   CheckCircle,
   Loader2,
-  Plus
+  Plus,
 } from 'lucide-react'
 import { useFirestoreCRUD, useClientes, useDistribuidores } from '@/app/hooks/useFirestoreCRUD'
 import { Button } from '@/app/components/ui/button'
@@ -43,7 +43,7 @@ import {
   SelectContent, 
   SelectItem, 
   SelectTrigger, 
-  SelectValue 
+  SelectValue, 
 } from '@/app/components/ui/select'
 import { Textarea } from '@/app/components/ui/textarea'
 import { useToast } from '@/app/hooks/use-toast'
@@ -106,7 +106,7 @@ const TransferenciaSchema = z.object({
   concepto: z.string().min(1, 'Concepto requerido'),
 }).refine(data => data.bancoOrigen !== data.bancoDestino, {
   message: 'Origen y destino deben ser diferentes',
-  path: ['bancoDestino']
+  path: ['bancoDestino'],
 })
 
 type TransferenciaFormData = z.infer<typeof TransferenciaSchema>
@@ -167,7 +167,7 @@ function ModalWrapper({ isOpen, onClose, title, icon, children, width = 'md' }: 
     sm: 'max-w-sm',
     md: 'max-w-md',
     lg: 'max-w-lg',
-    xl: 'max-w-xl'
+    xl: 'max-w-xl',
   }
   
   useEffect(() => {
@@ -289,7 +289,7 @@ export function FormVenta({ isOpen, onClose, editData, onSuccess }: FormVentaPro
     watch,
     setValue,
     reset,
-    formState: { errors }
+    formState: { errors },
   } = useForm<VentaFormData>({
     resolver: zodResolver(VentaSchema),
     defaultValues: {
@@ -300,7 +300,7 @@ export function FormVenta({ isOpen, onClose, editData, onSuccess }: FormVentaPro
       precioFlete: 0,
       estadoPago: 'pendiente',
       montoPagado: 0,
-    }
+    },
   })
   
   // Watch values para cálculos en tiempo real
@@ -387,7 +387,7 @@ export function FormVenta({ isOpen, onClose, editData, onSuccess }: FormVentaPro
       if (success) {
         toast({
           title: editData ? '✅ Venta actualizada' : '✅ Venta registrada',
-          description: `Total: $${calculos.precioTotalVenta.toLocaleString('es-MX')}`
+          description: `Total: $${calculos.precioTotalVenta.toLocaleString('es-MX')}`,
         })
         onSuccess?.()
         onClose()
@@ -398,7 +398,7 @@ export function FormVenta({ isOpen, onClose, editData, onSuccess }: FormVentaPro
       toast({
         title: '❌ Error',
         description: 'No se pudo guardar la venta',
-        variant: 'destructive'
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -663,7 +663,7 @@ export function FormGasto({ isOpen, onClose, defaultBanco, onSuccess }: FormGast
     handleSubmit,
     control,
     reset,
-    formState: { errors }
+    formState: { errors },
   } = useForm<GastoFormData>({
     resolver: zodResolver(GastoSchema),
     defaultValues: {
@@ -671,7 +671,7 @@ export function FormGasto({ isOpen, onClose, defaultBanco, onSuccess }: FormGast
       bancoOrigen: defaultBanco || '',
       monto: 0,
       concepto: '',
-    }
+    },
   })
   
   useEffect(() => {
@@ -698,7 +698,7 @@ export function FormGasto({ isOpen, onClose, defaultBanco, onSuccess }: FormGast
       if (id) {
         toast({
           title: '✅ Gasto registrado',
-          description: `$${data.monto.toLocaleString('es-MX')} de ${banco?.nombre || data.bancoOrigen}`
+          description: `$${data.monto.toLocaleString('es-MX')} de ${banco?.nombre || data.bancoOrigen}`,
         })
         onSuccess?.()
         onClose()
@@ -709,7 +709,7 @@ export function FormGasto({ isOpen, onClose, defaultBanco, onSuccess }: FormGast
       toast({
         title: '❌ Error',
         description: 'No se pudo registrar el gasto',
-        variant: 'destructive'
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -863,14 +863,14 @@ export function FormTransferencia({ isOpen, onClose, onSuccess }: FormTransferen
     control,
     watch,
     reset,
-    formState: { errors }
+    formState: { errors },
   } = useForm<TransferenciaFormData>({
     resolver: zodResolver(TransferenciaSchema),
     defaultValues: {
       fecha: new Date().toISOString().split('T')[0],
       monto: 0,
       concepto: 'Transferencia entre bancos',
-    }
+    },
   })
   
   const bancoOrigen = watch('bancoOrigen')
@@ -911,7 +911,7 @@ export function FormTransferencia({ isOpen, onClose, onSuccess }: FormTransferen
       
       toast({
         title: '✅ Transferencia realizada',
-        description: `$${data.monto.toLocaleString('es-MX')} de ${origen?.nombre} a ${destino?.nombre}`
+        description: `$${data.monto.toLocaleString('es-MX')} de ${origen?.nombre} a ${destino?.nombre}`,
       })
       onSuccess?.()
       onClose()
@@ -921,7 +921,7 @@ export function FormTransferencia({ isOpen, onClose, onSuccess }: FormTransferen
       toast({
         title: '❌ Error',
         description: 'No se pudo completar la transferencia',
-        variant: 'destructive'
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -1079,7 +1079,7 @@ export function FormCliente({ isOpen, onClose, editData, onSuccess }: FormClient
     handleSubmit,
     control,
     reset,
-    formState: { errors }
+    formState: { errors },
   } = useForm<ClienteFormData>({
     resolver: zodResolver(ClienteSchema),
     defaultValues: {
@@ -1089,7 +1089,7 @@ export function FormCliente({ isOpen, onClose, editData, onSuccess }: FormClient
       direccion: '',
       tipo: 'regular',
       observaciones: '',
-    }
+    },
   })
   
   useEffect(() => {
@@ -1137,7 +1137,7 @@ export function FormCliente({ isOpen, onClose, editData, onSuccess }: FormClient
       if (success) {
         toast({
           title: editData ? '✅ Cliente actualizado' : '✅ Cliente registrado',
-          description: data.nombre
+          description: data.nombre,
         })
         onSuccess?.()
         onClose()
@@ -1148,7 +1148,7 @@ export function FormCliente({ isOpen, onClose, editData, onSuccess }: FormClient
       toast({
         title: '❌ Error',
         description: 'No se pudo guardar el cliente',
-        variant: 'destructive'
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -1277,7 +1277,7 @@ export function FormDistribuidor({ isOpen, onClose, editData, onSuccess }: FormD
     register,
     handleSubmit,
     reset,
-    formState: { errors }
+    formState: { errors },
   } = useForm<DistribuidorFormData>({
     resolver: zodResolver(DistribuidorSchema),
     defaultValues: {
@@ -1287,7 +1287,7 @@ export function FormDistribuidor({ isOpen, onClose, editData, onSuccess }: FormD
       email: '',
       origen: '',
       observaciones: '',
-    }
+    },
   })
   
   useEffect(() => {
@@ -1335,7 +1335,7 @@ export function FormDistribuidor({ isOpen, onClose, editData, onSuccess }: FormD
       if (success) {
         toast({
           title: editData ? '✅ Distribuidor actualizado' : '✅ Distribuidor registrado',
-          description: data.nombre
+          description: data.nombre,
         })
         onSuccess?.()
         onClose()
@@ -1346,7 +1346,7 @@ export function FormDistribuidor({ isOpen, onClose, editData, onSuccess }: FormD
       toast({
         title: '❌ Error',
         description: 'No se pudo guardar el distribuidor',
-        variant: 'destructive'
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -1457,5 +1457,5 @@ export {
   TransferenciaSchema,
   ClienteSchema,
   DistribuidorSchema,
-  BANCOS
+  BANCOS,
 }

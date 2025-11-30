@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import { useState, useEffect, useCallback, useRef } from "react"
-import { useAppStore } from "@/app/lib/store/useAppStore"
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { useAppStore } from '@/app/lib/store/useAppStore'
 
 interface VoiceAgentConfig {
   apiKey?: string
@@ -15,7 +15,7 @@ interface FunctionCall {
 }
 
 interface FunctionArgs {
-  theme?: "light" | "dark" | "cyber"
+  theme?: 'light' | 'dark' | 'cyber'
   show_section?: string
   model_rotation?: number
   panel?: string
@@ -43,14 +43,14 @@ export function useVoiceAgent(config: VoiceAgentConfig = {}) {
     },
     get_balance: (args) => {
       // Return balance info - would connect to actual data
-      return { success: true, message: "Balance retrieved" }
+      return { success: true, message: 'Balance retrieved' }
     },
   }
 
   // Initialize WebRTC connection to OpenAI Realtime API
   const connect = useCallback(async () => {
     try {
-      setVoiceAgentStatus("listening")
+      setVoiceAgentStatus('listening')
 
       // Note: This is a placeholder for the actual OpenAI Realtime API connection
       // In production, you would set up proper WebRTC signaling here
@@ -65,8 +65,8 @@ export function useVoiceAgent(config: VoiceAgentConfig = {}) {
       // Start frequency visualization loop
       animateFrequencies()
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to connect")
-      setVoiceAgentStatus("idle")
+      setError(err instanceof Error ? err.message : 'Failed to connect')
+      setVoiceAgentStatus('idle')
     }
   }, [setVoiceAgentStatus])
 
@@ -110,7 +110,7 @@ export function useVoiceAgent(config: VoiceAgentConfig = {}) {
     }
 
     setIsConnected(false)
-    setVoiceAgentStatus("idle")
+    setVoiceAgentStatus('idle')
   }, [setVoiceAgentStatus])
 
   // Cleanup on unmount

@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 🛡️ SAFE CHART CONTAINER - Wrapper seguro para Recharts
@@ -14,8 +14,8 @@
  * </SafeChartContainer>
  */
 
-import { useState, useEffect, useRef, useCallback, type ReactNode, type ReactElement, isValidElement } from "react"
-import { ResponsiveContainer } from "recharts"
+import { useState, useEffect, useRef, useCallback, type ReactNode, type ReactElement, isValidElement } from 'react'
+import { ResponsiveContainer } from 'recharts'
 
 interface SafeChartContainerProps {
   /** Contenido del chart (AreaChart, BarChart, etc.) */
@@ -45,10 +45,10 @@ interface SafeChartContainerProps {
 export function SafeChartContainer({
   children,
   height = 300,
-  width = "100%",
+  width = '100%',
   minHeight = 100,
   minWidth = 100,
-  className = "",
+  className = '',
   debounceMs = 150,
   showSkeleton = true,
   aspect,
@@ -151,7 +151,7 @@ export function SafeChartContainer({
   }, [debounceMs, isReady, minWidth, minHeight])
 
   // Calcular altura efectiva
-  const effectiveHeight = typeof height === "number" 
+  const effectiveHeight = typeof height === 'number' 
     ? Math.max(height, minHeight) 
     : height
 
@@ -191,8 +191,8 @@ export function SafeChartContainer({
         <Skeleton />
       ) : hasValidDimensions ? (
         <ResponsiveContainer 
-          width={dimensions.width}
-          height={dimensions.height}
+          width="100%"
+          height="100%"
           minWidth={minWidth}
           minHeight={minHeight}
           aspect={aspect}

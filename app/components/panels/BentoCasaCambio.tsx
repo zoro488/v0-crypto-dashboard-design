@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { motion } from "framer-motion"
-import { DollarSign, TrendingUp, BarChart3, History } from "lucide-react"
-import CurrencyExchangeWidget from "@/app/components/widgets/CurrencyExchangeWidget"
+import { motion } from 'framer-motion'
+import { DollarSign, TrendingUp, BarChart3, History } from 'lucide-react'
+import CurrencyExchangeWidget from '@/app/components/widgets/CurrencyExchangeWidget'
 
 export default function BentoCasaCambio() {
   const inventory = {
@@ -11,10 +11,10 @@ export default function BentoCasaCambio() {
   }
 
   const recentTransactions = [
-    { id: 1, type: "Venta", amount: 1000, rate: 17.43, profit: 300, time: "10:30 AM" },
-    { id: 2, type: "Compra", amount: 2500, rate: 17.08, profit: 750, time: "11:15 AM" },
-    { id: 3, type: "Venta", amount: 500, rate: 17.45, profit: 150, time: "12:00 PM" },
-    { id: 4, type: "Compra", amount: 3000, rate: 17.1, profit: 900, time: "1:45 PM" },
+    { id: 1, type: 'Venta', amount: 1000, rate: 17.43, profit: 300, time: '10:30 AM' },
+    { id: 2, type: 'Compra', amount: 2500, rate: 17.08, profit: 750, time: '11:15 AM' },
+    { id: 3, type: 'Venta', amount: 500, rate: 17.45, profit: 150, time: '12:00 PM' },
+    { id: 4, type: 'Compra', amount: 3000, rate: 17.1, profit: 900, time: '1:45 PM' },
   ]
 
   const dailyStats = {
@@ -121,10 +121,10 @@ export default function BentoCasaCambio() {
               <div className="flex items-center gap-4">
                 <div
                   className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                    tx.type === "Venta" ? "bg-rose-500/20" : "bg-emerald-500/20"
+                    tx.type === 'Venta' ? 'bg-rose-500/20' : 'bg-emerald-500/20'
                   }`}
                 >
-                  <DollarSign className={`w-5 h-5 ${tx.type === "Venta" ? "text-rose-400" : "text-emerald-400"}`} />
+                  <DollarSign className={`w-5 h-5 ${tx.type === 'Venta' ? 'text-rose-400' : 'text-emerald-400'}`} />
                 </div>
                 <div>
                   <div className="font-medium text-white">{tx.type} USD</div>

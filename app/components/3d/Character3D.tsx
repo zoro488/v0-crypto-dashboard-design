@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import { useRef, useMemo, useEffect } from "react"
-import { useFrame } from "@react-three/fiber"
-import { useSpring, animated, config } from "@react-spring/three"
-import * as THREE from "three"
+import { useRef, useMemo, useEffect } from 'react'
+import { useFrame } from '@react-three/fiber'
+import { useSpring, animated, config } from '@react-spring/three'
+import * as THREE from 'three'
 
 interface Character3DProps {
   isListening: boolean
@@ -16,7 +16,7 @@ export function Character3D({
   isListening, 
   isSpeaking, 
   audioFrequencies = [], 
-  color = "#667eea" 
+  color = '#667eea', 
 }: Character3DProps) {
   const headRef = useRef<THREE.Mesh>(null!)
   const bodyRef = useRef<THREE.Mesh>(null!)
@@ -83,7 +83,7 @@ export function Character3D({
         const distance = Math.sqrt(
           positions[i * 3] ** 2 + 
           positions[i * 3 + 1] ** 2 + 
-          positions[i * 3 + 2] ** 2
+          positions[i * 3 + 2] ** 2,
         )
         
         const newDistance = 2 + frequency * 2

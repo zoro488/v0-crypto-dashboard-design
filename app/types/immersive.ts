@@ -1,5 +1,5 @@
-import * as THREE from "three"
-import type { ReactNode } from "react"
+import * as THREE from 'three'
+import type { ReactNode } from 'react'
 
 // ============================================
 // TIPOS PARA SISTEMA 3D INMERSIVO
@@ -14,7 +14,7 @@ export interface Base3DConfig {
   /** Device Pixel Ratio [min, max] */
   dpr?: [number, number]
   /** Preferencia de rendimiento GPU */
-  powerPreference?: "high-performance" | "low-power" | "default"
+  powerPreference?: 'high-performance' | 'low-power' | 'default'
   /** Fondo transparente */
   alpha?: boolean
 }
@@ -139,7 +139,7 @@ export interface NavBar3DProps {
   items: NavItem3D[]
   activeSection: string
   onSectionChange: (section: string) => void
-  orientation?: "horizontal" | "vertical"
+  orientation?: 'horizontal' | 'vertical'
   className?: string
 }
 
@@ -161,7 +161,7 @@ export interface AIBotState {
   isThinking: boolean
   isGlitching: boolean
   isListening: boolean
-  mood: "idle" | "happy" | "thinking" | "processing" | "error"
+  mood: 'idle' | 'happy' | 'thinking' | 'processing' | 'error'
 }
 
 /**
@@ -169,7 +169,7 @@ export interface AIBotState {
  */
 export interface ChatMessage {
   id: string
-  type: "user" | "bot" | "system"
+  type: 'user' | 'bot' | 'system'
   content: string
   timestamp: Date
   metadata?: {
@@ -184,7 +184,7 @@ export interface ChatMessage {
  */
 export interface AIAgentSceneProps {
   className?: string
-  size?: "sm" | "md" | "lg" | "xl"
+  size?: 'sm' | 'md' | 'lg' | 'xl'
   showChat?: boolean
   onMessageSend?: (message: string) => void
   onMessageReceive?: (message: ChatMessage) => void
@@ -214,7 +214,7 @@ export interface GlitchConfig {
   delay?: [number, number]
   duration?: [number, number]
   strength?: [number, number]
-  mode?: "constant" | "sporadic"
+  mode?: 'constant' | 'sporadic'
   active?: boolean
   ratio?: number
 }
@@ -288,9 +288,9 @@ export interface ImmersiveLayoutProps {
 export interface GlassCardProps {
   children: ReactNode
   className?: string
-  intensity?: "light" | "medium" | "strong"
+  intensity?: 'light' | 'medium' | 'strong'
   glow?: boolean
-  glowColor?: "blue" | "purple" | "cyan" | "pink"
+  glowColor?: 'blue' | 'purple' | 'cyan' | 'pink'
 }
 
 /**
@@ -347,14 +347,14 @@ export interface CursorState {
  * Tipos de sonidos disponibles
  */
 export type SoundType =
-  | "click"
-  | "hover"
-  | "success"
-  | "error"
-  | "notification"
-  | "transition"
-  | "warp"
-  | "glitch"
+  | 'click'
+  | 'hover'
+  | 'success'
+  | 'error'
+  | 'notification'
+  | 'transition'
+  | 'warp'
+  | 'glitch'
 
 /**
  * Opciones de sonido
@@ -382,7 +382,7 @@ export interface UISound {
  * Configuración de transición de página
  */
 export interface PageTransitionConfig {
-  type: "fade" | "slide" | "warp" | "morph"
+  type: 'fade' | 'slide' | 'warp' | 'morph'
   duration: number
   easing: string
   cameraAnimation?: {

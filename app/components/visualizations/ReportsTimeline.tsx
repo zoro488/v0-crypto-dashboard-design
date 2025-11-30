@@ -1,15 +1,15 @@
-"use client"
+'use client'
 
-import { useEffect, useRef, useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Calendar, FileText, TrendingUp, DollarSign, Package, Users, ChevronLeft, ChevronRight } from "lucide-react"
+import { useEffect, useRef, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Calendar, FileText, TrendingUp, DollarSign, Package, Users, ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface TimelineEvent {
   id: string
   date: Date
   title: string
   description: string
-  type: "venta" | "compra" | "reporte" | "cliente" | "inventario"
+  type: 'venta' | 'compra' | 'reporte' | 'cliente' | 'inventario'
   value?: number
   icon: typeof FileText
   color: string
@@ -26,7 +26,7 @@ export function ReportsTimeline({
   events,
   width = 1000,
   height = 700,
-  className = ""
+  className = '',
 }: ReportsTimelineProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationFrameRef = useRef<number | null>(null)
@@ -38,11 +38,11 @@ export function ReportsTimeline({
   // Generar eventos por defecto
   const generateDefaultEvents = (): TimelineEvent[] => {
     const types = [
-      { type: "venta", icon: DollarSign, color: "#10b981" },
-      { type: "compra", icon: Package, color: "#3b82f6" },
-      { type: "reporte", icon: FileText, color: "#8b5cf6" },
-      { type: "cliente", icon: Users, color: "#f59e0b" },
-      { type: "inventario", icon: Package, color: "#ef4444" }
+      { type: 'venta', icon: DollarSign, color: '#10b981' },
+      { type: 'compra', icon: Package, color: '#3b82f6' },
+      { type: 'reporte', icon: FileText, color: '#8b5cf6' },
+      { type: 'cliente', icon: Users, color: '#f59e0b' },
+      { type: 'inventario', icon: Package, color: '#ef4444' },
     ]
 
     const defaultEvents: TimelineEvent[] = []
@@ -59,11 +59,11 @@ export function ReportsTimeline({
         id: `event-${i}`,
         date,
         title: `${typeData.type.charAt(0).toUpperCase() + typeData.type.slice(1)} #${i + 1}`,
-        description: `Evento generado automáticamente`,
+        description: 'Evento generado automáticamente',
         type: typeData.type as any,
         value: Math.random() * 100000,
         icon: typeData.icon,
-        color: typeData.color
+        color: typeData.color,
       })
     }
 
@@ -82,7 +82,7 @@ export function ReportsTimeline({
     return {
       x: centerX + Math.cos(angle) * radius,
       y: centerY + Math.sin(angle) * radius,
-      angle
+      angle,
     }
   }
 
@@ -90,7 +90,7 @@ export function ReportsTimeline({
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const ctx = canvas.getContext("2d")
+    const ctx = canvas.getContext('2d')
     if (!ctx) return
 
     let time = 0
@@ -102,15 +102,15 @@ export function ReportsTimeline({
       // Gradiente de fondo
       const bgGradient = ctx.createRadialGradient(
         width / 2, height / 2, 0,
-        width / 2, height / 2, width / 2
+        width / 2, height / 2, width / 2,
       )
-      bgGradient.addColorStop(0, "rgba(20, 20, 40, 1)")
-      bgGradient.addColorStop(1, "rgba(10, 10, 20, 1)")
+      bgGradient.addColorStop(0, 'rgba(20, 20, 40, 1)')
+      bgGradient.addColorStop(1, 'rgba(10, 10, 20, 1)')
       ctx.fillStyle = bgGradient
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       // Dibujar espiral de fondo
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.05)"
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)'
       ctx.lineWidth = 2
       ctx.beginPath()
       for (let i = 0; i < 100; i++) {
@@ -178,9 +178,9 @@ export function ReportsTimeline({
         // Gradiente del nodo
         const nodeGradient = ctx.createRadialGradient(
           pos.x - radius * 0.3, pos.y - radius * 0.3, 0,
-          pos.x, pos.y, radius
+          pos.x, pos.y, radius,
         )
-        nodeGradient.addColorStop(0, "#ffffff")
+        nodeGradient.addColorStop(0, '#ffffff')
         nodeGradient.addColorStop(0.4, event.color)
         nodeGradient.addColorStop(1, `${event.color}cc`)
 
@@ -190,7 +190,7 @@ export function ReportsTimeline({
         ctx.fill()
 
         // Borde
-        ctx.strokeStyle = isActive ? "#ffffff" : `${event.color}80`
+        ctx.strokeStyle = isActive ? '#ffffff' : `${event.color}80`
         ctx.lineWidth = isActive ? 3 : 2
         ctx.stroke()
 
@@ -209,23 +209,23 @@ export function ReportsTimeline({
 
         // Ícono (emoji según tipo)
         const icon = 
-          event.type === "venta" ? "💰" :
-          event.type === "compra" ? "📦" :
-          event.type === "reporte" ? "📄" :
-          event.type === "cliente" ? "👤" : "📊"
+          event.type === 'venta' ? '💰' :
+          event.type === 'compra' ? '📦' :
+          event.type === 'reporte' ? '📄' :
+          event.type === 'cliente' ? '👤' : '📊'
 
         ctx.font = `${radius * 0.8}px sans-serif`
-        ctx.textAlign = "center"
-        ctx.textBaseline = "middle"
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
         ctx.fillText(icon, pos.x, pos.y)
 
         // Fecha si es activo
         if (isActive) {
-          ctx.fillStyle = "#ffffff"
-          ctx.font = "bold 11px sans-serif"
-          ctx.textAlign = "center"
-          ctx.textBaseline = "top"
-          const dateStr = event.date.toLocaleDateString("es", { month: "short", day: "numeric" })
+          ctx.fillStyle = '#ffffff'
+          ctx.font = 'bold 11px sans-serif'
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'top'
+          const dateStr = event.date.toLocaleDateString('es', { month: 'short', day: 'numeric' })
           ctx.fillText(dateStr, pos.x, pos.y + radius + 8)
         }
 
@@ -240,26 +240,26 @@ export function ReportsTimeline({
       // Centro de la espiral (punto focal)
       const centerGradient = ctx.createRadialGradient(
         width / 2, height / 2, 0,
-        width / 2, height / 2, 50
+        width / 2, height / 2, 50,
       )
-      centerGradient.addColorStop(0, "rgba(139, 92, 246, 0.8)")
-      centerGradient.addColorStop(1, "rgba(139, 92, 246, 0)")
+      centerGradient.addColorStop(0, 'rgba(139, 92, 246, 0.8)')
+      centerGradient.addColorStop(1, 'rgba(139, 92, 246, 0)')
 
       ctx.beginPath()
       ctx.arc(width / 2, height / 2, 30, 0, Math.PI * 2)
       ctx.fillStyle = centerGradient
       ctx.fill()
 
-      ctx.strokeStyle = "#8b5cf6"
+      ctx.strokeStyle = '#8b5cf6'
       ctx.lineWidth = 3
       ctx.stroke()
 
       // Icono central
-      ctx.font = "20px sans-serif"
-      ctx.textAlign = "center"
-      ctx.textBaseline = "middle"
-      ctx.fillStyle = "#ffffff"
-      ctx.fillText("📅", width / 2, height / 2)
+      ctx.font = '20px sans-serif'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText('📅', width / 2, height / 2)
 
       animationFrameRef.current = requestAnimationFrame(animate)
     }
@@ -348,7 +348,7 @@ export function ReportsTimeline({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="rounded-2xl cursor-pointer"
-        style={{ boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)" }}
+        style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)' }}
         onMouseMove={handleMouseMove}
         onClick={handleClick}
       />
@@ -373,10 +373,10 @@ export function ReportsTimeline({
                 <div>
                   <p className="text-white font-bold">{hoveredEvent.title}</p>
                   <p className="text-white/60 text-xs">
-                    {hoveredEvent.date.toLocaleDateString("es", { 
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric"
+                    {hoveredEvent.date.toLocaleDateString('es', { 
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
                     })}
                   </p>
                 </div>
@@ -413,13 +413,13 @@ export function ReportsTimeline({
           </div>
         </div>
         <div className="mt-3 pt-3 border-t border-white/10 space-y-1">
-          {["venta", "compra", "reporte", "cliente", "inventario"].map(type => {
+          {['venta', 'compra', 'reporte', 'cliente', 'inventario'].map(type => {
             const count = timelineEvents.filter(e => e.type === type).length
             const color = 
-              type === "venta" ? "#10b981" :
-              type === "compra" ? "#3b82f6" :
-              type === "reporte" ? "#8b5cf6" :
-              type === "cliente" ? "#f59e0b" : "#ef4444"
+              type === 'venta' ? '#10b981' :
+              type === 'compra' ? '#3b82f6' :
+              type === 'reporte' ? '#8b5cf6' :
+              type === 'cliente' ? '#f59e0b' : '#ef4444'
             
             return (
               <div key={type} className="flex items-center justify-between gap-3">

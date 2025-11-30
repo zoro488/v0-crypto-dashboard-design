@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { useEffect, useRef, useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { ShoppingCart, Users, Package, TrendingUp } from "lucide-react"
+import { useEffect, useRef, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ShoppingCart, Users, Package, TrendingUp } from 'lucide-react'
 
 interface FlowNode {
   id: string
@@ -41,7 +41,7 @@ export function SalesFlowDiagram({
   data,
   width = 800,
   height = 500,
-  className = ""
+  className = '',
 }: SalesFlowDiagramProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationFrameRef = useRef<number | null>(null)
@@ -52,19 +52,19 @@ export function SalesFlowDiagram({
   // Datos por defecto
   const defaultData = {
     nodes: [
-      { id: "productos", label: "Productos", value: 100, x: 100, y: 250, color: "#8b5cf6", icon: Package },
-      { id: "ventas", label: "Ventas", value: 80, x: 300, y: 200, color: "#3b82f6", icon: ShoppingCart },
-      { id: "distribuidores", label: "Distribuidores", value: 50, x: 300, y: 300, color: "#10b981", icon: Users },
-      { id: "clientes", label: "Clientes", value: 120, x: 500, y: 250, color: "#f59e0b", icon: Users },
-      { id: "ganancias", label: "Ganancias", value: 65, x: 700, y: 250, color: "#ef4444", icon: TrendingUp }
+      { id: 'productos', label: 'Productos', value: 100, x: 100, y: 250, color: '#8b5cf6', icon: Package },
+      { id: 'ventas', label: 'Ventas', value: 80, x: 300, y: 200, color: '#3b82f6', icon: ShoppingCart },
+      { id: 'distribuidores', label: 'Distribuidores', value: 50, x: 300, y: 300, color: '#10b981', icon: Users },
+      { id: 'clientes', label: 'Clientes', value: 120, x: 500, y: 250, color: '#f59e0b', icon: Users },
+      { id: 'ganancias', label: 'Ganancias', value: 65, x: 700, y: 250, color: '#ef4444', icon: TrendingUp },
     ],
     links: [
-      { source: "productos", target: "ventas", value: 60, particles: [] },
-      { source: "productos", target: "distribuidores", value: 40, particles: [] },
-      { source: "ventas", target: "clientes", value: 50, particles: [] },
-      { source: "distribuidores", target: "clientes", value: 30, particles: [] },
-      { source: "clientes", target: "ganancias", value: 65, particles: [] }
-    ]
+      { source: 'productos', target: 'ventas', value: 60, particles: [] },
+      { source: 'productos', target: 'distribuidores', value: 40, particles: [] },
+      { source: 'ventas', target: 'clientes', value: 50, particles: [] },
+      { source: 'distribuidores', target: 'clientes', value: 30, particles: [] },
+      { source: 'clientes', target: 'ganancias', value: 65, particles: [] },
+    ],
   }
 
   const flowData = data || defaultData
@@ -78,7 +78,7 @@ export function SalesFlowDiagram({
           link.particles.push({
             progress: Math.random(),
             speed: 0.002 + Math.random() * 0.003,
-            size: 3 + Math.random() * 4
+            size: 3 + Math.random() * 4,
           })
         }
       }
@@ -113,7 +113,7 @@ export function SalesFlowDiagram({
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const ctx = canvas.getContext("2d")
+    const ctx = canvas.getContext('2d')
     if (!ctx) return
 
     const animate = () => {
@@ -137,7 +137,7 @@ export function SalesFlowDiagram({
           ? gradient
           : `${source.color}40`
         ctx.lineWidth = isHovered ? Math.log(link.value) * 3 : Math.log(link.value) * 2
-        ctx.lineCap = "round"
+        ctx.lineCap = 'round'
 
         // Dibujar curva Bézier
         const cp1x = source.x + (target.x - source.x) * 0.3
@@ -160,7 +160,7 @@ export function SalesFlowDiagram({
           // Glow de la partícula
           const particleGradient = ctx.createRadialGradient(
             pos.x, pos.y, 0,
-            pos.x, pos.y, particle.size * 2
+            pos.x, pos.y, particle.size * 2,
           )
           particleGradient.addColorStop(0, `${target.color}ff`)
           particleGradient.addColorStop(0.5, `${target.color}80`)
@@ -226,7 +226,7 @@ export function SalesFlowDiagram({
           0,
           node.x,
           node.y,
-          nodeRadius
+          nodeRadius,
         )
         nodeGradient.addColorStop(0, `${node.color}ff`)
         nodeGradient.addColorStop(1, `${node.color}cc`)
@@ -238,22 +238,22 @@ export function SalesFlowDiagram({
         ctx.fill()
 
         // Borde del nodo
-        ctx.strokeStyle = isHovered || isSelected ? "#ffffff" : `${node.color}40`
+        ctx.strokeStyle = isHovered || isSelected ? '#ffffff' : `${node.color}40`
         ctx.lineWidth = isHovered || isSelected ? 3 : 2
         ctx.stroke()
 
         ctx.shadowBlur = 0
 
         // Valor del nodo (texto)
-        ctx.fillStyle = "#ffffff"
-        ctx.font = "bold 16px sans-serif"
-        ctx.textAlign = "center"
-        ctx.textBaseline = "middle"
+        ctx.fillStyle = '#ffffff'
+        ctx.font = 'bold 16px sans-serif'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
         ctx.fillText(`${node.value}`, node.x, node.y)
 
         // Label debajo del nodo
-        ctx.font = "12px sans-serif"
-        ctx.fillStyle = isHovered ? "#ffffff" : "#ffffff99"
+        ctx.font = '12px sans-serif'
+        ctx.fillStyle = isHovered ? '#ffffff' : '#ffffff99'
         ctx.fillText(node.label, node.x, node.y + nodeRadius + 20)
       })
 
@@ -330,8 +330,8 @@ export function SalesFlowDiagram({
         transition={{ duration: 0.5 }}
         className="rounded-2xl cursor-pointer"
         style={{
-          background: "linear-gradient(135deg, rgba(10, 10, 30, 0.95), rgba(30, 20, 50, 0.95))",
-          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)"
+          background: 'linear-gradient(135deg, rgba(10, 10, 30, 0.95), rgba(30, 20, 50, 0.95))',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
         }}
         onMouseMove={handleCanvasMouseMove}
         onClick={handleCanvasClick}

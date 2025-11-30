@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import { useState, useCallback } from "react"
+import { useState, useCallback } from 'react'
 
 export interface AIMessage {
-  role: "user" | "assistant"
+  role: 'user' | 'assistant'
   content: string
   timestamp: Date
 }
@@ -11,8 +11,8 @@ export interface AIMessage {
 export interface AIInsight {
   title: string
   description: string
-  impact: "high" | "medium" | "low"
-  category: "ventas" | "compras" | "capital" | "stock" | "clientes"
+  impact: 'high' | 'medium' | 'low'
+  category: 'ventas' | 'compras' | 'capital' | 'stock' | 'clientes'
 }
 
 interface ProductoStock {
@@ -64,10 +64,10 @@ export function useAI() {
         const lowStock = data.productos.filter((p) => p.stock < p.stockMinimo)
         if (lowStock.length > 0) {
           insights.push({
-            title: "Stock Crítico Detectado",
+            title: 'Stock Crítico Detectado',
             description: `${lowStock.length} productos por debajo del mínimo`,
-            impact: "high",
-            category: "stock",
+            impact: 'high',
+            category: 'stock',
           })
         }
       }
@@ -76,10 +76,10 @@ export function useAI() {
       if (data.ventas) {
         const totalVentas = data.ventas.reduce((sum, v) => sum + v.total, 0)
         insights.push({
-          title: "Análisis de Ventas",
+          title: 'Análisis de Ventas',
           description: `Total de ventas: $${totalVentas.toLocaleString()}`,
-          impact: "medium",
-          category: "ventas",
+          impact: 'medium',
+          category: 'ventas',
         })
       }
 
@@ -100,13 +100,13 @@ export function useAI() {
 function generateAIResponse(question: string): string {
   const lowerQuestion = question.toLowerCase()
 
-  if (lowerQuestion.includes("ventas") || lowerQuestion.includes("vender")) {
-    return "Según el análisis de tus ventas, el mes actual muestra un incremento del 23%. Te recomiendo mantener stock de los productos más vendidos."
+  if (lowerQuestion.includes('ventas') || lowerQuestion.includes('vender')) {
+    return 'Según el análisis de tus ventas, el mes actual muestra un incremento del 23%. Te recomiendo mantener stock de los productos más vendidos.'
   }
 
-  if (lowerQuestion.includes("banco") || lowerQuestion.includes("capital")) {
-    return "Tu capital total está distribuido en 7 bancos. Bóveda Monte tiene el mayor saldo. ¿Quieres un análisis detallado?"
+  if (lowerQuestion.includes('banco') || lowerQuestion.includes('capital')) {
+    return 'Tu capital total está distribuido en 7 bancos. Bóveda Monte tiene el mayor saldo. ¿Quieres un análisis detallado?'
   }
 
-  return "Entiendo tu pregunta. Estoy analizando los datos para darte la mejor recomendación..."
+  return 'Entiendo tu pregunta. Estoy analizando los datos para darte la mejor recomendación...'
 }

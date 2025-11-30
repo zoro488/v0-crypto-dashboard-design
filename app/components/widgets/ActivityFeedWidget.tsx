@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 🌊 ACTIVITY FEED WIDGET - Feed de Actividad en Tiempo Real Premium
@@ -24,7 +24,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Clock,
-  LucideIcon
+  LucideIcon,
 } from 'lucide-react'
 import { useRef, useEffect, useState } from 'react'
 
@@ -77,50 +77,50 @@ const activityConfig: Record<ActivityType, {
     icon: TrendingUp, 
     color: 'text-emerald-400', 
     bgColor: 'bg-emerald-500/20',
-    label: 'Venta'
+    label: 'Venta',
   },
   compra: { 
     icon: ShoppingCart, 
     color: 'text-blue-400', 
     bgColor: 'bg-blue-500/20',
-    label: 'Compra'
+    label: 'Compra',
   },
   transferencia: { 
     icon: ArrowRightLeft, 
     color: 'text-cyan-400', 
     bgColor: 'bg-cyan-500/20',
-    label: 'Transferencia'
+    label: 'Transferencia',
   },
   stock: { 
     icon: Package, 
     color: 'text-purple-400', 
     bgColor: 'bg-purple-500/20',
-    label: 'Stock'
+    label: 'Stock',
   },
   cliente: { 
     icon: Users, 
     color: 'text-pink-400', 
     bgColor: 'bg-pink-500/20',
-    label: 'Cliente'
+    label: 'Cliente',
   },
   pago: { 
     icon: DollarSign, 
     color: 'text-amber-400', 
     bgColor: 'bg-amber-500/20',
-    label: 'Pago'
+    label: 'Pago',
   },
   alerta: { 
     icon: AlertCircle, 
     color: 'text-red-400', 
     bgColor: 'bg-red-500/20',
-    label: 'Alerta'
+    label: 'Alerta',
   },
   sistema: { 
     icon: Bell, 
     color: 'text-slate-400', 
     bgColor: 'bg-slate-500/20',
-    label: 'Sistema'
-  }
+    label: 'Sistema',
+  },
 }
 
 // ============================================================================
@@ -149,7 +149,7 @@ function ActivityItemComponent({
   showTimestamp, 
   showAmount,
   onClick,
-  index 
+  index, 
 }: { 
   activity: ActivityItem
   showTimestamp: boolean
@@ -180,12 +180,12 @@ function ActivityItemComponent({
       transition={{
         duration: 0.3,
         delay: index * 0.05,
-        ease: [0.16, 1, 0.3, 1]
+        ease: [0.16, 1, 0.3, 1],
       }}
       whileHover={{ 
         x: 4,
         backgroundColor: 'rgba(255, 255, 255, 0.03)',
-        transition: { duration: 0.2 }
+        transition: { duration: 0.2 },
       }}
       onClick={() => onClick?.(activity)}
       className={`
@@ -257,7 +257,7 @@ export function ActivityFeedWidget({
   autoScroll = true,
   title = 'Actividad Reciente',
   className = '',
-  onItemClick
+  onItemClick,
 }: ActivityFeedWidgetProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [prevLength, setPrevLength] = useState(activities.length)
@@ -267,7 +267,7 @@ export function ActivityFeedWidget({
     if (autoScroll && activities.length > prevLength && scrollRef.current) {
       scrollRef.current.scrollTo({
         top: 0,
-        behavior: 'smooth'
+        behavior: 'smooth',
       })
     }
     setPrevLength(activities.length)

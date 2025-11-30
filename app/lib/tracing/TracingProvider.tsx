@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 🔍 TRACING PROVIDER
@@ -18,7 +18,7 @@ interface TracingProviderProps {
 
 export function TracingProvider({ 
   children, 
-  enabled = process.env.NODE_ENV === 'development' 
+  enabled = process.env.NODE_ENV === 'development', 
 }: TracingProviderProps) {
   useEffect(() => {
     if (!enabled) {
