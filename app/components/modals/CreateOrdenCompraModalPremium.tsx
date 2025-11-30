@@ -251,8 +251,9 @@ export function CreateOrdenCompraModalPremium({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
+        showCloseButton={false}
         className={cn(
-          "max-w-3xl h-[90vh] p-0 overflow-hidden",
+          "max-w-4xl h-[90vh] p-0 overflow-hidden",
           "bg-black/60 backdrop-blur-2xl",
           "border border-white/10",
           "text-white",
