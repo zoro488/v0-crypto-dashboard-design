@@ -50,6 +50,7 @@ import { useToast } from '@/app/hooks/use-toast'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
+import { registrarPagoDistribuidor } from '@/app/lib/services/business-logic.service'
 
 // ============================================
 // SCHEMA ZOD
@@ -223,30 +224,38 @@ export function CreatePagoDistribuidorModalPremium({
 
     try {
       const pagoData = {
-        ...data,
-        nuevaDeudaDistribuidor: nuevaDeuda,
-        timestamp: new Date().toISOString(),
+        distribuidorId: data.distribuidorId,
+        monto: data.monto,
+        bancoOrigen: data.bancoOrigen,
+        ordenCompraRelacionada: data.ordenesRelacionadas?.[0],
+        concepto: data.concepto || `Pago a ${data.distribuidorNombre}`,
       }
 
-      logger.info('Pago a distribuidor registrado', { 
+      logger.info('Registrando pago a distribuidor en Firestore', { 
         data: pagoData,
         context: 'CreatePagoDistribuidorModalPremium',
       })
 
-      toast({
-        title: '✅ Pago Registrado',
-        description: `${formatearMonto(data.monto)} pagado a ${data.distribuidorNombre}`,
-      })
+      const result = await registrarPagoDistribuidor(pagoData)
 
-      onClose()
-      onSuccess?.()
-      useAppStore.getState().triggerDataRefresh()
+      if (result) {
+        toast({
+          title: '✅ Pago Registrado',
+          description: `${formatearMonto(data.monto)} pagado a ${data.distribuidorNombre}`,
+        })
+
+        onClose()
+        onSuccess?.()
+        useAppStore.getState().triggerDataRefresh()
+      } else {
+        throw new Error('No se pudo registrar el pago')
+      }
 
     } catch (error) {
       logger.error('Error al registrar pago', error)
       toast({
         title: 'Error',
-        description: 'No se pudo registrar el pago',
+        description: error instanceof Error ? error.message : 'No se pudo registrar el pago',
         variant: 'destructive',
       })
     } finally {

@@ -6,7 +6,7 @@ import { FloatingSplineAIWidget } from '@/app/components/FloatingSplineAIWidget'
 import { FirestoreSetupAlert } from '@/app/components/ui/FirestoreSetupAlert'
 import { CommandMenu } from '@/app/components/CommandMenu'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useEffect, lazy, Suspense, useState, useCallback } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { useOptimizedPerformance } from '@/app/lib/hooks/useOptimizedPerformance'
 import { ScrollProgress, ScrollReveal } from '@/app/components/ui/ScrollReveal'
 
@@ -21,7 +21,6 @@ const BentoBanco = lazy(() => import('@/app/components/panels/BentoBanco'))
 const BentoVentasPremium = lazy(() => import('@/app/components/panels/BentoVentasPremium'))
 const BentoAlmacen = lazy(() => import('@/app/components/panels/BentoAlmacen'))
 const BentoReportes = lazy(() => import('@/app/components/panels/BentoReportes'))
-const BentoProfit = lazy(() => import('@/app/components/panels/BentoProfit'))
 
 // Paneles Premium con CRUD completo, perfiles y tabla avanzada
 const BentoClientesPremium = lazy(() => import('@/app/components/panels/BentoClientesPremium'))
@@ -82,36 +81,8 @@ const PanelLoader = () => (
 
 export default function Chronos() {
   const { currentPanel } = useAppStore()
-  const [isReady, setIsReady] = useState(false)
 
   useOptimizedPerformance()
-
-  // Hook para escalar con el viewport
-  const useViewportScale = useCallback(() => {
-    const [scale, setScale] = useState(1)
-    
-    useEffect(() => {
-      const calculateScale = () => {
-        const width = window.innerWidth
-        const height = window.innerHeight
-        const baseWidth = 1920
-        const baseHeight = 1080
-        
-        // Calcular escala basada en el viewport
-        const widthScale = width / baseWidth
-        const heightScale = height / baseHeight
-        const newScale = Math.min(widthScale, heightScale, 1.2) // Max 1.2x
-        
-        setScale(Math.max(newScale, 0.5)) // Min 0.5x
-      }
-      
-      calculateScale()
-      window.addEventListener('resize', calculateScale)
-      return () => window.removeEventListener('resize', calculateScale)
-    }, [])
-    
-    return scale
-  }, [])
 
   useEffect(() => {
     document.documentElement.style.scrollBehavior = 'smooth'
@@ -120,12 +91,9 @@ export default function Chronos() {
     // Añadir estilos de escalado global
     document.documentElement.style.setProperty('--viewport-scale', '1')
 
+    // Pre-cargar fuentes
     if (document.fonts) {
-      document.fonts.load('600 1em "Inter"').then(() => {
-        setIsReady(true)
-      })
-    } else {
-      setIsReady(true)
+      document.fonts.load('600 1em "Inter"')
     }
 
     return () => {
