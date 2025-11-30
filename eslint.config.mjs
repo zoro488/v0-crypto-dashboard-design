@@ -145,6 +145,14 @@ export default [
       '.git/**',
       '__tests__/**', // Opcional: no lintear tests si usan reglas diferentes
       'scripts/**', // Scripts de migración pueden tener console.log
+      'SPLINE COMPONENTS/**', // Componentes Spline extraídos con formato diferente
+      '_deprecated/**', // Código deprecado
+      'backend/**', // Backend Python
+      'automation/**', // Scripts de automatización
+      'csv/**', // Datos CSV
+      'dataconnect/**', // Firebase DataConnect
+      'e2e/**', // E2E tests con Playwright (reglas diferentes)
+      'gg/**', // Assets
     ],
   },
   

@@ -23,9 +23,8 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"],
+      "@/app/*": ["./app/*"]
     }
   },
   "include": [
@@ -42,10 +41,7 @@
     "node_modules",
     "components/ui",
     "jest.setup.ts",
-    "jest.setup.js",
     "jest.config.js",
-    "**/*.test.ts",
-    "**/*.test.tsx",
     "__tests__",
     "_deprecated",
     "app/lib/profit-engine/**",
