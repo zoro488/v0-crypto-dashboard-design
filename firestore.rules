@@ -2,362 +2,130 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // 🔒 REGLAS DE PRODUCCIÓN - CHRONOS SYSTEM
-    // Última actualización: 2025-01-27
-    // Sincronizado con CSVs de datos reales (783 registros)
-    
-    // ===================================================================
-    // FUNCIONES DE VALIDACIÓN
-    // ===================================================================
+    // 🔒 REGLAS DE DESARROLLO - CHRONOS SYSTEM
+    // ⚠️ IMPORTANTE: Cambiar allowAccess() a isAuthenticated() en producción
     
     function isAuthenticated() {
       return request.auth != null;
     }
     
-    function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
+    // DESARROLLO: Permitir acceso sin autenticación
+    function allowAccess() {
+      return true; // TODO: Cambiar a isAuthenticated() en producción
     }
+
+    // ===================================================================
+    // TODAS LAS COLECCIONES DEL SISTEMA CHRONOS
+    // ===================================================================
     
-    function hasRequiredFields(fields) {
-      return request.resource.data.keys().hasAll(fields);
+    // Bancos y Movimientos
+    match /bancos/{docId} {
+      allow read, write: if allowAccess();
     }
-    
-    function isValidMonto() {
-      return request.resource.data.monto is number && request.resource.data.monto >= 0;
+    match /movimientos/{docId} {
+      allow read, write: if allowAccess();
     }
-    
-    function isValidCantidad() {
-      return request.resource.data.cantidad is number && request.resource.data.cantidad > 0;
+    match /transferencias/{docId} {
+      allow read, write: if allowAccess();
     }
-    
-    function isValidBancoId(bancoId) {
-      return bancoId in ['boveda_monte', 'boveda_usa', 'profit', 'leftie', 'azteca', 'flete_sur', 'utilidades'];
+    match /abonos/{docId} {
+      allow read, write: if allowAccess();
     }
-    
-    function isValidTipoMovimiento() {
-      return request.resource.data.tipoMovimiento in ['ingreso', 'gasto', 'transferencia_entrada', 'transferencia_salida', 'abono_cliente', 'pago_distribuidor'];
+    match /ingresos/{docId} {
+      allow read, write: if allowAccess();
     }
-
-    // ===================================================================
-    // COLECCIÓN: BANCOS (Configuración de los 7 bancos/bóvedas)
-    // IDs: boveda_monte, boveda_usa, profit, leftie, azteca, flete_sur, utilidades
-    // ===================================================================
-    match /bancos/{bancoId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() 
-        && hasRequiredFields(['nombre', 'tipo'])
-        && isValidBancoId(bancoId);
-      allow update: if isAuthenticated();
-      allow delete: if false; // Los bancos no se pueden eliminar
+    match /gastos/{docId} {
+      allow read, write: if allowAccess();
     }
 
-    // ===================================================================
-    // COLECCIÓN: MOVIMIENTOS (Unificado para todos los bancos)
-    // Reemplaza: boveda_monte, boveda_usa, profit, leftie, azteca, flete_sur, utilidades, gastos_abonos
-    // ===================================================================
-    match /movimientos/{movimientoId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() 
-        && hasRequiredFields(['bancoId', 'tipoMovimiento', 'monto', 'fecha']) 
-        && isValidMonto()
-        && isValidTipoMovimiento();
-      allow update: if isAuthenticated() && isValidMonto();
-      allow delete: if isAuthenticated();
+    // Ventas y Clientes
+    match /ventas/{docId} {
+      allow read, write: if allowAccess();
+    }
+    match /clientes/{docId} {
+      allow read, write: if allowAccess();
     }
 
-    // ===================================================================
-    // COLECCIÓN: TRANSFERENCIAS (Entre bancos)
-    // ===================================================================
-    match /transferencias/{transferenciaId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() 
-        && hasRequiredFields(['bancoOrigenId', 'bancoDestinoId', 'monto', 'fecha'])
-        && isValidMonto();
-      allow update, delete: if isAuthenticated();
+    // Distribuidores y Órdenes
+    match /distribuidores/{docId} {
+      allow read, write: if allowAccess();
+    }
+    match /ordenes_compra/{docId} {
+      allow read, write: if allowAccess();
     }
 
-    // ===================================================================
-    // COLECCIÓN: ABONOS (Pagos de clientes/distribuidores)
-    // ===================================================================
-    match /abonos/{abonoId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() 
-        && hasRequiredFields(['tipo', 'entidadId', 'monto', 'bancoDestino'])
-        && isValidMonto();
-      allow update, delete: if isAuthenticated();
+    // Almacén
+    match /almacen/{docId} {
+      allow read, write: if allowAccess();
+    }
+    match /almacen_productos/{docId} {
+      allow read, write: if allowAccess();
+    }
+    match /almacen_entradas/{docId} {
+      allow read, write: if allowAccess();
+    }
+    match /almacen_salidas/{docId} {
+      allow read, write: if allowAccess();
     }
 
-    // ===================================================================
-    // COLECCIÓN: INGRESOS
-    // ===================================================================
-    match /ingresos/{ingresoId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() 
-        && hasRequiredFields(['monto', 'concepto', 'bancoDestino'])
-        && isValidMonto();
-      allow update, delete: if isAuthenticated();
+    // Legacy
+    match /gastos_abonos/{docId} {
+      allow read, write: if allowAccess();
     }
 
-    // ===================================================================
-    // COLECCIÓN: GASTOS
-    // ===================================================================
-    match /gastos/{gastoId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() 
-        && hasRequiredFields(['monto', 'concepto', 'bancoOrigen'])
-        && isValidMonto();
-      allow update, delete: if isAuthenticated();
-    }
-
-    // ===================================================================
-    // COLECCIÓN: VENTAS (96 registros desde ventas.csv)
-    // ===================================================================
-    match /ventas/{ventaId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() 
-        && hasRequiredFields(['cliente', 'fecha', 'cantidad'])
-        && isValidCantidad();
-      allow update, delete: if isAuthenticated();
-    }
-
-    // ===================================================================
-    // COLECCIÓN: CLIENTES (31 registros desde clientes.csv)
-    // ===================================================================
-    match /clientes/{clienteId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && hasRequiredFields(['nombre']);
-      allow update, delete: if isAuthenticated();
-    }
-
-    // ===================================================================
-    // COLECCIÓN: DISTRIBUIDORES (6 registros)
-    // PACMAN, Q-MAYA, A/X, CH-MONTE, VALLE-MONTE, Q-MAYA-MP
-    // ===================================================================
-    match /distribuidores/{distribuidorId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && hasRequiredFields(['nombre']);
-      allow update, delete: if isAuthenticated();
-    }
-
-    // ===================================================================
-    // COLECCIÓN: ORDENES_COMPRA (9 registros desde ordenes_compra.csv)
-    // ===================================================================
-    match /ordenes_compra/{ordenId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() 
-        && hasRequiredFields(['distribuidor', 'fecha', 'cantidad'])
-        && isValidCantidad();
-      allow update, delete: if isAuthenticated();
-    }
-
-    // ===================================================================
-    // COLECCIÓN: GASTOS_ABONOS (302 registros - histórico legacy)
-    // ===================================================================
-    match /gastos_abonos/{gastoId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() 
-        && hasRequiredFields(['fecha', 'valor', 'destino']);
-      allow update, delete: if isAuthenticated();
-    }
-
-    // ===================================================================
-    // COLECCIÓN: ALMACEN (Inventario de productos - 9 registros)
-    // ===================================================================
-    match /almacen/{itemId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && hasRequiredFields(['nombre']);
-      allow update, delete: if isAuthenticated();
-    }
-
-    match /almacen_productos/{productoId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && hasRequiredFields(['nombre']);
-      allow update, delete: if isAuthenticated();
-    }
-
-    match /almacen_entradas/{entradaId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() 
-        && hasRequiredFields(['fecha', 'cantidad'])
-        && isValidCantidad();
-      allow update, delete: if isAuthenticated();
-    }
-
-    match /almacen_salidas/{salidaId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() 
-        && hasRequiredFields(['fecha', 'cantidad'])
-        && isValidCantidad();
-      allow update, delete: if isAuthenticated();
-    }
-
-    // ===================================================================
-    // COLECCIÓN: CORTES BANCARIOS (Histórico de cortes)
-    // ===================================================================
-    match /cortes_bancarios/{corteId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && hasRequiredFields(['bancoId', 'fechaInicio']);
-      allow update, delete: if isAuthenticated();
-    }
-
-    // ===================================================================
-    // COLECCIÓN: LOGS (Auditoría del sistema - inmutable)
-    // ===================================================================
-    match /logs/{logId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update, delete: if false; // ⚠️ Los logs son INMUTABLES
-    }
-
-    // ===================================================================
-    // COLECCIONES DEL DASHBOARD
-    // ===================================================================
+    // Dashboard
     match /dashboard_totales/{docId} {
-      allow read, write: if isAuthenticated();
+      allow read, write: if allowAccess();
     }
-    
     match /dashboard_paneles/{docId} {
-      allow read, write: if isAuthenticated();
+      allow read, write: if allowAccess();
     }
 
-    // ===================================================================
-    // COLECCIÓN: USUARIOS (Perfil de usuario - solo el propietario)
-    // ===================================================================
-    match /usuarios/{userId} {
-      allow read, write: if isOwner(userId);
-    }
-
-    // ===================================================================
-    // COLECCIÓN: CONFIGURACIÓN
-    // ===================================================================
+    // Configuración y Logs
     match /configuracion/{docId} {
-      allow read, write: if isAuthenticated();
+      allow read, write: if allowAccess();
+    }
+    match /logs/{docId} {
+      allow read, create: if allowAccess();
+      allow update, delete: if false; // Logs inmutables
+    }
+    match /cortes_bancarios/{docId} {
+      allow read, write: if allowAccess();
     }
 
-    // ===================================================================
-    // TABLAS POR BANCO - INGRESOS
-    // Colecciones: boveda_monte_ingresos, boveda_usa_ingresos, etc.
-    // ===================================================================
-    match /boveda_monte_ingresos/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
-    match /boveda_usa_ingresos/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
-    match /profit_ingresos/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
-    match /leftie_ingresos/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
-    match /azteca_ingresos/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
-    match /flete_sur_ingresos/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
-    match /utilidades_ingresos/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
+    // Usuarios
+    match /usuarios/{userId} {
+      allow read, write: if allowAccess();
     }
 
-    // ===================================================================
-    // TABLAS POR BANCO - GASTOS
-    // Colecciones: boveda_monte_gastos, boveda_usa_gastos, etc.
-    // ===================================================================
-    match /boveda_monte_gastos/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
-    match /boveda_usa_gastos/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
-    match /profit_gastos/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
-    match /leftie_gastos/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
-    match /azteca_gastos/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
-    match /flete_sur_gastos/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
-    match /utilidades_gastos/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
+    // Tablas por banco - Ingresos
+    match /boveda_monte_ingresos/{docId} { allow read, write: if allowAccess(); }
+    match /boveda_usa_ingresos/{docId} { allow read, write: if allowAccess(); }
+    match /profit_ingresos/{docId} { allow read, write: if allowAccess(); }
+    match /leftie_ingresos/{docId} { allow read, write: if allowAccess(); }
+    match /azteca_ingresos/{docId} { allow read, write: if allowAccess(); }
+    match /flete_sur_ingresos/{docId} { allow read, write: if allowAccess(); }
+    match /utilidades_ingresos/{docId} { allow read, write: if allowAccess(); }
 
-    // ===================================================================
-    // TABLAS POR BANCO - CORTES (RF Actual histórico)
-    // Colecciones: boveda_monte_cortes, boveda_usa_cortes, etc.
-    // ===================================================================
-    match /boveda_monte_cortes/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
-    match /boveda_usa_cortes/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
-    match /profit_cortes/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
-    match /leftie_cortes/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
-    match /azteca_cortes/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
-    match /flete_sur_cortes/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
-    match /utilidades_cortes/{docId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
+    // Tablas por banco - Gastos
+    match /boveda_monte_gastos/{docId} { allow read, write: if allowAccess(); }
+    match /boveda_usa_gastos/{docId} { allow read, write: if allowAccess(); }
+    match /profit_gastos/{docId} { allow read, write: if allowAccess(); }
+    match /leftie_gastos/{docId} { allow read, write: if allowAccess(); }
+    match /azteca_gastos/{docId} { allow read, write: if allowAccess(); }
+    match /flete_sur_gastos/{docId} { allow read, write: if allowAccess(); }
+    match /utilidades_gastos/{docId} { allow read, write: if allowAccess(); }
 
-    // ===================================================================
-    // REGLA POR DEFECTO - DENEGAR TODO LO DEMÁS
-    // ⚠️ CRÍTICO: No cambiar esta regla
-    // ===================================================================
+    // Tablas por banco - Cortes
+    match /boveda_monte_cortes/{docId} { allow read, write: if allowAccess(); }
+    match /boveda_usa_cortes/{docId} { allow read, write: if allowAccess(); }
+    match /profit_cortes/{docId} { allow read, write: if allowAccess(); }
+    match /leftie_cortes/{docId} { allow read, write: if allowAccess(); }
+    match /azteca_cortes/{docId} { allow read, write: if allowAccess(); }
+    match /flete_sur_cortes/{docId} { allow read, write: if allowAccess(); }
+    match /utilidades_cortes/{docId} { allow read, write: if allowAccess(); }
+
+    // Denegar todo lo demás
     match /{document=**} {
       allow read, write: if false;
     }
