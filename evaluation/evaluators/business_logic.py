@@ -104,13 +104,13 @@ class BusinessLogicEvaluator(EvaluatorBase):
             "errors": []
         }
         
-        if operation_type == "sale_distribution":
+        if operation_type in ["sale_distribution", "venta", "distribucion_venta"]:
             results = self._evaluate_sale_distribution(input_data, output_data, expected_output)
-        elif operation_type == "capital_calculation":
+        elif operation_type in ["capital_calculation", "calculo_capital"]:
             results = self._evaluate_capital_calculation(input_data, output_data, expected_output)
-        elif operation_type == "payment_status":
+        elif operation_type in ["payment_status", "estado_pago"]:
             results = self._evaluate_payment_status(input_data, output_data, expected_output)
-        elif operation_type == "partial_payment":
+        elif operation_type in ["partial_payment", "pago_parcial"]:
             results = self._evaluate_partial_payment(input_data, output_data, expected_output)
         else:
             results["errors"].append(f"Tipo de operación desconocido: {operation_type}")
@@ -140,12 +140,12 @@ class BusinessLogicEvaluator(EvaluatorBase):
             "errors": []
         }
         
-        # Extraer datos de entrada
+        # Extraer datos de entrada (soporta múltiples nombres de campos)
         try:
-            precio_venta = Decimal(str(input_data.get("precioVentaUnidad", 0)))
-            precio_compra = Decimal(str(input_data.get("precioCompraUnidad", 0)))
+            precio_venta = Decimal(str(input_data.get("precioVentaUnidad", input_data.get("precioVenta", 0))))
+            precio_compra = Decimal(str(input_data.get("precioCompraUnidad", input_data.get("precioCompra", 0))))
             precio_flete = Decimal(str(input_data.get("precioFlete", 0)))
-            cantidad = Decimal(str(input_data.get("cantidad", 0)))
+            cantidad = Decimal(str(input_data.get("cantidad", 1)))
         except (ValueError, TypeError) as e:
             results["errors"].append(f"Error parseando datos de entrada: {e}")
             return results
@@ -166,10 +166,11 @@ class BusinessLogicEvaluator(EvaluatorBase):
         total_venta = precio_venta * cantidad
         results["details"]["expected_total"] = float(total_venta)
         
-        # Extraer distribución del output
-        output_boveda = Decimal(str(output_data.get("boveda_monte", output_data.get("montoBovedaMonte", 0))))
-        output_flete = Decimal(str(output_data.get("flete_sur", output_data.get("montoFletes", 0))))
-        output_utilidades = Decimal(str(output_data.get("utilidades", output_data.get("montoUtilidades", 0))))
+        # Extraer distribución del output (soporta estructura anidada o plana)
+        distribucion = output_data.get("distribucion", output_data)
+        output_boveda = Decimal(str(distribucion.get("boveda_monte", distribucion.get("montoBovedaMonte", 0))))
+        output_flete = Decimal(str(distribucion.get("flete_sur", distribucion.get("fletes", distribucion.get("montoFletes", 0)))))
+        output_utilidades = Decimal(str(distribucion.get("utilidades", distribucion.get("montoUtilidades", 0))))
         
         results["details"]["output"] = {
             "boveda_monte": float(output_boveda),

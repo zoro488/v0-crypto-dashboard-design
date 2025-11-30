@@ -385,7 +385,7 @@ export function CreateVentaModalPremium({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
         className={cn(
-          "max-w-4xl max-h-[95vh] p-0 overflow-hidden",
+          "max-w-4xl h-[90vh] p-0 overflow-hidden",
           "bg-black/60 backdrop-blur-2xl",
           "border border-white/10",
           "text-white",
@@ -981,7 +981,7 @@ export function CreateVentaModalPremium({
 
           {/* ===== FOOTER ===== */}
           <div className={cn(
-            "h-20 border-t border-white/10",
+            "shrink-0 h-20 border-t border-white/10",
             "bg-gradient-to-r from-black/50 via-white/5 to-black/50",
             "px-6 flex items-center justify-between"
           )}>

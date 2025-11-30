@@ -3,6 +3,9 @@ const nextConfig = {
   // Directorio de la app dentro de frontend
   distDir: '.next',
   
+  // Permitir orígenes de desarrollo
+  allowedDevOrigins: ['localhost', '127.0.0.1'],
+  
   // CRÍTICO: Usar /frontend como directorio base (contiene /app)
   // Next.js buscará automáticamente /frontend/app
   
@@ -48,6 +51,15 @@ const nextConfig = {
   },
   turbopack: {},
   webpack: (config, { isServer }) => {
+    // Resolver THREE a una única instancia para evitar conflictos
+    config.resolve = {
+      ...config.resolve,
+      alias: {
+        ...config.resolve?.alias,
+        three: require.resolve('three'),
+      },
+    };
+    
     // Optimizaciones de webpack
     config.optimization = {
       ...config.optimization,
