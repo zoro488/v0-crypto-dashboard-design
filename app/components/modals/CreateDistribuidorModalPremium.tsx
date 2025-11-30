@@ -214,8 +214,9 @@ export function CreateDistribuidorModalPremium({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
+        showCloseButton={false}
         className={cn(
-          "max-w-2xl max-h-[90vh] p-0 overflow-hidden",
+          "max-w-3xl h-[85vh] p-0 overflow-hidden",
           "bg-black/60 backdrop-blur-2xl",
           "border border-white/10",
           "text-white",

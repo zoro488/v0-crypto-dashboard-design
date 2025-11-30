@@ -384,6 +384,7 @@ export function CreateVentaModalPremium({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
+        showCloseButton={false}
         className={cn(
           "max-w-4xl h-[90vh] p-0 overflow-hidden",
           "bg-black/60 backdrop-blur-2xl",
