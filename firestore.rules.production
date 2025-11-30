@@ -1,0 +1,205 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 🔒 REGLAS DE PRODUCCIÓN - CHRONOS SYSTEM
+    // Versión: 2.0 - Con autenticación obligatoria
+    
+    // ===================================================================
+    // FUNCIONES DE AUTENTICACIÓN
+    // ===================================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function hasValidData() {
+      return request.resource.data.keys().hasAll(['createdAt']) 
+        || request.resource.data.keys().hasAll(['updatedAt']);
+    }
+    
+    function isValidWrite() {
+      return isAuthenticated() && hasValidData();
+    }
+
+    // ===================================================================
+    // REGLAS POR COLECCIÓN
+    // ===================================================================
+    
+    // Bancos y Movimientos Financieros
+    match /bancos/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update: if isAuthenticated();
+      allow delete: if false; // Los bancos no se pueden eliminar
+    }
+    
+    match /movimientos/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update: if isAuthenticated();
+      allow delete: if false; // Movimientos inmutables
+    }
+    
+    match /transferencias/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update: if isAuthenticated();
+      allow delete: if false;
+    }
+    
+    match /abonos/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update: if isAuthenticated();
+      allow delete: if false;
+    }
+    
+    match /ingresos/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update: if isAuthenticated();
+      allow delete: if false;
+    }
+    
+    match /gastos/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update: if isAuthenticated();
+      allow delete: if false;
+    }
+
+    // Ventas y Clientes
+    match /ventas/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update: if isAuthenticated();
+      allow delete: if false; // Ventas no se eliminan (auditoría)
+    }
+    
+    match /clientes/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isValidWrite();
+      allow delete: if false;
+    }
+
+    // Distribuidores y Órdenes de Compra
+    match /distribuidores/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isValidWrite();
+      allow delete: if false;
+    }
+    
+    match /ordenes_compra/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update: if isAuthenticated();
+      allow delete: if false;
+    }
+
+    // Almacén
+    match /almacen/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isValidWrite();
+      allow delete: if false;
+    }
+    
+    match /almacen_productos/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isValidWrite();
+      allow delete: if false;
+    }
+    
+    match /almacen_entradas/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update, delete: if false;
+    }
+    
+    match /almacen_salidas/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update, delete: if false;
+    }
+
+    // Dashboard y Configuración
+    match /dashboard_totales/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+    
+    match /dashboard_paneles/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    match /configuracion/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+    
+    // Logs de Auditoría (inmutables)
+    match /logs/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update, delete: if false;
+    }
+    
+    match /cortes_bancarios/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update: if isAuthenticated();
+      allow delete: if false;
+    }
+
+    // Usuarios (solo el propio usuario puede escribir)
+    match /usuarios/{userId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isOwner(userId);
+      allow delete: if false;
+    }
+
+    // Legacy - Tablas por banco
+    match /gastos_abonos/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update, delete: if false;
+    }
+
+    // Tablas por banco - Ingresos (lectura permitida, escritura controlada)
+    match /boveda_monte_ingresos/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update, delete: if false; }
+    match /boveda_usa_ingresos/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update, delete: if false; }
+    match /profit_ingresos/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update, delete: if false; }
+    match /leftie_ingresos/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update, delete: if false; }
+    match /azteca_ingresos/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update, delete: if false; }
+    match /flete_sur_ingresos/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update, delete: if false; }
+    match /utilidades_ingresos/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update, delete: if false; }
+
+    // Tablas por banco - Gastos
+    match /boveda_monte_gastos/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update, delete: if false; }
+    match /boveda_usa_gastos/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update, delete: if false; }
+    match /profit_gastos/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update, delete: if false; }
+    match /leftie_gastos/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update, delete: if false; }
+    match /azteca_gastos/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update, delete: if false; }
+    match /flete_sur_gastos/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update, delete: if false; }
+    match /utilidades_gastos/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update, delete: if false; }
+
+    // Tablas por banco - Cortes
+    match /boveda_monte_cortes/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update: if isAuthenticated(); allow delete: if false; }
+    match /boveda_usa_cortes/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update: if isAuthenticated(); allow delete: if false; }
+    match /profit_cortes/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update: if isAuthenticated(); allow delete: if false; }
+    match /leftie_cortes/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update: if isAuthenticated(); allow delete: if false; }
+    match /azteca_cortes/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update: if isAuthenticated(); allow delete: if false; }
+    match /flete_sur_cortes/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update: if isAuthenticated(); allow delete: if false; }
+    match /utilidades_cortes/{docId} { allow read: if isAuthenticated(); allow create: if isValidWrite(); allow update: if isAuthenticated(); allow delete: if false; }
+
+    // Denegar todo lo demás
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

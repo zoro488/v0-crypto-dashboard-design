@@ -1,13 +1,13 @@
-"use client"
+'use client'
 
-import { useEffect, useRef, useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { TrendingUp, TrendingDown, DollarSign, Percent } from "lucide-react"
+import { useEffect, useRef, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { TrendingUp, TrendingDown, DollarSign, Percent } from 'lucide-react'
 
 interface WaterfallSegment {
   label: string
   value: number
-  type: "positive" | "negative" | "total"
+  type: 'positive' | 'negative' | 'total'
   color: string
 }
 
@@ -22,7 +22,7 @@ export function ProfitWaterfallChart({
   segments,
   width = 900,
   height = 600,
-  className = ""
+  className = '',
 }: ProfitWaterfallChartProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationFrameRef = useRef<number | null>(null)
@@ -31,11 +31,11 @@ export function ProfitWaterfallChart({
 
   // Datos por defecto
   const defaultSegments: WaterfallSegment[] = [
-    { label: "Ingresos", value: 1500000, type: "positive", color: "#10b981" },
-    { label: "Costo de Ventas", value: -450000, type: "negative", color: "#ef4444" },
-    { label: "Gastos Operativos", value: -320000, type: "negative", color: "#f59e0b" },
-    { label: "Impuestos", value: -180000, type: "negative", color: "#f97316" },
-    { label: "Ganancia Neta", value: 550000, type: "total", color: "#8b5cf6" }
+    { label: 'Ingresos', value: 1500000, type: 'positive', color: '#10b981' },
+    { label: 'Costo de Ventas', value: -450000, type: 'negative', color: '#ef4444' },
+    { label: 'Gastos Operativos', value: -320000, type: 'negative', color: '#f59e0b' },
+    { label: 'Impuestos', value: -180000, type: 'negative', color: '#f97316' },
+    { label: 'Ganancia Neta', value: 550000, type: 'total', color: '#8b5cf6' },
   ]
 
   const waterfallSegments = segments || defaultSegments
@@ -52,7 +52,7 @@ export function ProfitWaterfallChart({
       const x = 50 + i * (barWidth + 20)
       const normalizedHeight = (Math.abs(segment.value) / maxValue) * chartHeight
       
-      if (segment.type === "total") {
+      if (segment.type === 'total') {
         const totalValue = waterfallSegments
           .slice(0, i)
           .reduce((acc, s) => acc + s.value, 0)
@@ -89,7 +89,7 @@ export function ProfitWaterfallChart({
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const ctx = canvas.getContext("2d")
+    const ctx = canvas.getContext('2d')
     if (!ctx) return
 
     let time = 0
@@ -101,13 +101,13 @@ export function ProfitWaterfallChart({
 
       // Gradiente de fondo
       const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
-      bgGradient.addColorStop(0, "rgba(10, 10, 30, 1)")
-      bgGradient.addColorStop(1, "rgba(30, 20, 50, 1)")
+      bgGradient.addColorStop(0, 'rgba(10, 10, 30, 1)')
+      bgGradient.addColorStop(1, 'rgba(30, 20, 50, 1)')
       ctx.fillStyle = bgGradient
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       // Línea base
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)"
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
       ctx.lineWidth = 2
       ctx.setLineDash([5, 5])
       ctx.beginPath()
@@ -122,7 +122,7 @@ export function ProfitWaterfallChart({
         const next = positions[i + 1]
         const segment = waterfallSegments[i]
 
-        if (segment.type !== "total") {
+        if (segment.type !== 'total') {
           const startX = current.x + barWidth
           const startY = current.y + (segment.value < 0 ? current.height : 0)
           const endX = next.x
@@ -169,7 +169,7 @@ export function ProfitWaterfallChart({
         const y = position.y + (position.height - currentHeight)
 
         // Sombra de la barra
-        ctx.fillStyle = "rgba(0, 0, 0, 0.3)"
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'
         ctx.fillRect(x + 5, y + currentHeight + 5, barWidth, 10)
 
         // Gradiente líquido de la barra
@@ -204,14 +204,14 @@ export function ProfitWaterfallChart({
 
         // Reflejo brillante
         const highlightGradient = ctx.createLinearGradient(x, y, x + barWidth / 2, y)
-        highlightGradient.addColorStop(0, "rgba(255, 255, 255, 0.3)")
-        highlightGradient.addColorStop(1, "rgba(255, 255, 255, 0)")
+        highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)')
+        highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
         ctx.fillStyle = highlightGradient
         ctx.fillRect(x, y, barWidth * 0.3, currentHeight)
 
         // Borde brillante si hover
         if (isHovered) {
-          ctx.strokeStyle = "#ffffff"
+          ctx.strokeStyle = '#ffffff'
           ctx.lineWidth = 3
           ctx.shadowBlur = 20
           ctx.shadowColor = segment.color
@@ -237,29 +237,29 @@ export function ProfitWaterfallChart({
         }
 
         // Label del segmento
-        ctx.fillStyle = "#ffffff"
-        ctx.font = "bold 12px sans-serif"
-        ctx.textAlign = "center"
+        ctx.fillStyle = '#ffffff'
+        ctx.font = 'bold 12px sans-serif'
+        ctx.textAlign = 'center'
         ctx.fillText(segment.label, x + barWidth / 2, height - 60)
 
         // Valor
-        ctx.font = "bold 14px sans-serif"
-        ctx.fillStyle = segment.type === "total" ? segment.color : segment.value > 0 ? "#10b981" : "#ef4444"
-        const valueText = `${segment.value > 0 ? "+" : ""}$${(Math.abs(segment.value) / 1000).toFixed(0)}k`
+        ctx.font = 'bold 14px sans-serif'
+        ctx.fillStyle = segment.type === 'total' ? segment.color : segment.value > 0 ? '#10b981' : '#ef4444'
+        const valueText = `${segment.value > 0 ? '+' : ''}$${(Math.abs(segment.value) / 1000).toFixed(0)}k`
         ctx.fillText(valueText, x + barWidth / 2, y - 10)
 
         // Ícono
-        const icon = segment.value > 0 ? "↑" : segment.value < 0 ? "↓" : "●"
-        ctx.font = "20px sans-serif"
+        const icon = segment.value > 0 ? '↑' : segment.value < 0 ? '↓' : '●'
+        ctx.font = '20px sans-serif'
         ctx.fillStyle = segment.color
         ctx.fillText(icon, x + barWidth / 2, y - 30)
       })
 
       // Título
-      ctx.fillStyle = "#ffffff"
-      ctx.font = "bold 20px sans-serif"
-      ctx.textAlign = "center"
-      ctx.fillText("Cascada de Ganancias", width / 2, 30)
+      ctx.fillStyle = '#ffffff'
+      ctx.font = 'bold 20px sans-serif'
+      ctx.textAlign = 'center'
+      ctx.fillText('Cascada de Ganancias', width / 2, 30)
 
       animationFrameRef.current = requestAnimationFrame(animate)
     }
@@ -309,7 +309,7 @@ export function ProfitWaterfallChart({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="rounded-2xl cursor-pointer"
-        style={{ boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)" }}
+        style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)' }}
         onMouseMove={handleMouseMove}
       />
 
@@ -341,7 +341,7 @@ export function ProfitWaterfallChart({
                       </div>
                     </div>
                     <div className="text-2xl font-bold" style={{ color: segment.color }}>
-                      {segment.value > 0 ? "+" : ""}${(Math.abs(segment.value) / 1000).toFixed(1)}k
+                      {segment.value > 0 ? '+' : ''}${(Math.abs(segment.value) / 1000).toFixed(1)}k
                     </div>
                     <div className="flex items-center gap-2 mt-2">
                       <Percent className="w-3 h-3 text-white/60" />

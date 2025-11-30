@@ -3,14 +3,14 @@
  * Proporciona acceso a todos los servicios de IA desde componentes React
  */
 
-'use client';
+'use client'
 
-import { useState, useCallback, useMemo } from 'react';
-import { MegaAIAgentService } from '@/app/lib/services/ai/MegaAIAgent.service';
-import { AIScheduledReportsService } from '@/app/lib/services/ai/AIScheduledReports.service';
-import { AIFormAutomationService } from '@/app/lib/services/ai/AIFormAutomation.service';
-import { AIPowerBIService } from '@/app/lib/services/ai/AIPowerBI.service';
-import { UserLearningService } from '@/app/lib/services/ai/UserLearning.service';
+import { useState, useCallback, useMemo } from 'react'
+import { MegaAIAgentService } from '@/app/lib/services/ai/MegaAIAgent.service'
+import { AIScheduledReportsService } from '@/app/lib/services/ai/AIScheduledReports.service'
+import { AIFormAutomationService } from '@/app/lib/services/ai/AIFormAutomation.service'
+import { AIPowerBIService } from '@/app/lib/services/ai/AIPowerBI.service'
+import { UserLearningService } from '@/app/lib/services/ai/UserLearning.service'
 
 // Tipos locales para el hook
 export interface Message {
@@ -63,7 +63,7 @@ export function useAI(userId: string = 'default-user'): UseAIResult {
     isLoading: false,
     error: null,
     conversationHistory: [],
-  });
+  })
 
   // Crear instancias de servicios (memoizadas)
   const services = useMemo(() => ({
@@ -72,23 +72,23 @@ export function useAI(userId: string = 'default-user'): UseAIResult {
     forms: new AIFormAutomationService(),
     powerBI: new AIPowerBIService(),
     learning: new UserLearningService(),
-  }), [userId]);
+  }), [userId])
 
   /**
    * Enviar mensaje al agente IA
    */
   const sendMessage = useCallback(async (
     message: string, 
-    context?: { userId?: string }
+    context?: { userId?: string },
   ): Promise<AIResponse | null> => {
-    setState(prev => ({ ...prev, isLoading: true, error: null }));
+    setState(prev => ({ ...prev, isLoading: true, error: null }))
 
     try {
       const response = await services.megaAI.sendMessage({
         message,
         userId: context?.userId || userId,
-        context: {}
-      });
+        context: {},
+      })
 
       // Agregar mensajes al historial
       const userMessage: Message = {
@@ -96,20 +96,20 @@ export function useAI(userId: string = 'default-user'): UseAIResult {
         role: 'user',
         content: message,
         timestamp: new Date(),
-      };
+      }
 
       const assistantMessage: Message = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
         content: response.message || '',
         timestamp: new Date(),
-      };
+      }
 
       setState(prev => ({
         ...prev,
         isLoading: false,
         conversationHistory: [...prev.conversationHistory, userMessage, assistantMessage],
-      }));
+      }))
 
       return {
         message: response.message || '',
@@ -117,79 +117,79 @@ export function useAI(userId: string = 'default-user'): UseAIResult {
         data: response.data,
         visualizations: response.visualizations,
         suggestions: response.suggestions,
-      };
+      }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-      setState(prev => ({ ...prev, isLoading: false, error: errorMessage }));
-      return null;
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
+      setState(prev => ({ ...prev, isLoading: false, error: errorMessage }))
+      return null
     }
-  }, [services.megaAI, userId]);
+  }, [services.megaAI, userId])
 
   /**
    * Limpiar historial de conversación
    */
   const clearConversation = useCallback(() => {
-    setState(prev => ({ ...prev, conversationHistory: [] }));
-  }, []);
+    setState(prev => ({ ...prev, conversationHistory: [] }))
+  }, [])
 
   /**
    * Obtener insights de IA
    */
   const getInsights = useCallback(async () => {
-    setState(prev => ({ ...prev, isLoading: true }));
+    setState(prev => ({ ...prev, isLoading: true }))
     try {
       // Retornar datos simulados mientras se implementa el servicio completo
-      setState(prev => ({ ...prev, isLoading: false }));
+      setState(prev => ({ ...prev, isLoading: false }))
       return {
         insights: [
           { type: 'success', title: 'Tendencia Positiva', description: 'Incremento del 18% en ventas' },
           { type: 'info', title: 'Predicción', description: 'Alcanzar 76K en ventas próximo mes' },
           { type: 'warning', title: 'Stock Bajo', description: 'Reponer inventario en 3 productos' },
-        ]
-      };
+        ],
+      }
     } catch (error) {
-      setState(prev => ({ ...prev, isLoading: false }));
-      return null;
+      setState(prev => ({ ...prev, isLoading: false }))
+      return null
     }
-  }, []);
+  }, [])
 
   /**
    * Obtener KPIs generados por IA
    */
   const getKPIs = useCallback(async () => {
-    setState(prev => ({ ...prev, isLoading: true }));
+    setState(prev => ({ ...prev, isLoading: true }))
     try {
-      setState(prev => ({ ...prev, isLoading: false }));
+      setState(prev => ({ ...prev, isLoading: false }))
       return {
         totalVentas: 3378700,
         totalCompras: 14678900,
         clientesActivos: 31,
         utilidades: 337870,
-      };
+      }
     } catch (error) {
-      setState(prev => ({ ...prev, isLoading: false }));
-      return null;
+      setState(prev => ({ ...prev, isLoading: false }))
+      return null
     }
-  }, []);
+  }, [])
 
   /**
    * Obtener predicciones
    */
   const getPredictions = useCallback(async (type: string, months: number = 6) => {
-    setState(prev => ({ ...prev, isLoading: true }));
+    setState(prev => ({ ...prev, isLoading: true }))
     try {
-      setState(prev => ({ ...prev, isLoading: false }));
+      setState(prev => ({ ...prev, isLoading: false }))
       return {
         predictions: Array.from({ length: months }, (_, i) => ({
           value: 45000 + i * 5000 + Math.random() * 3000,
           predicted: 48000 + i * 5500,
-        }))
-      };
+        })),
+      }
     } catch (error) {
-      setState(prev => ({ ...prev, isLoading: false }));
-      return null;
+      setState(prev => ({ ...prev, isLoading: false }))
+      return null
     }
-  }, []);
+  }, [])
 
   return {
     ...state,
@@ -199,7 +199,7 @@ export function useAI(userId: string = 'default-user'): UseAIResult {
     getKPIs,
     getPredictions,
     services,
-  };
+  }
 }
 
-export default useAI;
+export default useAI

@@ -1,20 +1,20 @@
-"use client"
+'use client'
 
-import { motion, AnimatePresence } from "framer-motion"
-import { Users, AlertTriangle, CheckCircle2, Clock, DollarSign, Plus, TrendingUp, BarChart3, Activity, Zap } from "lucide-react"
-import { Button } from "@/app/components/ui/button"
-import { Badge } from "@/app/components/ui/badge"
-import { useClientes } from "@/app/lib/firebase/firestore-hooks.service"
-import { CreateClienteModalPremium } from "@/app/components/modals/CreateClienteModalPremium"
-import { CreateAbonoModalPremium } from "@/app/components/modals/CreateAbonoModalPremium"
-import { useState, useMemo } from "react"
-import { Skeleton } from "@/app/components/ui/skeleton"
-import { ClientNetworkGraph } from "@/app/components/visualizations/ClientNetworkGraph"
-import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from "recharts"
-import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from "@/app/components/ui/SafeChartContainer"
-import { QuickStatWidget } from "@/app/components/widgets/QuickStatWidget"
-import { MiniChartWidget } from "@/app/components/widgets/MiniChartWidget"
-import { ActivityFeedWidget, ActivityItem } from "@/app/components/widgets/ActivityFeedWidget"
+import { motion, AnimatePresence } from 'framer-motion'
+import { Users, AlertTriangle, CheckCircle2, Clock, DollarSign, Plus, TrendingUp, BarChart3, Activity, Zap } from 'lucide-react'
+import { Button } from '@/app/components/ui/button'
+import { Badge } from '@/app/components/ui/badge'
+import { useClientes } from '@/app/lib/firebase/firestore-hooks.service'
+import { CreateClienteModalPremium } from '@/app/components/modals/CreateClienteModalPremium'
+import { CreateAbonoModalPremium } from '@/app/components/modals/CreateAbonoModalPremium'
+import { useState, useMemo } from 'react'
+import { Skeleton } from '@/app/components/ui/skeleton'
+import { ClientNetworkGraph } from '@/app/components/visualizations/ClientNetworkGraph'
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from 'recharts'
+import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/components/ui/SafeChartContainer'
+import { QuickStatWidget } from '@/app/components/widgets/QuickStatWidget'
+import { MiniChartWidget } from '@/app/components/widgets/MiniChartWidget'
+import { ActivityFeedWidget, ActivityItem } from '@/app/components/widgets/ActivityFeedWidget'
 
 // Interface para cliente
 interface ClienteData {
@@ -50,7 +50,7 @@ export default function BentoClientes() {
       name: c.nombre?.substring(0, 6) || `C${i + 1}`,
       ventas: c.totalVentas ?? 0,
       cobros: c.totalPagado ?? 0,
-      deuda: c.deudaTotal ?? 0
+      deuda: c.deudaTotal ?? 0,
     }))
   }, [topClientes])
 
@@ -72,7 +72,7 @@ export default function BentoClientes() {
       title: c.nombre || 'Cliente',
       description: `Venta total: $${((c.totalVentas ?? 0) / 1000).toFixed(0)}K`,
       timestamp: new Date(Date.now() - i * 3600000),
-      status: ((c.deudaTotal ?? 0) > 0 ? 'pending' : 'success') as 'pending' | 'success'
+      status: ((c.deudaTotal ?? 0) > 0 ? 'pending' : 'success') as 'pending' | 'success',
     }))
   }, [topClientes])
 
@@ -110,7 +110,7 @@ export default function BentoClientes() {
           </div>
         </div>
         <div className="flex gap-3">
-          {" "}
+          {' '}
           {/* Container for buttons */}
           <Button
             onClick={() => setShowAbonoModal(true)}
@@ -215,7 +215,7 @@ export default function BentoClientes() {
                   contentStyle={{ 
                     background: 'rgba(15, 23, 42, 0.95)', 
                     border: '1px solid rgba(255,255,255,0.1)', 
-                    borderRadius: '12px' 
+                    borderRadius: '12px', 
                   }}
                   formatter={(value: number) => [`$${value.toLocaleString()}`, '']}
                 />
@@ -350,7 +350,7 @@ export default function BentoClientes() {
                         </div>
                         <div>
                           <div className="font-medium text-white group-hover/row:text-cyan-400 transition-colors">
-                            {cliente.nombre ?? "-"}
+                            {cliente.nombre ?? '-'}
                           </div>
                           <div className="text-xs text-zinc-500">{cliente.id}</div>
                         </div>

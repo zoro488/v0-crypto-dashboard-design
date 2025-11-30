@@ -1,22 +1,22 @@
-"use client"
+'use client'
 
-import { Suspense, useRef, ReactNode, useState, useEffect, useMemo } from "react"
-import { Canvas, useFrame, useThree } from "@react-three/fiber"
+import { Suspense, useRef, ReactNode, useState, useEffect, useMemo } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { 
   EffectComposer, 
   Bloom, 
   Noise, 
   ChromaticAberration,
-  Vignette 
-} from "@react-three/postprocessing"
-import { BlendFunction } from "postprocessing"
-import Spline from "@splinetool/react-spline"
-import { motion, AnimatePresence } from "framer-motion"
-import { Loader2 } from "lucide-react"
-import * as THREE from "three"
+  Vignette, 
+} from '@react-three/postprocessing'
+import { BlendFunction } from 'postprocessing'
+import Spline from '@splinetool/react-spline'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Loader2 } from 'lucide-react'
+import * as THREE from 'three'
 
 // Constantes de configuración
-const SPLINE_BACKGROUND_URL = "https://prod.spline.design/t22KlukwndaHbHKF/scene.splinecode"
+const SPLINE_BACKGROUND_URL = 'https://prod.spline.design/t22KlukwndaHbHKF/scene.splinecode'
 
 // Interface para las props del componente
 interface ImmersiveLayoutProps {
@@ -159,13 +159,13 @@ function LoadingOverlay({ isLoading }: { isLoading: boolean }) {
         <motion.div
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.8, ease: "easeInOut" }}
+          transition={{ duration: 0.8, ease: 'easeInOut' }}
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black"
         >
           <div className="text-center space-y-4">
             <motion.div
               animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
             >
               <div className="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full" />
             </motion.div>
@@ -185,7 +185,7 @@ function LoadingOverlay({ isLoading }: { isLoading: boolean }) {
 
 // Wrapper para el fondo de Spline
 function SplineBackgroundWrapper({ 
-  onLoad 
+  onLoad, 
 }: { 
   onLoad: () => void 
 }) {
@@ -195,9 +195,9 @@ function SplineBackgroundWrapper({
         scene={SPLINE_BACKGROUND_URL}
         onLoad={onLoad}
         style={{
-          width: "100%",
-          height: "100%",
-          position: "absolute",
+          width: '100%',
+          height: '100%',
+          position: 'absolute',
           top: 0,
           left: 0,
         }}
@@ -211,7 +211,7 @@ export function ImmersiveLayout({
   children,
   showBackground = true,
   enablePostProcessing = true,
-  className = "",
+  className = '',
 }: ImmersiveLayoutProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [splineLoaded, setSplineLoaded] = useState(false)
@@ -258,16 +258,16 @@ export function ImmersiveLayout({
             gl={{
               antialias: true,
               alpha: true,
-              powerPreference: "high-performance",
+              powerPreference: 'high-performance',
             }}
             onCreated={handleCanvasCreated}
             style={{ 
-              background: "linear-gradient(135deg, #0a0a0f 0%, #0d0d1a 50%, #0a0a0f 100%)",
-              position: "absolute",
+              background: 'linear-gradient(135deg, #0a0a0f 0%, #0d0d1a 50%, #0a0a0f 100%)',
+              position: 'absolute',
               top: 0,
               left: 0,
-              width: "100%",
-              height: "100%",
+              width: '100%',
+              height: '100%',
             }}
           >
             <Suspense fallback={null}>
@@ -294,7 +294,7 @@ export function ImmersiveLayout({
         className="fixed inset-0 pointer-events-none"
         style={{ 
           zIndex: 0,
-          background: "radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.3) 100%)",
+          background: 'radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.3) 100%)',
         }}
       />
       
@@ -302,7 +302,7 @@ export function ImmersiveLayout({
       <motion.main
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: isLoading ? 0 : 1, y: isLoading ? 20 : 0 }}
-        transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+        transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
         className="relative z-10"
       >
         {children}
@@ -315,29 +315,29 @@ export function ImmersiveLayout({
 interface GlassCardProps {
   children: ReactNode
   className?: string
-  intensity?: "light" | "medium" | "strong"
+  intensity?: 'light' | 'medium' | 'strong'
   glow?: boolean
   glowColor?: string
 }
 
 export function GlassCard({
   children,
-  className = "",
-  intensity = "medium",
+  className = '',
+  intensity = 'medium',
   glow = false,
-  glowColor = "blue",
+  glowColor = 'blue',
 }: GlassCardProps) {
   const intensityClasses = {
-    light: "bg-black/10 backdrop-blur-sm border-white/5",
-    medium: "bg-black/20 backdrop-blur-md border-white/10",
-    strong: "bg-black/30 backdrop-blur-xl border-white/15",
+    light: 'bg-black/10 backdrop-blur-sm border-white/5',
+    medium: 'bg-black/20 backdrop-blur-md border-white/10',
+    strong: 'bg-black/30 backdrop-blur-xl border-white/15',
   }
   
   const glowColors: Record<string, string> = {
-    blue: "shadow-blue-500/20",
-    purple: "shadow-purple-500/20",
-    cyan: "shadow-cyan-500/20",
-    pink: "shadow-pink-500/20",
+    blue: 'shadow-blue-500/20',
+    purple: 'shadow-purple-500/20',
+    cyan: 'shadow-cyan-500/20',
+    pink: 'shadow-pink-500/20',
   }
   
   return (
@@ -348,7 +348,7 @@ export function GlassCard({
       className={`
         rounded-2xl border 
         ${intensityClasses[intensity]}
-        ${glow ? `shadow-lg ${glowColors[glowColor] || glowColors.blue}` : ""}
+        ${glow ? `shadow-lg ${glowColors[glowColor] || glowColors.blue}` : ''}
         ${className}
       `}
     >
@@ -367,7 +367,7 @@ interface GlassSidebarProps {
 
 export function GlassSidebar({
   children,
-  className = "",
+  className = '',
   width = 288,
   collapsed = false,
 }: GlassSidebarProps) {
@@ -398,14 +398,14 @@ interface GlassHeaderProps {
 
 export function GlassHeader({
   children,
-  className = "",
+  className = '',
   height = 72,
 }: GlassHeaderProps) {
   return (
     <motion.header
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
       className={`
         fixed top-0 left-0 right-0
         bg-black/20 backdrop-blur-xl

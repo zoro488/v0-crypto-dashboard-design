@@ -2,8 +2,8 @@
  * Hook para animaciones premium de micro-interacciones
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
-import { useSpring, type MotionValue } from 'framer-motion';
+import React, { useState, useCallback, useEffect } from 'react'
+import { useSpring, type MotionValue } from 'framer-motion'
 
 interface GlowStyle {
   opacity: MotionValue<number>;
@@ -19,29 +19,29 @@ interface UseHoverGlowReturn {
 }
 
 export const useHoverGlow = (color: string = 'rgba(59, 130, 246, 0.5)'): UseHoverGlowReturn => {
-  const [isHovered, setIsHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(false)
 
   const glowOpacity = useSpring(0, {
     stiffness: 300,
     damping: 30,
-  });
+  })
 
   const glowScale = useSpring(1, {
     stiffness: 400,
     damping: 25,
-  });
+  })
 
   const handleMouseEnter = useCallback(() => {
-    setIsHovered(true);
-    glowOpacity.set(1);
-    glowScale.set(1.05);
-  }, [glowOpacity, glowScale]);
+    setIsHovered(true)
+    glowOpacity.set(1)
+    glowScale.set(1.05)
+  }, [glowOpacity, glowScale])
 
   const handleMouseLeave = useCallback(() => {
-    setIsHovered(false);
-    glowOpacity.set(0);
-    glowScale.set(1);
-  }, [glowOpacity, glowScale]);
+    setIsHovered(false)
+    glowOpacity.set(0)
+    glowScale.set(1)
+  }, [glowOpacity, glowScale])
 
   return {
     isHovered,
@@ -52,8 +52,8 @@ export const useHoverGlow = (color: string = 'rgba(59, 130, 246, 0.5)'): UseHove
       scale: glowScale,
       boxShadow: `0 0 40px ${color}, 0 0 80px ${color}`,
     },
-  };
-};
+  }
+}
 
 interface UseCountUpReturn {
   displayValue: number;
@@ -63,45 +63,45 @@ interface UseCountUpReturn {
 export const useCountUp = (
   targetValue: number,
   duration: number = 1000,
-  delay: number = 0
+  delay: number = 0,
 ): UseCountUpReturn => {
-  const [displayValue, setDisplayValue] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [displayValue, setDisplayValue] = useState(0)
+  const [isAnimating, setIsAnimating] = useState(false)
 
   useEffect(() => {
     const startAnimation = () => {
-      setIsAnimating(true);
-      const startTime = Date.now();
-      const startValue = displayValue;
-      const difference = targetValue - startValue;
+      setIsAnimating(true)
+      const startTime = Date.now()
+      const startValue = displayValue
+      const difference = targetValue - startValue
 
       const animate = () => {
-        const now = Date.now();
-        const elapsed = now - startTime;
-        const progress = Math.min(elapsed / duration, 1);
+        const now = Date.now()
+        const elapsed = now - startTime
+        const progress = Math.min(elapsed / duration, 1)
 
         // Easing function (easeOutCubic)
-        const easeProgress = 1 - Math.pow(1 - progress, 3);
-        const currentValue = startValue + difference * easeProgress;
+        const easeProgress = 1 - Math.pow(1 - progress, 3)
+        const currentValue = startValue + difference * easeProgress
 
-        setDisplayValue(Math.round(currentValue));
+        setDisplayValue(Math.round(currentValue))
 
         if (progress < 1) {
-          requestAnimationFrame(animate);
+          requestAnimationFrame(animate)
         } else {
-          setIsAnimating(false);
+          setIsAnimating(false)
         }
-      };
+      }
 
-      requestAnimationFrame(animate);
-    };
+      requestAnimationFrame(animate)
+    }
 
-    const timer = setTimeout(startAnimation, delay);
-    return () => clearTimeout(timer);
-  }, [targetValue, duration, delay]);
+    const timer = setTimeout(startAnimation, delay)
+    return () => clearTimeout(timer)
+  }, [targetValue, duration, delay])
 
-  return { displayValue, isAnimating };
-};
+  return { displayValue, isAnimating }
+}
 
 interface UseParallaxReturn {
   y: number;
@@ -109,22 +109,22 @@ interface UseParallaxReturn {
 }
 
 export const useParallax = (strength: number = 0.5): UseParallaxReturn => {
-  const [scrollY, setScrollY] = useState(0);
+  const [scrollY, setScrollY] = useState(0)
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
+      setScrollY(window.scrollY)
+    }
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return {
     y: scrollY * strength,
     opacity: Math.max(0, 1 - scrollY / 500),
-  };
-};
+  }
+}
 
 interface UseRippleReturn {
   ripples: Array<{ id: number; x: number; y: number }>;
@@ -132,27 +132,27 @@ interface UseRippleReturn {
 }
 
 export const useRipple = (duration: number = 600): UseRippleReturn => {
-  const [ripples, setRipples] = useState<Array<{ id: number; x: number; y: number }>>([]);
+  const [ripples, setRipples] = useState<Array<{ id: number; x: number; y: number }>>([])
 
   const createRipple = useCallback(
     (event: React.MouseEvent<HTMLElement>) => {
-      const button = event.currentTarget;
-      const rect = button.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-      const id = Date.now();
+      const button = event.currentTarget
+      const rect = button.getBoundingClientRect()
+      const x = event.clientX - rect.left
+      const y = event.clientY - rect.top
+      const id = Date.now()
 
-      setRipples((prev) => [...prev, { id, x, y }]);
+      setRipples((prev) => [...prev, { id, x, y }])
 
       setTimeout(() => {
-        setRipples((prev) => prev.filter((ripple) => ripple.id !== id));
-      }, duration);
+        setRipples((prev) => prev.filter((ripple) => ripple.id !== id))
+      }, duration)
     },
-    [duration]
-  );
+    [duration],
+  )
 
-  return { ripples, createRipple };
-};
+  return { ripples, createRipple }
+}
 
 interface UseInViewReturn {
   ref: React.RefObject<HTMLElement | null>;
@@ -160,32 +160,32 @@ interface UseInViewReturn {
 }
 
 export const useInView = (threshold: number = 0.1): UseInViewReturn => {
-  const [isInView, setIsInView] = useState(false);
-  const ref = React.useRef<HTMLElement | null>(null);
+  const [isInView, setIsInView] = useState(false)
+  const ref = React.useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setIsInView(true);
+          setIsInView(true)
         }
       },
-      { threshold }
-    );
+      { threshold },
+    )
 
     if (ref.current) {
-      observer.observe(ref.current);
+      observer.observe(ref.current)
     }
 
     return () => {
       if (ref.current) {
-        observer.unobserve(ref.current);
+        observer.unobserve(ref.current)
       }
-    };
-  }, [threshold]);
+    }
+  }, [threshold])
 
-  return { ref, isInView };
-};
+  return { ref, isInView }
+}
 
 interface UseShimmerReturn {
   shimmerStyle: {
@@ -199,7 +199,7 @@ interface UseShimmerReturn {
 export const useShimmer = (
   color1: string = 'rgba(255, 255, 255, 0)',
   color2: string = 'rgba(255, 255, 255, 0.1)',
-  duration: number = 2000
+  duration: number = 2000,
 ): UseShimmerReturn => {
   return {
     shimmerStyle: {
@@ -208,8 +208,8 @@ export const useShimmer = (
       backgroundPosition: '-100% 0',
       animation: `shimmer ${duration}ms infinite`,
     },
-  };
-};
+  }
+}
 
 interface UsePulseReturn {
   pulseScale: number;
@@ -217,25 +217,25 @@ interface UsePulseReturn {
 }
 
 export const usePulse = (interval: number = 2000): UsePulseReturn => {
-  const [pulse, setPulse] = useState({ scale: 1, opacity: 1 });
+  const [pulse, setPulse] = useState({ scale: 1, opacity: 1 })
 
   useEffect(() => {
     const animate = () => {
-      setPulse({ scale: 1.05, opacity: 0.8 });
+      setPulse({ scale: 1.05, opacity: 0.8 })
       setTimeout(() => {
-        setPulse({ scale: 1, opacity: 1 });
-      }, interval / 2);
-    };
+        setPulse({ scale: 1, opacity: 1 })
+      }, interval / 2)
+    }
 
-    const timer = setInterval(animate, interval);
-    return () => clearInterval(timer);
-  }, [interval]);
+    const timer = setInterval(animate, interval)
+    return () => clearInterval(timer)
+  }, [interval])
 
   return {
     pulseScale: pulse.scale,
     pulseOpacity: pulse.opacity,
-  };
-};
+  }
+}
 
 // Variantes de animación predefinidas para framer-motion
 export const premiumVariants = {
@@ -362,7 +362,7 @@ export const premiumVariants = {
       },
     },
   },
-};
+}
 
 // Configuraciones de spring predefinidas
 export const springConfigs = {
@@ -372,4 +372,4 @@ export const springConfigs = {
   stiff: { stiffness: 400, damping: 25 },
   slow: { stiffness: 80, damping: 20 },
   molasses: { stiffness: 50, damping: 20 },
-};
+}

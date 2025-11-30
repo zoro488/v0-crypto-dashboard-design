@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { useRef, useMemo, Suspense } from "react"
-import { Canvas, useFrame, useThree } from "@react-three/fiber"
-import { useTexture } from "@react-three/drei"
-import * as THREE from "three"
-import { motion } from "framer-motion"
+import { useRef, useMemo, Suspense } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { useTexture } from '@react-three/drei'
+import * as THREE from 'three'
+import { motion } from 'framer-motion'
 
 // Constantes del sistema de partículas
 const PARTICLE_COUNT = 15000
@@ -33,8 +33,8 @@ function ParticleSystem({ imageSrc }: { imageSrc: string }) {
   
   // Generar geometría de partículas basada en la imagen
   const { positions, targetPositions, colors, brightness, randoms } = useMemo(() => {
-    const canvas = document.createElement("canvas")
-    const ctx = canvas.getContext("2d")
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
     
     if (!ctx || !texture.image) {
       // Fallback: generar partículas aleatorias si la imagen no carga
@@ -307,8 +307,8 @@ function LoadingFallback() {
 
 // Componente principal exportado
 export function SingularityLogo({
-  className = "",
-  imageSrc = "/images/Космос.jpeg",
+  className = '',
+  imageSrc = '/images/Космос.jpeg',
   interactive = true,
 }: SingularityLogoProps) {
   return (
@@ -316,7 +316,7 @@ export function SingularityLogo({
       className={`relative w-full h-full ${className}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 1.5, ease: "easeOut" }}
+      transition={{ duration: 1.5, ease: 'easeOut' }}
     >
       {/* Canvas de Three.js */}
       <Canvas
@@ -325,9 +325,9 @@ export function SingularityLogo({
         gl={{
           antialias: true,
           alpha: true,
-          powerPreference: "high-performance",
+          powerPreference: 'high-performance',
         }}
-        style={{ background: "transparent" }}
+        style={{ background: 'transparent' }}
       >
         <Suspense fallback={<LoadingFallback />}>
           <ParticleSystem imageSrc={imageSrc} />
@@ -349,8 +349,8 @@ export function SingularityLogo({
 
 // Versión simplificada sin Canvas (para usar dentro de otro Canvas)
 export function SingularityLogoScene({
-  imageSrc = "/images/Космос.jpeg",
-}: Pick<SingularityLogoProps, "imageSrc">) {
+  imageSrc = '/images/Космос.jpeg',
+}: Pick<SingularityLogoProps, 'imageSrc'>) {
   return (
     <Suspense fallback={<LoadingFallback />}>
       <ParticleSystem imageSrc={imageSrc} />

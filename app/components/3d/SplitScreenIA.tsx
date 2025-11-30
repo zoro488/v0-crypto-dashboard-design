@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { motion, AnimatePresence } from "framer-motion"
-import { useState, ReactNode } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { motion, AnimatePresence } from 'framer-motion'
+import { useState, ReactNode } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface SplitScreenIAProps {
   leftContent: ReactNode
@@ -17,7 +17,7 @@ export function SplitScreenIA({
   rightContent, 
   defaultRatio = 40,
   showControls = true,
-  className = "" 
+  className = '', 
 }: SplitScreenIAProps) {
   const [splitRatio, setSplitRatio] = useState(defaultRatio)
   const [isCollapsed, setIsCollapsed] = useState(false)
@@ -39,10 +39,10 @@ export function SplitScreenIA({
   }
 
   const presets = [
-    { label: "30/70", value: 30 },
-    { label: "40/60", value: 40 },
-    { label: "50/50", value: 50 },
-    { label: "60/40", value: 60 },
+    { label: '30/70', value: 30 },
+    { label: '40/60', value: 40 },
+    { label: '50/50', value: 50 },
+    { label: '60/40', value: 60 },
   ]
 
   return (
@@ -51,10 +51,10 @@ export function SplitScreenIA({
       <motion.div
         className="relative h-full bg-gradient-to-br from-blue-950/40 via-purple-950/40 to-black/40 backdrop-blur-sm"
         animate={{
-          width: isCollapsed ? "0%" : `${splitRatio}%`,
+          width: isCollapsed ? '0%' : `${splitRatio}%`,
           opacity: isCollapsed ? 0 : 1,
         }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
       >
         <div className="w-full h-full overflow-hidden">
           {leftContent}
@@ -86,7 +86,7 @@ export function SplitScreenIA({
           onDragStart={() => setIsDragging(true)}
           onDragEnd={() => setIsDragging(false)}
           className={`relative w-2 h-full cursor-col-resize bg-gradient-to-b from-blue-500/20 via-purple-500/20 to-pink-500/20 hover:bg-gradient-to-b hover:from-blue-500/40 hover:via-purple-500/40 hover:to-pink-500/40 transition-colors group ${
-            isDragging ? "bg-blue-500/50" : ""
+            isDragging ? 'bg-blue-500/50' : ''
           }`}
         >
           {/* Divider handle */}
@@ -116,9 +116,9 @@ export function SplitScreenIA({
       <motion.div
         className="relative h-full flex-1 bg-gradient-to-br from-slate-950/40 via-gray-950/40 to-black/40 backdrop-blur-sm overflow-auto"
         animate={{
-          width: isCollapsed ? "100%" : "auto",
+          width: isCollapsed ? '100%' : 'auto',
         }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
       >
         {/* @ts-ignore - motion.div children type */}
         {rightContent}

@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 💎 CREATE ABONO MODAL PREMIUM - Registro de Pagos de Clientes
@@ -12,22 +12,22 @@
  * 6. Glassmorphism futurista
  */
 
-import * as React from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
+import * as React from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from "@/app/components/ui/dialog"
-import { Button } from "@/app/components/ui/button"
-import { Input } from "@/app/components/ui/input"
-import { Label } from "@/app/components/ui/label"
-import { Badge } from "@/app/components/ui/badge"
-import { Textarea } from "@/app/components/ui/textarea"
+} from '@/app/components/ui/dialog'
+import { Button } from '@/app/components/ui/button'
+import { Input } from '@/app/components/ui/input'
+import { Label } from '@/app/components/ui/label'
+import { Badge } from '@/app/components/ui/badge'
+import { Textarea } from '@/app/components/ui/textarea'
 import {
   Banknote,
   User,
@@ -52,24 +52,24 @@ import {
   PiggyBank,
   CircleDollarSign,
   Calculator,
-} from "lucide-react"
-import { cn } from "@/app/lib/utils"
-import { useToast } from "@/app/hooks/use-toast"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { logger } from "@/app/lib/utils/logger"
-import { formatearMonto } from "@/app/lib/validations/smart-forms-schemas"
+} from 'lucide-react'
+import { cn } from '@/app/lib/utils'
+import { useToast } from '@/app/hooks/use-toast'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { logger } from '@/app/lib/utils/logger'
+import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
 
 // ============================================
 // SCHEMA ZOD
 // ============================================
 
 const abonoSchema = z.object({
-  clienteId: z.string().min(1, "Selecciona un cliente"),
+  clienteId: z.string().min(1, 'Selecciona un cliente'),
   clienteNombre: z.string(),
-  monto: z.number().min(1, "El monto debe ser mayor a 0"),
-  fecha: z.string().min(1, "La fecha es requerida"),
-  metodoPago: z.enum(["efectivo", "transferencia", "deposito"]),
-  bancoDestino: z.enum(["boveda_monte", "profit", "utilidades"]),
+  monto: z.number().min(1, 'El monto debe ser mayor a 0'),
+  fecha: z.string().min(1, 'La fecha es requerida'),
+  metodoPago: z.enum(['efectivo', 'transferencia', 'deposito']),
+  bancoDestino: z.enum(['boveda_monte', 'profit', 'utilidades']),
   referencia: z.string().optional(),
   concepto: z.string().optional(),
 })
@@ -95,25 +95,25 @@ interface CreateAbonoModalProps {
 
 // Mock de clientes con deuda (en producción viene de Firestore)
 const CLIENTES_CON_DEUDA = [
-  { id: "1", nombre: "Robalo", deuda: 660000, abonos: 426000, pendiente: 234000 },
-  { id: "2", nombre: "Valle", deuda: 880500, abonos: 845500, pendiente: 35000 },
-  { id: "3", nombre: "Tio Tocayo", deuda: 315000, abonos: 0, pendiente: 315000 },
-  { id: "4", nombre: "Lamas", deuda: 1057200, abonos: 941000, pendiente: 116200 },
-  { id: "5", nombre: "Galvan", deuda: 14000, abonos: 0, pendiente: 14000 },
-  { id: "6", nombre: "Negrito", deuda: 88300, abonos: 63000, pendiente: 25300 },
-  { id: "7", nombre: "Primo", deuda: 0, abonos: 3000, pendiente: -3000 }, // Saldo a favor
+  { id: '1', nombre: 'Robalo', deuda: 660000, abonos: 426000, pendiente: 234000 },
+  { id: '2', nombre: 'Valle', deuda: 880500, abonos: 845500, pendiente: 35000 },
+  { id: '3', nombre: 'Tio Tocayo', deuda: 315000, abonos: 0, pendiente: 315000 },
+  { id: '4', nombre: 'Lamas', deuda: 1057200, abonos: 941000, pendiente: 116200 },
+  { id: '5', nombre: 'Galvan', deuda: 14000, abonos: 0, pendiente: 14000 },
+  { id: '6', nombre: 'Negrito', deuda: 88300, abonos: 63000, pendiente: 25300 },
+  { id: '7', nombre: 'Primo', deuda: 0, abonos: 3000, pendiente: -3000 }, // Saldo a favor
 ]
 
 const BANCOS_DESTINO = [
-  { id: "boveda_monte", nombre: "Bóveda Monte", icono: "🏦", color: "blue" },
-  { id: "profit", nombre: "Profit", icono: "💰", color: "green" },
-  { id: "utilidades", nombre: "Utilidades", icono: "💎", color: "purple" },
+  { id: 'boveda_monte', nombre: 'Bóveda Monte', icono: '🏦', color: 'blue' },
+  { id: 'profit', nombre: 'Profit', icono: '💰', color: 'green' },
+  { id: 'utilidades', nombre: 'Utilidades', icono: '💎', color: 'purple' },
 ]
 
 const METODOS_PAGO = [
-  { id: "efectivo", nombre: "Efectivo", icono: Banknote, color: "green" },
-  { id: "transferencia", nombre: "Transferencia", icono: CreditCard, color: "blue" },
-  { id: "deposito", nombre: "Depósito", icono: Building2, color: "purple" },
+  { id: 'efectivo', nombre: 'Efectivo', icono: Banknote, color: 'green' },
+  { id: 'transferencia', nombre: 'Transferencia', icono: CreditCard, color: 'blue' },
+  { id: 'deposito', nombre: 'Depósito', icono: Building2, color: 'purple' },
 ]
 
 // Variantes de animación
@@ -122,7 +122,7 @@ const containerVariants = {
   visible: { 
     opacity: 1, 
     scale: 1,
-    transition: { staggerChildren: 0.05 }
+    transition: { staggerChildren: 0.05 },
   },
 }
 
@@ -139,35 +139,35 @@ export function CreateAbonoModalPremium({
   open, 
   onClose, 
   onSuccess,
-  preselectedCliente 
+  preselectedCliente, 
 }: CreateAbonoModalProps) {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
-  const [searchQuery, setSearchQuery] = React.useState("")
+  const [searchQuery, setSearchQuery] = React.useState('')
   const [showClienteList, setShowClienteList] = React.useState(false)
   const [selectedCliente, setSelectedCliente] = React.useState<typeof CLIENTES_CON_DEUDA[0] | null>(
-    preselectedCliente || null
+    preselectedCliente || null,
   )
 
   const form = useForm<AbonoInput>({
     resolver: zodResolver(abonoSchema),
     defaultValues: {
-      clienteId: preselectedCliente?.id || "",
-      clienteNombre: preselectedCliente?.nombre || "",
+      clienteId: preselectedCliente?.id || '',
+      clienteNombre: preselectedCliente?.nombre || '',
       monto: 0,
       fecha: new Date().toISOString().split('T')[0],
-      metodoPago: "efectivo",
-      bancoDestino: "boveda_monte",
-      referencia: "",
-      concepto: "",
+      metodoPago: 'efectivo',
+      bancoDestino: 'boveda_monte',
+      referencia: '',
+      concepto: '',
     },
   })
 
   const { watch, setValue, handleSubmit, reset, formState: { errors } } = form
   
-  const monto = watch("monto")
-  const metodoPago = watch("metodoPago")
-  const bancoDestino = watch("bancoDestino")
+  const monto = watch('monto')
+  const metodoPago = watch('metodoPago')
+  const bancoDestino = watch('bancoDestino')
 
   // Calcular nuevo saldo después del abono
   const nuevoSaldo = React.useMemo(() => {
@@ -185,24 +185,24 @@ export function CreateAbonoModalPremium({
   const clientesFiltrados = React.useMemo(() => {
     if (!searchQuery) return CLIENTES_CON_DEUDA.filter(c => c.pendiente > 0)
     return CLIENTES_CON_DEUDA.filter(c => 
-      c.nombre.toLowerCase().includes(searchQuery.toLowerCase()) && c.pendiente > 0
+      c.nombre.toLowerCase().includes(searchQuery.toLowerCase()) && c.pendiente > 0,
     )
   }, [searchQuery])
 
   // Seleccionar cliente
   const handleSelectCliente = (cliente: typeof CLIENTES_CON_DEUDA[0]) => {
     setSelectedCliente(cliente)
-    setValue("clienteId", cliente.id)
-    setValue("clienteNombre", cliente.nombre)
+    setValue('clienteId', cliente.id)
+    setValue('clienteNombre', cliente.nombre)
     setShowClienteList(false)
-    setSearchQuery("")
+    setSearchQuery('')
   }
 
   // Quick-set de monto
   const setQuickMonto = (porcentaje: number) => {
     if (!selectedCliente) return
     const montoCalculado = Math.round(selectedCliente.pendiente * porcentaje)
-    setValue("monto", montoCalculado)
+    setValue('monto', montoCalculado)
   }
 
   // Reset cuando se abre
@@ -210,8 +210,8 @@ export function CreateAbonoModalPremium({
     if (open) {
       if (preselectedCliente) {
         setSelectedCliente(preselectedCliente)
-        setValue("clienteId", preselectedCliente.id)
-        setValue("clienteNombre", preselectedCliente.nombre)
+        setValue('clienteId', preselectedCliente.id)
+        setValue('clienteNombre', preselectedCliente.nombre)
       } else {
         setSelectedCliente(null)
         reset()
@@ -230,13 +230,13 @@ export function CreateAbonoModalPremium({
         timestamp: new Date().toISOString(),
       }
 
-      logger.info("Abono registrado", { 
+      logger.info('Abono registrado', { 
         data: abonoData,
-        context: "CreateAbonoModalPremium"
+        context: 'CreateAbonoModalPremium',
       })
 
       toast({
-        title: "✅ Abono Registrado",
+        title: '✅ Abono Registrado',
         description: `${formatearMonto(data.monto)} de ${data.clienteNombre}. Nuevo saldo: ${formatearMonto(nuevoSaldo)}`,
       })
 
@@ -245,11 +245,11 @@ export function CreateAbonoModalPremium({
       useAppStore.getState().triggerDataRefresh()
 
     } catch (error) {
-      logger.error("Error al registrar abono", error)
+      logger.error('Error al registrar abono', error)
       toast({
-        title: "Error",
-        description: "No se pudo registrar el abono",
-        variant: "destructive",
+        title: 'Error',
+        description: 'No se pudo registrar el abono',
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -261,11 +261,11 @@ export function CreateAbonoModalPremium({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          "max-w-2xl max-h-[90vh] p-0 overflow-hidden",
-          "bg-black/60 backdrop-blur-2xl",
-          "border border-white/10",
-          "text-white",
-          "shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(34,197,94,0.15)]"
+          'max-w-2xl max-h-[90vh] p-0 overflow-hidden',
+          'bg-black/60 backdrop-blur-2xl',
+          'border border-white/10',
+          'text-white',
+          'shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(34,197,94,0.15)]',
         )}
       >
         <DialogTitle className="sr-only">Registrar Abono</DialogTitle>
@@ -352,9 +352,9 @@ export function CreateAbonoModalPremium({
                     onFocus={() => !selectedCliente && setShowClienteList(true)}
                     placeholder="Buscar cliente con deuda..."
                     className={cn(
-                      "pl-10 h-12 bg-white/5 border-white/10 text-white",
-                      "placeholder:text-gray-500",
-                      selectedCliente && "border-green-500/50 bg-green-500/10"
+                      'pl-10 h-12 bg-white/5 border-white/10 text-white',
+                      'placeholder:text-gray-500',
+                      selectedCliente && 'border-green-500/50 bg-green-500/10',
                     )}
                   />
                   {selectedCliente && (
@@ -364,8 +364,8 @@ export function CreateAbonoModalPremium({
                       size="icon"
                       onClick={() => {
                         setSelectedCliente(null)
-                        setValue("clienteId", "")
-                        setValue("clienteNombre", "")
+                        setValue('clienteId', '')
+                        setValue('clienteNombre', '')
                       }}
                       className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 hover:bg-white/10"
                     >
@@ -410,10 +410,10 @@ export function CreateAbonoModalPremium({
                             <Badge 
                               variant="outline" 
                               className={cn(
-                                "font-bold",
+                                'font-bold',
                                 cliente.pendiente > 100000 
-                                  ? "border-red-500/50 text-red-400" 
-                                  : "border-orange-500/50 text-orange-400"
+                                  ? 'border-red-500/50 text-red-400' 
+                                  : 'border-orange-500/50 text-orange-400',
                               )}
                             >
                               {formatearMonto(cliente.pendiente)}
@@ -434,9 +434,9 @@ export function CreateAbonoModalPremium({
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     className={cn(
-                      "p-4 rounded-xl border",
-                      "bg-gradient-to-br from-blue-500/10 to-purple-500/10",
-                      "border-blue-500/30"
+                      'p-4 rounded-xl border',
+                      'bg-gradient-to-br from-blue-500/10 to-purple-500/10',
+                      'border-blue-500/30',
                     )}
                   >
                     <div className="grid grid-cols-4 gap-4 text-center">
@@ -462,8 +462,8 @@ export function CreateAbonoModalPremium({
                         <p className="text-xs text-gray-400">Nuevo Saldo</p>
                         <motion.p 
                           className={cn(
-                            "text-lg font-bold",
-                            nuevoSaldo <= 0 ? "text-emerald-400" : "text-yellow-400"
+                            'text-lg font-bold',
+                            nuevoSaldo <= 0 ? 'text-emerald-400' : 'text-yellow-400',
                           )}
                           key={nuevoSaldo}
                           initial={{ scale: 0.8 }}
@@ -488,21 +488,21 @@ export function CreateAbonoModalPremium({
               </div>
 
               <div className={cn(
-                "p-5 rounded-2xl border",
-                "bg-gradient-to-br from-white/5 to-transparent",
-                "border-white/10"
+                'p-5 rounded-2xl border',
+                'bg-gradient-to-br from-white/5 to-transparent',
+                'border-white/10',
               )}>
                 {/* Input principal grande */}
                 <div className="relative mb-4">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-3xl text-gray-500">$</span>
                   <Input
                     type="number"
-                    {...form.register("monto", { valueAsNumber: true })}
+                    {...form.register('monto', { valueAsNumber: true })}
                     className={cn(
-                      "pl-12 h-20 text-4xl font-bold text-center",
-                      "bg-green-500/5 border-green-500/20 text-green-300",
-                      "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
-                      errors.monto && "border-red-500/50"
+                      'pl-12 h-20 text-4xl font-bold text-center',
+                      'bg-green-500/5 border-green-500/20 text-green-300',
+                      '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+                      errors.monto && 'border-red-500/50',
                     )}
                     placeholder="0"
                   />
@@ -512,10 +512,10 @@ export function CreateAbonoModalPremium({
                 {selectedCliente && selectedCliente.pendiente > 0 && (
                   <div className="flex gap-2 mb-4">
                     {[
-                      { label: "25%", value: 0.25 },
-                      { label: "50%", value: 0.5 },
-                      { label: "75%", value: 0.75 },
-                      { label: "100%", value: 1 },
+                      { label: '25%', value: 0.25 },
+                      { label: '50%', value: 0.5 },
+                      { label: '75%', value: 0.75 },
+                      { label: '100%', value: 1 },
                     ].map((opt) => (
                       <Button
                         key={opt.label}
@@ -524,8 +524,8 @@ export function CreateAbonoModalPremium({
                         size="sm"
                         onClick={() => setQuickMonto(opt.value)}
                         className={cn(
-                          "flex-1 border-white/10 hover:bg-white/10",
-                          porcentajePago >= opt.value * 100 && "bg-green-500/20 border-green-500/50 text-green-400"
+                          'flex-1 border-white/10 hover:bg-white/10',
+                          porcentajePago >= opt.value * 100 && 'bg-green-500/20 border-green-500/50 text-green-400',
                         )}
                       >
                         {opt.label}
@@ -543,8 +543,8 @@ export function CreateAbonoModalPremium({
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-400">Progreso del pago</span>
                       <span className={cn(
-                        "font-bold",
-                        porcentajePago >= 100 ? "text-emerald-400" : "text-green-400"
+                        'font-bold',
+                        porcentajePago >= 100 ? 'text-emerald-400' : 'text-green-400',
                       )}>
                         {porcentajePago.toFixed(1)}%
                       </span>
@@ -552,14 +552,14 @@ export function CreateAbonoModalPremium({
                     <div className="h-3 rounded-full bg-white/10 overflow-hidden">
                       <motion.div
                         className={cn(
-                          "h-full",
+                          'h-full',
                           porcentajePago >= 100 
-                            ? "bg-gradient-to-r from-emerald-500 to-teal-500" 
-                            : "bg-gradient-to-r from-green-500 to-emerald-500"
+                            ? 'bg-gradient-to-r from-emerald-500 to-teal-500' 
+                            : 'bg-gradient-to-r from-green-500 to-emerald-500',
                         )}
                         initial={{ width: 0 }}
                         animate={{ width: `${Math.min(100, porcentajePago)}%` }}
-                        transition={{ duration: 0.5, ease: "easeOut" }}
+                        transition={{ duration: 0.5, ease: 'easeOut' }}
                       />
                     </div>
                     {porcentajePago >= 100 && (
@@ -595,7 +595,7 @@ export function CreateAbonoModalPremium({
                   </Label>
                   <Input
                     type="date"
-                    {...form.register("fecha")}
+                    {...form.register('fecha')}
                     className="h-11 bg-white/5 border-white/10 text-white [color-scheme:dark]"
                   />
                 </div>
@@ -604,7 +604,7 @@ export function CreateAbonoModalPremium({
                 <div className="space-y-2">
                   <Label className="text-sm text-gray-400">Referencia (opcional)</Label>
                   <Input
-                    {...form.register("referencia")}
+                    {...form.register('referencia')}
                     placeholder="No. de transferencia, recibo, etc."
                     className="h-11 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
                   />
@@ -619,18 +619,18 @@ export function CreateAbonoModalPremium({
                     <motion.button
                       key={metodo.id}
                       type="button"
-                      onClick={() => setValue("metodoPago", metodo.id as "efectivo" | "transferencia" | "deposito")}
+                      onClick={() => setValue('metodoPago', metodo.id as 'efectivo' | 'transferencia' | 'deposito')}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       className={cn(
-                        "p-4 rounded-xl border text-center transition-all",
+                        'p-4 rounded-xl border text-center transition-all',
                         metodoPago === metodo.id
-                          ? metodo.color === "green"
-                            ? "bg-green-500/20 border-green-500 text-green-400"
-                            : metodo.color === "blue"
-                            ? "bg-blue-500/20 border-blue-500 text-blue-400"
-                            : "bg-purple-500/20 border-purple-500 text-purple-400"
-                          : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+                          ? metodo.color === 'green'
+                            ? 'bg-green-500/20 border-green-500 text-green-400'
+                            : metodo.color === 'blue'
+                            ? 'bg-blue-500/20 border-blue-500 text-blue-400'
+                            : 'bg-purple-500/20 border-purple-500 text-purple-400'
+                          : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10',
                       )}
                     >
                       <metodo.icono className="w-6 h-6 mx-auto mb-2" />
@@ -651,24 +651,24 @@ export function CreateAbonoModalPremium({
                     <motion.button
                       key={banco.id}
                       type="button"
-                      onClick={() => setValue("bancoDestino", banco.id as "boveda_monte" | "profit" | "utilidades")}
+                      onClick={() => setValue('bancoDestino', banco.id as 'boveda_monte' | 'profit' | 'utilidades')}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       className={cn(
-                        "p-3 rounded-xl border text-center transition-all",
+                        'p-3 rounded-xl border text-center transition-all',
                         bancoDestino === banco.id
-                          ? banco.color === "blue"
-                            ? "bg-blue-500/20 border-blue-500"
-                            : banco.color === "green"
-                            ? "bg-green-500/20 border-green-500"
-                            : "bg-purple-500/20 border-purple-500"
-                          : "bg-white/5 border-white/10 hover:bg-white/10"
+                          ? banco.color === 'blue'
+                            ? 'bg-blue-500/20 border-blue-500'
+                            : banco.color === 'green'
+                            ? 'bg-green-500/20 border-green-500'
+                            : 'bg-purple-500/20 border-purple-500'
+                          : 'bg-white/5 border-white/10 hover:bg-white/10',
                       )}
                     >
                       <span className="text-2xl mb-1 block">{banco.icono}</span>
                       <p className={cn(
-                        "text-xs font-medium",
-                        bancoDestino === banco.id ? "text-white" : "text-gray-400"
+                        'text-xs font-medium',
+                        bancoDestino === banco.id ? 'text-white' : 'text-gray-400',
                       )}>
                         {banco.nombre}
                       </p>
@@ -681,7 +681,7 @@ export function CreateAbonoModalPremium({
               <div className="space-y-2">
                 <Label className="text-sm text-gray-400">Concepto (opcional)</Label>
                 <Textarea
-                  {...form.register("concepto")}
+                  {...form.register('concepto')}
                   placeholder="Notas adicionales sobre el abono..."
                   rows={2}
                   className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 resize-none"
@@ -694,9 +694,9 @@ export function CreateAbonoModalPremium({
               <motion.div 
                 variants={itemVariants}
                 className={cn(
-                  "p-5 rounded-2xl border",
-                  "bg-gradient-to-br from-green-500/10 to-emerald-500/10",
-                  "border-green-500/30"
+                  'p-5 rounded-2xl border',
+                  'bg-gradient-to-br from-green-500/10 to-emerald-500/10',
+                  'border-green-500/30',
                 )}
               >
                 <div className="flex items-center justify-between mb-4">
@@ -734,8 +734,8 @@ export function CreateAbonoModalPremium({
                     <p className="text-xs text-gray-400 mb-1">Saldo Después</p>
                     <motion.p 
                       className={cn(
-                        "text-xl font-bold",
-                        nuevoSaldo <= 0 ? "text-emerald-400" : "text-yellow-400"
+                        'text-xl font-bold',
+                        nuevoSaldo <= 0 ? 'text-emerald-400' : 'text-yellow-400',
                       )}
                       key={nuevoSaldo}
                       initial={{ scale: 0.5, opacity: 0 }}
@@ -759,9 +759,9 @@ export function CreateAbonoModalPremium({
 
           {/* ===== FOOTER ===== */}
           <div className={cn(
-            "shrink-0 h-20 border-t border-white/10",
-            "bg-gradient-to-r from-black/50 via-white/5 to-black/50",
-            "px-6 flex items-center justify-between"
+            'shrink-0 h-20 border-t border-white/10',
+            'bg-gradient-to-r from-black/50 via-white/5 to-black/50',
+            'px-6 flex items-center justify-between',
           )}>
             <Button
               type="button"
@@ -777,12 +777,12 @@ export function CreateAbonoModalPremium({
               type="submit"
               disabled={isSubmitting || !selectedCliente || monto <= 0}
               className={cn(
-                "min-w-[180px]",
-                "bg-gradient-to-r from-green-600 to-emerald-600",
-                "hover:from-green-500 hover:to-emerald-500",
-                "text-white font-bold",
-                "shadow-[0_0_30px_rgba(34,197,94,0.4)]",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
+                'min-w-[180px]',
+                'bg-gradient-to-r from-green-600 to-emerald-600',
+                'hover:from-green-500 hover:to-emerald-500',
+                'text-white font-bold',
+                'shadow-[0_0_30px_rgba(34,197,94,0.4)]',
+                'disabled:opacity-50 disabled:cursor-not-allowed',
               )}
             >
               {isSubmitting ? (

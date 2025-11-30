@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { useEffect, useRef, useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Building2, CreditCard, ArrowRightLeft, DollarSign } from "lucide-react"
+import { useEffect, useRef, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Building2, CreditCard, ArrowRightLeft, DollarSign } from 'lucide-react'
 
 interface Transaction {
   id: string
@@ -10,7 +10,7 @@ interface Transaction {
   to: string
   amount: number
   time: number
-  type: "ingreso" | "egreso" | "transferencia"
+  type: 'ingreso' | 'egreso' | 'transferencia'
   x: number
   y: number
   vx: number
@@ -37,7 +37,7 @@ interface Ripple {
 
 interface FinancialRiverFlowProps {
   accounts?: BankAccount[]
-  transactions?: Omit<Transaction, "x" | "y" | "vx" | "vy" | "radius" | "life">[]
+  transactions?: Omit<Transaction, 'x' | 'y' | 'vx' | 'vy' | 'radius' | 'life'>[]
   width?: number
   height?: number
   className?: string
@@ -48,7 +48,7 @@ export function FinancialRiverFlow({
   transactions,
   width = 900,
   height = 600,
-  className = ""
+  className = '',
 }: FinancialRiverFlowProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationFrameRef = useRef<number | null>(null)
@@ -58,16 +58,16 @@ export function FinancialRiverFlow({
 
   // Datos por defecto
   const defaultAccounts: BankAccount[] = [
-    { id: "main", name: "Cuenta Principal", balance: 1250000, x: 150, y: 300, color: "#3b82f6", ripples: [] },
-    { id: "operations", name: "Operaciones", balance: 380000, x: 450, y: 200, color: "#10b981", ripples: [] },
-    { id: "savings", name: "Ahorros", balance: 520000, x: 450, y: 400, color: "#f59e0b", ripples: [] },
-    { id: "investment", name: "Inversiones", balance: 890000, x: 750, y: 300, color: "#8b5cf6", ripples: [] }
+    { id: 'main', name: 'Cuenta Principal', balance: 1250000, x: 150, y: 300, color: '#3b82f6', ripples: [] },
+    { id: 'operations', name: 'Operaciones', balance: 380000, x: 450, y: 200, color: '#10b981', ripples: [] },
+    { id: 'savings', name: 'Ahorros', balance: 520000, x: 450, y: 400, color: '#f59e0b', ripples: [] },
+    { id: 'investment', name: 'Inversiones', balance: 890000, x: 750, y: 300, color: '#8b5cf6', ripples: [] },
   ]
 
   const bankAccounts = accounts || defaultAccounts
 
   // Crear transacción visual
-  const createTransaction = (tx: Omit<Transaction, "x" | "y" | "vx" | "vy" | "radius" | "life">) => {
+  const createTransaction = (tx: Omit<Transaction, 'x' | 'y' | 'vx' | 'vy' | 'radius' | 'life'>) => {
     const fromAccount = bankAccounts.find(a => a.id === tx.from)
     const toAccount = bankAccounts.find(a => a.id === tx.to)
     
@@ -83,7 +83,7 @@ export function FinancialRiverFlow({
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed,
       radius: Math.log(tx.amount) * 2 + 5,
-      life: 100
+      life: 100,
     })
 
     // Crear ripple en cuenta origen
@@ -100,14 +100,14 @@ export function FinancialRiverFlow({
         to = accounts[Math.floor(Math.random() * accounts.length)]
       }
 
-      const types: ("ingreso" | "egreso" | "transferencia")[] = ["ingreso", "egreso", "transferencia"]
+      const types: ('ingreso' | 'egreso' | 'transferencia')[] = ['ingreso', 'egreso', 'transferencia']
       createTransaction({
         id: `tx-${Date.now()}`,
         from,
         to,
         amount: 1000 + Math.random() * 50000,
         time: Date.now(),
-        type: types[Math.floor(Math.random() * types.length)]
+        type: types[Math.floor(Math.random() * types.length)],
       })
     }, 2000)
 
@@ -119,7 +119,7 @@ export function FinancialRiverFlow({
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const ctx = canvas.getContext("2d")
+    const ctx = canvas.getContext('2d')
     if (!ctx) return
 
     const animate = () => {
@@ -127,9 +127,9 @@ export function FinancialRiverFlow({
 
       // Fondo con gradiente de agua
       const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
-      bgGradient.addColorStop(0, "rgba(10, 20, 40, 1)")
-      bgGradient.addColorStop(0.5, "rgba(20, 30, 60, 1)")
-      bgGradient.addColorStop(1, "rgba(10, 20, 40, 1)")
+      bgGradient.addColorStop(0, 'rgba(10, 20, 40, 1)')
+      bgGradient.addColorStop(0.5, 'rgba(20, 30, 60, 1)')
+      bgGradient.addColorStop(1, 'rgba(10, 20, 40, 1)')
       ctx.fillStyle = bgGradient
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -138,7 +138,7 @@ export function FinancialRiverFlow({
         bankAccounts.slice(i + 1).forEach(toAccount => {
           const gradient = ctx.createLinearGradient(
             fromAccount.x, fromAccount.y,
-            toAccount.x, toAccount.y
+            toAccount.x, toAccount.y,
           )
           gradient.addColorStop(0, `${fromAccount.color}15`)
           gradient.addColorStop(0.5, `${fromAccount.color}08`)
@@ -146,7 +146,7 @@ export function FinancialRiverFlow({
 
           ctx.strokeStyle = gradient
           ctx.lineWidth = 40
-          ctx.lineCap = "round"
+          ctx.lineCap = 'round'
 
           // Curva Bézier para la corriente
           const cp1x = fromAccount.x + (toAccount.x - fromAccount.x) * 0.3
@@ -214,7 +214,7 @@ export function FinancialRiverFlow({
         // Gradiente de la cuenta
         const accountGradient = ctx.createRadialGradient(
           account.x - 15, account.y - 15, 0,
-          account.x, account.y, radius
+          account.x, account.y, radius,
         )
         accountGradient.addColorStop(0, `${account.color}ff`)
         accountGradient.addColorStop(1, `${account.color}cc`)
@@ -225,18 +225,18 @@ export function FinancialRiverFlow({
         ctx.fill()
 
         // Borde
-        ctx.strokeStyle = isHovered ? "#ffffff" : `${account.color}80`
+        ctx.strokeStyle = isHovered ? '#ffffff' : `${account.color}80`
         ctx.lineWidth = isHovered ? 4 : 2
         ctx.stroke()
 
         ctx.shadowBlur = 0
 
         // Icono
-        ctx.fillStyle = "#ffffff"
-        ctx.font = "30px sans-serif"
-        ctx.textAlign = "center"
-        ctx.textBaseline = "middle"
-        ctx.fillText("💰", account.x, account.y)
+        ctx.fillStyle = '#ffffff'
+        ctx.font = '30px sans-serif'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillText('💰', account.x, account.y)
       })
 
       // Actualizar y dibujar transacciones (burbujas)
@@ -272,8 +272,8 @@ export function FinancialRiverFlow({
         }
 
         // Color según tipo
-        const color = tx.type === "ingreso" ? "#10b981" :
-                     tx.type === "egreso" ? "#ef4444" : "#3b82f6"
+        const color = tx.type === 'ingreso' ? '#10b981' :
+                     tx.type === 'egreso' ? '#ef4444' : '#3b82f6'
 
         // Gradiente de la burbuja
         const bubbleGradient = ctx.createRadialGradient(
@@ -282,7 +282,7 @@ export function FinancialRiverFlow({
           0,
           tx.x,
           tx.y,
-          tx.radius
+          tx.radius,
         )
         bubbleGradient.addColorStop(0, `${color}ff`)
         bubbleGradient.addColorStop(0.7, `${color}cc`)
@@ -301,10 +301,10 @@ export function FinancialRiverFlow({
           0,
           tx.x - tx.radius * 0.4,
           tx.y - tx.radius * 0.4,
-          tx.radius * 0.6
+          tx.radius * 0.6,
         )
-        highlightGradient.addColorStop(0, "rgba(255, 255, 255, 0.6)")
-        highlightGradient.addColorStop(1, "rgba(255, 255, 255, 0)")
+        highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)')
+        highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
 
         ctx.beginPath()
         ctx.arc(tx.x - tx.radius * 0.3, tx.y - tx.radius * 0.3, tx.radius * 0.4, 0, Math.PI * 2)
@@ -313,10 +313,10 @@ export function FinancialRiverFlow({
 
         // Monto en la burbuja
         if (tx.radius > 10) {
-          ctx.fillStyle = "#ffffff"
-          ctx.font = "bold 10px sans-serif"
-          ctx.textAlign = "center"
-          ctx.textBaseline = "middle"
+          ctx.fillStyle = '#ffffff'
+          ctx.font = 'bold 10px sans-serif'
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
           ctx.fillText(`$${Math.floor(tx.amount / 1000)}k`, tx.x, tx.y)
         }
 
@@ -366,7 +366,7 @@ export function FinancialRiverFlow({
         animate={{ opacity: 1 }}
         className="rounded-2xl cursor-pointer"
         style={{
-          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)"
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
         }}
         onMouseMove={handleMouseMove}
       />

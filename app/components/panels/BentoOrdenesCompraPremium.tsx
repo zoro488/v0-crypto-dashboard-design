@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 📦 BENTO ÓRDENES DE COMPRA PREMIUM - Panel de OC con Componentes 3D
@@ -12,26 +12,26 @@
  * - Estados visuales dinámicos
  */
 
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   ShoppingCart, Plus, TrendingUp, AlertCircle, CheckCircle2, Clock, Package,
   Building2, DollarSign, Calendar, Search, Filter, Download, Eye, Edit,
   ArrowUpRight, ArrowDownRight, Truck, BarChart3, PieChart as PieChartIcon,
   CreditCard, Receipt, RefreshCw, ChevronRight, Sparkles, Activity,
-  type LucideIcon
-} from "lucide-react"
-import { Button } from "@/app/components/ui/button"
-import { Badge } from "@/app/components/ui/badge"
-import { Input } from "@/app/components/ui/input"
-import { Skeleton } from "@/app/components/ui/skeleton"
-import { useState, useEffect, useMemo } from "react"
-import { suscribirOrdenesCompra } from "@/app/lib/firebase/firestore-service"
-import type { OrdenCompra, FirestoreTimestamp } from "@/app/types"
-import { CreateOrdenCompraModalPremium } from "@/app/components/modals/CreateOrdenCompraModalPremium"
+  type LucideIcon,
+} from 'lucide-react'
+import { Button } from '@/app/components/ui/button'
+import { Badge } from '@/app/components/ui/badge'
+import { Input } from '@/app/components/ui/input'
+import { Skeleton } from '@/app/components/ui/skeleton'
+import { useState, useEffect, useMemo } from 'react'
+import { suscribirOrdenesCompra } from '@/app/lib/firebase/firestore-service'
+import type { OrdenCompra, FirestoreTimestamp } from '@/app/types'
+import { CreateOrdenCompraModalPremium } from '@/app/components/modals/CreateOrdenCompraModalPremium'
 import { 
   AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, 
-  Tooltip, PieChart, Pie, Cell, CartesianGrid, Legend, ComposedChart, Line
-} from "recharts"
+  Tooltip, PieChart, Pie, Cell, CartesianGrid, Legend, ComposedChart, Line,
+} from 'recharts'
 
 // Componentes 3D Premium
 import { 
@@ -41,32 +41,32 @@ import {
   PulseIndicator,
   MiniChart3D,
   GradientText,
-  VARIANT_COLORS 
-} from "@/app/components/3d/PremiumPanelComponents"
+  VARIANT_COLORS, 
+} from '@/app/components/3d/PremiumPanelComponents'
 
 // ============================================================================
 // HELPERS
 // ============================================================================
 function formatearFecha(fecha: string | FirestoreTimestamp | undefined): string {
-  if (!fecha) return "-"
+  if (!fecha) return '-'
   try {
-    if (typeof fecha === "object" && "seconds" in fecha) {
-      return new Date(fecha.seconds * 1000).toLocaleDateString("es-MX", {
-        day: "2-digit", month: "short", year: "numeric"
+    if (typeof fecha === 'object' && 'seconds' in fecha) {
+      return new Date(fecha.seconds * 1000).toLocaleDateString('es-MX', {
+        day: '2-digit', month: 'short', year: 'numeric',
       })
     }
-    return new Date(fecha).toLocaleDateString("es-MX", {
-      day: "2-digit", month: "short", year: "numeric"
+    return new Date(fecha).toLocaleDateString('es-MX', {
+      day: '2-digit', month: 'short', year: 'numeric',
     })
   } catch {
-    return "-"
+    return '-'
   }
 }
 
 function formatearMoneda(valor: number | undefined): string {
-  return new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
+  return new Intl.NumberFormat('es-MX', {
+    style: 'currency',
+    currency: 'MXN',
     minimumFractionDigits: 0,
   }).format(valor ?? 0)
 }
@@ -90,29 +90,29 @@ const ESTADO_CONFIG: Record<string, {
     bgColor: 'bg-emerald-500/20 border-emerald-500/30', 
     icon: CheckCircle2, 
     label: 'Pagado',
-    variant: 'success'
+    variant: 'success',
   },
   parcial: { 
     color: 'text-amber-300', 
     bgColor: 'bg-amber-500/20 border-amber-500/30', 
     icon: Clock, 
     label: 'Parcial',
-    variant: 'warning'
+    variant: 'warning',
   },
   pendiente: { 
     color: 'text-rose-300', 
     bgColor: 'bg-rose-500/20 border-rose-500/30', 
     icon: AlertCircle, 
     label: 'Pendiente',
-    variant: 'danger'
+    variant: 'danger',
   },
   entregado: { 
     color: 'text-cyan-300', 
     bgColor: 'bg-cyan-500/20 border-cyan-500/30', 
     icon: Truck, 
     label: 'Entregado',
-    variant: 'info'
-  }
+    variant: 'info',
+  },
 }
 
 const CHART_COLORS = ['#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#8b5cf6', '#3b82f6']
@@ -130,7 +130,7 @@ function StatCardPremium({
   variant = 'primary',
   trend,
   trendValue,
-  miniChartData
+  miniChartData,
 }: { 
   title: string
   value: string | number
@@ -192,7 +192,7 @@ function StatCardPremium({
 // Tarjeta de Orden de Compra Premium
 function OrdenCompraCardPremium({ 
   orden, 
-  onView 
+  onView, 
 }: { 
   orden: OrdenCompra
   onView: (oc: OrdenCompra) => void 
@@ -275,7 +275,7 @@ function OrdenCompraCardPremium({
                 style={{ backgroundColor: colors.primary }}
                 initial={{ width: 0 }}
                 animate={{ width: `${progreso}%` }}
-                transition={{ duration: 1, ease: "easeOut" }}
+                transition={{ duration: 1, ease: 'easeOut' }}
               />
             </div>
           </div>
@@ -374,7 +374,7 @@ export function BentoOrdenesCompraPremium() {
     if (searchTerm) {
       filtered = filtered.filter(oc => 
         oc.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        oc.distribuidor?.toLowerCase().includes(searchTerm.toLowerCase())
+        oc.distribuidor?.toLowerCase().includes(searchTerm.toLowerCase()),
       )
     }
     
@@ -480,7 +480,7 @@ export function BentoOrdenesCompraPremium() {
           value={formatearMoneda(metricas.pendientePago)}
           subtitle="Por pagar"
           icon={Receipt}
-          variant={metricas.pendientePago > 0 ? "warning" : "success"}
+          variant={metricas.pendientePago > 0 ? 'warning' : 'success'}
         />
       </div>
       
@@ -558,7 +558,7 @@ export function BentoOrdenesCompraPremium() {
               {['todos', 'pendiente', 'parcial', 'pagado', 'entregado'].map((estado) => (
                 <Button
                   key={estado}
-                  variant={filtroEstado === estado ? "default" : "ghost"}
+                  variant={filtroEstado === estado ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setFiltroEstado(estado)}
                   className={`
@@ -630,8 +630,8 @@ export function BentoOrdenesCompraPremium() {
               hidden: { opacity: 0 },
               visible: { 
                 opacity: 1,
-                transition: { staggerChildren: 0.1 }
-              }
+                transition: { staggerChildren: 0.1 },
+              },
             }}
           >
             {ordenesFiltradas.map((orden, index) => (
@@ -639,7 +639,7 @@ export function BentoOrdenesCompraPremium() {
                 key={orden.id || index}
                 variants={{
                   hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0 }
+                  visible: { opacity: 1, y: 0 },
                 }}
               >
                 <OrdenCompraCardPremium orden={orden} onView={handleViewOrden} />

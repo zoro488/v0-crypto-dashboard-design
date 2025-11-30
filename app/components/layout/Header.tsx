@@ -1,19 +1,19 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Search, Bell, ChevronRight, PanelLeftClose, Sun, Moon, Globe, Menu, Plus } from "lucide-react"
-import { Button } from "@/app/components/ui/button"
-import { Input } from "@/app/components/ui/input"
-import { Badge } from "@/app/components/ui/badge"
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { Search, Bell, ChevronRight, PanelLeftClose, Sun, Moon, Globe, Menu, Plus } from 'lucide-react'
+import { Button } from '@/app/components/ui/button'
+import { Input } from '@/app/components/ui/input'
+import { Badge } from '@/app/components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/app/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar"
+} from '@/app/components/ui/dropdown-menu'
+import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar'
 
 interface HeaderProps {
   currentPanel: string
@@ -21,12 +21,12 @@ interface HeaderProps {
 }
 
 export default function Header({ currentPanel, onToggleSidebar }: HeaderProps) {
-  const [theme, setTheme] = useState<"dark" | "light">("dark")
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const [searchOpen, setSearchOpen] = useState(false)
 
   const breadcrumbs = [
-    { label: "Inicio", href: "#" },
-    { label: currentPanel.charAt(0).toUpperCase() + currentPanel.slice(1), href: "#" },
+    { label: 'Inicio', href: '#' },
+    { label: currentPanel.charAt(0).toUpperCase() + currentPanel.slice(1), href: '#' },
   ]
 
   return (
@@ -66,7 +66,7 @@ export default function Header({ currentPanel, onToggleSidebar }: HeaderProps) {
             {breadcrumbs.map((crumb, idx) => (
               <div key={idx} className="flex items-center gap-2">
                 {idx > 0 && <ChevronRight className="h-4 w-4 text-slate-600" />}
-                <span className={idx === breadcrumbs.length - 1 ? "text-white font-semibold" : "text-slate-500"}>
+                <span className={idx === breadcrumbs.length - 1 ? 'text-white font-semibold' : 'text-slate-500'}>
                   {crumb.label}
                 </span>
               </div>
@@ -123,9 +123,9 @@ export default function Header({ currentPanel, onToggleSidebar }: HeaderProps) {
             variant="ghost"
             size="icon"
             className="hidden xs:flex text-slate-400 hover:text-white hover:bg-white/5 h-8 w-8 sm:h-9 sm:w-9"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
           >
-            {theme === "dark" ? <Sun className="h-4 w-4 sm:h-5 sm:w-5" /> : <Moon className="h-4 w-4 sm:h-5 sm:w-5" />}
+            {theme === 'dark' ? <Sun className="h-4 w-4 sm:h-5 sm:w-5" /> : <Moon className="h-4 w-4 sm:h-5 sm:w-5" />}
           </Button>
 
           {/* Language - Solo tablet+ */}
@@ -157,8 +157,8 @@ export default function Header({ currentPanel, onToggleSidebar }: HeaderProps) {
               <DropdownMenuItem className="text-white">Configuración</DropdownMenuItem>
               {/* Opciones adicionales para móvil */}
               <DropdownMenuSeparator className="bg-white/10 sm:hidden" />
-              <DropdownMenuItem className="text-white sm:hidden" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
-                {theme === "dark" ? "Modo Claro" : "Modo Oscuro"}
+              <DropdownMenuItem className="text-white sm:hidden" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+                {theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-white/10" />
               <DropdownMenuItem className="text-red-400">Cerrar Sesión</DropdownMenuItem>

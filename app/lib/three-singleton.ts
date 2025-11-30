@@ -113,7 +113,7 @@ export function disposeObject3D(obj: THREE.Object3D): void {
 export function handleContextLost(
   renderer: THREE.WebGLRenderer,
   onLost?: () => void,
-  onRestored?: () => void
+  onRestored?: () => void,
 ): () => void {
   const canvas = renderer.domElement
 

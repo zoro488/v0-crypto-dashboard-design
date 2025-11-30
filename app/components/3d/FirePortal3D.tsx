@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 /**
  * 🔥 FirePortal3D - Portal de Fuego Estilo Dr. Strange
@@ -11,18 +11,18 @@
  * - Transiciones de entrada/salida
  */
 
-import { useRef, useMemo, useState, useEffect, Suspense } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { useRef, useMemo, useState, useEffect, Suspense } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { 
   Points, 
   PointMaterial, 
   shaderMaterial,
-  Environment
-} from '@react-three/drei';
-import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing';
-import { BlendFunction } from 'postprocessing';
-import { motion, AnimatePresence } from 'framer-motion';
-import * as THREE from 'three';
+  Environment,
+} from '@react-three/drei'
+import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing'
+import { BlendFunction } from 'postprocessing'
+import { motion, AnimatePresence } from 'framer-motion'
+import * as THREE from 'three'
 
 // ============================================================================
 // TIPOS
@@ -49,7 +49,7 @@ const PORTAL_COLORS: Record<string, { inner: string; outer: string; particles: s
   void: { inner: '#7c4dff', outer: '#651fff', particles: '#b388ff', glow: '#a855f7' },
   gold: { inner: '#ffd700', outer: '#ff8f00', particles: '#ffecb3', glow: '#ffc107' },
   emerald: { inner: '#00e676', outer: '#00c853', particles: '#69f0ae', glow: '#1de9b6' },
-};
+}
 
 // ============================================================================
 // PARTÍCULAS DE FUEGO
@@ -64,71 +64,71 @@ interface FireParticlesProps {
 }
 
 function FireParticles({ count = 2000, radius = 2, speed = 1, color, state }: FireParticlesProps) {
-  const pointsRef = useRef<THREE.Points>(null);
+  const pointsRef = useRef<THREE.Points>(null)
   
   // Generar posiciones y velocidades iniciales
   const { positions, velocities, lifetimes, sizes } = useMemo(() => {
-    const pos = new Float32Array(count * 3);
-    const vel = new Float32Array(count * 3);
-    const life = new Float32Array(count);
-    const siz = new Float32Array(count);
+    const pos = new Float32Array(count * 3)
+    const vel = new Float32Array(count * 3)
+    const life = new Float32Array(count)
+    const siz = new Float32Array(count)
     
     for (let i = 0; i < count; i++) {
       // Posición en anillo
-      const angle = (i / count) * Math.PI * 2;
-      const r = radius * (0.8 + Math.random() * 0.4);
-      pos[i * 3] = Math.cos(angle) * r;
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 0.5;
-      pos[i * 3 + 2] = Math.sin(angle) * r;
+      const angle = (i / count) * Math.PI * 2
+      const r = radius * (0.8 + Math.random() * 0.4)
+      pos[i * 3] = Math.cos(angle) * r
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 0.5
+      pos[i * 3 + 2] = Math.sin(angle) * r
       
       // Velocidad de rotación y caos
-      vel[i * 3] = (Math.random() - 0.5) * 0.02;
-      vel[i * 3 + 1] = Math.random() * 0.02;
-      vel[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
+      vel[i * 3] = (Math.random() - 0.5) * 0.02
+      vel[i * 3 + 1] = Math.random() * 0.02
+      vel[i * 3 + 2] = (Math.random() - 0.5) * 0.02
       
-      life[i] = Math.random();
-      siz[i] = 0.5 + Math.random() * 1.5;
+      life[i] = Math.random()
+      siz[i] = 0.5 + Math.random() * 1.5
     }
     
-    return { positions: pos, velocities: vel, lifetimes: life, sizes: siz };
-  }, [count, radius]);
+    return { positions: pos, velocities: vel, lifetimes: life, sizes: siz }
+  }, [count, radius])
 
   useFrame((frameState, delta) => {
-    if (!pointsRef.current) return;
+    if (!pointsRef.current) return
     
-    const time = frameState.clock.getElapsedTime();
-    const positions = pointsRef.current.geometry.attributes.position.array as Float32Array;
-    const speedMultiplier = state === 'active' ? speed : state === 'opening' ? speed * 2 : 0.2;
+    const time = frameState.clock.getElapsedTime()
+    const positions = pointsRef.current.geometry.attributes.position.array as Float32Array
+    const speedMultiplier = state === 'active' ? speed : state === 'opening' ? speed * 2 : 0.2
     
     for (let i = 0; i < count; i++) {
-      const i3 = i * 3;
-      const angle = Math.atan2(positions[i3 + 2], positions[i3]);
-      const r = Math.sqrt(positions[i3] ** 2 + positions[i3 + 2] ** 2);
+      const i3 = i * 3
+      const angle = Math.atan2(positions[i3 + 2], positions[i3])
+      const r = Math.sqrt(positions[i3] ** 2 + positions[i3 + 2] ** 2)
       
       // Rotación + movimiento caótico
-      const newAngle = angle + delta * speedMultiplier * (1 + Math.sin(time + i) * 0.3);
-      positions[i3] = Math.cos(newAngle) * r + velocities[i3] * Math.sin(time * 3 + i);
-      positions[i3 + 1] += velocities[i3 + 1] * (1 + Math.sin(time * 5 + i) * 0.5);
-      positions[i3 + 2] = Math.sin(newAngle) * r + velocities[i3 + 2] * Math.cos(time * 3 + i);
+      const newAngle = angle + delta * speedMultiplier * (1 + Math.sin(time + i) * 0.3)
+      positions[i3] = Math.cos(newAngle) * r + velocities[i3] * Math.sin(time * 3 + i)
+      positions[i3 + 1] += velocities[i3 + 1] * (1 + Math.sin(time * 5 + i) * 0.5)
+      positions[i3 + 2] = Math.sin(newAngle) * r + velocities[i3 + 2] * Math.cos(time * 3 + i)
       
       // Reset cuando sale del rango
       if (positions[i3 + 1] > 0.5) {
-        positions[i3 + 1] = -0.5;
-        lifetimes[i] = Math.random();
+        positions[i3 + 1] = -0.5
+        lifetimes[i] = Math.random()
       }
       
       // Mantener en el anillo
-      const currentR = Math.sqrt(positions[i3] ** 2 + positions[i3 + 2] ** 2);
+      const currentR = Math.sqrt(positions[i3] ** 2 + positions[i3 + 2] ** 2)
       if (currentR > radius * 1.3 || currentR < radius * 0.7) {
-        const targetR = radius * (0.9 + Math.random() * 0.2);
-        positions[i3] *= targetR / currentR;
-        positions[i3 + 2] *= targetR / currentR;
+        const targetR = radius * (0.9 + Math.random() * 0.2)
+        positions[i3] *= targetR / currentR
+        positions[i3 + 2] *= targetR / currentR
       }
     }
     
-    pointsRef.current.geometry.attributes.position.needsUpdate = true;
-    pointsRef.current.rotation.z = time * 0.1;
-  });
+    pointsRef.current.geometry.attributes.position.needsUpdate = true
+    pointsRef.current.rotation.z = time * 0.1
+  })
 
   return (
     <Points ref={pointsRef} positions={positions} stride={3}>
@@ -142,7 +142,7 @@ function FireParticles({ count = 2000, radius = 2, speed = 1, color, state }: Fi
         opacity={state === 'idle' ? 0 : 0.8}
       />
     </Points>
-  );
+  )
 }
 
 // ============================================================================
@@ -166,40 +166,40 @@ function EnergyRing({
   rotationSpeed = 1, 
   segments = 128,
   state,
-  delay = 0
+  delay = 0,
 }: EnergyRingProps) {
-  const ringRef = useRef<THREE.Mesh>(null);
-  const materialRef = useRef<THREE.MeshBasicMaterial>(null);
-  const [scale, setScale] = useState(state === 'idle' ? 0 : 1);
+  const ringRef = useRef<THREE.Mesh>(null)
+  const materialRef = useRef<THREE.MeshBasicMaterial>(null)
+  const [scale, setScale] = useState(state === 'idle' ? 0 : 1)
   
   useEffect(() => {
     if (state === 'opening') {
-      const timer = setTimeout(() => setScale(1), delay);
-      return () => clearTimeout(timer);
+      const timer = setTimeout(() => setScale(1), delay)
+      return () => clearTimeout(timer)
     } else if (state === 'closing') {
-      setScale(0);
+      setScale(0)
     } else if (state === 'idle') {
-      setScale(0);
+      setScale(0)
     }
-  }, [state, delay]);
+  }, [state, delay])
 
   useFrame((frameState, delta) => {
-    if (!ringRef.current) return;
+    if (!ringRef.current) return
     
-    const time = frameState.clock.getElapsedTime();
-    ringRef.current.rotation.z += delta * rotationSpeed;
+    const time = frameState.clock.getElapsedTime()
+    ringRef.current.rotation.z += delta * rotationSpeed
     
     // Pulsación
-    const pulse = 1 + Math.sin(time * 3 + delay) * 0.05;
-    const targetScale = state === 'idle' ? 0 : state === 'closing' ? 0 : pulse;
-    ringRef.current.scale.setScalar(THREE.MathUtils.lerp(ringRef.current.scale.x, targetScale, 0.1));
+    const pulse = 1 + Math.sin(time * 3 + delay) * 0.05
+    const targetScale = state === 'idle' ? 0 : state === 'closing' ? 0 : pulse
+    ringRef.current.scale.setScalar(THREE.MathUtils.lerp(ringRef.current.scale.x, targetScale, 0.1))
     
     // Opacidad
     if (materialRef.current) {
-      const targetOpacity = state === 'active' || state === 'opening' ? 0.9 : 0;
-      materialRef.current.opacity = THREE.MathUtils.lerp(materialRef.current.opacity, targetOpacity, 0.1);
+      const targetOpacity = state === 'active' || state === 'opening' ? 0.9 : 0
+      materialRef.current.opacity = THREE.MathUtils.lerp(materialRef.current.opacity, targetOpacity, 0.1)
     }
-  });
+  })
 
   return (
     <mesh ref={ringRef} scale={0}>
@@ -212,7 +212,7 @@ function EnergyRing({
         blending={THREE.AdditiveBlending}
       />
     </mesh>
-  );
+  )
 }
 
 // ============================================================================
@@ -220,63 +220,63 @@ function EnergyRing({
 // ============================================================================
 
 function FloatingRunes({ radius, color, state }: { radius: number; color: string; state: PortalState }) {
-  const groupRef = useRef<THREE.Group>(null);
-  const runeCount = 12;
+  const groupRef = useRef<THREE.Group>(null)
+  const runeCount = 12
   
   // Geometrías de runas simplificadas
   const runeGeometries = useMemo(() => {
     return Array.from({ length: runeCount }, () => {
-      const shape = new THREE.Shape();
-      const type = Math.floor(Math.random() * 3);
+      const shape = new THREE.Shape()
+      const type = Math.floor(Math.random() * 3)
       
       if (type === 0) {
         // Triángulo
-        shape.moveTo(0, 0.15);
-        shape.lineTo(-0.1, -0.1);
-        shape.lineTo(0.1, -0.1);
-        shape.closePath();
+        shape.moveTo(0, 0.15)
+        shape.lineTo(-0.1, -0.1)
+        shape.lineTo(0.1, -0.1)
+        shape.closePath()
       } else if (type === 1) {
         // Diamante
-        shape.moveTo(0, 0.15);
-        shape.lineTo(-0.08, 0);
-        shape.lineTo(0, -0.15);
-        shape.lineTo(0.08, 0);
-        shape.closePath();
+        shape.moveTo(0, 0.15)
+        shape.lineTo(-0.08, 0)
+        shape.lineTo(0, -0.15)
+        shape.lineTo(0.08, 0)
+        shape.closePath()
       } else {
         // Línea con cruz
-        shape.moveTo(-0.05, 0.1);
-        shape.lineTo(0.05, 0.1);
-        shape.lineTo(0.05, -0.1);
-        shape.lineTo(-0.05, -0.1);
-        shape.closePath();
+        shape.moveTo(-0.05, 0.1)
+        shape.lineTo(0.05, 0.1)
+        shape.lineTo(0.05, -0.1)
+        shape.lineTo(-0.05, -0.1)
+        shape.closePath()
       }
       
-      return new THREE.ShapeGeometry(shape);
-    });
-  }, []);
+      return new THREE.ShapeGeometry(shape)
+    })
+  }, [])
 
   useFrame((frameState) => {
-    if (!groupRef.current) return;
+    if (!groupRef.current) return
     
-    const time = frameState.clock.getElapsedTime();
-    groupRef.current.rotation.z = -time * 0.3;
+    const time = frameState.clock.getElapsedTime()
+    groupRef.current.rotation.z = -time * 0.3
     
     groupRef.current.children.forEach((child, i) => {
       if (child instanceof THREE.Mesh) {
         // Flotar y pulsar
-        const mesh = child as THREE.Mesh;
-        const angle = (i / runeCount) * Math.PI * 2 + time * 0.2;
-        mesh.position.x = Math.cos(angle) * radius;
-        mesh.position.y = Math.sin(time * 2 + i) * 0.1;
-        mesh.position.z = Math.sin(angle) * radius;
-        mesh.rotation.z = time + i;
+        const mesh = child as THREE.Mesh
+        const angle = (i / runeCount) * Math.PI * 2 + time * 0.2
+        mesh.position.x = Math.cos(angle) * radius
+        mesh.position.y = Math.sin(time * 2 + i) * 0.1
+        mesh.position.z = Math.sin(angle) * radius
+        mesh.rotation.z = time + i
         
         // Escala según estado
-        const targetScale = state === 'active' || state === 'opening' ? 1 : 0;
-        mesh.scale.setScalar(THREE.MathUtils.lerp(mesh.scale.x, targetScale, 0.1));
+        const targetScale = state === 'active' || state === 'opening' ? 1 : 0
+        mesh.scale.setScalar(THREE.MathUtils.lerp(mesh.scale.x, targetScale, 0.1))
       }
-    });
-  });
+    })
+  })
 
   return (
     <group ref={groupRef}>
@@ -292,7 +292,7 @@ function FloatingRunes({ radius, color, state }: { radius: number; color: string
         </mesh>
       ))}
     </group>
-  );
+  )
 }
 
 // ============================================================================
@@ -300,25 +300,25 @@ function FloatingRunes({ radius, color, state }: { radius: number; color: string
 // ============================================================================
 
 function PortalCenter({ color, state, progress }: { color: string; state: PortalState; progress: number }) {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const materialRef = useRef<THREE.MeshBasicMaterial>(null);
+  const meshRef = useRef<THREE.Mesh>(null)
+  const materialRef = useRef<THREE.MeshBasicMaterial>(null)
   
   useFrame((frameState) => {
-    if (!meshRef.current || !materialRef.current) return;
+    if (!meshRef.current || !materialRef.current) return
     
-    const time = frameState.clock.getElapsedTime();
+    const time = frameState.clock.getElapsedTime()
     
     // Distorsión del centro
-    const scale = state === 'active' ? 1.5 + Math.sin(time * 2) * 0.2 : state === 'opening' ? progress * 1.5 : 0;
-    meshRef.current.scale.setScalar(THREE.MathUtils.lerp(meshRef.current.scale.x, scale, 0.1));
+    const scale = state === 'active' ? 1.5 + Math.sin(time * 2) * 0.2 : state === 'opening' ? progress * 1.5 : 0
+    meshRef.current.scale.setScalar(THREE.MathUtils.lerp(meshRef.current.scale.x, scale, 0.1))
     
     // Rotación
-    meshRef.current.rotation.z = time;
+    meshRef.current.rotation.z = time
     
     // Opacidad
-    const targetOpacity = state === 'active' ? 0.3 + progress * 0.3 : 0;
-    materialRef.current.opacity = THREE.MathUtils.lerp(materialRef.current.opacity, targetOpacity, 0.1);
-  });
+    const targetOpacity = state === 'active' ? 0.3 + progress * 0.3 : 0
+    materialRef.current.opacity = THREE.MathUtils.lerp(materialRef.current.opacity, targetOpacity, 0.1)
+  })
 
   return (
     <mesh ref={meshRef} scale={0}>
@@ -331,7 +331,7 @@ function PortalCenter({ color, state, progress }: { color: string; state: Portal
         blending={THREE.AdditiveBlending}
       />
     </mesh>
-  );
+  )
 }
 
 // ============================================================================
@@ -339,40 +339,40 @@ function PortalCenter({ color, state, progress }: { color: string; state: Portal
 // ============================================================================
 
 function Sparks({ color, state }: { color: string; state: PortalState }) {
-  const sparkCount = 50;
-  const pointsRef = useRef<THREE.Points>(null);
+  const sparkCount = 50
+  const pointsRef = useRef<THREE.Points>(null)
   
   const positions = useMemo(() => {
-    const pos = new Float32Array(sparkCount * 3);
+    const pos = new Float32Array(sparkCount * 3)
     for (let i = 0; i < sparkCount; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const r = 1.8 + Math.random() * 0.5;
-      pos[i * 3] = Math.cos(angle) * r;
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 0.3;
-      pos[i * 3 + 2] = Math.sin(angle) * r;
+      const angle = Math.random() * Math.PI * 2
+      const r = 1.8 + Math.random() * 0.5
+      pos[i * 3] = Math.cos(angle) * r
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 0.3
+      pos[i * 3 + 2] = Math.sin(angle) * r
     }
-    return pos;
-  }, []);
+    return pos
+  }, [])
 
   useFrame((frameState) => {
-    if (!pointsRef.current) return;
+    if (!pointsRef.current) return
     
-    const time = frameState.clock.getElapsedTime();
-    const pos = pointsRef.current.geometry.attributes.position.array as Float32Array;
+    const time = frameState.clock.getElapsedTime()
+    const pos = pointsRef.current.geometry.attributes.position.array as Float32Array
     
     for (let i = 0; i < sparkCount; i++) {
-      const i3 = i * 3;
-      const angle = Math.atan2(pos[i3 + 2], pos[i3]);
-      const newAngle = angle + 0.05 + Math.sin(time + i) * 0.02;
-      const r = 1.8 + Math.sin(time * 3 + i * 0.5) * 0.3;
+      const i3 = i * 3
+      const angle = Math.atan2(pos[i3 + 2], pos[i3])
+      const newAngle = angle + 0.05 + Math.sin(time + i) * 0.02
+      const r = 1.8 + Math.sin(time * 3 + i * 0.5) * 0.3
       
-      pos[i3] = Math.cos(newAngle) * r;
-      pos[i3 + 1] = Math.sin(time * 5 + i) * 0.2;
-      pos[i3 + 2] = Math.sin(newAngle) * r;
+      pos[i3] = Math.cos(newAngle) * r
+      pos[i3 + 1] = Math.sin(time * 5 + i) * 0.2
+      pos[i3 + 2] = Math.sin(newAngle) * r
     }
     
-    pointsRef.current.geometry.attributes.position.needsUpdate = true;
-  });
+    pointsRef.current.geometry.attributes.position.needsUpdate = true
+  })
 
   return (
     <Points ref={pointsRef} positions={positions} stride={3}>
@@ -386,7 +386,7 @@ function Sparks({ color, state }: { color: string; state: PortalState }) {
         opacity={state === 'active' || state === 'opening' ? 1 : 0}
       />
     </Points>
-  );
+  )
 }
 
 // ============================================================================
@@ -446,7 +446,7 @@ function PortalScene({ state, progress, colors }: PortalSceneProps) {
         <Vignette darkness={0.7} offset={0.2} />
       </EffectComposer>
     </>
-  );
+  )
 }
 
 // ============================================================================
@@ -459,19 +459,19 @@ export function FirePortal3D({
   size = 300,
   color = 'fire',
   onComplete,
-  message = 'Cargando...'
+  message = 'Cargando...',
 }: FirePortal3DProps) {
-  const colors = PORTAL_COLORS[color];
-  const [internalState, setInternalState] = useState<PortalState>(state);
+  const colors = PORTAL_COLORS[color]
+  const [internalState, setInternalState] = useState<PortalState>(state)
   
   useEffect(() => {
-    setInternalState(state);
+    setInternalState(state)
     
     if (state === 'closing' && onComplete) {
-      const timer = setTimeout(onComplete, 1000);
-      return () => clearTimeout(timer);
+      const timer = setTimeout(onComplete, 1000)
+      return () => clearTimeout(timer)
     }
-  }, [state, onComplete]);
+  }, [state, onComplete])
 
   return (
     <AnimatePresence>
@@ -514,7 +514,7 @@ export function FirePortal3D({
         </motion.div>
       )}
     </AnimatePresence>
-  );
+  )
 }
 
 // ============================================================================
@@ -532,21 +532,21 @@ export function PortalLoadingOverlay({
   isLoading,
   progress = 0,
   message = 'Procesando...',
-  color = 'fire'
+  color = 'fire',
 }: PortalLoadingOverlayProps) {
-  const [state, setState] = useState<PortalState>('idle');
+  const [state, setState] = useState<PortalState>('idle')
   
   useEffect(() => {
     if (isLoading) {
-      setState('opening');
-      const timer = setTimeout(() => setState('active'), 500);
-      return () => clearTimeout(timer);
+      setState('opening')
+      const timer = setTimeout(() => setState('active'), 500)
+      return () => clearTimeout(timer)
     } else {
-      setState('closing');
-      const timer = setTimeout(() => setState('idle'), 1000);
-      return () => clearTimeout(timer);
+      setState('closing')
+      const timer = setTimeout(() => setState('idle'), 1000)
+      return () => clearTimeout(timer)
     }
-  }, [isLoading]);
+  }, [isLoading])
 
   return (
     <AnimatePresence>
@@ -567,7 +567,7 @@ export function PortalLoadingOverlay({
         </motion.div>
       )}
     </AnimatePresence>
-  );
+  )
 }
 
-export default FirePortal3D;
+export default FirePortal3D

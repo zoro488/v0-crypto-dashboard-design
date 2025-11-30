@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback, useRef } from 'react'
 // Importación dinámica para evitar errores en SSR
 // import useSound from "use-sound" // Se importará dinámicamente
 
@@ -19,14 +19,14 @@ interface UISound {
 
 // URLs de sonidos sci-fi (puedes reemplazar con tus propios archivos)
 const SOUND_URLS = {
-  click: "/sounds/ui-click.mp3",
-  hover: "/sounds/ui-hover.mp3",
-  success: "/sounds/ui-success.mp3",
-  error: "/sounds/ui-error.mp3",
-  notification: "/sounds/ui-notification.mp3",
-  transition: "/sounds/ui-transition.mp3",
-  warp: "/sounds/ui-warp.mp3",
-  glitch: "/sounds/ui-glitch.mp3",
+  click: '/sounds/ui-click.mp3',
+  hover: '/sounds/ui-hover.mp3',
+  success: '/sounds/ui-success.mp3',
+  error: '/sounds/ui-error.mp3',
+  notification: '/sounds/ui-notification.mp3',
+  transition: '/sounds/ui-transition.mp3',
+  warp: '/sounds/ui-warp.mp3',
+  glitch: '/sounds/ui-glitch.mp3',
 } as const
 
 type SoundType = keyof typeof SOUND_URLS
@@ -36,8 +36,8 @@ type SoundType = keyof typeof SOUND_URLS
  * Usa use-sound internamente con fallback si no está disponible
  */
 export function useUISound(
-  soundType: SoundType = "click",
-  options: SoundOptions = {}
+  soundType: SoundType = 'click',
+  options: SoundOptions = {},
 ) {
   const {
     volume = 0.5,
@@ -51,25 +51,25 @@ export function useUISound(
 
   // Inicializar audio element como fallback
   useEffect(() => {
-    if (typeof window === "undefined") return
+    if (typeof window === 'undefined') return
 
     const audio = new Audio(SOUND_URLS[soundType])
     audio.volume = volume
     audio.playbackRate = playbackRate
     audioRef.current = audio
 
-    audio.addEventListener("canplaythrough", () => {
+    audio.addEventListener('canplaythrough', () => {
       setIsReady(true)
     })
 
-    audio.addEventListener("error", () => {
+    audio.addEventListener('error', () => {
       // Silenciar errores si el archivo no existe
       console.debug(`Sonido no encontrado: ${SOUND_URLS[soundType]}`)
     })
 
     return () => {
       audio.pause()
-      audio.src = ""
+      audio.src = ''
     }
   }, [soundType, volume, playbackRate])
 
@@ -122,13 +122,13 @@ export function useUISounds(soundEnabled = true) {
   })
 
   useEffect(() => {
-    if (typeof window === "undefined") return
+    if (typeof window === 'undefined') return
 
     const soundTypes = Object.keys(SOUND_URLS) as SoundType[]
     
     soundTypes.forEach((type) => {
       const audio = new Audio(SOUND_URLS[type])
-      audio.volume = type === "hover" ? 0.3 : 0.5
+      audio.volume = type === 'hover' ? 0.3 : 0.5
       audioRefs.current[type] = audio
     })
 
@@ -161,7 +161,7 @@ export function useUISounds(soundEnabled = true) {
         const audio = audioRefs.current[type]
         if (audio) {
           audio.pause()
-          audio.src = ""
+          audio.src = ''
         }
       })
     }
@@ -203,7 +203,7 @@ export function useSoundBindings(soundEnabled = true) {
         return handler(...args)
       }
     },
-    [playClick]
+    [playClick],
   )
 
   const withHoverSound = useCallback(
@@ -213,7 +213,7 @@ export function useSoundBindings(soundEnabled = true) {
         return handler(...args)
       }
     },
-    [playHover]
+    [playHover],
   )
 
   // Props para añadir a cualquier elemento
@@ -222,7 +222,7 @@ export function useSoundBindings(soundEnabled = true) {
       onClick: onClick ? withClickSound(onClick) : playClick,
       onMouseEnter: playHover,
     }),
-    [withClickSound, playClick, playHover]
+    [withClickSound, playClick, playHover],
   )
 
   return {

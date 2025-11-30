@@ -34,7 +34,7 @@ describe('Órdenes de Compra Schema - Validaciones', () => {
       const result = validarOrdenCompra(ordenValida)
       
       expect(result.success).toBe(true)
-      if (result.success) {
+      if (result.success && result.data) {
         expect(result.data.costoPorUnidad).toBe(6800)
         expect(result.data.costoTotal).toBe(680000)
       }

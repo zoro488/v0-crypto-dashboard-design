@@ -3,7 +3,7 @@
  * @module schemas/distribuidores
  */
 
-import { z } from "zod"
+import { z } from 'zod'
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ESQUEMAS DE DISTRIBUIDOR
@@ -14,34 +14,34 @@ import { z } from "zod"
  */
 export const CrearDistribuidorSchema = z.object({
   nombre: z.string()
-    .min(2, "El nombre debe tener al menos 2 caracteres")
-    .max(100, "El nombre no puede exceder 100 caracteres")
+    .min(2, 'El nombre debe tener al menos 2 caracteres')
+    .max(100, 'El nombre no puede exceder 100 caracteres')
     .trim(),
   
   empresa: z.string()
-    .max(100, "El nombre de empresa no puede exceder 100 caracteres")
+    .max(100, 'El nombre de empresa no puede exceder 100 caracteres')
     .optional()
-    .or(z.literal("")),
+    .or(z.literal('')),
   
   contacto: z.string()
-    .max(100, "El nombre de contacto no puede exceder 100 caracteres")
+    .max(100, 'El nombre de contacto no puede exceder 100 caracteres')
     .optional()
-    .or(z.literal("")),
+    .or(z.literal('')),
   
   telefono: z.string()
-    .regex(/^\+?[\d\s-()]+$/, "Formato de teléfono inválido")
+    .regex(/^\+?[\d\s-()]+$/, 'Formato de teléfono inválido')
     .optional()
-    .or(z.literal("")),
+    .or(z.literal('')),
   
   email: z.string()
-    .email("Email inválido")
+    .email('Email inválido')
     .optional()
-    .or(z.literal("")),
+    .or(z.literal('')),
   
   direccion: z.string()
-    .max(200, "La dirección no puede exceder 200 caracteres")
+    .max(200, 'La dirección no puede exceder 200 caracteres')
     .optional()
-    .or(z.literal("")),
+    .or(z.literal('')),
 })
 
 /**
@@ -80,7 +80,7 @@ export const DistribuidorSchema = CrearDistribuidorSchema.extend({
   keywords: z.array(z.string()).default([]),
   
   // Estado
-  estado: z.enum(["activo", "inactivo", "suspendido"]).default("activo"),
+  estado: z.enum(['activo', 'inactivo', 'suspendido']).default('activo'),
   
   // Timestamps
   createdAt: z.any().optional(),
@@ -115,7 +115,7 @@ export function validarDistribuidor(data: unknown): {
   
   return {
     success: false,
-    errors: result.error.errors.map((e) => `${e.path.join(".")}: ${e.message}`),
+    errors: result.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`),
   }
 }
 
@@ -135,7 +135,7 @@ export function validarActualizacionDistribuidor(data: unknown): {
   
   return {
     success: false,
-    errors: result.error.errors.map((e) => `${e.path.join(".")}: ${e.message}`),
+    errors: result.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`),
   }
 }
 
@@ -147,7 +147,7 @@ export function generarKeywordsDistribuidor(
   empresa?: string,
   contacto?: string,
   telefono?: string,
-  email?: string
+  email?: string,
 ): string[] {
   const keywords: string[] = []
   

@@ -19,13 +19,13 @@ import {
   Timestamp,
   orderBy,
   limit,
-  QueryConstraint
-} from 'firebase/firestore';
-import { db, isFirebaseConfigured } from '@/app/lib/firebase/config';
-import { UserLearningService } from './UserLearning.service';
-import { AIScheduledReportsService } from './AIScheduledReports.service';
-import { AIFormAutomationService } from './AIFormAutomation.service';
-import { AIPowerBIService } from './AIPowerBI.service';
+  QueryConstraint,
+} from 'firebase/firestore'
+import { db, isFirebaseConfigured } from '@/app/lib/firebase/config'
+import { UserLearningService } from './UserLearning.service'
+import { AIScheduledReportsService } from './AIScheduledReports.service'
+import { AIFormAutomationService } from './AIFormAutomation.service'
+import { AIPowerBIService } from './AIPowerBI.service'
 
 // Tipos
 export interface AIRequest {
@@ -114,8 +114,8 @@ const COLLECTIONS = {
   scheduledReports: 'scheduled_reports',
   userProfiles: 'user_profiles',
   aiInsights: 'ai_insights',
-  kpis: 'kpis'
-} as const;
+  kpis: 'kpis',
+} as const
 
 type CollectionName = keyof typeof COLLECTIONS;
 
@@ -142,19 +142,19 @@ interface DetectedIntent {
 }
 
 export class MegaAIAgentService {
-  private conversationHistory: ConversationMessage[] = [];
-  private learningService: UserLearningService;
-  private reportsService: AIScheduledReportsService;
-  private formService: AIFormAutomationService;
-  private powerBIService: AIPowerBIService;
-  private userId: string;
+  private conversationHistory: ConversationMessage[] = []
+  private learningService: UserLearningService
+  private reportsService: AIScheduledReportsService
+  private formService: AIFormAutomationService
+  private powerBIService: AIPowerBIService
+  private userId: string
 
   constructor(userId: string) {
-    this.userId = userId;
-    this.learningService = new UserLearningService();
-    this.reportsService = new AIScheduledReportsService();
-    this.formService = new AIFormAutomationService();
-    this.powerBIService = new AIPowerBIService();
+    this.userId = userId
+    this.learningService = new UserLearningService()
+    this.reportsService = new AIScheduledReportsService()
+    this.formService = new AIFormAutomationService()
+    this.powerBIService = new AIPowerBIService()
   }
 
   /**
@@ -167,59 +167,59 @@ export class MegaAIAgentService {
         request.userId, 
         'chat_message', 
         'general',
-        { message: request.message }
-      );
+        { message: request.message },
+      )
 
       // Analizar intención del mensaje
-      const intent = this.analyzeIntent(request.message);
+      const intent = this.analyzeIntent(request.message)
 
       // Agregar mensaje a historial
       this.conversationHistory.push({
         id: Date.now().toString(),
         role: 'user',
         content: request.message,
-        timestamp: new Date()
-      });
+        timestamp: new Date(),
+      })
 
       // Ejecutar acción según intención
-      let response: AIResponse;
+      let response: AIResponse
 
       switch (intent.type) {
         case 'query_data':
-          response = await this.handleQueryData(intent, request);
-          break;
+          response = await this.handleQueryData(intent, request)
+          break
 
         case 'create_record':
-          response = await this.handleCreateRecord(intent, request);
-          break;
+          response = await this.handleCreateRecord(intent, request)
+          break
 
         case 'generate_report':
-          response = await this.handleGenerateReport(intent, request);
-          break;
+          response = await this.handleGenerateReport(intent, request)
+          break
 
         case 'schedule_report':
-          response = await this.handleScheduleReport(intent, request);
-          break;
+          response = await this.handleScheduleReport(intent, request)
+          break
 
         case 'analyze':
-          response = await this.handleAnalyze(intent, request);
-          break;
+          response = await this.handleAnalyze(intent, request)
+          break
 
         case 'navigate':
-          response = await this.handleNavigate(intent);
-          break;
+          response = await this.handleNavigate(intent)
+          break
 
         case 'export':
-          response = await this.handleExport(intent, request);
-          break;
+          response = await this.handleExport(intent, request)
+          break
 
         case 'help':
-          response = this.handleHelp();
-          break;
+          response = this.handleHelp()
+          break
 
         case 'conversation':
         default:
-          response = await this.handleConversation(request);
+          response = await this.handleConversation(request)
       }
 
       // Agregar respuesta a historial
@@ -228,21 +228,21 @@ export class MegaAIAgentService {
         role: 'assistant',
         content: response.message,
         timestamp: new Date(),
-        visualizations: response.visualizations
-      });
+        visualizations: response.visualizations,
+      })
 
-      return response;
+      return response
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
       return {
         type: 'error',
         message: `❌ Lo siento, ocurrió un error: ${errorMessage}. ¿Puedo ayudarte con algo más?`,
         suggestions: [
           'Ver ventas del día',
           'Mostrar estado de bancos',
-          'Generar reporte'
-        ]
-      };
+          'Generar reporte',
+        ],
+      }
     }
   }
 
@@ -250,7 +250,7 @@ export class MegaAIAgentService {
    * Analiza la intención del mensaje
    */
   private analyzeIntent(message: string): DetectedIntent {
-    const lowerMessage = message.toLowerCase();
+    const lowerMessage = message.toLowerCase()
 
     // Detectar consultas de datos
     if (this.matchesPatterns(lowerMessage, ['mostrar', 'ver', 'cuánto', 'cuantos', 'lista', 'dame', 'busca', 'consulta'])) {
@@ -259,8 +259,8 @@ export class MegaAIAgentService {
         entity: this.detectEntity(lowerMessage),
         collection: this.detectCollection(lowerMessage),
         timeframe: this.detectTimeframe(lowerMessage),
-        confidence: 0.85
-      };
+        confidence: 0.85,
+      }
     }
 
     // Detectar creación de registros
@@ -268,8 +268,8 @@ export class MegaAIAgentService {
       return {
         type: 'create_record',
         collection: this.detectCollection(lowerMessage),
-        confidence: 0.9
-      };
+        confidence: 0.9,
+      }
     }
 
     // Detectar solicitudes de reportes
@@ -278,15 +278,15 @@ export class MegaAIAgentService {
         return {
           type: 'schedule_report',
           timeframe: this.detectTimeframe(lowerMessage),
-          confidence: 0.9
-        };
+          confidence: 0.9,
+        }
       }
       return {
         type: 'generate_report',
         entity: this.detectEntity(lowerMessage),
         timeframe: this.detectTimeframe(lowerMessage),
-        confidence: 0.85
-      };
+        confidence: 0.85,
+      }
     }
 
     // Detectar análisis
@@ -295,8 +295,8 @@ export class MegaAIAgentService {
         type: 'analyze',
         entity: this.detectEntity(lowerMessage),
         timeframe: this.detectTimeframe(lowerMessage),
-        confidence: 0.85
-      };
+        confidence: 0.85,
+      }
     }
 
     // Detectar navegación
@@ -304,8 +304,8 @@ export class MegaAIAgentService {
       return {
         type: 'navigate',
         entity: this.detectDestination(lowerMessage),
-        confidence: 0.8
-      };
+        confidence: 0.8,
+      }
     }
 
     // Detectar exportación
@@ -313,42 +313,42 @@ export class MegaAIAgentService {
       return {
         type: 'export',
         entity: this.detectEntity(lowerMessage),
-        confidence: 0.85
-      };
+        confidence: 0.85,
+      }
     }
 
     // Detectar ayuda
     if (this.matchesPatterns(lowerMessage, ['ayuda', 'help', 'qué puedes', 'comandos', 'opciones'])) {
       return {
         type: 'help',
-        confidence: 0.95
-      };
+        confidence: 0.95,
+      }
     }
 
     // Default: conversación general
     return {
       type: 'conversation',
-      confidence: 0.5
-    };
+      confidence: 0.5,
+    }
   }
 
   private matchesPatterns(text: string, patterns: string[]): boolean {
-    return patterns.some(pattern => text.includes(pattern));
+    return patterns.some(pattern => text.includes(pattern))
   }
 
   /**
    * Detecta la entidad mencionada
    */
   private detectEntity(message: string): string {
-    if (message.includes('venta')) return 'ventas';
-    if (message.includes('compra') || message.includes('orden')) return 'compras';
-    if (message.includes('cliente')) return 'clientes';
-    if (message.includes('producto') || message.includes('inventario') || message.includes('stock')) return 'productos';
-    if (message.includes('banco') || message.includes('capital') || message.includes('saldo')) return 'bancos';
-    if (message.includes('distribuidor')) return 'distribuidores';
-    if (message.includes('gasto')) return 'gastos';
-    if (message.includes('almacén') || message.includes('almacen')) return 'almacen';
-    return 'general';
+    if (message.includes('venta')) return 'ventas'
+    if (message.includes('compra') || message.includes('orden')) return 'compras'
+    if (message.includes('cliente')) return 'clientes'
+    if (message.includes('producto') || message.includes('inventario') || message.includes('stock')) return 'productos'
+    if (message.includes('banco') || message.includes('capital') || message.includes('saldo')) return 'bancos'
+    if (message.includes('distribuidor')) return 'distribuidores'
+    if (message.includes('gasto')) return 'gastos'
+    if (message.includes('almacén') || message.includes('almacen')) return 'almacen'
+    return 'general'
   }
 
   /**
@@ -373,29 +373,29 @@ export class MegaAIAgentService {
       'utilidad': 'utilidades',
       'flete': 'fleteSur',
       'azteca': 'azteca',
-      'leftie': 'leftie'
-    };
+      'leftie': 'leftie',
+    }
 
     for (const [keyword, collectionName] of Object.entries(entityMap)) {
       if (message.includes(keyword)) {
-        return collectionName;
+        return collectionName
       }
     }
 
-    return undefined;
+    return undefined
   }
 
   /**
    * Detecta el timeframe mencionado
    */
   private detectTimeframe(message: string): string {
-    if (message.includes('hoy')) return 'hoy';
-    if (message.includes('ayer')) return 'ayer';
-    if (message.includes('semana')) return 'semana';
-    if (message.includes('mes')) return 'mes';
-    if (message.includes('año')) return 'año';
-    if (message.includes('trimestre')) return 'trimestre';
-    return 'mes'; // default
+    if (message.includes('hoy')) return 'hoy'
+    if (message.includes('ayer')) return 'ayer'
+    if (message.includes('semana')) return 'semana'
+    if (message.includes('mes')) return 'mes'
+    if (message.includes('año')) return 'año'
+    if (message.includes('trimestre')) return 'trimestre'
+    return 'mes' // default
   }
 
   /**
@@ -412,53 +412,53 @@ export class MegaAIAgentService {
       'almacen': '/almacen',
       'bancos': '/bancos',
       'reportes': '/reportes',
-      'configuración': '/configuracion'
-    };
+      'configuración': '/configuracion',
+    }
 
     for (const [keyword, path] of Object.entries(destinations)) {
       if (message.includes(keyword)) {
-        return path;
+        return path
       }
     }
 
-    return '/dashboard';
+    return '/dashboard'
   }
 
   /**
    * Maneja consultas de datos
    */
   private async handleQueryData(intent: DetectedIntent, request: AIRequest): Promise<AIResponse> {
-    const collectionName = intent.collection || 'ventas';
-    const timeframe = intent.timeframe || 'mes';
+    const collectionName = intent.collection || 'ventas'
+    const timeframe = intent.timeframe || 'mes'
 
     try {
-      const data = await this.queryCollection(collectionName, timeframe);
-      const stats = this.calculateStats(data, collectionName);
-      const visualizations = this.generateVisualizations(data, collectionName);
+      const data = await this.queryCollection(collectionName, timeframe)
+      const stats = this.calculateStats(data, collectionName)
+      const visualizations = this.generateVisualizations(data, collectionName)
 
       // Actualizar aprendizaje - registrar uso de colección
       await this.learningService.trackActivity(
         request.userId, 
         'query_collection', 
         collectionName,
-        { timeframe }
-      );
+        { timeframe },
+      )
 
-      const formattedMessage = this.formatQueryResponse(collectionName, stats, timeframe);
+      const formattedMessage = this.formatQueryResponse(collectionName, stats, timeframe)
 
       return {
         type: 'data',
         message: formattedMessage,
         data: stats,
         visualizations,
-        suggestions: this.generateSuggestions(collectionName)
-      };
+        suggestions: this.generateSuggestions(collectionName),
+      }
     } catch (error) {
       return {
         type: 'error',
         message: `No pude obtener los datos de ${collectionName}. ¿Quieres intentar con otra consulta?`,
-        suggestions: ['Ver ventas del día', 'Mostrar clientes', 'Estado de bancos']
-      };
+        suggestions: ['Ver ventas del día', 'Mostrar clientes', 'Estado de bancos'],
+      }
     }
   }
 
@@ -466,49 +466,49 @@ export class MegaAIAgentService {
    * Consulta una colección de Firestore
    */
   private async queryCollection(collectionName: CollectionName, timeframe: string): Promise<unknown[]> {
-    const collectionPath = COLLECTIONS[collectionName];
-    const collectionRef = collection(db!, collectionPath);
+    const collectionPath = COLLECTIONS[collectionName]
+    const collectionRef = collection(db!, collectionPath)
     
-    const constraints: QueryConstraint[] = [];
-    const startDate = this.getStartDate(timeframe);
+    const constraints: QueryConstraint[] = []
+    const startDate = this.getStartDate(timeframe)
 
     // Agregar filtro de fecha si la colección lo soporta
     if (['ventas', 'compras', 'gastos', 'pagos'].includes(collectionName)) {
-      constraints.push(where('fecha', '>=', startDate));
-      constraints.push(orderBy('fecha', 'desc'));
+      constraints.push(where('fecha', '>=', startDate))
+      constraints.push(orderBy('fecha', 'desc'))
     }
 
-    constraints.push(limit(100));
+    constraints.push(limit(100))
 
-    const q = query(collectionRef, ...constraints);
-    const snapshot = await getDocs(q);
+    const q = query(collectionRef, ...constraints)
+    const snapshot = await getDocs(q)
 
     return snapshot.docs.map(doc => ({
       id: doc.id,
-      ...doc.data()
-    }));
+      ...doc.data(),
+    }))
   }
 
   private getStartDate(timeframe: string): Date {
-    const now = new Date();
+    const now = new Date()
     switch (timeframe) {
       case 'hoy':
-        return new Date(now.setHours(0, 0, 0, 0));
+        return new Date(now.setHours(0, 0, 0, 0))
       case 'ayer':
-        const yesterday = new Date(now);
-        yesterday.setDate(yesterday.getDate() - 1);
-        yesterday.setHours(0, 0, 0, 0);
-        return yesterday;
+        const yesterday = new Date(now)
+        yesterday.setDate(yesterday.getDate() - 1)
+        yesterday.setHours(0, 0, 0, 0)
+        return yesterday
       case 'semana':
-        return new Date(now.setDate(now.getDate() - 7));
+        return new Date(now.setDate(now.getDate() - 7))
       case 'mes':
-        return new Date(now.setMonth(now.getMonth() - 1));
+        return new Date(now.setMonth(now.getMonth() - 1))
       case 'trimestre':
-        return new Date(now.setMonth(now.getMonth() - 3));
+        return new Date(now.setMonth(now.getMonth() - 3))
       case 'año':
-        return new Date(now.setFullYear(now.getFullYear() - 1));
+        return new Date(now.setFullYear(now.getFullYear() - 1))
       default:
-        return new Date(now.setDate(now.getDate() - 30));
+        return new Date(now.setDate(now.getDate() - 30))
     }
   }
 
@@ -516,51 +516,51 @@ export class MegaAIAgentService {
    * Calcula estadísticas de los datos
    */
   private calculateStats(data: unknown[], collectionName: string): Record<string, unknown> {
-    const items = data as Record<string, unknown>[];
+    const items = data as Record<string, unknown>[]
     
     switch (collectionName) {
       case 'ventas':
-        const totalVentas = items.reduce((sum, v) => sum + (Number(v.total) || 0), 0);
-        const promedioVenta = items.length > 0 ? totalVentas / items.length : 0;
+        const totalVentas = items.reduce((sum, v) => sum + (Number(v.total) || 0), 0)
+        const promedioVenta = items.length > 0 ? totalVentas / items.length : 0
         return {
           count: items.length,
           total: totalVentas,
           promedio: promedioVenta,
-          tipo: 'ventas'
-        };
+          tipo: 'ventas',
+        }
 
       case 'clientes':
         return {
           count: items.length,
           activos: items.filter(c => c.estado === 'activo').length,
-          tipo: 'clientes'
-        };
+          tipo: 'clientes',
+        }
 
       case 'productos':
         const stockBajo = items.filter(p => 
-          Number(p.stockActual) <= Number(p.stockMinimo)
-        ).length;
+          Number(p.stockActual) <= Number(p.stockMinimo),
+        ).length
         return {
           count: items.length,
           stockBajo,
-          tipo: 'productos'
-        };
+          tipo: 'productos',
+        }
 
       case 'bancos':
         const totalCapital = items.reduce((sum, b) => 
-          sum + (Number(b.capitalActual) || Number(b.saldo) || 0), 0
-        );
+          sum + (Number(b.capitalActual) || Number(b.saldo) || 0), 0,
+        )
         return {
           count: items.length,
           totalCapital,
-          tipo: 'bancos'
-        };
+          tipo: 'bancos',
+        }
 
       default:
         return {
           count: items.length,
-          tipo: collectionName
-        };
+          tipo: collectionName,
+        }
     }
   }
 
@@ -568,23 +568,23 @@ export class MegaAIAgentService {
    * Genera visualizaciones para los datos
    */
   private generateVisualizations(data: unknown[], collectionName: string): AIVisualization[] {
-    const items = data as Record<string, unknown>[];
-    const visualizations: AIVisualization[] = [];
+    const items = data as Record<string, unknown>[]
+    const visualizations: AIVisualization[] = []
 
-    if (items.length === 0) return visualizations;
+    if (items.length === 0) return visualizations
 
     switch (collectionName) {
       case 'ventas':
         // Gráfico de tendencia
-        const ventasPorDia = this.groupByDate(items, 'fecha', 'total');
+        const ventasPorDia = this.groupByDate(items, 'fecha', 'total')
         if (ventasPorDia.length > 0) {
           visualizations.push({
             type: 'line',
             title: 'Tendencia de Ventas',
-            data: ventasPorDia
-          });
+            data: ventasPorDia,
+          })
         }
-        break;
+        break
 
       case 'bancos':
         // Gráfico de distribución
@@ -593,46 +593,46 @@ export class MegaAIAgentService {
           title: 'Distribución de Capital',
           data: items.map(b => ({
             name: b.nombre || b.id,
-            value: Number(b.capitalActual) || Number(b.saldo) || 0
-          }))
-        });
-        break;
+            value: Number(b.capitalActual) || Number(b.saldo) || 0,
+          })),
+        })
+        break
 
       case 'productos':
         // Top productos
         const topProductos = items
           .sort((a, b) => (Number(b.stockActual) || 0) - (Number(a.stockActual) || 0))
-          .slice(0, 10);
+          .slice(0, 10)
         visualizations.push({
           type: 'bar',
           title: 'Top 10 Productos por Stock',
           data: topProductos.map(p => ({
             name: p.nombre || p.id,
-            value: Number(p.stockActual) || 0
-          }))
-        });
-        break;
+            value: Number(p.stockActual) || 0,
+          })),
+        })
+        break
     }
 
-    return visualizations;
+    return visualizations
   }
 
   private groupByDate(items: Record<string, unknown>[], dateField: string, valueField: string): unknown[] {
-    const grouped: Record<string, number> = {};
+    const grouped: Record<string, number> = {}
 
     items.forEach(item => {
-      const date = item[dateField];
+      const date = item[dateField]
       if (date) {
         const dateStr = typeof date === 'string' 
           ? date.split('T')[0] 
-          : new Date(date as number).toISOString().split('T')[0];
-        grouped[dateStr] = (grouped[dateStr] || 0) + (Number(item[valueField]) || 0);
+          : new Date(date as number).toISOString().split('T')[0]
+        grouped[dateStr] = (grouped[dateStr] || 0) + (Number(item[valueField]) || 0)
       }
-    });
+    })
 
     return Object.entries(grouped)
       .map(([date, value]) => ({ date, value }))
-      .sort((a, b) => a.date.localeCompare(b.date));
+      .sort((a, b) => a.date.localeCompare(b.date))
   }
 
   private formatQueryResponse(collection: string, stats: Record<string, unknown>, timeframe: string): string {
@@ -642,35 +642,35 @@ export class MegaAIAgentService {
       semana: 'esta semana',
       mes: 'este mes',
       trimestre: 'este trimestre',
-      año: 'este año'
-    };
+      año: 'este año',
+    }
 
-    const period = timeframeLabels[timeframe] || 'el período';
+    const period = timeframeLabels[timeframe] || 'el período'
 
     switch (collection) {
       case 'ventas':
         return `📊 **Resumen de Ventas ${period}:**\n\n` +
           `• Total de ventas: **${stats.count}**\n` +
           `• Monto total: **$${Number(stats.total).toLocaleString('es-MX')}**\n` +
-          `• Ticket promedio: **$${Number(stats.promedio).toLocaleString('es-MX')}**`;
+          `• Ticket promedio: **$${Number(stats.promedio).toLocaleString('es-MX')}**`
 
       case 'clientes':
-        return `👥 **Resumen de Clientes:**\n\n` +
+        return '👥 **Resumen de Clientes:**\n\n' +
           `• Total: **${stats.count}**\n` +
-          `• Activos: **${stats.activos}**`;
+          `• Activos: **${stats.activos}**`
 
       case 'productos':
-        return `📦 **Resumen de Inventario:**\n\n` +
+        return '📦 **Resumen de Inventario:**\n\n' +
           `• Total productos: **${stats.count}**\n` +
-          `• Con stock bajo: **${stats.stockBajo}** ⚠️`;
+          `• Con stock bajo: **${stats.stockBajo}** ⚠️`
 
       case 'bancos':
-        return `💰 **Estado de Bancos:**\n\n` +
+        return '💰 **Estado de Bancos:**\n\n' +
           `• Bancos activos: **${stats.count}**\n` +
-          `• Capital total: **$${Number(stats.totalCapital).toLocaleString('es-MX')}**`;
+          `• Capital total: **$${Number(stats.totalCapital).toLocaleString('es-MX')}**`
 
       default:
-        return `📋 Se encontraron **${stats.count}** registros de ${collection}.`;
+        return `📋 Se encontraron **${stats.count}** registros de ${collection}.`
     }
   }
 
@@ -680,37 +680,37 @@ export class MegaAIAgentService {
         'Ver detalles de ventas',
         'Generar reporte de ventas',
         'Comparar con mes anterior',
-        'Top clientes por ventas'
+        'Top clientes por ventas',
       ],
       clientes: [
         'Ver clientes activos',
         'Clientes con adeudo',
-        'Agregar nuevo cliente'
+        'Agregar nuevo cliente',
       ],
       productos: [
         'Ver productos con stock bajo',
         'Generar orden de compra',
-        'Top productos vendidos'
+        'Top productos vendidos',
       ],
       bancos: [
         'Ver movimientos del día',
         'Generar corte de bancos',
-        'Ver transferencias pendientes'
-      ]
-    };
+        'Ver transferencias pendientes',
+      ],
+    }
 
     return suggestions[entity] || [
       'Mostrar ventas del día',
       'Ver estado de bancos',
-      'Consultar inventario'
-    ];
+      'Consultar inventario',
+    ]
   }
 
   /**
    * Maneja creación de registros
    */
   private async handleCreateRecord(intent: DetectedIntent, request: AIRequest): Promise<AIResponse> {
-    const collectionName = intent.collection;
+    const collectionName = intent.collection
     
     if (!collectionName) {
       return {
@@ -720,16 +720,16 @@ export class MegaAIAgentService {
           '• Nuevo cliente\n' +
           '• Nueva orden de compra\n' +
           '• Nuevo gasto',
-        suggestions: ['Nueva venta', 'Nuevo cliente', 'Nueva orden', 'Nuevo gasto']
-      };
+        suggestions: ['Nueva venta', 'Nuevo cliente', 'Nueva orden', 'Nuevo gasto'],
+      }
     }
 
     // Obtener sugerencias de auto-llenado
     const formSuggestions = await this.formService.analyzeAndSuggest(
       request.userId,
       collectionName,
-      {}
-    );
+      {},
+    )
 
     return {
       type: 'action',
@@ -744,75 +744,75 @@ export class MegaAIAgentService {
           payload: {
             collection: collectionName,
             suggestions: formSuggestions.suggestions,
-            template: formSuggestions.template
-          }
-        }
+            template: formSuggestions.template,
+          },
+        },
       ],
-      suggestions: ['Cancelar', 'Ver registros existentes']
-    };
+      suggestions: ['Cancelar', 'Ver registros existentes'],
+    }
   }
 
   /**
    * Maneja generación de reportes
    */
   private async handleGenerateReport(intent: DetectedIntent, request: AIRequest): Promise<AIResponse> {
-    const entity = intent.entity || 'general';
-    const timeframe = intent.timeframe || 'mes';
+    const entity = intent.entity || 'general'
+    const timeframe = intent.timeframe || 'mes'
 
     // Usar servicio Power BI para generar dashboard
     const dashboard = await this.powerBIService.generateDashboard(
       request.userId,
       entity,
-      { timeframe }
-    );
+      { timeframe },
+    )
 
     if (!dashboard.success) {
       return {
         type: 'error',
         message: '❌ No pude generar el reporte. ¿Quieres intentar con otro tipo?',
-        suggestions: ['Reporte de ventas', 'Reporte financiero', 'Reporte de inventario']
-      };
+        suggestions: ['Reporte de ventas', 'Reporte financiero', 'Reporte de inventario'],
+      }
     }
 
     return {
       type: 'visualization',
       message: `📊 **Reporte de ${entity} - ${timeframe}**\n\n` +
-        `He generado un análisis completo con KPIs, visualizaciones e insights.`,
+        'He generado un análisis completo con KPIs, visualizaciones e insights.',
       data: dashboard.dashboard,
       visualizations: dashboard.dashboard?.visualizations as AIVisualization[] | undefined,
       actions: [
         {
           type: 'export',
           label: 'Exportar a PDF',
-          payload: { format: 'pdf', data: dashboard.dashboard }
+          payload: { format: 'pdf', data: dashboard.dashboard },
         },
         {
           type: 'export',
           label: 'Exportar a Excel',
-          payload: { format: 'excel', data: dashboard.dashboard }
-        }
+          payload: { format: 'excel', data: dashboard.dashboard },
+        },
       ],
       suggestions: [
         'Programar reporte semanal',
         'Ver más detalles',
-        'Comparar con período anterior'
-      ]
-    };
+        'Comparar con período anterior',
+      ],
+    }
   }
 
   /**
    * Maneja programación de reportes
    */
   private async handleScheduleReport(intent: DetectedIntent, request: AIRequest): Promise<AIResponse> {
-    const timeframe = intent.timeframe || 'semanal';
+    const timeframe = intent.timeframe || 'semanal'
     
     const recurrenceMap: Record<string, string> = {
       'diario': 'daily',
       'semanal': 'weekly',
-      'mensual': 'monthly'
-    };
+      'mensual': 'monthly',
+    }
 
-    const recurrence = recurrenceMap[timeframe] || 'weekly';
+    const recurrence = recurrenceMap[timeframe] || 'weekly'
 
     const reportId = await this.reportsService.createScheduledReport({
       userId: request.userId,
@@ -821,62 +821,62 @@ export class MegaAIAgentService {
       recurrence: recurrence as 'daily' | 'weekly' | 'monthly',
       recipients: [],
       format: 'pdf',
-      includeInsights: true
-    });
+      includeInsights: true,
+    })
 
     return {
       type: 'action',
-      message: `✅ **Reporte programado exitosamente**\n\n` +
+      message: '✅ **Reporte programado exitosamente**\n\n' +
         `• Frecuencia: ${timeframe}\n` +
-        `• Formato: PDF con insights\n` +
+        '• Formato: PDF con insights\n' +
         `• ID: ${reportId}\n\n` +
-        `Recibirás el reporte automáticamente.`,
+        'Recibirás el reporte automáticamente.',
       actions: [
         {
           type: 'navigate',
           label: 'Ver reportes programados',
-          payload: { path: '/reportes/programados' }
-        }
+          payload: { path: '/reportes/programados' },
+        },
       ],
-      suggestions: ['Ver mis reportes', 'Editar programación', 'Agregar destinatarios']
-    };
+      suggestions: ['Ver mis reportes', 'Editar programación', 'Agregar destinatarios'],
+    }
   }
 
   /**
    * Maneja análisis con IA
    */
   private async handleAnalyze(intent: DetectedIntent, request: AIRequest): Promise<AIResponse> {
-    const entity = intent.entity || 'ventas';
-    const timeframe = intent.timeframe || 'mes';
+    const entity = intent.entity || 'ventas'
+    const timeframe = intent.timeframe || 'mes'
 
     // Obtener datos
-    const collection = this.detectCollection(entity) || 'ventas';
-    const data = await this.queryCollection(collection, timeframe);
+    const collection = this.detectCollection(entity) || 'ventas'
+    const data = await this.queryCollection(collection, timeframe)
 
     // Generar insights con Power BI
     const dashboard = await this.powerBIService.generateDashboard(
       request.userId,
       entity,
-      { timeframe }
-    );
+      { timeframe },
+    )
 
-    const insights = dashboard.dashboard?.insights || [];
-    const recommendations = dashboard.dashboard?.recommendations || [];
+    const insights = dashboard.dashboard?.insights || []
+    const recommendations = dashboard.dashboard?.recommendations || []
 
-    let insightsText = '';
+    let insightsText = ''
     if (insights.length > 0) {
       insightsText = '\n\n**🔍 Insights detectados:**\n' +
         insights.map((i: { type: string; title: string; description: string }) => 
-          `${i.type === 'positive' ? '✅' : i.type === 'warning' ? '⚠️' : '💡'} ${i.title}`
-        ).join('\n');
+          `${i.type === 'positive' ? '✅' : i.type === 'warning' ? '⚠️' : '💡'} ${i.title}`,
+        ).join('\n')
     }
 
-    let recommendationsText = '';
+    let recommendationsText = ''
     if (recommendations.length > 0) {
       recommendationsText = '\n\n**📋 Recomendaciones:**\n' +
         recommendations.map((r: { priority: string; title: string }, i: number) => 
-          `${i + 1}. ${r.title}`
-        ).join('\n');
+          `${i + 1}. ${r.title}`,
+        ).join('\n')
     }
 
     return {
@@ -887,16 +887,16 @@ export class MegaAIAgentService {
       suggestions: [
         'Ver detalles de insights',
         'Exportar análisis',
-        'Programar análisis automático'
-      ]
-    };
+        'Programar análisis automático',
+      ],
+    }
   }
 
   /**
    * Maneja navegación
    */
   private async handleNavigate(intent: DetectedIntent): Promise<AIResponse> {
-    const destination = intent.entity || '/dashboard';
+    const destination = intent.entity || '/dashboard'
 
     return {
       type: 'action',
@@ -905,17 +905,17 @@ export class MegaAIAgentService {
         {
           type: 'navigate',
           label: `Ir a ${destination}`,
-          payload: { path: destination }
-        }
-      ]
-    };
+          payload: { path: destination },
+        },
+      ],
+    }
   }
 
   /**
    * Maneja exportación
    */
   private async handleExport(intent: DetectedIntent, request: AIRequest): Promise<AIResponse> {
-    const entity = intent.entity || 'ventas';
+    const entity = intent.entity || 'ventas'
     
     return {
       type: 'action',
@@ -924,21 +924,21 @@ export class MegaAIAgentService {
         {
           type: 'export',
           label: 'PDF',
-          payload: { format: 'pdf', entity }
+          payload: { format: 'pdf', entity },
         },
         {
           type: 'export',
           label: 'Excel',
-          payload: { format: 'excel', entity }
+          payload: { format: 'excel', entity },
         },
         {
           type: 'export',
           label: 'CSV',
-          payload: { format: 'csv', entity }
-        }
+          payload: { format: 'csv', entity },
+        },
       ],
-      suggestions: ['Cancelar', 'Ver datos primero']
-    };
+      suggestions: ['Cancelar', 'Ver datos primero'],
+    }
   }
 
   /**
@@ -947,33 +947,33 @@ export class MegaAIAgentService {
   private handleHelp(): AIResponse {
     return {
       type: 'text',
-      message: `🤖 **¡Hola! Soy tu asistente de IA**\n\n` +
-        `Puedo ayudarte con:\n\n` +
-        `📊 **Consultas de datos:**\n` +
-        `• "Mostrar ventas del día"\n` +
-        `• "¿Cuántos clientes tenemos?"\n` +
-        `• "Ver estado de bancos"\n\n` +
-        `📈 **Reportes y análisis:**\n` +
-        `• "Generar reporte de ventas"\n` +
-        `• "Analiza las tendencias del mes"\n` +
-        `• "Programa un reporte semanal"\n\n` +
-        `✏️ **Crear registros:**\n` +
-        `• "Nueva venta"\n` +
-        `• "Registrar un cliente"\n` +
-        `• "Crear orden de compra"\n\n` +
-        `🚀 **Navegación:**\n` +
-        `• "Ir a dashboard"\n` +
-        `• "Abrir panel de clientes"\n\n` +
-        `📥 **Exportación:**\n` +
-        `• "Exportar ventas a Excel"\n` +
-        `• "Descargar reporte PDF"`,
+      message: '🤖 **¡Hola! Soy tu asistente de IA**\n\n' +
+        'Puedo ayudarte con:\n\n' +
+        '📊 **Consultas de datos:**\n' +
+        '• "Mostrar ventas del día"\n' +
+        '• "¿Cuántos clientes tenemos?"\n' +
+        '• "Ver estado de bancos"\n\n' +
+        '📈 **Reportes y análisis:**\n' +
+        '• "Generar reporte de ventas"\n' +
+        '• "Analiza las tendencias del mes"\n' +
+        '• "Programa un reporte semanal"\n\n' +
+        '✏️ **Crear registros:**\n' +
+        '• "Nueva venta"\n' +
+        '• "Registrar un cliente"\n' +
+        '• "Crear orden de compra"\n\n' +
+        '🚀 **Navegación:**\n' +
+        '• "Ir a dashboard"\n' +
+        '• "Abrir panel de clientes"\n\n' +
+        '📥 **Exportación:**\n' +
+        '• "Exportar ventas a Excel"\n' +
+        '• "Descargar reporte PDF"',
       suggestions: [
         'Ver ventas del día',
         'Estado de bancos',
         'Generar reporte',
-        'Ayuda con más opciones'
-      ]
-    };
+        'Ayuda con más opciones',
+      ],
+    }
   }
 
   /**
@@ -981,11 +981,11 @@ export class MegaAIAgentService {
    */
   private async handleConversation(request: AIRequest): Promise<AIResponse> {
     // Respuestas para conversación general
-    const greetings = ['hola', 'buenos días', 'buenas tardes', 'hey', 'hi'];
-    const thanks = ['gracias', 'thanks', 'perfecto', 'genial'];
-    const farewells = ['adiós', 'bye', 'hasta luego', 'chao'];
+    const greetings = ['hola', 'buenos días', 'buenas tardes', 'hey', 'hi']
+    const thanks = ['gracias', 'thanks', 'perfecto', 'genial']
+    const farewells = ['adiós', 'bye', 'hasta luego', 'chao']
 
-    const lowerMessage = request.message.toLowerCase();
+    const lowerMessage = request.message.toLowerCase()
 
     if (greetings.some(g => lowerMessage.includes(g))) {
       return {
@@ -995,9 +995,9 @@ export class MegaAIAgentService {
         suggestions: [
           'Ver ventas del día',
           'Estado de bancos',
-          '¿Qué puedes hacer?'
-        ]
-      };
+          '¿Qué puedes hacer?',
+        ],
+      }
     }
 
     if (thanks.some(t => lowerMessage.includes(t))) {
@@ -1007,17 +1007,17 @@ export class MegaAIAgentService {
         suggestions: [
           'No, eso es todo',
           'Sí, otra consulta',
-          'Ver resumen del día'
-        ]
-      };
+          'Ver resumen del día',
+        ],
+      }
     }
 
     if (farewells.some(f => lowerMessage.includes(f))) {
       return {
         type: 'text',
         message: '👋 ¡Hasta pronto! Estaré aquí cuando me necesites.',
-        suggestions: []
-      };
+        suggestions: [],
+      }
     }
 
     // Respuesta por defecto
@@ -1031,59 +1031,59 @@ export class MegaAIAgentService {
       suggestions: [
         'Ver ventas',
         'Estado de bancos',
-        '¿Qué puedes hacer?'
-      ]
-    };
+        '¿Qué puedes hacer?',
+      ],
+    }
   }
 
   /**
    * Obtiene el historial de conversación
    */
   getConversationHistory(): ConversationMessage[] {
-    return this.conversationHistory;
+    return this.conversationHistory
   }
 
   /**
    * Limpia el historial de conversación
    */
   clearHistory(): void {
-    this.conversationHistory = [];
+    this.conversationHistory = []
   }
 
   /**
    * Crea un registro en Firestore
    */
   async createRecord(collectionName: CollectionName, data: Record<string, unknown>): Promise<string> {
-    const collectionPath = COLLECTIONS[collectionName];
-    const collectionRef = collection(db!, collectionPath);
+    const collectionPath = COLLECTIONS[collectionName]
+    const collectionRef = collection(db!, collectionPath)
     
     const docData = {
       ...data,
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
-      createdBy: this.userId
-    };
+      createdBy: this.userId,
+    }
 
-    const docRef = await addDoc(collectionRef, docData);
+    const docRef = await addDoc(collectionRef, docData)
     
     // Registrar para aprendizaje
     await this.learningService.trackActivity(
       this.userId,
       'create_record',
       collectionName,
-      { recordId: docRef.id }
-    );
+      { recordId: docRef.id },
+    )
 
-    return docRef.id;
+    return docRef.id
   }
 }
 
 // Singleton para uso global
-let megaAIAgentInstance: MegaAIAgentService | null = null;
+let megaAIAgentInstance: MegaAIAgentService | null = null
 
 export function getMegaAIAgent(userId: string): MegaAIAgentService {
   if (!megaAIAgentInstance || megaAIAgentInstance['userId'] !== userId) {
-    megaAIAgentInstance = new MegaAIAgentService(userId);
+    megaAIAgentInstance = new MegaAIAgentService(userId)
   }
-  return megaAIAgentInstance;
+  return megaAIAgentInstance
 }

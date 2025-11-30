@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 /**
  * GlassNavIcons - Sistema de iconos de navegación 3D glassmorphism
@@ -6,18 +6,18 @@
  * Para uso en el Header de Chronos Dashboard
  */
 
-import { useRef, useState, useCallback, Suspense, memo, useMemo } from 'react';
-import { Canvas, useFrame, ThreeEvent } from '@react-three/fiber';
+import { useRef, useState, useCallback, Suspense, memo, useMemo } from 'react'
+import { Canvas, useFrame, ThreeEvent } from '@react-three/fiber'
 import {
   MeshTransmissionMaterial,
   Environment,
   Float,
   RoundedBox,
   Center,
-} from '@react-three/drei';
-import { EffectComposer, Bloom } from '@react-three/postprocessing';
-import * as THREE from 'three';
-import { motion, AnimatePresence } from 'framer-motion';
+} from '@react-three/drei'
+import { EffectComposer, Bloom } from '@react-three/postprocessing'
+import * as THREE from 'three'
+import { motion, AnimatePresence } from 'framer-motion'
 
 // ==================== TIPOS ====================
 
@@ -65,19 +65,19 @@ const COLOR_SCHEMES = {
   emerald: { primary: '#10b981', glow: '#34d399', accent: '#059669' },
   amber: { primary: '#f59e0b', glow: '#fbbf24', accent: '#d97706' },
   rose: { primary: '#f43f5e', glow: '#fb7185', accent: '#e11d48' },
-};
+}
 
 const SIZE_MAP = {
   xs: { canvas: 40, scale: 0.6 },
   sm: { canvas: 52, scale: 0.8 },
   md: { canvas: 64, scale: 1 },
-};
+}
 
 // ==================== GEOMETRÍAS DE ICONOS ====================
 
 const IconGeometry = memo(function IconGeometry({ 
   icon, 
-  color 
+  color, 
 }: { 
   icon: IconName; 
   color: string;
@@ -87,7 +87,7 @@ const IconGeometry = memo(function IconGeometry({
     metalness: 0.9,
     roughness: 0.1,
     envMapIntensity: 1,
-  };
+  }
 
   switch (icon) {
     case 'dashboard':
@@ -111,7 +111,7 @@ const IconGeometry = memo(function IconGeometry({
             <meshStandardMaterial {...materialProps} />
           </mesh>
         </group>
-      );
+      )
 
     case 'analytics':
       return (
@@ -134,7 +134,7 @@ const IconGeometry = memo(function IconGeometry({
             <meshStandardMaterial {...materialProps} />
           </mesh>
         </group>
-      );
+      )
 
     case 'inventory':
       return (
@@ -149,7 +149,7 @@ const IconGeometry = memo(function IconGeometry({
             <meshStandardMaterial {...materialProps} color={color} />
           </mesh>
         </group>
-      );
+      )
 
     case 'orders':
       return (
@@ -167,7 +167,7 @@ const IconGeometry = memo(function IconGeometry({
             </mesh>
           ))}
         </group>
-      );
+      )
 
     case 'clients':
       return (
@@ -182,7 +182,7 @@ const IconGeometry = memo(function IconGeometry({
             <meshStandardMaterial {...materialProps} />
           </mesh>
         </group>
-      );
+      )
 
     case 'distributors':
       return (
@@ -206,7 +206,7 @@ const IconGeometry = memo(function IconGeometry({
             <meshStandardMaterial color="#333" metalness={0.8} roughness={0.3} />
           </mesh>
         </group>
-      );
+      )
 
     case 'banks':
       return (
@@ -229,7 +229,7 @@ const IconGeometry = memo(function IconGeometry({
             <meshStandardMaterial {...materialProps} />
           </mesh>
         </group>
-      );
+      )
 
     case 'vault':
       return (
@@ -249,7 +249,7 @@ const IconGeometry = memo(function IconGeometry({
             <meshStandardMaterial color="#ffd700" metalness={1} roughness={0.2} />
           </mesh>
         </group>
-      );
+      )
 
     case 'expenses':
       return (
@@ -264,7 +264,7 @@ const IconGeometry = memo(function IconGeometry({
             <meshStandardMaterial color="#ef4444" metalness={0.8} roughness={0.2} />
           </mesh>
         </group>
-      );
+      )
 
     case 'profits':
       return (
@@ -279,7 +279,7 @@ const IconGeometry = memo(function IconGeometry({
             <meshStandardMaterial color="#22c55e" metalness={0.8} roughness={0.2} />
           </mesh>
         </group>
-      );
+      )
 
     case 'settings':
       return (
@@ -294,7 +294,7 @@ const IconGeometry = memo(function IconGeometry({
             <meshStandardMaterial {...materialProps} />
           </mesh>
         </group>
-      );
+      )
 
     case 'notifications':
       return (
@@ -313,7 +313,7 @@ const IconGeometry = memo(function IconGeometry({
             <meshStandardMaterial {...materialProps} />
           </mesh>
         </group>
-      );
+      )
 
     case 'user':
       return (
@@ -327,7 +327,7 @@ const IconGeometry = memo(function IconGeometry({
             <meshStandardMaterial {...materialProps} />
           </mesh>
         </group>
-      );
+      )
 
     case 'search':
       return (
@@ -341,7 +341,7 @@ const IconGeometry = memo(function IconGeometry({
             <meshStandardMaterial {...materialProps} />
           </mesh>
         </group>
-      );
+      )
 
     case 'menu':
       return (
@@ -353,7 +353,7 @@ const IconGeometry = memo(function IconGeometry({
             </mesh>
           ))}
         </group>
-      );
+      )
 
     default:
       return (
@@ -361,42 +361,42 @@ const IconGeometry = memo(function IconGeometry({
           <sphereGeometry args={[0.35, 16, 16]} />
           <meshStandardMaterial {...materialProps} />
         </mesh>
-      );
+      )
   }
-});
+})
 
 // ==================== MESH DEL ICONO ====================
 
 function NavIconMesh({ icon, color, isHovered, isActive }: IconMeshProps) {
-  const groupRef = useRef<THREE.Group>(null);
-  const glassRef = useRef<THREE.Mesh>(null);
+  const groupRef = useRef<THREE.Group>(null)
+  const glassRef = useRef<THREE.Mesh>(null)
 
   useFrame((state, delta) => {
     if (groupRef.current) {
       // Rotación suave en hover
-      const targetRotY = isHovered ? Math.sin(state.clock.elapsedTime * 2) * 0.15 : 0;
+      const targetRotY = isHovered ? Math.sin(state.clock.elapsedTime * 2) * 0.15 : 0
       groupRef.current.rotation.y = THREE.MathUtils.lerp(
         groupRef.current.rotation.y,
         targetRotY,
-        0.1
-      );
+        0.1,
+      )
 
       // Escala en hover
-      const targetScale = isHovered ? 1.1 : 1;
+      const targetScale = isHovered ? 1.1 : 1
       groupRef.current.scale.lerp(
         new THREE.Vector3(targetScale, targetScale, targetScale),
-        0.1
-      );
+        0.1,
+      )
     }
 
     if (glassRef.current) {
       // Efecto de brillo pulsante cuando está activo
       if (isActive) {
-        const pulse = Math.sin(state.clock.elapsedTime * 3) * 0.1 + 0.9;
-        glassRef.current.scale.setScalar(pulse);
+        const pulse = Math.sin(state.clock.elapsedTime * 3) * 0.1 + 0.9
+        glassRef.current.scale.setScalar(pulse)
       }
     }
-  });
+  })
 
   return (
     <group ref={groupRef}>
@@ -441,7 +441,7 @@ function NavIconMesh({ icon, color, isHovered, isActive }: IconMeshProps) {
         </mesh>
       )}
     </group>
-  );
+  )
 }
 
 // ==================== COMPONENTE PRINCIPAL ====================
@@ -456,9 +456,9 @@ export const GlassNavIcon = memo(function GlassNavIcon({
   size = 'sm',
   colorScheme = 'blue',
 }: NavIconProps) {
-  const [isHovered, setIsHovered] = useState(false);
-  const colors = COLOR_SCHEMES[colorScheme];
-  const dimensions = SIZE_MAP[size];
+  const [isHovered, setIsHovered] = useState(false)
+  const colors = COLOR_SCHEMES[colorScheme]
+  const dimensions = SIZE_MAP[size]
 
   return (
     <motion.div
@@ -548,8 +548,8 @@ export const GlassNavIcon = memo(function GlassNavIcon({
         />
       )}
     </motion.div>
-  );
-});
+  )
+})
 
 // ==================== BARRA DE NAVEGACIÓN COMPLETA ====================
 
@@ -592,7 +592,7 @@ export function GlassNavBar({
         />
       ))}
     </div>
-  );
+  )
 }
 
 // ==================== PRESETS PARA CHRONOS ====================
@@ -608,6 +608,6 @@ export const CHRONOS_NAV_ITEMS: NavBarItem[] = [
   { icon: 'vault', label: 'Bóveda', colorScheme: 'purple' },
   { icon: 'expenses', label: 'Gastos', colorScheme: 'rose' },
   { icon: 'profits', label: 'Utilidades', colorScheme: 'emerald' },
-];
+]
 
-export default GlassNavIcon;
+export default GlassNavIcon

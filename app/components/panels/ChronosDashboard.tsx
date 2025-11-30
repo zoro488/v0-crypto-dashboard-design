@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import { motion, AnimatePresence } from "framer-motion"
-import { useAppStore } from "@/app/lib/store/useAppStore"
+import { motion, AnimatePresence } from 'framer-motion'
+import { useAppStore } from '@/app/lib/store/useAppStore'
 import { 
   TrendingUp, 
   DollarSign, 
@@ -28,7 +28,7 @@ import {
   Box,
   Target,
   type LucideIcon,
-} from "lucide-react"
+} from 'lucide-react'
 import {
   AreaChart,
   Area,
@@ -44,20 +44,20 @@ import {
   Cell,
   LineChart,
   Line,
-} from "recharts"
-import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from "@/app/components/ui/SafeChartContainer"
-import { useState, useEffect, useMemo, Suspense, lazy } from "react"
-import { useVentas, useOrdenesCompra, useProductos, useClientes } from "@/app/lib/firebase/firestore-hooks.service"
-import { Skeleton } from "@/app/components/ui/skeleton"
-import { CreateOrdenCompraModalPremium } from "@/app/components/modals/CreateOrdenCompraModalPremium"
-import { CreateVentaModalPremium } from "@/app/components/modals/CreateVentaModalPremium"
-import { CreateTransferenciaModalPremium } from "@/app/components/modals/CreateTransferenciaModalPremium"
-import { LiveMarketTicker } from "@/app/components/ui/LiveMarketTicker"
-import { PerformanceMetrics, MiniPerformanceWidget } from "@/app/components/ui/PerformanceMetrics"
+} from 'recharts'
+import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/components/ui/SafeChartContainer'
+import { useState, useEffect, useMemo, Suspense, lazy } from 'react'
+import { useVentas, useOrdenesCompra, useProductos, useClientes } from '@/app/lib/firebase/firestore-hooks.service'
+import { Skeleton } from '@/app/components/ui/skeleton'
+import { CreateOrdenCompraModalPremium } from '@/app/components/modals/CreateOrdenCompraModalPremium'
+import { CreateVentaModalPremium } from '@/app/components/modals/CreateVentaModalPremium'
+import { CreateTransferenciaModalPremium } from '@/app/components/modals/CreateTransferenciaModalPremium'
+import { LiveMarketTicker } from '@/app/components/ui/LiveMarketTicker'
+import { PerformanceMetrics, MiniPerformanceWidget } from '@/app/components/ui/PerformanceMetrics'
 
 // Lazy load 3D components
 const PremiumSplineOrb = lazy(() => 
-  import("@/app/components/3d/PremiumSplineOrb").then(mod => ({ default: mod.PremiumSplineOrb }))
+  import('@/app/components/3d/PremiumSplineOrb').then(mod => ({ default: mod.PremiumSplineOrb })),
 )
 
 // ============================================================
@@ -89,7 +89,7 @@ interface StatCardProps {
   title: string
   value: string
   change: string
-  trend: "up" | "down"
+  trend: 'up' | 'down'
   icon: LucideIcon
   color: string
   index: number
@@ -142,17 +142,17 @@ const StatCard = ({ title, value, change, trend, icon: Icon, color, index, spark
             <motion.div
               className={`p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-gradient-to-br ${color} shadow-lg`}
               whileHover={{ scale: 1.1, rotate: 5 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 10 }}
             >
               <Icon className="w-4 h-4 md:w-5 md:h-5 text-white" />
             </motion.div>
             <motion.div
               className={`px-2 md:px-3 py-1 rounded-full text-[10px] md:text-xs font-semibold flex items-center gap-1
-                ${trend === "up" ? "bg-emerald-500/15 text-emerald-400" : "bg-rose-500/15 text-rose-400"}
+                ${trend === 'up' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'}
               `}
               whileHover={{ scale: 1.05 }}
             >
-              {trend === "up" ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+              {trend === 'up' ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
               {change}
             </motion.div>
           </div>
@@ -167,14 +167,14 @@ const StatCard = ({ title, value, change, trend, icon: Icon, color, index, spark
                 <AreaChart data={sparklineData.map((v, i) => ({ value: v }))}>
                   <defs>
                     <linearGradient id={`spark-${index}`} x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={trend === "up" ? "#10b981" : "#ef4444"} stopOpacity={0.3} />
-                      <stop offset="95%" stopColor={trend === "up" ? "#10b981" : "#ef4444"} stopOpacity={0} />
+                      <stop offset="5%" stopColor={trend === 'up' ? '#10b981' : '#ef4444'} stopOpacity={0.3} />
+                      <stop offset="95%" stopColor={trend === 'up' ? '#10b981' : '#ef4444'} stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <Area
                     type="monotone"
                     dataKey="value"
-                    stroke={trend === "up" ? "#10b981" : "#ef4444"}
+                    stroke={trend === 'up' ? '#10b981' : '#ef4444'}
                     strokeWidth={2}
                     fill={`url(#spark-${index})`}
                     {...SAFE_ANIMATION_PROPS}
@@ -224,11 +224,11 @@ const BankCard = ({ banco, index }: { banco: { id: string; nombre: string; saldo
 }
 
 // Quick Action Button
-const QuickActionButton = ({ label, icon: Icon, onClick, variant = "default" }: { label: string; icon: LucideIcon; onClick: () => void; variant?: "primary" | "secondary" | "default" }) => {
+const QuickActionButton = ({ label, icon: Icon, onClick, variant = 'default' }: { label: string; icon: LucideIcon; onClick: () => void; variant?: 'primary' | 'secondary' | 'default' }) => {
   const variants = {
-    primary: "bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 shadow-lg shadow-blue-500/25",
-    secondary: "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 shadow-lg shadow-green-500/25",
-    default: "bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20"
+    primary: 'bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 shadow-lg shadow-blue-500/25',
+    secondary: 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 shadow-lg shadow-green-500/25',
+    default: 'bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20',
   }
   
   return (
@@ -246,7 +246,7 @@ const QuickActionButton = ({ label, icon: Icon, onClick, variant = "default" }: 
 }
 
 // Activity Item Component
-const ActivityItem = ({ type, title, description, amount, time, status }: { type: string; title: string; description: string; amount?: number; time: string; status: "success" | "pending" | "error" }) => {
+const ActivityItem = ({ type, title, description, amount, time, status }: { type: string; title: string; description: string; amount?: number; time: string; status: 'success' | 'pending' | 'error' }) => {
   const icons = {
     venta: ShoppingCart,
     compra: Package,
@@ -258,9 +258,9 @@ const ActivityItem = ({ type, title, description, amount, time, status }: { type
   const Icon = icons[type as keyof typeof icons] || Activity
   
   const statusColors = {
-    success: "bg-emerald-500",
-    pending: "bg-amber-500",
-    error: "bg-red-500"
+    success: 'bg-emerald-500',
+    pending: 'bg-amber-500',
+    error: 'bg-red-500',
   }
   
   return (
@@ -307,7 +307,7 @@ export default function ChronosDashboard() {
 
   const [mounted, setMounted] = useState(false)
   const [showChronos, setShowChronos] = useState(true)
-  const [timeRange, setTimeRange] = useState("1M")
+  const [timeRange, setTimeRange] = useState('1M')
   const [isOrdenModalOpen, setIsOrdenModalOpen] = useState(false)
   const [isVentaModalOpen, setIsVentaModalOpen] = useState(false)
   const [isTransferenciaModalOpen, setIsTransferenciaModalOpen] = useState(false)
@@ -322,12 +322,12 @@ export default function ChronosDashboard() {
   const capitalTotal = useMemo(() => bancos?.reduce((acc, b) => acc + (b?.saldo || 0), 0) || 0, [bancos])
   const ventasMes = useMemo(() => ventas?.reduce((acc, v) => acc + (v?.montoTotal ?? 0), 0) ?? 0, [ventas])
   const stockActual = useMemo(() => productos?.reduce((acc, p) => acc + (p?.stock ?? 0), 0) ?? 0, [productos])
-  const ordenesActivas = useMemo(() => ordenesCompra?.filter((oc) => oc?.estado === "pendiente")?.length ?? 0, [ordenesCompra])
+  const ordenesActivas = useMemo(() => ordenesCompra?.filter((oc) => oc?.estado === 'pendiente')?.length ?? 0, [ordenesCompra])
   const clientesActivos = clientesRaw?.length ?? 0
 
   // Chart Data
   const chartData = useMemo(() => {
-    const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun"]
+    const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun']
     return months.map((name, i) => ({
       name,
       ventas: Math.floor(Math.random() * 150000) + 80000,
@@ -337,57 +337,57 @@ export default function ChronosDashboard() {
   }, [])
 
   const pieData = useMemo(() => [
-    { name: "Bóveda Monte", value: 45, color: "#3b82f6" },
-    { name: "Bóveda USA", value: 25, color: "#ef4444" },
-    { name: "Utilidades", value: 15, color: "#10b981" },
-    { name: "Otros", value: 15, color: "#8b5cf6" },
+    { name: 'Bóveda Monte', value: 45, color: '#3b82f6' },
+    { name: 'Bóveda USA', value: 25, color: '#ef4444' },
+    { name: 'Utilidades', value: 15, color: '#10b981' },
+    { name: 'Otros', value: 15, color: '#8b5cf6' },
   ], [])
 
   const stats = useMemo(() => [
     {
-      title: "Capital Total",
+      title: 'Capital Total',
       value: `$${capitalTotal.toLocaleString()}`,
-      change: "+12.5%",
-      trend: "up" as const,
+      change: '+12.5%',
+      trend: 'up' as const,
       icon: DollarSign,
-      color: "from-blue-500 to-cyan-500",
+      color: 'from-blue-500 to-cyan-500',
       sparklineData: [65, 70, 68, 75, 80, 85, 90],
     },
     {
-      title: "Ventas del Mes",
+      title: 'Ventas del Mes',
       value: `$${ventasMes.toLocaleString()}`,
-      change: "+8.3%",
-      trend: "up" as const,
+      change: '+8.3%',
+      trend: 'up' as const,
       icon: TrendingUp,
-      color: "from-emerald-500 to-green-500",
+      color: 'from-emerald-500 to-green-500',
       sparklineData: [40, 55, 45, 60, 70, 65, 80],
     },
     {
-      title: "Stock Actual",
+      title: 'Stock Actual',
       value: stockActual.toLocaleString(),
-      change: "-3.2%",
-      trend: "down" as const,
+      change: '-3.2%',
+      trend: 'down' as const,
       icon: Package,
-      color: "from-violet-500 to-purple-500",
+      color: 'from-violet-500 to-purple-500',
       sparklineData: [100, 95, 90, 85, 88, 82, 78],
     },
     {
-      title: "Órdenes Activas",
+      title: 'Órdenes Activas',
       value: ordenesActivas.toString(),
-      change: "+15.8%",
-      trend: "up" as const,
+      change: '+15.8%',
+      trend: 'up' as const,
       icon: ShoppingCart,
-      color: "from-amber-500 to-orange-500",
+      color: 'from-amber-500 to-orange-500',
       sparklineData: [12, 15, 18, 14, 20, 22, 25],
     },
   ], [capitalTotal, ventasMes, stockActual, ordenesActivas])
 
   const activities = useMemo(() => [
-    { type: "venta", title: "Venta #1234", description: "Cliente: Bódega Valle", amount: 45000, time: "Hace 5 min", status: "success" as const },
-    { type: "compra", title: "OC-456 recibida", description: "Proveedor: DistMex", amount: -23000, time: "Hace 15 min", status: "success" as const },
-    { type: "transferencia", title: "Transferencia Interna", description: "Monte → Azteca", amount: 50000, time: "Hace 1 hr", status: "success" as const },
-    { type: "stock", title: "Stock Actualizado", description: "Premium Box (+50 uds)", amount: undefined, time: "Hace 2 hr", status: "success" as const },
-    { type: "alerta", title: "Stock Bajo", description: "Producto A por debajo del mínimo", amount: undefined, time: "Hace 4 hr", status: "pending" as const },
+    { type: 'venta', title: 'Venta #1234', description: 'Cliente: Bódega Valle', amount: 45000, time: 'Hace 5 min', status: 'success' as const },
+    { type: 'compra', title: 'OC-456 recibida', description: 'Proveedor: DistMex', amount: -23000, time: 'Hace 15 min', status: 'success' as const },
+    { type: 'transferencia', title: 'Transferencia Interna', description: 'Monte → Azteca', amount: 50000, time: 'Hace 1 hr', status: 'success' as const },
+    { type: 'stock', title: 'Stock Actualizado', description: 'Premium Box (+50 uds)', amount: undefined, time: 'Hace 2 hr', status: 'success' as const },
+    { type: 'alerta', title: 'Stock Bajo', description: 'Producto A por debajo del mínimo', amount: undefined, time: 'Hace 4 hr', status: 'pending' as const },
   ], [])
 
   // Loading State
@@ -420,7 +420,7 @@ export default function ChronosDashboard() {
             key="chronos-intro"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0, scale: 0.95, filter: "blur(20px)" }}
+            exit={{ opacity: 0, scale: 0.95, filter: 'blur(20px)' }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="col-span-12 relative z-50 mb-4 md:mb-8"
           >
@@ -458,10 +458,10 @@ export default function ChronosDashboard() {
                     className="w-16 h-16 md:w-24 md:h-24 mx-auto mb-4 md:mb-6 rounded-2xl md:rounded-3xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center"
                     animate={{ 
                       boxShadow: [
-                        "0 0 60px rgba(59, 130, 246, 0.3)",
-                        "0 0 80px rgba(168, 85, 247, 0.4)",
-                        "0 0 60px rgba(59, 130, 246, 0.3)",
-                      ]
+                        '0 0 60px rgba(59, 130, 246, 0.3)',
+                        '0 0 80px rgba(168, 85, 247, 0.4)',
+                        '0 0 60px rgba(59, 130, 246, 0.3)',
+                      ],
                     }}
                     transition={{ duration: 3, repeat: Infinity }}
                   >
@@ -471,7 +471,7 @@ export default function ChronosDashboard() {
                   <motion.h1
                     className="text-4xl md:text-7xl lg:text-8xl font-bold text-white tracking-tight mb-2 md:mb-4"
                     style={{
-                      textShadow: "0 0 80px rgba(59, 130, 246, 0.5)",
+                      textShadow: '0 0 80px rgba(59, 130, 246, 0.5)',
                     }}
                   >
                     CHRONOS
@@ -501,9 +501,9 @@ export default function ChronosDashboard() {
                     className="flex items-center justify-center gap-4 md:gap-6 mt-4 md:mt-8"
                   >
                     {[
-                      { label: "Sistema", status: "Online" },
-                      { label: "Firebase", status: "Connected" },
-                      { label: "AI", status: "Active" },
+                      { label: 'Sistema', status: 'Online' },
+                      { label: 'Firebase', status: 'Connected' },
+                      { label: 'AI', status: 'Active' },
                     ].map((item, i) => (
                       <div key={item.label} className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
@@ -529,11 +529,11 @@ export default function ChronosDashboard() {
       >
         <LiveMarketTicker 
           items={[
-            { id: "capital", label: "Capital Total", value: `$${(capitalTotal / 1000000).toFixed(2)}M`, change: 2.34, icon: DollarSign, color: "from-blue-500 to-cyan-500" },
-            { id: "ventas", label: "Ventas Hoy", value: `$${(ventasMes / 1000).toFixed(1)}K`, change: 8.3, icon: TrendingUp, color: "from-green-500 to-emerald-500" },
-            { id: "ordenes", label: "Órdenes Activas", value: ordenesActivas.toString(), change: 15.8, icon: Package, color: "from-purple-500 to-pink-500" },
-            { id: "stock", label: "Stock Actual", value: stockActual.toLocaleString(), change: -3.2, icon: Box, color: "from-orange-500 to-amber-500" },
-            { id: "clientes", label: "Clientes", value: clientesActivos.toString(), change: 5.6, icon: Users, color: "from-indigo-500 to-violet-500" },
+            { id: 'capital', label: 'Capital Total', value: `$${(capitalTotal / 1000000).toFixed(2)}M`, change: 2.34, icon: DollarSign, color: 'from-blue-500 to-cyan-500' },
+            { id: 'ventas', label: 'Ventas Hoy', value: `$${(ventasMes / 1000).toFixed(1)}K`, change: 8.3, icon: TrendingUp, color: 'from-green-500 to-emerald-500' },
+            { id: 'ordenes', label: 'Órdenes Activas', value: ordenesActivas.toString(), change: 15.8, icon: Package, color: 'from-purple-500 to-pink-500' },
+            { id: 'stock', label: 'Stock Actual', value: stockActual.toLocaleString(), change: -3.2, icon: Box, color: 'from-orange-500 to-amber-500' },
+            { id: 'clientes', label: 'Clientes', value: clientesActivos.toString(), change: 5.6, icon: Users, color: 'from-indigo-500 to-violet-500' },
           ]}
           speed={25}
         />
@@ -565,14 +565,14 @@ export default function ChronosDashboard() {
               <p className="text-xs md:text-sm text-white/40">Flujo de capital en tiempo real</p>
             </div>
             <div className="flex gap-1 p-1 bg-white/5 rounded-lg md:rounded-xl border border-white/10">
-              {["1D", "1W", "1M", "1Y"].map((range) => (
+              {['1D', '1W', '1M', '1Y'].map((range) => (
                 <button
                   key={range}
                   onClick={() => setTimeRange(range)}
                   className={`px-3 md:px-4 py-1.5 md:py-2 rounded-md md:rounded-lg text-xs md:text-sm font-medium transition-all
                     ${timeRange === range 
-                      ? "bg-blue-500 text-white shadow-lg shadow-blue-500/30" 
-                      : "text-white/50 hover:text-white hover:bg-white/5"
+                      ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' 
+                      : 'text-white/50 hover:text-white hover:bg-white/5'
                     }`}
                 >
                   {range}
@@ -623,7 +623,7 @@ export default function ChronosDashboard() {
               <p className="text-xs md:text-sm text-white/40">Saldos actualizados</p>
             </div>
             <motion.button
-              onClick={() => setCurrentPanel("banco")}
+              onClick={() => setCurrentPanel('banco')}
               className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -710,12 +710,12 @@ export default function ChronosDashboard() {
             className="absolute inset-0"
             animate={{
               background: [
-                "radial-gradient(circle at 30% 30%, rgba(139,92,246,0.15) 0%, transparent 50%)",
-                "radial-gradient(circle at 70% 70%, rgba(59,130,246,0.15) 0%, transparent 50%)",
-                "radial-gradient(circle at 30% 30%, rgba(139,92,246,0.15) 0%, transparent 50%)",
-              ]
+                'radial-gradient(circle at 30% 30%, rgba(139,92,246,0.15) 0%, transparent 50%)',
+                'radial-gradient(circle at 70% 70%, rgba(59,130,246,0.15) 0%, transparent 50%)',
+                'radial-gradient(circle at 30% 30%, rgba(139,92,246,0.15) 0%, transparent 50%)',
+              ],
             }}
-            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
           />
 
           <div className="relative z-10">
@@ -727,7 +727,7 @@ export default function ChronosDashboard() {
               <motion.div 
                 className="p-2 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500"
                 animate={{ rotate: [0, 360] }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
               >
                 <Sparkles className="w-4 h-4 text-white" />
               </motion.div>
@@ -754,9 +754,9 @@ export default function ChronosDashboard() {
             {/* AI Stats */}
             <div className="grid grid-cols-3 gap-3 mt-4">
               {[
-                { label: "Precisión", value: "98.5%", color: "text-emerald-400" },
-                { label: "Consultas", value: "247", color: "text-cyan-400" },
-                { label: "Latencia", value: "42ms", color: "text-purple-400" },
+                { label: 'Precisión', value: '98.5%', color: 'text-emerald-400' },
+                { label: 'Consultas', value: '247', color: 'text-cyan-400' },
+                { label: 'Latencia', value: '42ms', color: 'text-purple-400' },
               ].map((stat) => (
                 <div key={stat.label} className="text-center">
                   <p className={`text-sm md:text-lg font-bold ${stat.color}`}>{stat.value}</p>
@@ -844,7 +844,7 @@ export default function ChronosDashboard() {
                   <motion.div 
                     className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"
                     initial={{ width: 0 }}
-                    animate={{ width: "78%" }}
+                    animate={{ width: '78%' }}
                     transition={{ delay: 1, duration: 1 }}
                   />
                 </div>
@@ -858,7 +858,7 @@ export default function ChronosDashboard() {
                   <motion.div 
                     className="h-full bg-gradient-to-r from-emerald-500 to-green-500 rounded-full"
                     initial={{ width: 0 }}
-                    animate={{ width: "92%" }}
+                    animate={{ width: '92%' }}
                     transition={{ delay: 1.1, duration: 1 }}
                   />
                 </div>
@@ -872,7 +872,7 @@ export default function ChronosDashboard() {
                   <motion.div 
                     className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
                     initial={{ width: 0 }}
-                    animate={{ width: "65%" }}
+                    animate={{ width: '65%' }}
                     transition={{ delay: 1.2, duration: 1 }}
                   />
                 </div>
@@ -912,7 +912,7 @@ export default function ChronosDashboard() {
               <QuickActionButton label="Nueva Venta" icon={DollarSign} onClick={() => setIsVentaModalOpen(true)} variant="secondary" />
               <QuickActionButton label="Nueva Orden" icon={Package} onClick={() => setIsOrdenModalOpen(true)} variant="primary" />
               <QuickActionButton label="Transferencia" icon={ArrowUpRight} onClick={() => setIsTransferenciaModalOpen(true)} />
-              <QuickActionButton label="Reportes" icon={BarChart3} onClick={() => setCurrentPanel("reportes")} />
+              <QuickActionButton label="Reportes" icon={BarChart3} onClick={() => setCurrentPanel('reportes')} />
             </div>
           </div>
         </div>

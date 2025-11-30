@@ -6,8 +6,31 @@
  * import { validarVenta, validarCliente } from '@/app/lib/schemas'
  */
 
-// Schemas de Ventas
-export * from './ventas.schema'
+// Schemas de Ventas (excepto PagoDistribuidorSchema que conflictúa)
+export {
+  MontoSchema,
+  CantidadSchema,
+  FechaSchema,
+  BancoIdSchema,
+  EstadoPagoSchema,
+  DistribucionBancosSchema,
+  CrearVentaSchema,
+  VentaSchema,
+  AbonoClienteSchema,
+  TransferenciaSchema,
+  validarVenta,
+  validarTransferencia,
+  validarAbono,
+  type CrearVentaInput,
+  type Venta,
+  type AbonoCliente,
+  type Transferencia,
+  type EstadoPago,
+} from './ventas.schema'
+
+// Re-export PagoDistribuidorSchema de ventas con alias para evitar conflicto
+export { PagoDistribuidorSchema as PagoDistribuidorVentaSchema } from './ventas.schema'
+export type { PagoDistribuidor as PagoDistribuidorVenta } from './ventas.schema'
 
 // Schemas de Clientes
 export * from './clientes.schema'
@@ -31,22 +54,3 @@ export {
   type PagoDistribuidorInput,
   type EstadoOrden,
 } from './ordenes-compra.schema'
-
-// Funciones de validación principales
-export {
-  validarVenta,
-  validarTransferencia,
-  validarAbono,
-} from './ventas.schema'
-
-export {
-  validarCliente,
-  validarActualizacionCliente,
-  generarKeywordsCliente,
-} from './clientes.schema'
-
-export {
-  validarDistribuidor,
-  validarActualizacionDistribuidor,
-  generarKeywordsDistribuidor,
-} from './distribuidores.schema'

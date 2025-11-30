@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import { useRef } from "react"
-import { Canvas, useFrame } from "@react-three/fiber"
-import { MeshTransmissionMaterial, Float, Environment } from "@react-three/drei"
-import type * as THREE from "three"
+import { useRef } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { MeshTransmissionMaterial, Float, Environment } from '@react-three/drei'
+import type * as THREE from 'three'
 
 interface VoiceAgentVisualizerProps {
   isActive: boolean
@@ -43,7 +43,7 @@ function AudioSphere({ isActive, audioLevel = 0 }: VoiceAgentVisualizerProps) {
           iridescence={1}
           iridescenceIOR={1}
           iridescenceThicknessRange={[0, 1400]}
-          color={isActive ? "#3b82f6" : "#8b5cf6"}
+          color={isActive ? '#3b82f6' : '#8b5cf6'}
         />
       </mesh>
     </Float>

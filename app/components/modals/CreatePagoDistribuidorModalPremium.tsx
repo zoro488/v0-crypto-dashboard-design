@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 💎 CREATE PAGO DISTRIBUIDOR MODAL PREMIUM - Pagos a Proveedores
@@ -11,22 +11,22 @@
  * 5. Validación con Zod
  */
 
-import * as React from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
+import * as React from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from "@/app/components/ui/dialog"
-import { Button } from "@/app/components/ui/button"
-import { Input } from "@/app/components/ui/input"
-import { Label } from "@/app/components/ui/label"
-import { Badge } from "@/app/components/ui/badge"
-import { Textarea } from "@/app/components/ui/textarea"
+} from '@/app/components/ui/dialog'
+import { Button } from '@/app/components/ui/button'
+import { Input } from '@/app/components/ui/input'
+import { Label } from '@/app/components/ui/label'
+import { Badge } from '@/app/components/ui/badge'
+import { Textarea } from '@/app/components/ui/textarea'
 import {
   Truck,
   Building2,
@@ -44,27 +44,27 @@ import {
   CreditCard,
   Banknote,
   FileText,
-} from "lucide-react"
-import { cn } from "@/app/lib/utils"
-import { useToast } from "@/app/hooks/use-toast"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { logger } from "@/app/lib/utils/logger"
-import { formatearMonto } from "@/app/lib/validations/smart-forms-schemas"
+} from 'lucide-react'
+import { cn } from '@/app/lib/utils'
+import { useToast } from '@/app/hooks/use-toast'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { logger } from '@/app/lib/utils/logger'
+import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
 
 // ============================================
 // SCHEMA ZOD
 // ============================================
 
 const pagoDistribuidorSchema = z.object({
-  distribuidorId: z.string().min(1, "Selecciona un distribuidor"),
+  distribuidorId: z.string().min(1, 'Selecciona un distribuidor'),
   distribuidorNombre: z.string(),
-  monto: z.number().min(1, "El monto debe ser mayor a 0"),
-  fecha: z.string().min(1, "La fecha es requerida"),
+  monto: z.number().min(1, 'El monto debe ser mayor a 0'),
+  fecha: z.string().min(1, 'La fecha es requerida'),
   bancoOrigen: z.enum([
-    "boveda_monte", "boveda_usa", "profit", "leftie", 
-    "azteca", "flete_sur", "utilidades"
+    'boveda_monte', 'boveda_usa', 'profit', 'leftie', 
+    'azteca', 'flete_sur', 'utilidades',
   ]),
-  metodoPago: z.enum(["efectivo", "transferencia"]),
+  metodoPago: z.enum(['efectivo', 'transferencia']),
   ordenesRelacionadas: z.array(z.string()).optional(),
   referencia: z.string().optional(),
   concepto: z.string().optional(),
@@ -90,23 +90,23 @@ interface CreatePagoDistribuidorModalProps {
 
 // Distribuidores del CSV con deuda simulada
 const DISTRIBUIDORES = [
-  { id: "Q-MAYA", nombre: "Q-MAYA", icono: "🌴", deudaTotal: 6098400, ordenesAbiertas: 3 },
-  { id: "PACMAN", nombre: "PACMAN", icono: "🎮", deudaTotal: 6142500, ordenesAbiertas: 2 },
-  { id: "CH-MONTE", nombre: "CH-MONTE", icono: "⛰️", deudaTotal: 0, ordenesAbiertas: 1 },
-  { id: "VALLE-MONTE", nombre: "VALLE-MONTE", icono: "🏔️", deudaTotal: 140000, ordenesAbiertas: 1 },
-  { id: "A/X", nombre: "A/X 🌶️🦀", icono: "🦀", deudaTotal: 207900, ordenesAbiertas: 1 },
-  { id: "Q-MAYA-MP", nombre: "Q-MAYA-MP", icono: "🌴", deudaTotal: 1260000, ordenesAbiertas: 1 },
+  { id: 'Q-MAYA', nombre: 'Q-MAYA', icono: '🌴', deudaTotal: 6098400, ordenesAbiertas: 3 },
+  { id: 'PACMAN', nombre: 'PACMAN', icono: '🎮', deudaTotal: 6142500, ordenesAbiertas: 2 },
+  { id: 'CH-MONTE', nombre: 'CH-MONTE', icono: '⛰️', deudaTotal: 0, ordenesAbiertas: 1 },
+  { id: 'VALLE-MONTE', nombre: 'VALLE-MONTE', icono: '🏔️', deudaTotal: 140000, ordenesAbiertas: 1 },
+  { id: 'A/X', nombre: 'A/X 🌶️🦀', icono: '🦀', deudaTotal: 207900, ordenesAbiertas: 1 },
+  { id: 'Q-MAYA-MP', nombre: 'Q-MAYA-MP', icono: '🌴', deudaTotal: 1260000, ordenesAbiertas: 1 },
 ]
 
 // 7 Bancos disponibles
 const BANCOS = [
-  { id: "boveda_monte", nombre: "Bóveda Monte", icono: "🏦", capital: 2500000 },
-  { id: "boveda_usa", nombre: "Bóveda USA", icono: "🇺🇸", capital: 850000 },
-  { id: "profit", nombre: "Profit", icono: "💰", capital: 1200000 },
-  { id: "leftie", nombre: "Leftie", icono: "🎯", capital: 450000 },
-  { id: "azteca", nombre: "Azteca", icono: "🌮", capital: 320000 },
-  { id: "flete_sur", nombre: "Flete Sur", icono: "🚚", capital: 180000 },
-  { id: "utilidades", nombre: "Utilidades", icono: "💎", capital: 750000 },
+  { id: 'boveda_monte', nombre: 'Bóveda Monte', icono: '🏦', capital: 2500000 },
+  { id: 'boveda_usa', nombre: 'Bóveda USA', icono: '🇺🇸', capital: 850000 },
+  { id: 'profit', nombre: 'Profit', icono: '💰', capital: 1200000 },
+  { id: 'leftie', nombre: 'Leftie', icono: '🎯', capital: 450000 },
+  { id: 'azteca', nombre: 'Azteca', icono: '🌮', capital: 320000 },
+  { id: 'flete_sur', nombre: 'Flete Sur', icono: '🚚', capital: 180000 },
+  { id: 'utilidades', nombre: 'Utilidades', icono: '💎', capital: 750000 },
 ]
 
 const containerVariants = {
@@ -114,7 +114,7 @@ const containerVariants = {
   visible: { 
     opacity: 1, 
     scale: 1,
-    transition: { staggerChildren: 0.03 }
+    transition: { staggerChildren: 0.03 },
   },
 }
 
@@ -131,37 +131,37 @@ export function CreatePagoDistribuidorModalPremium({
   open, 
   onClose, 
   onSuccess,
-  preselectedDistribuidor 
+  preselectedDistribuidor, 
 }: CreatePagoDistribuidorModalProps) {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [selectedDistribuidor, setSelectedDistribuidor] = React.useState<typeof DISTRIBUIDORES[0] | null>(
     preselectedDistribuidor ? {
       ...preselectedDistribuidor,
-      icono: DISTRIBUIDORES.find(d => d.id === preselectedDistribuidor.id)?.icono || "📦"
-    } : null
+      icono: DISTRIBUIDORES.find(d => d.id === preselectedDistribuidor.id)?.icono || '📦',
+    } : null,
   )
 
   const form = useForm<PagoDistribuidorInput>({
     resolver: zodResolver(pagoDistribuidorSchema),
     defaultValues: {
-      distribuidorId: preselectedDistribuidor?.id || "",
-      distribuidorNombre: preselectedDistribuidor?.nombre || "",
+      distribuidorId: preselectedDistribuidor?.id || '',
+      distribuidorNombre: preselectedDistribuidor?.nombre || '',
       monto: 0,
       fecha: new Date().toISOString().split('T')[0],
-      bancoOrigen: "boveda_monte",
-      metodoPago: "transferencia",
+      bancoOrigen: 'boveda_monte',
+      metodoPago: 'transferencia',
       ordenesRelacionadas: [],
-      referencia: "",
-      concepto: "",
+      referencia: '',
+      concepto: '',
     },
   })
 
   const { watch, setValue, handleSubmit, reset, formState: { errors } } = form
   
-  const monto = watch("monto")
-  const bancoOrigen = watch("bancoOrigen")
-  const metodoPago = watch("metodoPago")
+  const monto = watch('monto')
+  const bancoOrigen = watch('bancoOrigen')
+  const metodoPago = watch('metodoPago')
 
   // Banco seleccionado
   const bancoSeleccionado = React.useMemo(() => {
@@ -189,15 +189,15 @@ export function CreatePagoDistribuidorModalPremium({
   // Seleccionar distribuidor
   const handleSelectDistribuidor = (dist: typeof DISTRIBUIDORES[0]) => {
     setSelectedDistribuidor(dist)
-    setValue("distribuidorId", dist.id)
-    setValue("distribuidorNombre", dist.nombre)
+    setValue('distribuidorId', dist.id)
+    setValue('distribuidorNombre', dist.nombre)
   }
 
   // Quick-set monto
   const setQuickMonto = (porcentaje: number) => {
     if (!selectedDistribuidor) return
     const montoCalculado = Math.round(selectedDistribuidor.deudaTotal * porcentaje)
-    setValue("monto", montoCalculado)
+    setValue('monto', montoCalculado)
   }
 
   // Reset
@@ -212,9 +212,9 @@ export function CreatePagoDistribuidorModalPremium({
   const onSubmit = async (data: PagoDistribuidorInput) => {
     if (!saldoSuficiente) {
       toast({
-        title: "Saldo Insuficiente",
+        title: 'Saldo Insuficiente',
         description: `${bancoSeleccionado?.nombre} no tiene saldo suficiente`,
-        variant: "destructive",
+        variant: 'destructive',
       })
       return
     }
@@ -228,13 +228,13 @@ export function CreatePagoDistribuidorModalPremium({
         timestamp: new Date().toISOString(),
       }
 
-      logger.info("Pago a distribuidor registrado", { 
+      logger.info('Pago a distribuidor registrado', { 
         data: pagoData,
-        context: "CreatePagoDistribuidorModalPremium"
+        context: 'CreatePagoDistribuidorModalPremium',
       })
 
       toast({
-        title: "✅ Pago Registrado",
+        title: '✅ Pago Registrado',
         description: `${formatearMonto(data.monto)} pagado a ${data.distribuidorNombre}`,
       })
 
@@ -243,11 +243,11 @@ export function CreatePagoDistribuidorModalPremium({
       useAppStore.getState().triggerDataRefresh()
 
     } catch (error) {
-      logger.error("Error al registrar pago", error)
+      logger.error('Error al registrar pago', error)
       toast({
-        title: "Error",
-        description: "No se pudo registrar el pago",
-        variant: "destructive",
+        title: 'Error',
+        description: 'No se pudo registrar el pago',
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -262,11 +262,11 @@ export function CreatePagoDistribuidorModalPremium({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          "max-w-2xl max-h-[90vh] p-0 overflow-hidden",
-          "bg-black/60 backdrop-blur-2xl",
-          "border border-white/10",
-          "text-white",
-          "shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(139,92,246,0.15)]"
+          'max-w-2xl max-h-[90vh] p-0 overflow-hidden',
+          'bg-black/60 backdrop-blur-2xl',
+          'border border-white/10',
+          'text-white',
+          'shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(139,92,246,0.15)]',
         )}
       >
         <DialogTitle className="sr-only">Pago a Distribuidor</DialogTitle>
@@ -347,17 +347,17 @@ export function CreatePagoDistribuidorModalPremium({
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     className={cn(
-                      "relative p-4 rounded-xl border text-left transition-all",
+                      'relative p-4 rounded-xl border text-left transition-all',
                       selectedDistribuidor?.id === dist.id
-                        ? "bg-purple-500/20 border-purple-500 shadow-lg shadow-purple-500/20"
-                        : "bg-white/5 border-white/10 hover:bg-white/10"
+                        ? 'bg-purple-500/20 border-purple-500 shadow-lg shadow-purple-500/20'
+                        : 'bg-white/5 border-white/10 hover:bg-white/10',
                     )}
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-2xl">{dist.icono}</span>
                       <span className={cn(
-                        "font-bold",
-                        selectedDistribuidor?.id === dist.id ? "text-white" : "text-gray-300"
+                        'font-bold',
+                        selectedDistribuidor?.id === dist.id ? 'text-white' : 'text-gray-300',
                       )}>
                         {dist.nombre}
                       </span>
@@ -396,9 +396,9 @@ export function CreatePagoDistribuidorModalPremium({
                 </div>
 
                 <div className={cn(
-                  "p-5 rounded-2xl border",
-                  "bg-gradient-to-br from-white/5 to-transparent",
-                  "border-white/10"
+                  'p-5 rounded-2xl border',
+                  'bg-gradient-to-br from-white/5 to-transparent',
+                  'border-white/10',
                 )}>
                   {/* Info de deuda */}
                   <div className="flex items-center justify-between mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
@@ -419,13 +419,13 @@ export function CreatePagoDistribuidorModalPremium({
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-3xl text-gray-500">$</span>
                     <Input
                       type="number"
-                      {...form.register("monto", { valueAsNumber: true })}
+                      {...form.register('monto', { valueAsNumber: true })}
                       className={cn(
-                        "pl-12 h-16 text-3xl font-bold text-center",
-                        "bg-purple-500/5 border-purple-500/20 text-purple-300",
-                        "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
-                        !saldoSuficiente && "border-red-500",
-                        errors.monto && "border-red-500/50"
+                        'pl-12 h-16 text-3xl font-bold text-center',
+                        'bg-purple-500/5 border-purple-500/20 text-purple-300',
+                        '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+                        !saldoSuficiente && 'border-red-500',
+                        errors.monto && 'border-red-500/50',
                       )}
                       placeholder="0"
                     />
@@ -434,10 +434,10 @@ export function CreatePagoDistribuidorModalPremium({
                   {/* Quick-set */}
                   <div className="flex gap-2 mb-4">
                     {[
-                      { label: "25%", value: 0.25 },
-                      { label: "50%", value: 0.5 },
-                      { label: "75%", value: 0.75 },
-                      { label: "100%", value: 1 },
+                      { label: '25%', value: 0.25 },
+                      { label: '50%', value: 0.5 },
+                      { label: '75%', value: 0.75 },
+                      { label: '100%', value: 1 },
                     ].map((opt) => (
                       <Button
                         key={opt.label}
@@ -446,8 +446,8 @@ export function CreatePagoDistribuidorModalPremium({
                         size="sm"
                         onClick={() => setQuickMonto(opt.value)}
                         className={cn(
-                          "flex-1 border-white/10 hover:bg-white/10",
-                          porcentajePago >= opt.value * 100 && "bg-purple-500/20 border-purple-500/50 text-purple-400"
+                          'flex-1 border-white/10 hover:bg-white/10',
+                          porcentajePago >= opt.value * 100 && 'bg-purple-500/20 border-purple-500/50 text-purple-400',
                         )}
                       >
                         {opt.label}
@@ -460,8 +460,8 @@ export function CreatePagoDistribuidorModalPremium({
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-400">Progreso del pago</span>
                       <span className={cn(
-                        "font-bold",
-                        porcentajePago >= 100 ? "text-green-400" : "text-purple-400"
+                        'font-bold',
+                        porcentajePago >= 100 ? 'text-green-400' : 'text-purple-400',
                       )}>
                         {porcentajePago.toFixed(1)}%
                       </span>
@@ -469,10 +469,10 @@ export function CreatePagoDistribuidorModalPremium({
                     <div className="h-3 rounded-full bg-white/10 overflow-hidden">
                       <motion.div
                         className={cn(
-                          "h-full",
+                          'h-full',
                           porcentajePago >= 100 
-                            ? "bg-gradient-to-r from-green-500 to-emerald-500" 
-                            : "bg-gradient-to-r from-purple-500 to-blue-500"
+                            ? 'bg-gradient-to-r from-green-500 to-emerald-500' 
+                            : 'bg-gradient-to-r from-purple-500 to-blue-500',
                         )}
                         initial={{ width: 0 }}
                         animate={{ width: `${Math.min(100, porcentajePago)}%` }}
@@ -487,8 +487,8 @@ export function CreatePagoDistribuidorModalPremium({
                       <span className="text-sm text-gray-400">Nueva deuda:</span>
                       <motion.span 
                         className={cn(
-                          "text-lg font-bold",
-                          nuevaDeuda === 0 ? "text-green-400" : "text-yellow-400"
+                          'text-lg font-bold',
+                          nuevaDeuda === 0 ? 'text-green-400' : 'text-yellow-400',
                         )}
                         key={nuevaDeuda}
                         initial={{ scale: 0.8 }}
@@ -523,24 +523,24 @@ export function CreatePagoDistribuidorModalPremium({
                     <motion.button
                       key={banco.id}
                       type="button"
-                      onClick={() => setValue("bancoOrigen", banco.id as typeof bancoOrigen)}
+                      onClick={() => setValue('bancoOrigen', banco.id as typeof bancoOrigen)}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       disabled={banco.capital < monto}
                       className={cn(
-                        "p-3 rounded-xl border text-center transition-all",
+                        'p-3 rounded-xl border text-center transition-all',
                         bancoOrigen === banco.id
-                          ? "bg-blue-500/20 border-blue-500"
+                          ? 'bg-blue-500/20 border-blue-500'
                           : banco.capital < monto
-                          ? "bg-white/5 border-white/5 opacity-50 cursor-not-allowed"
-                          : "bg-white/5 border-white/10 hover:bg-white/10"
+                          ? 'bg-white/5 border-white/5 opacity-50 cursor-not-allowed'
+                          : 'bg-white/5 border-white/10 hover:bg-white/10',
                       )}
                     >
                       <span className="text-xl">{banco.icono}</span>
                       <p className="text-xs font-medium mt-1 truncate">{banco.nombre}</p>
                       <p className={cn(
-                        "text-[10px]",
-                        banco.capital < monto ? "text-red-400" : "text-green-400"
+                        'text-[10px]',
+                        banco.capital < monto ? 'text-red-400' : 'text-green-400',
                       )}>
                         {formatearMonto(banco.capital)}
                       </p>
@@ -578,7 +578,7 @@ export function CreatePagoDistribuidorModalPremium({
                     <Label className="text-sm text-gray-400">Fecha</Label>
                     <Input
                       type="date"
-                      {...form.register("fecha")}
+                      {...form.register('fecha')}
                       className="h-11 bg-white/5 border-white/10 text-white [color-scheme:dark]"
                     />
                   </div>
@@ -587,18 +587,18 @@ export function CreatePagoDistribuidorModalPremium({
                     <Label className="text-sm text-gray-400">Método</Label>
                     <div className="grid grid-cols-2 gap-2">
                       {[
-                        { id: "transferencia", icon: CreditCard, label: "Transfer" },
-                        { id: "efectivo", icon: Banknote, label: "Efectivo" },
+                        { id: 'transferencia', icon: CreditCard, label: 'Transfer' },
+                        { id: 'efectivo', icon: Banknote, label: 'Efectivo' },
                       ].map((m) => (
                         <button
                           key={m.id}
                           type="button"
-                          onClick={() => setValue("metodoPago", m.id as "efectivo" | "transferencia")}
+                          onClick={() => setValue('metodoPago', m.id as 'efectivo' | 'transferencia')}
                           className={cn(
-                            "p-2 rounded-lg border flex items-center justify-center gap-2",
+                            'p-2 rounded-lg border flex items-center justify-center gap-2',
                             metodoPago === m.id
-                              ? "bg-white/10 border-white/30"
-                              : "bg-white/5 border-white/10 hover:bg-white/10"
+                              ? 'bg-white/10 border-white/30'
+                              : 'bg-white/5 border-white/10 hover:bg-white/10',
                           )}
                         >
                           <m.icon className="w-4 h-4" />
@@ -612,7 +612,7 @@ export function CreatePagoDistribuidorModalPremium({
                 <div className="space-y-2">
                   <Label className="text-sm text-gray-400">Referencia (opcional)</Label>
                   <Input
-                    {...form.register("referencia")}
+                    {...form.register('referencia')}
                     placeholder="No. de transferencia, comprobante..."
                     className="h-11 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
                   />
@@ -621,7 +621,7 @@ export function CreatePagoDistribuidorModalPremium({
                 <div className="space-y-2">
                   <Label className="text-sm text-gray-400">Concepto (opcional)</Label>
                   <Textarea
-                    {...form.register("concepto")}
+                    {...form.register('concepto')}
                     placeholder="Pago de OC0001, OC0002..."
                     rows={2}
                     className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 resize-none"
@@ -635,9 +635,9 @@ export function CreatePagoDistribuidorModalPremium({
               <motion.div 
                 variants={itemVariants}
                 className={cn(
-                  "p-5 rounded-2xl border",
-                  "bg-gradient-to-br from-purple-500/10 to-blue-500/10",
-                  "border-purple-500/30"
+                  'p-5 rounded-2xl border',
+                  'bg-gradient-to-br from-purple-500/10 to-blue-500/10',
+                  'border-purple-500/30',
                 )}
               >
                 <div className="flex items-center justify-between mb-4">
@@ -683,9 +683,9 @@ export function CreatePagoDistribuidorModalPremium({
 
           {/* ===== FOOTER ===== */}
           <div className={cn(
-            "shrink-0 h-20 border-t border-white/10",
-            "bg-gradient-to-r from-black/50 via-white/5 to-black/50",
-            "px-6 flex items-center justify-between"
+            'shrink-0 h-20 border-t border-white/10',
+            'bg-gradient-to-r from-black/50 via-white/5 to-black/50',
+            'px-6 flex items-center justify-between',
           )}>
             <Button
               type="button"
@@ -701,12 +701,12 @@ export function CreatePagoDistribuidorModalPremium({
               type="submit"
               disabled={isSubmitting || !selectedDistribuidor || monto <= 0 || !saldoSuficiente}
               className={cn(
-                "min-w-[180px]",
-                "bg-gradient-to-r from-purple-600 to-blue-600",
-                "hover:from-purple-500 hover:to-blue-500",
-                "text-white font-bold",
-                "shadow-[0_0_30px_rgba(139,92,246,0.4)]",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
+                'min-w-[180px]',
+                'bg-gradient-to-r from-purple-600 to-blue-600',
+                'hover:from-purple-500 hover:to-blue-500',
+                'text-white font-bold',
+                'shadow-[0_0_30px_rgba(139,92,246,0.4)]',
+                'disabled:opacity-50 disabled:cursor-not-allowed',
               )}
             >
               {isSubmitting ? (

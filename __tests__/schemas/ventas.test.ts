@@ -11,7 +11,7 @@ import {
   CrearVentaSchema,
   TransferenciaSchema,
   AbonoClienteSchema,
-} from '@/app/lib/schemas/ventas.schema'
+} from '../../app/lib/schemas/ventas.schema'
 
 describe('Ventas Schema - Validaciones', () => {
   
@@ -40,7 +40,7 @@ describe('Ventas Schema - Validaciones', () => {
       const result = validarVenta(ventaValida)
       
       expect(result.success).toBe(true)
-      if (result.success) {
+      if (result.success && result.data) {
         expect(result.data.cantidad).toBe(10)
         expect(result.data.estadoPago).toBe('completo')
       }

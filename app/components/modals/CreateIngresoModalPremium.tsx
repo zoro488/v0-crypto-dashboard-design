@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 💎 CREATE INGRESO MODAL PREMIUM
@@ -9,22 +9,22 @@
  * Bancos disponibles: Bóveda Monte, USA, Profit, Leftie, Azteca, Flete Sur, Utilidades
  */
 
-import * as React from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
+import * as React from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from "@/app/components/ui/dialog"
-import { Button } from "@/app/components/ui/button"
-import { Input } from "@/app/components/ui/input"
-import { Label } from "@/app/components/ui/label"
-import { Textarea } from "@/app/components/ui/textarea"
-import { Badge } from "@/app/components/ui/badge"
+} from '@/app/components/ui/dialog'
+import { Button } from '@/app/components/ui/button'
+import { Input } from '@/app/components/ui/input'
+import { Label } from '@/app/components/ui/label'
+import { Textarea } from '@/app/components/ui/textarea'
+import { Badge } from '@/app/components/ui/badge'
 import {
   ArrowDownCircle,
   Loader2,
@@ -41,27 +41,27 @@ import {
   Landmark,
   Banknote,
   CreditCard,
-} from "lucide-react"
-import { cn } from "@/app/lib/utils"
-import { useToast } from "@/app/hooks/use-toast"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { logger } from "@/app/lib/utils/logger"
-import { crearIngreso } from "@/app/lib/firebase/firestore-service"
-import type { BancoId } from "@/app/types"
+} from 'lucide-react'
+import { cn } from '@/app/lib/utils'
+import { useToast } from '@/app/hooks/use-toast'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { logger } from '@/app/lib/utils/logger'
+import { crearIngreso } from '@/app/lib/firebase/firestore-service'
+import type { BancoId } from '@/app/types'
 
 // ============================================
 // SCHEMA ZOD
 // ============================================
 
 const ingresoPremiumSchema = z.object({
-  bancoDestino: z.string().min(1, "Selecciona un banco de destino"),
+  bancoDestino: z.string().min(1, 'Selecciona un banco de destino'),
   monto: z.number()
-    .min(1, "El monto debe ser mayor a 0")
-    .max(100000000, "Monto excede el límite"),
-  categoria: z.string().min(1, "Selecciona una categoría"),
+    .min(1, 'El monto debe ser mayor a 0')
+    .max(100000000, 'Monto excede el límite'),
+  categoria: z.string().min(1, 'Selecciona una categoría'),
   referencia: z.string().optional(),
-  concepto: z.string().min(3, "El concepto debe tener al menos 3 caracteres"),
-  fecha: z.string().min(1, "La fecha es requerida"),
+  concepto: z.string().min(3, 'El concepto debe tener al menos 3 caracteres'),
+  fecha: z.string().min(1, 'La fecha es requerida'),
   notas: z.string().optional(),
 })
 
@@ -86,62 +86,62 @@ const BANCOS_CONFIG: Record<BancoId, {
   icon: React.ReactNode;
 }> = {
   boveda_monte: { 
-    nombre: "Bóveda Monte", 
-    color: "text-blue-400", 
-    bgColor: "bg-blue-500/20",
-    icon: <Wallet className="w-5 h-5" />
+    nombre: 'Bóveda Monte', 
+    color: 'text-blue-400', 
+    bgColor: 'bg-blue-500/20',
+    icon: <Wallet className="w-5 h-5" />,
   },
   boveda_usa: { 
-    nombre: "Bóveda USA", 
-    color: "text-green-400", 
-    bgColor: "bg-green-500/20",
-    icon: <DollarSign className="w-5 h-5" />
+    nombre: 'Bóveda USA', 
+    color: 'text-green-400', 
+    bgColor: 'bg-green-500/20',
+    icon: <DollarSign className="w-5 h-5" />,
   },
   profit: { 
-    nombre: "Profit", 
-    color: "text-yellow-400", 
-    bgColor: "bg-yellow-500/20",
-    icon: <TrendingUp className="w-5 h-5" />
+    nombre: 'Profit', 
+    color: 'text-yellow-400', 
+    bgColor: 'bg-yellow-500/20',
+    icon: <TrendingUp className="w-5 h-5" />,
   },
   leftie: { 
-    nombre: "Leftie", 
-    color: "text-purple-400", 
-    bgColor: "bg-purple-500/20",
-    icon: <Building2 className="w-5 h-5" />
+    nombre: 'Leftie', 
+    color: 'text-purple-400', 
+    bgColor: 'bg-purple-500/20',
+    icon: <Building2 className="w-5 h-5" />,
   },
   azteca: { 
-    nombre: "Azteca", 
-    color: "text-orange-400", 
-    bgColor: "bg-orange-500/20",
-    icon: <Landmark className="w-5 h-5" />
+    nombre: 'Azteca', 
+    color: 'text-orange-400', 
+    bgColor: 'bg-orange-500/20',
+    icon: <Landmark className="w-5 h-5" />,
   },
   flete_sur: { 
-    nombre: "Flete Sur", 
-    color: "text-red-400", 
-    bgColor: "bg-red-500/20",
-    icon: <Banknote className="w-5 h-5" />
+    nombre: 'Flete Sur', 
+    color: 'text-red-400', 
+    bgColor: 'bg-red-500/20',
+    icon: <Banknote className="w-5 h-5" />,
   },
   utilidades: { 
-    nombre: "Utilidades", 
-    color: "text-emerald-400", 
-    bgColor: "bg-emerald-500/20",
-    icon: <CreditCard className="w-5 h-5" />
+    nombre: 'Utilidades', 
+    color: 'text-emerald-400', 
+    bgColor: 'bg-emerald-500/20',
+    icon: <CreditCard className="w-5 h-5" />,
   },
 }
 
 const BANCO_IDS: BancoId[] = [
-  "boveda_monte", "boveda_usa", "profit", "leftie", "azteca", "flete_sur", "utilidades"
+  'boveda_monte', 'boveda_usa', 'profit', 'leftie', 'azteca', 'flete_sur', 'utilidades',
 ]
 
 // Categorías de ingreso
 const CATEGORIAS_INGRESO = [
-  { id: "venta", nombre: "Venta", icon: "💰", color: "emerald" },
-  { id: "cobro_cliente", nombre: "Cobro a Cliente", icon: "🤝", color: "blue" },
-  { id: "transferencia", nombre: "Transferencia Recibida", icon: "↘️", color: "purple" },
-  { id: "devolucion", nombre: "Devolución", icon: "↩️", color: "yellow" },
-  { id: "prestamo", nombre: "Préstamo Recibido", icon: "🏦", color: "orange" },
-  { id: "inversion", nombre: "Inversión", icon: "📈", color: "cyan" },
-  { id: "otro", nombre: "Otro Ingreso", icon: "📥", color: "gray" },
+  { id: 'venta', nombre: 'Venta', icon: '💰', color: 'emerald' },
+  { id: 'cobro_cliente', nombre: 'Cobro a Cliente', icon: '🤝', color: 'blue' },
+  { id: 'transferencia', nombre: 'Transferencia Recibida', icon: '↘️', color: 'purple' },
+  { id: 'devolucion', nombre: 'Devolución', icon: '↩️', color: 'yellow' },
+  { id: 'prestamo', nombre: 'Préstamo Recibido', icon: '🏦', color: 'orange' },
+  { id: 'inversion', nombre: 'Inversión', icon: '📈', color: 'cyan' },
+  { id: 'otro', nombre: 'Otro Ingreso', icon: '📥', color: 'gray' },
 ]
 
 // Montos rápidos
@@ -152,7 +152,7 @@ const containerVariants = {
   visible: { 
     opacity: 1, 
     scale: 1,
-    transition: { staggerChildren: 0.03 }
+    transition: { staggerChildren: 0.03 },
   },
 }
 
@@ -169,13 +169,13 @@ export function CreateIngresoModalPremium({
   open, 
   onClose, 
   bancoPreseleccionado,
-  onSuccess 
+  onSuccess, 
 }: CreateIngresoModalPremiumProps) {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [showSuccess, setShowSuccess] = React.useState(false)
 
-  const today = new Date().toISOString().split("T")[0]
+  const today = new Date().toISOString().split('T')[0]
 
   const {
     register,
@@ -186,21 +186,21 @@ export function CreateIngresoModalPremium({
     formState: { errors, isValid },
   } = useForm<IngresoPremiumInput>({
     resolver: zodResolver(ingresoPremiumSchema),
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
-      bancoDestino: bancoPreseleccionado || "",
+      bancoDestino: bancoPreseleccionado || '',
       monto: 0,
-      categoria: "",
-      referencia: "",
-      concepto: "",
+      categoria: '',
+      referencia: '',
+      concepto: '',
       fecha: today,
-      notas: "",
+      notas: '',
     },
   })
 
-  const watchedMonto = watch("monto")
-  const watchedBanco = watch("bancoDestino") as BancoId
-  const watchedCategoria = watch("categoria")
+  const watchedMonto = watch('monto')
+  const watchedBanco = watch('bancoDestino') as BancoId
+  const watchedCategoria = watch('categoria')
 
   const bancoSeleccionado = watchedBanco ? BANCOS_CONFIG[watchedBanco] : null
   const categoriaSeleccionada = CATEGORIAS_INGRESO.find(c => c.id === watchedCategoria)
@@ -209,13 +209,13 @@ export function CreateIngresoModalPremium({
   React.useEffect(() => {
     if (open) {
       reset({
-        bancoDestino: bancoPreseleccionado || "",
+        bancoDestino: bancoPreseleccionado || '',
         monto: 0,
-        categoria: "",
-        referencia: "",
-        concepto: "",
+        categoria: '',
+        referencia: '',
+        concepto: '',
         fecha: today,
-        notas: "",
+        notas: '',
       })
       setShowSuccess(false)
     }
@@ -237,16 +237,16 @@ export function CreateIngresoModalPremium({
 
       await crearIngreso(ingresoData)
 
-      logger.info("Ingreso registrado exitosamente", {
-        context: "CreateIngresoModalPremium",
-        data: { banco: data.bancoDestino, monto: data.monto }
+      logger.info('Ingreso registrado exitosamente', {
+        context: 'CreateIngresoModalPremium',
+        data: { banco: data.bancoDestino, monto: data.monto },
       })
 
       setShowSuccess(true)
 
       setTimeout(() => {
         toast({
-          title: "✅ Ingreso Registrado",
+          title: '✅ Ingreso Registrado',
           description: `$${data.monto.toLocaleString()} a ${BANCOS_CONFIG[data.bancoDestino as BancoId]?.nombre}`,
         })
         onClose()
@@ -255,13 +255,13 @@ export function CreateIngresoModalPremium({
       }, 1500)
 
     } catch (error) {
-      logger.error("Error al registrar ingreso", error, {
-        context: "CreateIngresoModalPremium"
+      logger.error('Error al registrar ingreso', error, {
+        context: 'CreateIngresoModalPremium',
       })
       toast({
-        title: "Error",
-        description: "No se pudo registrar el ingreso",
-        variant: "destructive",
+        title: 'Error',
+        description: 'No se pudo registrar el ingreso',
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -273,11 +273,11 @@ export function CreateIngresoModalPremium({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          "max-w-3xl h-[85vh] p-0 overflow-hidden",
-          "bg-black/60 backdrop-blur-2xl",
-          "border border-white/10",
-          "text-white",
-          "shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(16,185,129,0.15)]"
+          'max-w-3xl h-[85vh] p-0 overflow-hidden',
+          'bg-black/60 backdrop-blur-2xl',
+          'border border-white/10',
+          'text-white',
+          'shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(16,185,129,0.15)]',
         )}
       >
         <DialogTitle className="sr-only">Nuevo Ingreso</DialogTitle>
@@ -312,7 +312,7 @@ export function CreateIngresoModalPremium({
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
+                transition={{ type: 'spring', stiffness: 200, delay: 0.1 }}
                 className="w-24 h-24 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/30"
               >
                 <CheckCircle2 className="w-12 h-12 text-white" />
@@ -390,22 +390,22 @@ export function CreateIngresoModalPremium({
                         <motion.button
                           key={bancoId}
                           type="button"
-                          onClick={() => setValue("bancoDestino", bancoId)}
+                          onClick={() => setValue('bancoDestino', bancoId)}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           className={cn(
-                            "p-3 rounded-xl border transition-all text-left",
+                            'p-3 rounded-xl border transition-all text-left',
                             isSelected 
                               ? `${config.bgColor} border-emerald-500/50 shadow-lg` 
-                              : "bg-white/5 border-white/10 hover:bg-white/10"
+                              : 'bg-white/5 border-white/10 hover:bg-white/10',
                           )}
                         >
-                          <div className={cn("mb-1", config.color)}>
+                          <div className={cn('mb-1', config.color)}>
                             {config.icon}
                           </div>
                           <p className={cn(
-                            "text-xs font-medium truncate",
-                            isSelected ? "text-white" : "text-gray-400"
+                            'text-xs font-medium truncate',
+                            isSelected ? 'text-white' : 'text-gray-400',
                           )}>
                             {config.nombre}
                           </p>
@@ -428,12 +428,12 @@ export function CreateIngresoModalPremium({
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-emerald-400">$</span>
                     <Input
                       type="number"
-                      {...register("monto", { valueAsNumber: true })}
+                      {...register('monto', { valueAsNumber: true })}
                       placeholder="0.00"
                       className={cn(
-                        "h-16 text-3xl font-bold pl-10 pr-4 text-center",
-                        "bg-emerald-500/10 border-emerald-500/30 text-emerald-300",
-                        errors.monto && "border-red-500"
+                        'h-16 text-3xl font-bold pl-10 pr-4 text-center',
+                        'bg-emerald-500/10 border-emerald-500/30 text-emerald-300',
+                        errors.monto && 'border-red-500',
                       )}
                     />
                   </div>
@@ -449,10 +449,10 @@ export function CreateIngresoModalPremium({
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => setValue("monto", monto)}
+                        onClick={() => setValue('monto', monto)}
                         className={cn(
-                          "border-white/10 hover:bg-emerald-500/20 hover:border-emerald-500/50",
-                          watchedMonto === monto && "bg-emerald-500/20 border-emerald-500/50"
+                          'border-white/10 hover:bg-emerald-500/20 hover:border-emerald-500/50',
+                          watchedMonto === monto && 'bg-emerald-500/20 border-emerald-500/50',
                         )}
                       >
                         ${monto.toLocaleString()}
@@ -474,20 +474,20 @@ export function CreateIngresoModalPremium({
                         <motion.button
                           key={cat.id}
                           type="button"
-                          onClick={() => setValue("categoria", cat.id)}
+                          onClick={() => setValue('categoria', cat.id)}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           className={cn(
-                            "p-3 rounded-xl border transition-all flex flex-col items-center gap-1",
+                            'p-3 rounded-xl border transition-all flex flex-col items-center gap-1',
                             isSelected 
                               ? `bg-${cat.color}-500/20 border-${cat.color}-500/50 shadow-lg` 
-                              : "bg-white/5 border-white/10 hover:bg-white/10"
+                              : 'bg-white/5 border-white/10 hover:bg-white/10',
                           )}
                         >
                           <span className="text-xl">{cat.icon}</span>
                           <span className={cn(
-                            "text-xs font-medium text-center",
-                            isSelected ? "text-white" : "text-gray-400"
+                            'text-xs font-medium text-center',
+                            isSelected ? 'text-white' : 'text-gray-400',
                           )}>
                             {cat.nombre}
                           </span>
@@ -507,11 +507,11 @@ export function CreateIngresoModalPremium({
                     Concepto *
                   </Label>
                   <Input
-                    {...register("concepto")}
+                    {...register('concepto')}
                     placeholder="Descripción del ingreso..."
                     className={cn(
-                      "h-12 bg-white/5 border-white/10 text-white",
-                      errors.concepto && "border-red-500"
+                      'h-12 bg-white/5 border-white/10 text-white',
+                      errors.concepto && 'border-red-500',
                     )}
                   />
                   {errors.concepto && (
@@ -528,10 +528,10 @@ export function CreateIngresoModalPremium({
                     </Label>
                     <Input
                       type="date"
-                      {...register("fecha")}
+                      {...register('fecha')}
                       className={cn(
-                        "h-11 bg-white/5 border-white/10 text-white",
-                        "[color-scheme:dark]"
+                        'h-11 bg-white/5 border-white/10 text-white',
+                        '[color-scheme:dark]',
                       )}
                     />
                   </div>
@@ -540,7 +540,7 @@ export function CreateIngresoModalPremium({
                       Referencia (opcional)
                     </Label>
                     <Input
-                      {...register("referencia")}
+                      {...register('referencia')}
                       placeholder="# de referencia"
                       className="h-11 bg-white/5 border-white/10 text-white"
                     />
@@ -553,7 +553,7 @@ export function CreateIngresoModalPremium({
                     Notas (opcional)
                   </Label>
                   <Textarea
-                    {...register("notas")}
+                    {...register('notas')}
                     placeholder="Observaciones adicionales..."
                     rows={2}
                     className="bg-white/5 border-white/10 text-white resize-none"
@@ -573,8 +573,8 @@ export function CreateIngresoModalPremium({
                     </div>
                     <div className="flex items-center gap-4">
                       <div className={cn(
-                        "w-14 h-14 rounded-xl flex items-center justify-center",
-                        "bg-gradient-to-br from-emerald-500 to-teal-500"
+                        'w-14 h-14 rounded-xl flex items-center justify-center',
+                        'bg-gradient-to-br from-emerald-500 to-teal-500',
                       )}>
                         <ArrowDownCircle className="w-7 h-7 text-white" />
                       </div>
@@ -601,9 +601,9 @@ export function CreateIngresoModalPremium({
 
               {/* Footer */}
               <div className={cn(
-                "shrink-0 h-20 border-t border-white/10",
-                "bg-gradient-to-r from-black/50 via-white/5 to-black/50",
-                "px-6 flex items-center justify-between"
+                'shrink-0 h-20 border-t border-white/10',
+                'bg-gradient-to-r from-black/50 via-white/5 to-black/50',
+                'px-6 flex items-center justify-between',
               )}>
                 <Button
                   type="button"
@@ -619,12 +619,12 @@ export function CreateIngresoModalPremium({
                   type="submit"
                   disabled={isSubmitting || !isValid}
                   className={cn(
-                    "min-w-[180px]",
-                    "bg-gradient-to-r from-emerald-600 to-teal-600",
-                    "hover:from-emerald-500 hover:to-teal-500",
-                    "text-white font-bold",
-                    "shadow-[0_0_30px_rgba(16,185,129,0.4)]",
-                    "disabled:opacity-50"
+                    'min-w-[180px]',
+                    'bg-gradient-to-r from-emerald-600 to-teal-600',
+                    'hover:from-emerald-500 hover:to-teal-500',
+                    'text-white font-bold',
+                    'shadow-[0_0_30px_rgba(16,185,129,0.4)]',
+                    'disabled:opacity-50',
                   )}
                 >
                   {isSubmitting ? (

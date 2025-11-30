@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 💎 CREATE CLIENTE MODAL PREMIUM - Gestión Ultra de Clientes
@@ -12,22 +12,22 @@
  * 6. Validación con Zod
  */
 
-import * as React from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useForm, Controller } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
+import * as React from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from "@/app/components/ui/dialog"
-import { Button } from "@/app/components/ui/button"
-import { Input } from "@/app/components/ui/input"
-import { Label } from "@/app/components/ui/label"
-import { Badge } from "@/app/components/ui/badge"
-import { Textarea } from "@/app/components/ui/textarea"
+} from '@/app/components/ui/dialog'
+import { Button } from '@/app/components/ui/button'
+import { Input } from '@/app/components/ui/input'
+import { Label } from '@/app/components/ui/label'
+import { Badge } from '@/app/components/ui/badge'
+import { Textarea } from '@/app/components/ui/textarea'
 import {
   User,
   Phone,
@@ -53,12 +53,12 @@ import {
   Calculator,
   ArrowUpRight,
   ArrowDownRight,
-} from "lucide-react"
-import { cn } from "@/app/lib/utils"
-import { useToast } from "@/app/hooks/use-toast"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { logger } from "@/app/lib/utils/logger"
-import { formatearMonto } from "@/app/lib/validations/smart-forms-schemas"
+} from 'lucide-react'
+import { cn } from '@/app/lib/utils'
+import { useToast } from '@/app/hooks/use-toast'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { logger } from '@/app/lib/utils/logger'
+import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
 
 // ============================================
 // SCHEMA ZOD - Basado en clientes.csv
@@ -66,12 +66,12 @@ import { formatearMonto } from "@/app/lib/validations/smart-forms-schemas"
 
 const clienteSchema = z.object({
   nombre: z.string()
-    .min(2, "El nombre debe tener al menos 2 caracteres")
-    .max(100, "El nombre es demasiado largo"),
+    .min(2, 'El nombre debe tener al menos 2 caracteres')
+    .max(100, 'El nombre es demasiado largo'),
   telefono: z.string().optional(),
-  email: z.string().email("Email inválido").optional().or(z.literal("")),
+  email: z.string().email('Email inválido').optional().or(z.literal('')),
   direccion: z.string().optional(),
-  tipo: z.enum(["mayorista", "minorista", "especial"]),
+  tipo: z.enum(['mayorista', 'minorista', 'especial']),
   // Campos financieros del CSV
   actual: z.number().min(0), // Saldo actual
   deuda: z.number().min(0), // Deuda acumulada
@@ -104,9 +104,9 @@ const containerVariants = {
     transition: {
       duration: 0.4,
       staggerChildren: 0.05,
-    }
+    },
   },
-  exit: { opacity: 0, scale: 0.95, y: -20, transition: { duration: 0.2 } }
+  exit: { opacity: 0, scale: 0.95, y: -20, transition: { duration: 0.2 } },
 }
 
 const itemVariants = {
@@ -115,7 +115,7 @@ const itemVariants = {
     opacity: 1, 
     y: 0, 
     scale: 1,
-    transition: { duration: 0.3 }
+    transition: { duration: 0.3 },
   },
 }
 
@@ -127,7 +127,7 @@ export function CreateClienteModalPremium({
   open, 
   onClose, 
   onSuccess,
-  editData 
+  editData, 
 }: CreateClienteModalProps) {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
@@ -138,15 +138,15 @@ export function CreateClienteModalPremium({
   const form = useForm<ClienteInput>({
     resolver: zodResolver(clienteSchema),
     defaultValues: {
-      nombre: editData?.nombre || "",
-      telefono: editData?.telefono || "",
-      email: editData?.email || "",
-      direccion: editData?.direccion || "",
-      tipo: editData?.tipo || "minorista",
+      nombre: editData?.nombre || '',
+      telefono: editData?.telefono || '',
+      email: editData?.email || '',
+      direccion: editData?.direccion || '',
+      tipo: editData?.tipo || 'minorista',
       actual: editData?.actual || 0,
       deuda: editData?.deuda || 0,
       abonos: editData?.abonos || 0,
-      observaciones: editData?.observaciones || "",
+      observaciones: editData?.observaciones || '',
       limiteCredito: editData?.limiteCredito || 100000,
     },
   })
@@ -154,10 +154,10 @@ export function CreateClienteModalPremium({
   const { watch, setValue, handleSubmit, reset, formState: { errors } } = form
   
   // Watch valores para cálculos en tiempo real
-  const deuda = watch("deuda")
-  const abonos = watch("abonos")
-  const limiteCredito = watch("limiteCredito")
-  const tipo = watch("tipo")
+  const deuda = watch('deuda')
+  const abonos = watch('abonos')
+  const limiteCredito = watch('limiteCredito')
+  const tipo = watch('tipo')
 
   // Calcular saldo pendiente
   const pendiente = React.useMemo(() => {
@@ -180,15 +180,15 @@ export function CreateClienteModalPremium({
     if (open) {
       if (editData) {
         reset({
-          nombre: editData.nombre || "",
-          telefono: editData.telefono || "",
-          email: editData.email || "",
-          direccion: editData.direccion || "",
-          tipo: editData.tipo || "minorista",
+          nombre: editData.nombre || '',
+          telefono: editData.telefono || '',
+          email: editData.email || '',
+          direccion: editData.direccion || '',
+          tipo: editData.tipo || 'minorista',
           actual: editData.actual || 0,
           deuda: editData.deuda || 0,
           abonos: editData.abonos || 0,
-          observaciones: editData.observaciones || "",
+          observaciones: editData.observaciones || '',
           limiteCredito: editData.limiteCredito || 100000,
         })
       } else {
@@ -211,13 +211,13 @@ export function CreateClienteModalPremium({
       //   updatedAt: serverTimestamp(),
       // }
 
-      logger.info("Cliente creado/actualizado", { 
+      logger.info('Cliente creado/actualizado', { 
         data: { ...data, pendiente },
-        context: "CreateClienteModalPremium"
+        context: 'CreateClienteModalPremium',
       })
 
       toast({
-        title: isEdit ? "✅ Cliente Actualizado" : "✅ Cliente Creado",
+        title: isEdit ? '✅ Cliente Actualizado' : '✅ Cliente Creado',
         description: `${data.nombre} - Pendiente: ${formatearMonto(pendiente)}`,
       })
 
@@ -226,11 +226,11 @@ export function CreateClienteModalPremium({
       useAppStore.getState().triggerDataRefresh()
 
     } catch (error) {
-      logger.error("Error al guardar cliente", error)
+      logger.error('Error al guardar cliente', error)
       toast({
-        title: "Error",
-        description: "No se pudo guardar el cliente",
-        variant: "destructive",
+        title: 'Error',
+        description: 'No se pudo guardar el cliente',
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -242,16 +242,16 @@ export function CreateClienteModalPremium({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          "max-w-3xl h-[85vh] p-0 overflow-hidden",
+          'max-w-3xl h-[85vh] p-0 overflow-hidden',
           // 🎨 GLASSMORPHISM ULTRA PREMIUM
-          "bg-black/60 backdrop-blur-2xl",
-          "border border-white/10",
-          "text-white",
-          "shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(59,130,246,0.15)]"
+          'bg-black/60 backdrop-blur-2xl',
+          'border border-white/10',
+          'text-white',
+          'shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(59,130,246,0.15)]',
         )}
       >
         <DialogTitle className="sr-only">
-          {isEdit ? "Editar Cliente" : "Nuevo Cliente"}
+          {isEdit ? 'Editar Cliente' : 'Nuevo Cliente'}
         </DialogTitle>
         <DialogDescription className="sr-only">
           Formulario para gestionar datos del cliente
@@ -287,7 +287,7 @@ export function CreateClienteModalPremium({
                 </motion.div>
                 <div>
                   <h2 className="text-2xl font-bold text-white">
-                    {isEdit ? "Editar Cliente" : "Nuevo Cliente"}
+                    {isEdit ? 'Editar Cliente' : 'Nuevo Cliente'}
                   </h2>
                   <p className="text-sm text-gray-400 flex items-center gap-2">
                     <Sparkles className="w-3 h-3 text-yellow-400" />
@@ -331,13 +331,13 @@ export function CreateClienteModalPremium({
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                     <Input
-                      {...form.register("nombre")}
+                      {...form.register('nombre')}
                       placeholder="Ej: Valle, Ax, Robalo..."
                       className={cn(
-                        "pl-10 h-12 bg-white/5 border-white/10 text-white",
-                        "placeholder:text-gray-500",
-                        "focus:border-blue-500/50 focus:ring-blue-500/20",
-                        errors.nombre && "border-red-500/50"
+                        'pl-10 h-12 bg-white/5 border-white/10 text-white',
+                        'placeholder:text-gray-500',
+                        'focus:border-blue-500/50 focus:ring-blue-500/20',
+                        errors.nombre && 'border-red-500/50',
                       )}
                     />
                     {errors.nombre && (
@@ -352,7 +352,7 @@ export function CreateClienteModalPremium({
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                     <Input
-                      {...form.register("telefono")}
+                      {...form.register('telefono')}
                       placeholder="(33) 1234-5678"
                       className="pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
                     />
@@ -365,12 +365,12 @@ export function CreateClienteModalPremium({
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                     <Input
-                      {...form.register("email")}
+                      {...form.register('email')}
                       type="email"
                       placeholder="cliente@email.com"
                       className={cn(
-                        "pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-gray-500",
-                        errors.email && "border-red-500/50"
+                        'pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-gray-500',
+                        errors.email && 'border-red-500/50',
                       )}
                     />
                   </div>
@@ -382,7 +382,7 @@ export function CreateClienteModalPremium({
                   <div className="relative">
                     <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
                     <Input
-                      {...form.register("direccion")}
+                      {...form.register('direccion')}
                       placeholder="Calle, número, colonia, ciudad..."
                       className="pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
                     />
@@ -394,25 +394,25 @@ export function CreateClienteModalPremium({
                   <Label className="text-sm text-gray-400">Tipo de Cliente</Label>
                   <div className="grid grid-cols-3 gap-3">
                     {[
-                      { id: "mayorista", icon: Building2, label: "Mayorista", color: "purple" },
-                      { id: "minorista", icon: User, label: "Minorista", color: "blue" },
-                      { id: "especial", icon: Star, label: "Especial", color: "yellow" },
+                      { id: 'mayorista', icon: Building2, label: 'Mayorista', color: 'purple' },
+                      { id: 'minorista', icon: User, label: 'Minorista', color: 'blue' },
+                      { id: 'especial', icon: Star, label: 'Especial', color: 'yellow' },
                     ].map((t) => (
                       <motion.button
                         key={t.id}
                         type="button"
-                        onClick={() => setValue("tipo", t.id as "mayorista" | "minorista" | "especial")}
+                        onClick={() => setValue('tipo', t.id as 'mayorista' | 'minorista' | 'especial')}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         className={cn(
-                          "p-4 rounded-xl border text-center transition-all",
+                          'p-4 rounded-xl border text-center transition-all',
                           tipo === t.id
-                            ? t.color === "purple" 
-                              ? "bg-purple-500/20 border-purple-500 text-purple-400"
-                              : t.color === "blue"
-                              ? "bg-blue-500/20 border-blue-500 text-blue-400"
-                              : "bg-yellow-500/20 border-yellow-500 text-yellow-400"
-                            : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+                            ? t.color === 'purple' 
+                              ? 'bg-purple-500/20 border-purple-500 text-purple-400'
+                              : t.color === 'blue'
+                              ? 'bg-blue-500/20 border-blue-500 text-blue-400'
+                              : 'bg-yellow-500/20 border-yellow-500 text-yellow-400'
+                            : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10',
                         )}
                       >
                         <t.icon className="w-5 h-5 mx-auto mb-2" />
@@ -438,9 +438,9 @@ export function CreateClienteModalPremium({
 
               {/* Tarjeta de Resumen Financiero */}
               <div className={cn(
-                "p-5 rounded-2xl border",
-                "bg-gradient-to-br from-white/5 to-transparent",
-                "border-white/10"
+                'p-5 rounded-2xl border',
+                'bg-gradient-to-br from-white/5 to-transparent',
+                'border-white/10',
               )}>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                   {/* Deuda Total */}
@@ -463,18 +463,18 @@ export function CreateClienteModalPremium({
 
                   {/* Pendiente (Calculado) */}
                   <div className={cn(
-                    "text-center p-3 rounded-xl border",
+                    'text-center p-3 rounded-xl border',
                     pendiente > 0 
-                      ? "bg-orange-500/10 border-orange-500/20" 
-                      : "bg-emerald-500/10 border-emerald-500/20"
+                      ? 'bg-orange-500/10 border-orange-500/20' 
+                      : 'bg-emerald-500/10 border-emerald-500/20',
                   )}>
                     <Calculator className="w-5 h-5 mx-auto mb-1 text-orange-400" />
                     <p className="text-xs text-gray-400">Pendiente</p>
                     <p className={cn(
-                      "text-lg font-bold",
-                      pendiente > 0 ? "text-orange-400" : "text-emerald-400"
+                      'text-lg font-bold',
+                      pendiente > 0 ? 'text-orange-400' : 'text-emerald-400',
                     )}>
-                      {pendiente < 0 ? "-" : ""}{formatearMonto(Math.abs(pendiente))}
+                      {pendiente < 0 ? '-' : ''}{formatearMonto(Math.abs(pendiente))}
                     </p>
                     <p className="text-[9px] text-gray-500">= Deuda - Abonos</p>
                   </div>
@@ -501,7 +501,7 @@ export function CreateClienteModalPremium({
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                       <Input
                         type="number"
-                        {...form.register("deuda", { valueAsNumber: true })}
+                        {...form.register('deuda', { valueAsNumber: true })}
                         className="pl-7 h-11 bg-red-500/5 border-red-500/20 text-red-300"
                       />
                     </div>
@@ -517,7 +517,7 @@ export function CreateClienteModalPremium({
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                       <Input
                         type="number"
-                        {...form.register("abonos", { valueAsNumber: true })}
+                        {...form.register('abonos', { valueAsNumber: true })}
                         className="pl-7 h-11 bg-green-500/5 border-green-500/20 text-green-300"
                       />
                     </div>
@@ -533,7 +533,7 @@ export function CreateClienteModalPremium({
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                       <Input
                         type="number"
-                        {...form.register("limiteCredito", { valueAsNumber: true })}
+                        {...form.register('limiteCredito', { valueAsNumber: true })}
                         className="pl-7 h-11 bg-blue-500/5 border-blue-500/20 text-blue-300"
                       />
                     </div>
@@ -545,9 +545,9 @@ export function CreateClienteModalPremium({
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs text-gray-400">Uso del Crédito</span>
                     <span className={cn(
-                      "text-xs font-bold",
-                      porcentajeCredito < 50 ? "text-green-400" :
-                      porcentajeCredito < 80 ? "text-yellow-400" : "text-red-400"
+                      'text-xs font-bold',
+                      porcentajeCredito < 50 ? 'text-green-400' :
+                      porcentajeCredito < 80 ? 'text-yellow-400' : 'text-red-400',
                     )}>
                       {porcentajeCredito.toFixed(1)}%
                     </span>
@@ -555,13 +555,13 @@ export function CreateClienteModalPremium({
                   <div className="h-2 rounded-full bg-white/10 overflow-hidden">
                     <motion.div
                       className={cn(
-                        "h-full",
-                        porcentajeCredito < 50 ? "bg-green-500" :
-                        porcentajeCredito < 80 ? "bg-yellow-500" : "bg-red-500"
+                        'h-full',
+                        porcentajeCredito < 50 ? 'bg-green-500' :
+                        porcentajeCredito < 80 ? 'bg-yellow-500' : 'bg-red-500',
                       )}
                       initial={{ width: 0 }}
                       animate={{ width: `${porcentajeCredito}%` }}
-                      transition={{ duration: 0.8, ease: "easeOut" }}
+                      transition={{ duration: 0.8, ease: 'easeOut' }}
                     />
                   </div>
                   {porcentajeCredito >= 80 && (
@@ -588,7 +588,7 @@ export function CreateClienteModalPremium({
               </div>
 
               <Textarea
-                {...form.register("observaciones")}
+                {...form.register('observaciones')}
                 placeholder="Notas adicionales sobre el cliente (ej: '33 panaderia', 'Pago los viernes', etc.)"
                 rows={3}
                 className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 resize-none"
@@ -598,9 +598,9 @@ export function CreateClienteModalPremium({
 
           {/* ===== FOOTER ===== */}
           <div className={cn(
-            "shrink-0 h-20 border-t border-white/10",
-            "bg-gradient-to-r from-black/50 via-white/5 to-black/50",
-            "px-6 flex items-center justify-between"
+            'shrink-0 h-20 border-t border-white/10',
+            'bg-gradient-to-r from-black/50 via-white/5 to-black/50',
+            'px-6 flex items-center justify-between',
           )}>
             <Button
               type="button"
@@ -616,12 +616,12 @@ export function CreateClienteModalPremium({
               type="submit"
               disabled={isSubmitting}
               className={cn(
-                "min-w-[180px]",
-                "bg-gradient-to-r from-blue-600 to-purple-600",
-                "hover:from-blue-500 hover:to-purple-500",
-                "text-white font-bold",
-                "shadow-[0_0_30px_rgba(59,130,246,0.4)]",
-                "transition-all duration-300"
+                'min-w-[180px]',
+                'bg-gradient-to-r from-blue-600 to-purple-600',
+                'hover:from-blue-500 hover:to-purple-500',
+                'text-white font-bold',
+                'shadow-[0_0_30px_rgba(59,130,246,0.4)]',
+                'transition-all duration-300',
               )}
             >
               {isSubmitting ? (
@@ -632,7 +632,7 @@ export function CreateClienteModalPremium({
               ) : (
                 <>
                   <Zap className="w-4 h-4 mr-2" />
-                  {isEdit ? "Actualizar Cliente" : "Crear Cliente"}
+                  {isEdit ? 'Actualizar Cliente' : 'Crear Cliente'}
                 </>
               )}
             </Button>

@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * BentoZeroForce - Panel de IA con Zero Force Overdrive
@@ -24,7 +24,7 @@ import {
   Eye,
   EyeOff,
   Layers,
-  Radio
+  Radio,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { ZeroState, ChatMessage } from '../3d'
@@ -34,8 +34,8 @@ const ZeroPanel = dynamic(
   () => import('../3d/ZeroPanel').then(mod => mod.ZeroPanel),
   { 
     ssr: false, 
-    loading: () => <ZeroLoader />
-  }
+    loading: () => <ZeroLoader />,
+  },
 )
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -61,16 +61,16 @@ function ZeroLoader() {
             className="w-32 h-5 rounded-full"
             style={{ 
               backgroundColor: '#ef4444',
-              boxShadow: '0 0 40px #ef4444, 0 0 80px #ef4444, 0 0 120px #ef4444'
+              boxShadow: '0 0 40px #ef4444, 0 0 80px #ef4444, 0 0 120px #ef4444',
             }}
             animate={{
               scaleX: [1, 0.8, 1],
-              opacity: [1, 0.7, 1]
+              opacity: [1, 0.7, 1],
             }}
             transition={{
               duration: 2,
               repeat: Infinity,
-              ease: 'easeInOut'
+              ease: 'easeInOut',
             }}
           />
           
@@ -81,7 +81,7 @@ function ZeroLoader() {
             transition={{ 
               duration: 1.5, 
               repeat: Infinity, 
-              ease: 'linear' 
+              ease: 'linear', 
             }}
           />
         </div>
@@ -137,7 +137,7 @@ function ControlPanel({ settings, onSettingsChange, currentState }: ControlPanel
     processing: 'bg-purple-500',
     combat: 'bg-red-500',
     success: 'bg-emerald-500',
-    error: 'bg-orange-500'
+    error: 'bg-orange-500',
   }
   
   return (
@@ -230,7 +230,7 @@ function QuickActions({ onAction, disabled }: QuickActionsProps) {
     { id: 'sales', label: 'Análisis Ventas', icon: Activity, color: 'from-blue-600 to-cyan-600' },
     { id: 'inventory', label: 'Inventario', icon: Shield, color: 'from-purple-600 to-pink-600' },
     { id: 'predictions', label: 'Predicciones', icon: Sparkles, color: 'from-amber-600 to-orange-600' },
-    { id: 'combat', label: 'Modo Combate', icon: Target, color: 'from-red-600 to-rose-600' }
+    { id: 'combat', label: 'Modo Combate', icon: Target, color: 'from-red-600 to-rose-600' },
   ]
   
   return (
@@ -281,7 +281,7 @@ export default function BentoZeroForce({ className = '' }: BentoZeroForceProps) 
     showHUD: true,
     showLogs: true,
     showScene: true,
-    effectsIntensity: 'normal'
+    effectsIntensity: 'normal',
   })
   
   // Handlers
@@ -334,7 +334,7 @@ export default function BentoZeroForce({ className = '' }: BentoZeroForceProps) 
                 className="w-8 h-2 rounded-full animate-pulse"
                 style={{ 
                   backgroundColor: '#ef4444',
-                  boxShadow: '0 0 15px #ef4444'
+                  boxShadow: '0 0 15px #ef4444',
                 }}
               />
             </div>

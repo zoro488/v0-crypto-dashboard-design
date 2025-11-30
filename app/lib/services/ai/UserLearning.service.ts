@@ -19,9 +19,9 @@ import {
   Timestamp,
   orderBy,
   limit,
-  increment
-} from 'firebase/firestore';
-import { db, isFirebaseConfigured } from '@/app/lib/firebase/config';
+  increment,
+} from 'firebase/firestore'
+import { db, isFirebaseConfigured } from '@/app/lib/firebase/config'
 
 // Tipos
 export interface UserProfile {
@@ -131,15 +131,15 @@ export interface LearningInsight {
 }
 
 export class UserLearningService {
-  private sessionId: string;
-  private sessionStart: Date;
-  private activityBuffer: UserActivity[] = [];
-  private flushInterval: ReturnType<typeof setInterval> | null = null;
+  private sessionId: string
+  private sessionStart: Date
+  private activityBuffer: UserActivity[] = []
+  private flushInterval: ReturnType<typeof setInterval> | null = null
 
   constructor() {
-    this.sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    this.sessionStart = new Date();
-    this.startActivityFlush();
+    this.sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    this.sessionStart = new Date()
+    this.startActivityFlush()
   }
 
   /**
@@ -148,8 +148,8 @@ export class UserLearningService {
   private startActivityFlush(): void {
     // Flush cada 30 segundos
     this.flushInterval = setInterval(() => {
-      this.flushActivities().catch(console.error);
-    }, 30000);
+      this.flushActivities().catch(console.error)
+    }, 30000)
   }
 
   /**
@@ -159,7 +159,7 @@ export class UserLearningService {
     userId: string,
     action: string,
     context: string,
-    metadata?: Record<string, unknown>
+    metadata?: Record<string, unknown>,
   ): Promise<void> {
     const activity: UserActivity = {
       id: `activity_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -168,14 +168,14 @@ export class UserLearningService {
       context,
       metadata,
       timestamp: new Date(),
-      sessionId: this.sessionId
-    };
+      sessionId: this.sessionId,
+    }
 
-    this.activityBuffer.push(activity);
+    this.activityBuffer.push(activity)
 
     // Si el buffer tiene más de 20 items, flush inmediato
     if (this.activityBuffer.length >= 20) {
-      await this.flushActivities();
+      await this.flushActivities()
     }
   }
 
@@ -183,31 +183,31 @@ export class UserLearningService {
    * Flush actividades a Firestore
    */
   private async flushActivities(): Promise<void> {
-    if (this.activityBuffer.length === 0) return;
+    if (this.activityBuffer.length === 0) return
 
-    const activitiesToFlush = [...this.activityBuffer];
-    this.activityBuffer = [];
+    const activitiesToFlush = [...this.activityBuffer]
+    this.activityBuffer = []
 
     try {
       // Guardar actividades en batch
       const batch = activitiesToFlush.map(activity => {
-        const activityRef = doc(db!, 'userActivities', activity.id);
+        const activityRef = doc(db!, 'userActivities', activity.id)
         return setDoc(activityRef, {
           ...activity,
-          timestamp: Timestamp.fromDate(activity.timestamp)
-        });
-      });
+          timestamp: Timestamp.fromDate(activity.timestamp),
+        })
+      })
 
-      await Promise.all(batch);
+      await Promise.all(batch)
 
       // Actualizar patrones del usuario
       if (activitiesToFlush.length > 0) {
-        await this.updateUserPatterns(activitiesToFlush[0].userId, activitiesToFlush);
+        await this.updateUserPatterns(activitiesToFlush[0].userId, activitiesToFlush)
       }
     } catch (error) {
       // Re-agregar al buffer si falla
-      this.activityBuffer = [...activitiesToFlush, ...this.activityBuffer];
-      console.error('Error flushing activities:', error);
+      this.activityBuffer = [...activitiesToFlush, ...this.activityBuffer]
+      console.error('Error flushing activities:', error)
     }
   }
 
@@ -216,19 +216,19 @@ export class UserLearningService {
    */
   private async updateUserPatterns(
     userId: string,
-    activities: UserActivity[]
+    activities: UserActivity[],
   ): Promise<void> {
     try {
-      const userPatternsRef = doc(db!, 'userPatterns', userId);
+      const userPatternsRef = doc(db!, 'userPatterns', userId)
       
       // Calcular nuevos patrones
-      const actionCounts: Record<string, number> = {};
-      const contextCounts: Record<string, number> = {};
+      const actionCounts: Record<string, number> = {}
+      const contextCounts: Record<string, number> = {}
 
       activities.forEach(activity => {
-        actionCounts[activity.action] = (actionCounts[activity.action] || 0) + 1;
-        contextCounts[activity.context] = (contextCounts[activity.context] || 0) + 1;
-      });
+        actionCounts[activity.action] = (actionCounts[activity.action] || 0) + 1
+        contextCounts[activity.context] = (contextCounts[activity.context] || 0) + 1
+      })
 
       // Actualizar con merge
       await setDoc(userPatternsRef, {
@@ -236,10 +236,10 @@ export class UserLearningService {
         lastUpdated: Timestamp.now(),
         sessionCount: increment(0), // Se actualizará en getProfile
         actionPatterns: actionCounts,
-        contextPatterns: contextCounts
-      }, { merge: true });
+        contextPatterns: contextCounts,
+      }, { merge: true })
     } catch (error) {
-      console.error('Error updating user patterns:', error);
+      console.error('Error updating user patterns:', error)
     }
   }
 
@@ -249,28 +249,28 @@ export class UserLearningService {
   async getUserProfile(userId: string): Promise<UserProfile | null> {
     try {
       // Obtener actividades del usuario
-      const activitiesRef = collection(db!, 'userActivities');
+      const activitiesRef = collection(db!, 'userActivities')
       const q = query(
         activitiesRef,
         where('userId', '==', userId),
         orderBy('timestamp', 'desc'),
-        limit(1000)
-      );
+        limit(1000),
+      )
       
-      const snapshot = await getDocs(q);
+      const snapshot = await getDocs(q)
       const activities = snapshot.docs.map(doc => ({
         ...doc.data(),
-        timestamp: doc.data().timestamp?.toDate?.() || new Date(doc.data().timestamp)
-      })) as UserActivity[];
+        timestamp: doc.data().timestamp?.toDate?.() || new Date(doc.data().timestamp),
+      })) as UserActivity[]
 
       if (activities.length === 0) {
-        return this.createDefaultProfile(userId);
+        return this.createDefaultProfile(userId)
       }
 
       // Analizar patrones
-      const patterns = this.analyzePatterns(activities);
-      const analytics = this.calculateAnalytics(activities);
-      const preferences = await this.getPreferences(userId);
+      const patterns = this.analyzePatterns(activities)
+      const analytics = this.calculateAnalytics(activities)
+      const preferences = await this.getPreferences(userId)
 
       return {
         userId,
@@ -279,11 +279,11 @@ export class UserLearningService {
         totalSessions: this.countSessions(activities),
         preferences,
         patterns,
-        analytics
-      };
+        analytics,
+      }
     } catch (error) {
-      console.error('Error getting user profile:', error);
-      return null;
+      console.error('Error getting user profile:', error)
+      return null
     }
   }
 
@@ -306,20 +306,20 @@ export class UserLearningService {
           push: true,
           inApp: true,
           frequency: 'realtime',
-          types: ['alerts', 'reports', 'updates']
+          types: ['alerts', 'reports', 'updates'],
         },
         aiAssistant: {
           autoSuggestions: true,
           voiceEnabled: true,
           proactiveInsights: true,
-          detailLevel: 'detailed'
-        }
+          detailLevel: 'detailed',
+        },
       },
       patterns: {
         commonActions: [],
         timePatterns: [],
         searchPatterns: [],
-        navigationPatterns: []
+        navigationPatterns: [],
       },
       analytics: {
         totalActions: 0,
@@ -327,9 +327,9 @@ export class UserLearningService {
         avgSessionDuration: 0,
         mostUsedFeatures: [],
         peakActivityHours: [],
-        engagementScore: 50
-      }
-    };
+        engagementScore: 50,
+      },
+    }
   }
 
   /**
@@ -337,142 +337,142 @@ export class UserLearningService {
    */
   private analyzePatterns(activities: UserActivity[]): UserPatterns {
     // Patrones de acciones comunes
-    const actionFrequency: Record<string, { count: number; lastUsed: Date }> = {};
+    const actionFrequency: Record<string, { count: number; lastUsed: Date }> = {}
     activities.forEach(a => {
       if (!actionFrequency[a.action]) {
-        actionFrequency[a.action] = { count: 0, lastUsed: a.timestamp };
+        actionFrequency[a.action] = { count: 0, lastUsed: a.timestamp }
       }
-      actionFrequency[a.action].count++;
+      actionFrequency[a.action].count++
       if (a.timestamp > actionFrequency[a.action].lastUsed) {
-        actionFrequency[a.action].lastUsed = a.timestamp;
+        actionFrequency[a.action].lastUsed = a.timestamp
       }
-    });
+    })
 
     const commonActions: ActionPattern[] = Object.entries(actionFrequency)
       .map(([action, data]) => ({
         action,
         frequency: data.count,
-        lastUsed: data.lastUsed
+        lastUsed: data.lastUsed,
       }))
       .sort((a, b) => b.frequency - a.frequency)
-      .slice(0, 10);
+      .slice(0, 10)
 
     // Patrones de tiempo
-    const timeActivity: Record<string, { count: number; activities: string[] }> = {};
+    const timeActivity: Record<string, { count: number; activities: string[] }> = {}
     activities.forEach(a => {
-      const hour = a.timestamp.getHours();
-      const day = a.timestamp.getDay();
-      const key = `${day}_${hour}`;
+      const hour = a.timestamp.getHours()
+      const day = a.timestamp.getDay()
+      const key = `${day}_${hour}`
       
       if (!timeActivity[key]) {
-        timeActivity[key] = { count: 0, activities: [] };
+        timeActivity[key] = { count: 0, activities: [] }
       }
-      timeActivity[key].count++;
+      timeActivity[key].count++
       if (!timeActivity[key].activities.includes(a.action)) {
-        timeActivity[key].activities.push(a.action);
+        timeActivity[key].activities.push(a.action)
       }
-    });
+    })
 
     const timePatterns: TimePattern[] = Object.entries(timeActivity)
       .map(([key, data]) => {
-        const [day, hour] = key.split('_').map(Number);
-        const level = data.count > 10 ? 'high' : data.count > 5 ? 'medium' : 'low';
+        const [day, hour] = key.split('_').map(Number)
+        const level = data.count > 10 ? 'high' : data.count > 5 ? 'medium' : 'low'
         return {
           dayOfWeek: day,
           hour,
           activityLevel: level as 'low' | 'medium' | 'high',
-          commonActivities: data.activities.slice(0, 5)
-        };
+          commonActivities: data.activities.slice(0, 5),
+        }
       })
-      .filter(p => p.activityLevel !== 'low');
+      .filter(p => p.activityLevel !== 'low')
 
     // Patrones de navegación
-    const navigationFrequency: Record<string, { count: number; times: number[] }> = {};
+    const navigationFrequency: Record<string, { count: number; times: number[] }> = {}
     for (let i = 1; i < activities.length; i++) {
-      const from = activities[i].context;
-      const to = activities[i - 1].context;
+      const from = activities[i].context
+      const to = activities[i - 1].context
       if (from !== to) {
-        const key = `${from}|${to}`;
+        const key = `${from}|${to}`
         if (!navigationFrequency[key]) {
-          navigationFrequency[key] = { count: 0, times: [] };
+          navigationFrequency[key] = { count: 0, times: [] }
         }
-        navigationFrequency[key].count++;
-        const timeDiff = activities[i - 1].timestamp.getTime() - activities[i].timestamp.getTime();
-        navigationFrequency[key].times.push(timeDiff);
+        navigationFrequency[key].count++
+        const timeDiff = activities[i - 1].timestamp.getTime() - activities[i].timestamp.getTime()
+        navigationFrequency[key].times.push(timeDiff)
       }
     }
 
     const navigationPatterns: NavigationPattern[] = Object.entries(navigationFrequency)
       .map(([key, data]) => {
-        const [from, to] = key.split('|');
-        const avgTime = data.times.reduce((a, b) => a + b, 0) / data.times.length;
-        return { from, to, frequency: data.count, avgTime };
+        const [from, to] = key.split('|')
+        const avgTime = data.times.reduce((a, b) => a + b, 0) / data.times.length
+        return { from, to, frequency: data.count, avgTime }
       })
       .sort((a, b) => b.frequency - a.frequency)
-      .slice(0, 10);
+      .slice(0, 10)
 
     return {
       commonActions,
       timePatterns,
       searchPatterns: [],
-      navigationPatterns
-    };
+      navigationPatterns,
+    }
   }
 
   /**
    * Calcula analíticas del usuario
    */
   private calculateAnalytics(activities: UserActivity[]): UserAnalytics {
-    const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const now = new Date()
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
 
     // Acciones de hoy
-    const actionsToday = activities.filter(a => a.timestamp >= todayStart).length;
+    const actionsToday = activities.filter(a => a.timestamp >= todayStart).length
 
     // Features más usadas
-    const featureUsage: Record<string, { count: number; lastUsed: Date }> = {};
+    const featureUsage: Record<string, { count: number; lastUsed: Date }> = {}
     activities.forEach(a => {
-      const feature = a.context;
+      const feature = a.context
       if (!featureUsage[feature]) {
-        featureUsage[feature] = { count: 0, lastUsed: a.timestamp };
+        featureUsage[feature] = { count: 0, lastUsed: a.timestamp }
       }
-      featureUsage[feature].count++;
+      featureUsage[feature].count++
       if (a.timestamp > featureUsage[feature].lastUsed) {
-        featureUsage[feature].lastUsed = a.timestamp;
+        featureUsage[feature].lastUsed = a.timestamp
       }
-    });
+    })
 
     const mostUsedFeatures: FeatureUsage[] = Object.entries(featureUsage)
       .map(([feature, data]) => ({
         feature,
         usageCount: data.count,
-        lastUsed: data.lastUsed
+        lastUsed: data.lastUsed,
       }))
       .sort((a, b) => b.usageCount - a.usageCount)
-      .slice(0, 5);
+      .slice(0, 5)
 
     // Horas pico
-    const hourActivity: Record<number, number> = {};
+    const hourActivity: Record<number, number> = {}
     activities.forEach(a => {
-      const hour = a.timestamp.getHours();
-      hourActivity[hour] = (hourActivity[hour] || 0) + 1;
-    });
+      const hour = a.timestamp.getHours()
+      hourActivity[hour] = (hourActivity[hour] || 0) + 1
+    })
 
     const peakActivityHours = Object.entries(hourActivity)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 3)
-      .map(([hour]) => Number(hour));
+      .map(([hour]) => Number(hour))
 
     // Engagement score (0-100)
-    const daysActive = this.countUniqueDays(activities);
-    const avgActionsPerDay = activities.length / Math.max(daysActive, 1);
-    const featureVariety = Object.keys(featureUsage).length;
+    const daysActive = this.countUniqueDays(activities)
+    const avgActionsPerDay = activities.length / Math.max(daysActive, 1)
+    const featureVariety = Object.keys(featureUsage).length
     
     const engagementScore = Math.min(100, Math.round(
       (avgActionsPerDay * 2) + // Frecuencia
       (featureVariety * 5) + // Diversidad
-      (actionsToday > 0 ? 20 : 0) // Actividad reciente
-    ));
+      (actionsToday > 0 ? 20 : 0), // Actividad reciente
+    ))
 
     return {
       totalActions: activities.length,
@@ -480,8 +480,8 @@ export class UserLearningService {
       avgSessionDuration: this.calculateAvgSessionDuration(activities),
       mostUsedFeatures,
       peakActivityHours,
-      engagementScore
-    };
+      engagementScore,
+    }
   }
 
   /**
@@ -489,9 +489,9 @@ export class UserLearningService {
    */
   private countUniqueDays(activities: UserActivity[]): number {
     const uniqueDays = new Set(
-      activities.map(a => a.timestamp.toISOString().split('T')[0])
-    );
-    return uniqueDays.size;
+      activities.map(a => a.timestamp.toISOString().split('T')[0]),
+    )
+    return uniqueDays.size
   }
 
   /**
@@ -499,38 +499,38 @@ export class UserLearningService {
    */
   private countSessions(activities: UserActivity[]): number {
     const uniqueSessions = new Set(
-      activities.map(a => a.sessionId).filter(Boolean)
-    );
-    return uniqueSessions.size || 1;
+      activities.map(a => a.sessionId).filter(Boolean),
+    )
+    return uniqueSessions.size || 1
   }
 
   /**
    * Calcula duración promedio de sesión
    */
   private calculateAvgSessionDuration(activities: UserActivity[]): number {
-    const sessionDurations: Record<string, { start: Date; end: Date }> = {};
+    const sessionDurations: Record<string, { start: Date; end: Date }> = {}
     
     activities.forEach(a => {
-      if (!a.sessionId) return;
+      if (!a.sessionId) return
       
       if (!sessionDurations[a.sessionId]) {
-        sessionDurations[a.sessionId] = { start: a.timestamp, end: a.timestamp };
+        sessionDurations[a.sessionId] = { start: a.timestamp, end: a.timestamp }
       } else {
         if (a.timestamp < sessionDurations[a.sessionId].start) {
-          sessionDurations[a.sessionId].start = a.timestamp;
+          sessionDurations[a.sessionId].start = a.timestamp
         }
         if (a.timestamp > sessionDurations[a.sessionId].end) {
-          sessionDurations[a.sessionId].end = a.timestamp;
+          sessionDurations[a.sessionId].end = a.timestamp
         }
       }
-    });
+    })
 
     const durations = Object.values(sessionDurations).map(
-      s => s.end.getTime() - s.start.getTime()
-    );
+      s => s.end.getTime() - s.start.getTime(),
+    )
 
-    if (durations.length === 0) return 0;
-    return Math.round(durations.reduce((a, b) => a + b, 0) / durations.length / 1000); // en segundos
+    if (durations.length === 0) return 0
+    return Math.round(durations.reduce((a, b) => a + b, 0) / durations.length / 1000) // en segundos
   }
 
   /**
@@ -538,18 +538,18 @@ export class UserLearningService {
    */
   private async getPreferences(userId: string): Promise<UserPreferences> {
     try {
-      const prefsRef = collection(db!, 'userPreferences');
-      const q = query(prefsRef, where('userId', '==', userId), limit(1));
-      const snapshot = await getDocs(q);
+      const prefsRef = collection(db!, 'userPreferences')
+      const q = query(prefsRef, where('userId', '==', userId), limit(1))
+      const snapshot = await getDocs(q)
       
       if (!snapshot.empty) {
-        return snapshot.docs[0].data() as UserPreferences;
+        return snapshot.docs[0].data() as UserPreferences
       }
     } catch (error) {
-      console.error('Error getting preferences:', error);
+      console.error('Error getting preferences:', error)
     }
 
-    return this.createDefaultProfile(userId).preferences;
+    return this.createDefaultProfile(userId).preferences
   }
 
   /**
@@ -557,19 +557,19 @@ export class UserLearningService {
    */
   async updatePreferences(
     userId: string,
-    updates: Partial<UserPreferences>
+    updates: Partial<UserPreferences>,
   ): Promise<boolean> {
     try {
-      const prefsRef = doc(db!, 'userPreferences', userId);
+      const prefsRef = doc(db!, 'userPreferences', userId)
       await setDoc(prefsRef, {
         userId,
         ...updates,
-        updatedAt: Timestamp.now()
-      }, { merge: true });
-      return true;
+        updatedAt: Timestamp.now(),
+      }, { merge: true })
+      return true
     } catch (error) {
-      console.error('Error updating preferences:', error);
-      return false;
+      console.error('Error updating preferences:', error)
+      return false
     }
   }
 
@@ -577,14 +577,14 @@ export class UserLearningService {
    * Genera insights personalizados basados en aprendizaje
    */
   async generateLearningInsights(userId: string): Promise<LearningInsight[]> {
-    const profile = await this.getUserProfile(userId);
-    if (!profile) return [];
+    const profile = await this.getUserProfile(userId)
+    if (!profile) return []
 
-    const insights: LearningInsight[] = [];
+    const insights: LearningInsight[] = []
 
     // Sugerir atajos basados en acciones comunes
     if (profile.patterns.commonActions.length > 0) {
-      const topAction = profile.patterns.commonActions[0];
+      const topAction = profile.patterns.commonActions[0]
       if (topAction.frequency > 10) {
         insights.push({
           type: 'shortcut',
@@ -592,21 +592,21 @@ export class UserLearningService {
           description: `Usas "${topAction.action}" frecuentemente. ¿Te gustaría agregarlo a tus accesos rápidos?`,
           confidence: 0.9,
           actionable: true,
-          suggestedAction: `addQuickAccess:${topAction.action}`
-        });
+          suggestedAction: `addQuickAccess:${topAction.action}`,
+        })
       }
     }
 
     // Recomendaciones basadas en horas de actividad
     if (profile.analytics.peakActivityHours.length > 0) {
-      const peakHour = profile.analytics.peakActivityHours[0];
+      const peakHour = profile.analytics.peakActivityHours[0]
       insights.push({
         type: 'optimization',
         title: 'Horario Óptimo de Trabajo',
         description: `Tu mayor productividad es alrededor de las ${peakHour}:00. Considera agendar tareas importantes para este horario.`,
         confidence: 0.75,
-        actionable: false
-      });
+        actionable: false,
+      })
     }
 
     // Alertas de engagement bajo
@@ -617,14 +617,14 @@ export class UserLearningService {
         description: 'Hay muchas funcionalidades que aún no has explorado. ¿Te gustaría un tour guiado?',
         confidence: 0.8,
         actionable: true,
-        suggestedAction: 'startTour'
-      });
+        suggestedAction: 'startTour',
+      })
     }
 
     // Recomendaciones de features no usadas
-    const allFeatures = ['ventas', 'compras', 'inventario', 'bancos', 'clientes', 'reportes'];
-    const usedFeatures = profile.analytics.mostUsedFeatures.map(f => f.feature);
-    const unusedFeatures = allFeatures.filter(f => !usedFeatures.includes(f));
+    const allFeatures = ['ventas', 'compras', 'inventario', 'bancos', 'clientes', 'reportes']
+    const usedFeatures = profile.analytics.mostUsedFeatures.map(f => f.feature)
+    const unusedFeatures = allFeatures.filter(f => !usedFeatures.includes(f))
 
     if (unusedFeatures.length > 0) {
       insights.push({
@@ -633,35 +633,35 @@ export class UserLearningService {
         description: `Aún no has explorado la sección de ${unusedFeatures[0]}. Esta funcionalidad podría ayudarte a optimizar tu trabajo.`,
         confidence: 0.6,
         actionable: true,
-        suggestedAction: `navigate:${unusedFeatures[0]}`
-      });
+        suggestedAction: `navigate:${unusedFeatures[0]}`,
+      })
     }
 
-    return insights.sort((a, b) => b.confidence - a.confidence);
+    return insights.sort((a, b) => b.confidence - a.confidence)
   }
 
   /**
    * Predice siguiente acción del usuario
    */
   async predictNextAction(userId: string, currentContext: string): Promise<string | null> {
-    const profile = await this.getUserProfile(userId);
-    if (!profile) return null;
+    const profile = await this.getUserProfile(userId)
+    if (!profile) return null
 
     // Buscar patrón de navegación desde contexto actual
     const matchingPattern = profile.patterns.navigationPatterns.find(
-      p => p.from === currentContext
-    );
+      p => p.from === currentContext,
+    )
 
     if (matchingPattern && matchingPattern.frequency >= 3) {
-      return matchingPattern.to;
+      return matchingPattern.to
     }
 
     // Si no hay patrón, sugerir acción más común
     if (profile.patterns.commonActions.length > 0) {
-      return profile.patterns.commonActions[0].action;
+      return profile.patterns.commonActions[0].action
     }
 
-    return null;
+    return null
   }
 
   /**
@@ -669,8 +669,8 @@ export class UserLearningService {
    */
   destroy(): void {
     if (this.flushInterval) {
-      clearInterval(this.flushInterval);
+      clearInterval(this.flushInterval)
     }
-    this.flushActivities().catch(console.error);
+    this.flushActivities().catch(console.error)
   }
 }

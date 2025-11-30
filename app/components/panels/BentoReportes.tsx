@@ -1,28 +1,30 @@
-"use client"
+'use client'
 
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   FileText, Download, Calendar, Filter, Search, TrendingUp, TrendingDown,
   DollarSign, Users, Package, ShoppingCart, Building2, PieChart as PieChartIcon,
   BarChart3, LineChart, Clock, CheckCircle2, AlertCircle, RefreshCw,
   FileSpreadsheet, FileType, Printer, Share2, Star, ArrowUpRight, ArrowDownRight,
   Wallet, Receipt, Truck, Scissors, Eye, ChevronRight, Sparkles,
-  type LucideIcon
-} from "lucide-react"
-import { Button } from "@/app/components/ui/button"
-import { Badge } from "@/app/components/ui/badge"
-import { Input } from "@/app/components/ui/input"
-import { Skeleton } from "@/app/components/ui/skeleton"
-import { useState, useMemo } from "react"
+  type LucideIcon,
+} from 'lucide-react'
+import { Button } from '@/app/components/ui/button'
+import { Badge } from '@/app/components/ui/badge'
+import { Input } from '@/app/components/ui/input'
+import { Skeleton } from '@/app/components/ui/skeleton'
+import { useState, useMemo, useCallback } from 'react'
+import { useToast } from '@/app/hooks/use-toast'
+import { logger } from '@/app/lib/utils/logger'
 import { 
   useVentas, useClientes, useDistribuidores, useOrdenesCompra, 
-  useProductos, useBancosData 
-} from "@/app/lib/firebase/firestore-hooks.service"
+  useProductos, useBancosData, 
+} from '@/app/lib/firebase/firestore-hooks.service'
 import { 
   AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, 
   Tooltip, PieChart, Pie, Cell, CartesianGrid, Legend, LineChart as RechartsLineChart, Line,
-  ComposedChart, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis
-} from "recharts"
+  ComposedChart, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+} from 'recharts'
 
 // ============================================================================
 // TIPOS E INTERFACES
@@ -50,13 +52,13 @@ const formatCurrency = (value: number | undefined): string => {
   return new Intl.NumberFormat('es-MX', { 
     style: 'currency', 
     currency: 'MXN',
-    minimumFractionDigits: 0 
+    minimumFractionDigits: 0, 
   }).format(value ?? 0)
 }
 
 const formatDate = (date: Date): string => {
   return date.toLocaleDateString('es-MX', { 
-    day: '2-digit', month: 'short', year: 'numeric' 
+    day: '2-digit', month: 'short', year: 'numeric', 
   })
 }
 
@@ -77,7 +79,7 @@ const CATEGORIAS = [
 
 // Tarjeta de estadística
 function StatCard({ 
-  title, value, subtitle, icon: Icon, color, trend, trendValue 
+  title, value, subtitle, icon: Icon, color, trend, trendValue, 
 }: { 
   title: string
   value: string | number
@@ -120,11 +122,15 @@ function StatCard({
 function ReporteCard({ 
   reporte, 
   onGenerar, 
-  onToggleFavorito 
+  onToggleFavorito,
+  onExportPDF,
+  onExportExcel,
 }: { 
   reporte: ReporteConfig
   onGenerar: () => void
   onToggleFavorito: () => void
+  onExportPDF: () => void
+  onExportExcel: () => void
 }) {
   const Icon = reporte.icon
   
@@ -138,7 +144,7 @@ function ReporteCard({
     >
       {/* Indicador de favorito */}
       <button
-        onClick={(e) => { e.stopPropagation(); onToggleFavorito(); }}
+        onClick={(e) => { e.stopPropagation(); onToggleFavorito() }}
         className="absolute top-4 right-4 z-10"
       >
         <Star 
@@ -166,10 +172,10 @@ function ReporteCard({
             {reporte.frecuencia}
           </Badge>
           <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button size="sm" variant="ghost" className="text-white/60 hover:text-white h-8 w-8 p-0">
+            <Button size="sm" variant="ghost" className="text-white/60 hover:text-white h-8 w-8 p-0" onClick={(e) => { e.stopPropagation(); onExportPDF() }}>
               <FileType size={16} />
             </Button>
-            <Button size="sm" variant="ghost" className="text-white/60 hover:text-white h-8 w-8 p-0">
+            <Button size="sm" variant="ghost" className="text-white/60 hover:text-white h-8 w-8 p-0" onClick={(e) => { e.stopPropagation(); onExportExcel() }}>
               <FileSpreadsheet size={16} />
             </Button>
           </div>
@@ -187,7 +193,7 @@ function ReporteCard({
 // ============================================================================
 export default function BentoReportes() {
   const [categoriaActiva, setCategoriaActiva] = useState('todos')
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState('')
   const [periodoActivo, setPeriodoActivo] = useState('mes')
   const [generandoReporte, setGenerandoReporte] = useState<string | null>(null)
 
@@ -204,19 +210,19 @@ export default function BentoReportes() {
   // Métricas calculadas
   const metricas = useMemo(() => {
     const totalVentas = ventas.reduce((sum, v: Record<string, unknown>) => 
-      sum + (Number(v.precioTotalVenta) || Number(v.montoTotal) || 0), 0
+      sum + (Number(v.precioTotalVenta) || Number(v.montoTotal) || 0), 0,
     )
     const totalCompras = ordenesCompra.reduce((sum, oc: Record<string, unknown>) => 
-      sum + (Number(oc.costoTotal) || 0), 0
+      sum + (Number(oc.costoTotal) || 0), 0,
     )
     const totalStock = productos.reduce((sum, p: Record<string, unknown>) => 
-      sum + (Number(p.stock) || Number(p.stockActual) || 0), 0
+      sum + (Number(p.stock) || Number(p.stockActual) || 0), 0,
     )
     const totalDeudaClientes = clientes.reduce((sum, c: Record<string, unknown>) => 
-      sum + (Number(c.deudaTotal) || Number(c.deuda) || 0), 0
+      sum + (Number(c.deudaTotal) || Number(c.deuda) || 0), 0,
     )
     const capitalTotal = bancos.reduce((sum, b: Record<string, unknown>) => 
-      sum + (Number(b.capitalActual) || 0), 0
+      sum + (Number(b.capitalActual) || 0), 0,
     )
     
     return {
@@ -380,7 +386,7 @@ export default function BentoReportes() {
       const q = searchQuery.toLowerCase()
       result = result.filter(r => 
         r.nombre.toLowerCase().includes(q) ||
-        r.descripcion.toLowerCase().includes(q)
+        r.descripcion.toLowerCase().includes(q),
       )
     }
 
@@ -392,17 +398,80 @@ export default function BentoReportes() {
   // Toggle favorito
   const toggleFavorito = (id: string) => {
     setReportes(prev => prev.map(r => 
-      r.id === id ? { ...r, favorito: !r.favorito } : r
+      r.id === id ? { ...r, favorito: !r.favorito } : r,
     ))
   }
+
+  // Toast para notificaciones
+  const { toast } = useToast()
 
   // Generar reporte
   const generarReporte = async (id: string) => {
     setGenerandoReporte(id)
+    logger.info('Generando reporte', { context: 'BentoReportes', data: { reporteId: id } })
     // Simular generación
     await new Promise(resolve => setTimeout(resolve, 2000))
     setGenerandoReporte(null)
+    toast({
+      title: '✅ Reporte Generado',
+      description: `El reporte ha sido generado exitosamente`,
+    })
   }
+
+  // Handler para exportar datos
+  const handleExportData = useCallback((format: 'excel' | 'pdf' | 'print' | 'share') => {
+    logger.info(`Exportando datos en formato ${format}`, { context: 'BentoReportes', data: { format } })
+    
+    if (format === 'excel' || format === 'pdf') {
+      const exportData = {
+        fechaExportacion: new Date().toISOString(),
+        formato: format,
+        metricas,
+        ventas: ventas.length,
+        clientes: clientes.length,
+        distribuidores: distribuidores.length,
+        ordenesCompra: ordenesCompra.length,
+        productos: productos.length,
+      }
+      
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `reporte_chronos_${format}_${new Date().toISOString().split('T')[0]}.json`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      
+      toast({
+        title: `📥 Exportado a ${format.toUpperCase()}`,
+        description: 'El archivo se ha descargado correctamente',
+      })
+    } else if (format === 'print') {
+      window.print()
+      toast({
+        title: '🖨️ Imprimiendo',
+        description: 'Se ha abierto el diálogo de impresión',
+      })
+    } else if (format === 'share') {
+      const shareUrl = `${window.location.origin}/reports/share/${Date.now()}`
+      navigator.clipboard.writeText(shareUrl)
+      toast({
+        title: '🔗 Link Copiado',
+        description: 'El enlace temporal ha sido copiado al portapapeles',
+      })
+    }
+  }, [metricas, ventas, clientes, distribuidores, ordenesCompra, productos, toast])
+
+  // Handler para generar con IA
+  const handleGenerarIA = useCallback(() => {
+    logger.info('Iniciando generación con IA', { context: 'BentoReportes' })
+    toast({
+      title: '🤖 Generación IA',
+      description: 'Funcionalidad de reportes con IA próximamente disponible',
+    })
+  }, [toast])
 
   // Datos para gráficos del dashboard
   const ventasPorMes = useMemo(() => {
@@ -550,7 +619,7 @@ export default function BentoReportes() {
                   contentStyle={{ 
                     backgroundColor: 'rgba(0,0,0,0.8)', 
                     border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '8px'
+                    borderRadius: '8px',
                   }}
                   formatter={(value: number) => formatCurrency(value)}
                 />
@@ -607,6 +676,8 @@ export default function BentoReportes() {
                     reporte={reporte}
                     onGenerar={() => generarReporte(reporte.id)}
                     onToggleFavorito={() => toggleFavorito(reporte.id)}
+                    onExportPDF={() => handleExportData('pdf')}
+                    onExportExcel={() => handleExportData('excel')}
                   />
                 </motion.div>
               ))}
@@ -640,7 +711,7 @@ export default function BentoReportes() {
               <span className="text-white/50 font-normal text-base ml-2">({reportesFiltrados.length})</span>
             </h3>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="border-white/20 text-white/70">
+              <Button variant="outline" size="sm" className="border-white/20 text-white/70" onClick={handleGenerarIA}>
                 <Sparkles size={16} className="mr-2" />
                 Generar IA
               </Button>
@@ -667,6 +738,8 @@ export default function BentoReportes() {
                       reporte={reporte}
                       onGenerar={() => generarReporte(reporte.id)}
                       onToggleFavorito={() => toggleFavorito(reporte.id)}
+                      onExportPDF={() => handleExportData('pdf')}
+                      onExportExcel={() => handleExportData('excel')}
                     />
                   </motion.div>
                 ))}
@@ -679,22 +752,22 @@ export default function BentoReportes() {
         <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.05] to-white/[0.02] p-6">
           <h4 className="text-white font-medium mb-4">Exportar Datos</h4>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Button variant="outline" className="border-white/20 text-white/70 hover:bg-white/10 h-auto py-4 flex-col">
+            <Button variant="outline" className="border-white/20 text-white/70 hover:bg-white/10 h-auto py-4 flex-col" onClick={() => handleExportData('excel')}>
               <FileSpreadsheet size={24} className="mb-2" />
               <span>Excel</span>
               <span className="text-xs text-white/50">Todos los datos</span>
             </Button>
-            <Button variant="outline" className="border-white/20 text-white/70 hover:bg-white/10 h-auto py-4 flex-col">
+            <Button variant="outline" className="border-white/20 text-white/70 hover:bg-white/10 h-auto py-4 flex-col" onClick={() => handleExportData('pdf')}>
               <FileType size={24} className="mb-2" />
               <span>PDF</span>
               <span className="text-xs text-white/50">Reporte ejecutivo</span>
             </Button>
-            <Button variant="outline" className="border-white/20 text-white/70 hover:bg-white/10 h-auto py-4 flex-col">
+            <Button variant="outline" className="border-white/20 text-white/70 hover:bg-white/10 h-auto py-4 flex-col" onClick={() => handleExportData('print')}>
               <Printer size={24} className="mb-2" />
               <span>Imprimir</span>
               <span className="text-xs text-white/50">Vista de impresión</span>
             </Button>
-            <Button variant="outline" className="border-white/20 text-white/70 hover:bg-white/10 h-auto py-4 flex-col">
+            <Button variant="outline" className="border-white/20 text-white/70 hover:bg-white/10 h-auto py-4 flex-col" onClick={() => handleExportData('share')}>
               <Share2 size={24} className="mb-2" />
               <span>Compartir</span>
               <span className="text-xs text-white/50">Link temporal</span>

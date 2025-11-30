@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion"
-import { TrendingUp, Sparkles } from "lucide-react"
-import { AreaChart, Area, ResponsiveContainer, Tooltip } from "recharts"
-import { SafeChartContainer, SAFE_ANIMATION_PROPS } from "@/app/components/ui/SafeChartContainer"
-import { useState } from "react"
+import { motion, useMotionValue, useTransform, AnimatePresence } from 'framer-motion'
+import { TrendingUp, Sparkles } from 'lucide-react'
+import { AreaChart, Area, ResponsiveContainer, Tooltip } from 'recharts'
+import { SafeChartContainer, SAFE_ANIMATION_PROPS } from '@/app/components/ui/SafeChartContainer'
+import { useState } from 'react'
 
 interface RevenueWidgetProps {
   value: number
@@ -36,7 +36,7 @@ export default function RevenueWidget({ value, change, data, sparkle = true }: R
       style={{
         rotateX,
         rotateY,
-        transformStyle: "preserve-3d",
+        transformStyle: 'preserve-3d',
       }}
       className="relative col-span-12 md:col-span-6 lg:col-span-4 h-[280px] rounded-[32px] overflow-hidden cursor-pointer"
     >
@@ -136,12 +136,12 @@ export default function RevenueWidget({ value, change, data, sparkle = true }: R
       <AnimatePresence>
         {isHovered && (
           <motion.div
-            initial={{ x: "-100%", opacity: 0 }}
-            animate={{ x: "100%", opacity: [0, 1, 0] }}
+            initial={{ x: '-100%', opacity: 0 }}
+            animate={{ x: '100%', opacity: [0, 1, 0] }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6 }}
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
-            style={{ transform: "skewX(-20deg)" }}
+            style={{ transform: 'skewX(-20deg)' }}
           />
         )}
       </AnimatePresence>

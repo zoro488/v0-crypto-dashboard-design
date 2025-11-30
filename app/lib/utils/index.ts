@@ -28,10 +28,10 @@ export {
   type DistribucionVenta,
   type MargenCalculo,
   type ProyeccionData,
-} from './calculations';
+} from './calculations'
 
 // Default export de calculations
-export { default as business } from './calculations';
+export { default as business } from './calculations'
 
 // Validadores Zod
 export {
@@ -71,7 +71,7 @@ export {
   type RegistroInput,
   type FiltroReporteInput,
   type ReporteProgramadoInput,
-} from './validators';
+} from './validators'
 
 // Formateadores
 export {
@@ -102,7 +102,7 @@ export {
   date,
   text,
   file,
-} from './formatters';
+} from './formatters'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // GESTIÓN DE INVENTARIO / STOCK
@@ -122,7 +122,7 @@ export {
   type ProyeccionAgotamiento,
   type RotacionInventario,
   type ValorizacionInventario,
-} from './stock';
+} from './stock'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // GESTIÓN DE CRÉDITO
@@ -141,7 +141,7 @@ export {
   type Factura,
   type AnalisisCredito,
   type ResultadoValidacion,
-} from './credit';
+} from './credit'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // CORTES DE CAJA
@@ -160,4 +160,4 @@ export {
   type CorteCaja,
   type ResumenDiario,
   type Discrepancia,
-} from './cortes';
+} from './cortes'

@@ -28,11 +28,11 @@ import {
   startAfter,
   DocumentSnapshot,
   addDoc,
-} from "firebase/firestore"
-import { db, isFirebaseConfigured } from "./config"
-import type { Movimiento, BancoId, TipoMovimiento } from "@/app/types"
-import { logger } from "../utils/logger"
-import { COLLECTIONS, normalizeBancoId, TIPOS_MOVIMIENTO } from "@/app/lib/config/collections.config"
+} from 'firebase/firestore'
+import { db, isFirebaseConfigured } from './config'
+import type { Movimiento, BancoId, TipoMovimiento } from '@/app/types'
+import { logger } from '../utils/logger'
+import { COLLECTIONS, normalizeBancoId, TIPOS_MOVIMIENTO } from '@/app/lib/config/collections.config'
 
 // ============================================================
 // HELPER: Verificar Firestore disponible
@@ -60,7 +60,7 @@ export interface NuevoMovimientoInput {
   destino?: string
   tc?: number
   referenciaId?: string
-  referenciaTipo?: "venta" | "orden_compra" | "abono" | "transferencia" | "manual"
+  referenciaTipo?: 'venta' | 'orden_compra' | 'abono' | 'transferencia' | 'manual'
   observaciones?: string
 }
 
@@ -94,12 +94,12 @@ export async function crearMovimiento(input: NuevoMovimientoInput): Promise<stri
       throw new Error(`ID de banco inválido: ${input.bancoId}`)
     }
 
-    const movimiento: Omit<Movimiento, "id"> = {
+    const movimiento: Omit<Movimiento, 'id'> = {
       bancoId: bancoIdNormalizado,
       tipoMovimiento: input.tipoMovimiento,
       monto: input.monto,
       concepto: input.concepto,
-      fecha: input.fecha ? (typeof input.fecha === "string" ? input.fecha : input.fecha.toISOString()) : new Date().toISOString(),
+      fecha: input.fecha ? (typeof input.fecha === 'string' ? input.fecha : input.fecha.toISOString()) : new Date().toISOString(),
       cliente: input.cliente,
       origen: input.origen,
       destino: input.destino,
@@ -113,18 +113,18 @@ export async function crearMovimiento(input: NuevoMovimientoInput): Promise<stri
 
     const docRef = await addDoc(collection(db!, COLLECTIONS.MOVIMIENTOS), movimiento)
     
-    logger.info("Movimiento creado", { 
+    logger.info('Movimiento creado', { 
       data: { 
         id: docRef.id, 
         bancoId: bancoIdNormalizado, 
         tipo: input.tipoMovimiento,
-        monto: input.monto 
-      } 
+        monto: input.monto, 
+      }, 
     })
     
     return docRef.id
   } catch (error) {
-    logger.error("Error creando movimiento", error, { context: "MovimientosService" })
+    logger.error('Error creando movimiento', error, { context: 'MovimientosService' })
     throw error
   }
 }
@@ -138,7 +138,7 @@ export async function crearMovimiento(input: NuevoMovimientoInput): Promise<stri
  */
 export function suscribirMovimientosBanco(
   bancoId: BancoId,
-  callback: (movimientos: Movimiento[]) => void
+  callback: (movimientos: Movimiento[]) => void,
 ) {
   const bancoIdNormalizado = normalizeBancoId(bancoId)
   if (!bancoIdNormalizado) {
@@ -149,8 +149,8 @@ export function suscribirMovimientosBanco(
 
   const q = query(
     collection(db!, COLLECTIONS.MOVIMIENTOS),
-    where("bancoId", "==", bancoIdNormalizado),
-    orderBy("fecha", "desc")
+    where('bancoId', '==', bancoIdNormalizado),
+    orderBy('fecha', 'desc'),
   )
 
   return onSnapshot(
@@ -163,9 +163,9 @@ export function suscribirMovimientosBanco(
       callback(movimientos)
     },
     (error) => {
-      logger.error("Error en suscripción de movimientos", error, { context: "MovimientosService" })
+      logger.error('Error en suscripción de movimientos', error, { context: 'MovimientosService' })
       callback([])
-    }
+    },
   )
 }
 
@@ -175,7 +175,7 @@ export function suscribirMovimientosBanco(
 export function suscribirMovimientosPorTipo(
   bancoId: BancoId,
   tipo: TipoMovimiento,
-  callback: (movimientos: Movimiento[]) => void
+  callback: (movimientos: Movimiento[]) => void,
 ) {
   const bancoIdNormalizado = normalizeBancoId(bancoId)
   if (!bancoIdNormalizado) {
@@ -185,9 +185,9 @@ export function suscribirMovimientosPorTipo(
 
   const q = query(
     collection(db!, COLLECTIONS.MOVIMIENTOS),
-    where("bancoId", "==", bancoIdNormalizado),
-    where("tipoMovimiento", "==", tipo),
-    orderBy("fecha", "desc")
+    where('bancoId', '==', bancoIdNormalizado),
+    where('tipoMovimiento', '==', tipo),
+    orderBy('fecha', 'desc'),
   )
 
   return onSnapshot(
@@ -200,9 +200,9 @@ export function suscribirMovimientosPorTipo(
       callback(movimientos)
     },
     (error) => {
-      logger.error("Error en suscripción de movimientos por tipo", error, { context: "MovimientosService" })
+      logger.error('Error en suscripción de movimientos por tipo', error, { context: 'MovimientosService' })
       callback([])
-    }
+    },
   )
 }
 
@@ -211,12 +211,12 @@ export function suscribirMovimientosPorTipo(
  */
 export function suscribirTodosMovimientos(
   callback: (movimientos: Movimiento[]) => void,
-  maxResults = 100
+  maxResults = 100,
 ) {
   const q = query(
     collection(db!, COLLECTIONS.MOVIMIENTOS),
-    orderBy("fecha", "desc"),
-    limit(maxResults)
+    orderBy('fecha', 'desc'),
+    limit(maxResults),
   )
 
   return onSnapshot(
@@ -229,9 +229,9 @@ export function suscribirTodosMovimientos(
       callback(movimientos)
     },
     (error) => {
-      logger.error("Error en suscripción de todos los movimientos", error, { context: "MovimientosService" })
+      logger.error('Error en suscripción de todos los movimientos', error, { context: 'MovimientosService' })
       callback([])
-    }
+    },
   )
 }
 
@@ -248,9 +248,9 @@ export async function obtenerIngresosBanco(bancoId: BancoId): Promise<Movimiento
 
   const q = query(
     collection(db!, COLLECTIONS.MOVIMIENTOS),
-    where("bancoId", "==", bancoIdNormalizado),
-    where("tipoMovimiento", "==", TIPOS_MOVIMIENTO.INGRESO),
-    orderBy("fecha", "desc")
+    where('bancoId', '==', bancoIdNormalizado),
+    where('tipoMovimiento', '==', TIPOS_MOVIMIENTO.INGRESO),
+    orderBy('fecha', 'desc'),
   )
 
   const snapshot = await getDocs(q)
@@ -269,9 +269,9 @@ export async function obtenerGastosBanco(bancoId: BancoId): Promise<Movimiento[]
 
   const q = query(
     collection(db!, COLLECTIONS.MOVIMIENTOS),
-    where("bancoId", "==", bancoIdNormalizado),
-    where("tipoMovimiento", "==", TIPOS_MOVIMIENTO.GASTO),
-    orderBy("fecha", "desc")
+    where('bancoId', '==', bancoIdNormalizado),
+    where('tipoMovimiento', '==', TIPOS_MOVIMIENTO.GASTO),
+    orderBy('fecha', 'desc'),
   )
 
   const snapshot = await getDocs(q)
@@ -291,17 +291,17 @@ export async function obtenerTransferenciasBanco(bancoId: BancoId): Promise<Movi
   // Transferencias de entrada
   const qEntradas = query(
     collection(db!, COLLECTIONS.MOVIMIENTOS),
-    where("bancoId", "==", bancoIdNormalizado),
-    where("tipoMovimiento", "==", TIPOS_MOVIMIENTO.TRANSFERENCIA_ENTRADA),
-    orderBy("fecha", "desc")
+    where('bancoId', '==', bancoIdNormalizado),
+    where('tipoMovimiento', '==', TIPOS_MOVIMIENTO.TRANSFERENCIA_ENTRADA),
+    orderBy('fecha', 'desc'),
   )
 
   // Transferencias de salida
   const qSalidas = query(
     collection(db!, COLLECTIONS.MOVIMIENTOS),
-    where("bancoId", "==", bancoIdNormalizado),
-    where("tipoMovimiento", "==", TIPOS_MOVIMIENTO.TRANSFERENCIA_SALIDA),
-    orderBy("fecha", "desc")
+    where('bancoId', '==', bancoIdNormalizado),
+    where('tipoMovimiento', '==', TIPOS_MOVIMIENTO.TRANSFERENCIA_SALIDA),
+    orderBy('fecha', 'desc'),
   )
 
   const [snapshotEntradas, snapshotSalidas] = await Promise.all([
@@ -321,8 +321,8 @@ export async function obtenerTransferenciasBanco(bancoId: BancoId): Promise<Movi
 
   // Combinar y ordenar por fecha
   return [...entradas, ...salidas].sort((a, b) => {
-    const fechaA = typeof a.fecha === "string" ? new Date(a.fecha).getTime() : 0
-    const fechaB = typeof b.fecha === "string" ? new Date(b.fecha).getTime() : 0
+    const fechaA = typeof a.fecha === 'string' ? new Date(a.fecha).getTime() : 0
+    const fechaB = typeof b.fecha === 'string' ? new Date(b.fecha).getTime() : 0
     return fechaB - fechaA
   })
 }
@@ -356,7 +356,7 @@ export async function calcularTotalesBanco(bancoId: BancoId): Promise<{
 
   const q = query(
     collection(db!, COLLECTIONS.MOVIMIENTOS),
-    where("bancoId", "==", bancoIdNormalizado)
+    where('bancoId', '==', bancoIdNormalizado),
   )
 
   const snapshot = await getDocs(q)
@@ -406,8 +406,8 @@ export async function calcularTotalesBanco(bancoId: BancoId): Promise<{
 export async function obtenerMovimientosRecientes(cantidad = 20): Promise<Movimiento[]> {
   const q = query(
     collection(db!, COLLECTIONS.MOVIMIENTOS),
-    orderBy("createdAt", "desc"),
-    limit(cantidad)
+    orderBy('createdAt', 'desc'),
+    limit(cantidad),
   )
 
   const snapshot = await getDocs(q)

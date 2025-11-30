@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 💎 CREATE GASTO MODAL PREMIUM - Registro de Egresos/Gastos
@@ -12,22 +12,22 @@
  * 6. Glassmorphism futurista
  */
 
-import * as React from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
+import * as React from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from "@/app/components/ui/dialog"
-import { Button } from "@/app/components/ui/button"
-import { Input } from "@/app/components/ui/input"
-import { Label } from "@/app/components/ui/label"
-import { Badge } from "@/app/components/ui/badge"
-import { Textarea } from "@/app/components/ui/textarea"
+} from '@/app/components/ui/dialog'
+import { Button } from '@/app/components/ui/button'
+import { Input } from '@/app/components/ui/input'
+import { Label } from '@/app/components/ui/label'
+import { Badge } from '@/app/components/ui/badge'
+import { Textarea } from '@/app/components/ui/textarea'
 import {
   Wallet,
   TrendingDown,
@@ -55,12 +55,13 @@ import {
   Package,
   AlertCircle,
   CheckCircle2,
-} from "lucide-react"
-import { cn } from "@/app/lib/utils"
-import { useToast } from "@/app/hooks/use-toast"
-import { useAppStore } from "@/app/lib/store/useAppStore"
-import { logger } from "@/app/lib/utils/logger"
-import { formatearMonto } from "@/app/lib/validations/smart-forms-schemas"
+} from 'lucide-react'
+import { cn } from '@/app/lib/utils'
+import { useToast } from '@/app/hooks/use-toast'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { logger } from '@/app/lib/utils/logger'
+import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
+import { crearGasto } from '@/app/lib/firebase/firestore-service'
 
 // ============================================
 // SCHEMA ZOD
@@ -68,14 +69,14 @@ import { formatearMonto } from "@/app/lib/validations/smart-forms-schemas"
 
 const gastoSchema = z.object({
   bancoOrigen: z.enum([
-    "boveda_monte", "boveda_usa", "profit", "leftie", 
-    "azteca", "flete_sur", "utilidades"
+    'boveda_monte', 'boveda_usa', 'profit', 'leftie', 
+    'azteca', 'flete_sur', 'utilidades',
   ]),
-  categoria: z.string().min(1, "Selecciona una categoría"),
-  monto: z.number().min(1, "El monto debe ser mayor a 0"),
-  fecha: z.string().min(1, "La fecha es requerida"),
-  concepto: z.string().min(1, "El concepto es requerido"),
-  metodoPago: z.enum(["efectivo", "transferencia", "tarjeta"]),
+  categoria: z.string().min(1, 'Selecciona una categoría'),
+  monto: z.number().min(1, 'El monto debe ser mayor a 0'),
+  fecha: z.string().min(1, 'La fecha es requerida'),
+  concepto: z.string().min(1, 'El concepto es requerido'),
+  metodoPago: z.enum(['efectivo', 'transferencia', 'tarjeta']),
   referencia: z.string().optional(),
   notas: z.string().optional(),
 })
@@ -94,31 +95,31 @@ interface CreateGastoModalProps {
 
 // 7 Bancos del sistema
 const BANCOS = [
-  { id: "boveda_monte", nombre: "Bóveda Monte", icono: "🏦", color: "blue", capital: 2500000 },
-  { id: "boveda_usa", nombre: "Bóveda USA", icono: "🇺🇸", color: "indigo", capital: 850000 },
-  { id: "profit", nombre: "Profit", icono: "💰", color: "green", capital: 1200000 },
-  { id: "leftie", nombre: "Leftie", icono: "🎯", color: "orange", capital: 450000 },
-  { id: "azteca", nombre: "Azteca", icono: "🌮", color: "red", capital: 320000 },
-  { id: "flete_sur", nombre: "Flete Sur", icono: "🚚", color: "yellow", capital: 180000 },
-  { id: "utilidades", nombre: "Utilidades", icono: "💎", color: "purple", capital: 750000 },
+  { id: 'boveda_monte', nombre: 'Bóveda Monte', icono: '🏦', color: 'blue', capital: 2500000 },
+  { id: 'boveda_usa', nombre: 'Bóveda USA', icono: '🇺🇸', color: 'indigo', capital: 850000 },
+  { id: 'profit', nombre: 'Profit', icono: '💰', color: 'green', capital: 1200000 },
+  { id: 'leftie', nombre: 'Leftie', icono: '🎯', color: 'orange', capital: 450000 },
+  { id: 'azteca', nombre: 'Azteca', icono: '🌮', color: 'red', capital: 320000 },
+  { id: 'flete_sur', nombre: 'Flete Sur', icono: '🚚', color: 'yellow', capital: 180000 },
+  { id: 'utilidades', nombre: 'Utilidades', icono: '💎', color: 'purple', capital: 750000 },
 ]
 
 // Categorías de gastos
 const CATEGORIAS = [
-  { id: "operativos", nombre: "Operativos", icono: Briefcase, color: "blue" },
-  { id: "transporte", nombre: "Transporte", icono: Truck, color: "orange" },
-  { id: "mercancia", nombre: "Mercancía", icono: Package, color: "green" },
-  { id: "personal", nombre: "Personal", icono: Users, color: "purple" },
-  { id: "servicios", nombre: "Servicios", icono: Wrench, color: "yellow" },
-  { id: "renta", nombre: "Renta/Local", icono: Home, color: "red" },
-  { id: "comidas", nombre: "Comidas", icono: Utensils, color: "pink" },
-  { id: "otros", nombre: "Otros", icono: Gift, color: "gray" },
+  { id: 'operativos', nombre: 'Operativos', icono: Briefcase, color: 'blue' },
+  { id: 'transporte', nombre: 'Transporte', icono: Truck, color: 'orange' },
+  { id: 'mercancia', nombre: 'Mercancía', icono: Package, color: 'green' },
+  { id: 'personal', nombre: 'Personal', icono: Users, color: 'purple' },
+  { id: 'servicios', nombre: 'Servicios', icono: Wrench, color: 'yellow' },
+  { id: 'renta', nombre: 'Renta/Local', icono: Home, color: 'red' },
+  { id: 'comidas', nombre: 'Comidas', icono: Utensils, color: 'pink' },
+  { id: 'otros', nombre: 'Otros', icono: Gift, color: 'gray' },
 ]
 
 const METODOS_PAGO = [
-  { id: "efectivo", nombre: "Efectivo", icono: Banknote },
-  { id: "transferencia", nombre: "Transferencia", icono: CreditCard },
-  { id: "tarjeta", nombre: "Tarjeta", icono: CreditCard },
+  { id: 'efectivo', nombre: 'Efectivo', icono: Banknote },
+  { id: 'transferencia', nombre: 'Transferencia', icono: CreditCard },
+  { id: 'tarjeta', nombre: 'Tarjeta', icono: CreditCard },
 ]
 
 // Variantes de animación
@@ -127,7 +128,7 @@ const containerVariants = {
   visible: { 
     opacity: 1, 
     scale: 1,
-    transition: { staggerChildren: 0.03 }
+    transition: { staggerChildren: 0.03 },
   },
 }
 
@@ -143,7 +144,7 @@ const itemVariants = {
 export function CreateGastoModalPremium({ 
   open, 
   onClose, 
-  onSuccess 
+  onSuccess, 
 }: CreateGastoModalProps) {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
@@ -151,23 +152,23 @@ export function CreateGastoModalPremium({
   const form = useForm<GastoInput>({
     resolver: zodResolver(gastoSchema),
     defaultValues: {
-      bancoOrigen: "boveda_monte",
-      categoria: "",
+      bancoOrigen: 'boveda_monte',
+      categoria: '',
       monto: 0,
       fecha: new Date().toISOString().split('T')[0],
-      concepto: "",
-      metodoPago: "efectivo",
-      referencia: "",
-      notas: "",
+      concepto: '',
+      metodoPago: 'efectivo',
+      referencia: '',
+      notas: '',
     },
   })
 
   const { watch, setValue, handleSubmit, reset, formState: { errors } } = form
   
-  const bancoOrigen = watch("bancoOrigen")
-  const categoria = watch("categoria")
-  const monto = watch("monto")
-  const metodoPago = watch("metodoPago")
+  const bancoOrigen = watch('bancoOrigen')
+  const categoria = watch('categoria')
+  const monto = watch('monto')
+  const metodoPago = watch('metodoPago')
 
   // Obtener banco seleccionado
   const bancoSeleccionado = React.useMemo(() => {
@@ -203,9 +204,9 @@ export function CreateGastoModalPremium({
   const onSubmit = async (data: GastoInput) => {
     if (!saldoSuficiente) {
       toast({
-        title: "Saldo Insuficiente",
+        title: 'Saldo Insuficiente',
         description: `El banco ${bancoSeleccionado?.nombre} no tiene saldo suficiente`,
-        variant: "destructive",
+        variant: 'destructive',
       })
       return
     }
@@ -214,31 +215,40 @@ export function CreateGastoModalPremium({
 
     try {
       const gastoData = {
-        ...data,
-        nuevoSaldoBanco: nuevoSaldo,
-        timestamp: new Date().toISOString(),
+        monto: data.monto,
+        concepto: data.concepto,
+        bancoOrigen: data.bancoOrigen,
+        categoria: data.categoria || 'General',
+        referencia: data.referencia || undefined,
+        notas: data.notas || undefined,
       }
 
-      logger.info("Gasto registrado", { 
+      logger.info('Creando gasto en Firestore', { 
         data: gastoData,
-        context: "CreateGastoModalPremium"
+        context: 'CreateGastoModalPremium',
       })
 
-      toast({
-        title: "✅ Gasto Registrado",
-        description: `${formatearMonto(data.monto)} de ${bancoSeleccionado?.nombre}`,
-      })
+      const result = await crearGasto(gastoData)
 
-      onClose()
-      onSuccess?.()
-      useAppStore.getState().triggerDataRefresh()
+      if (result) {
+        toast({
+          title: '✅ Gasto Registrado',
+          description: `${formatearMonto(data.monto)} de ${bancoSeleccionado?.nombre}`,
+        })
+
+        onClose()
+        onSuccess?.()
+        useAppStore.getState().triggerDataRefresh()
+      } else {
+        throw new Error('No se pudo registrar el gasto')
+      }
 
     } catch (error) {
-      logger.error("Error al registrar gasto", error)
+      logger.error('Error al registrar gasto', error)
       toast({
-        title: "Error",
-        description: "No se pudo registrar el gasto",
-        variant: "destructive",
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'No se pudo registrar el gasto',
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -252,11 +262,11 @@ export function CreateGastoModalPremium({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          "max-w-3xl h-[85vh] p-0 overflow-hidden",
-          "bg-black/60 backdrop-blur-2xl",
-          "border border-white/10",
-          "text-white",
-          "shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(239,68,68,0.15)]"
+          'max-w-3xl h-[85vh] p-0 overflow-hidden',
+          'bg-black/60 backdrop-blur-2xl',
+          'border border-white/10',
+          'text-white',
+          'shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(239,68,68,0.15)]',
         )}
       >
         <DialogTitle className="sr-only">Registrar Gasto</DialogTitle>
@@ -333,14 +343,14 @@ export function CreateGastoModalPremium({
                   <motion.button
                     key={banco.id}
                     type="button"
-                    onClick={() => setValue("bancoOrigen", banco.id as typeof bancoOrigen)}
+                    onClick={() => setValue('bancoOrigen', banco.id as typeof bancoOrigen)}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     className={cn(
-                      "relative p-3 rounded-xl border text-center transition-all overflow-hidden",
+                      'relative p-3 rounded-xl border text-center transition-all overflow-hidden',
                       bancoOrigen === banco.id
                         ? `bg-${banco.color}-500/20 border-${banco.color}-500 shadow-lg`
-                        : "bg-white/5 border-white/10 hover:bg-white/10"
+                        : 'bg-white/5 border-white/10 hover:bg-white/10',
                     )}
                     style={{
                       backgroundColor: bancoOrigen === banco.id ? `var(--${banco.color}-500-20, rgba(59, 130, 246, 0.2))` : undefined,
@@ -349,14 +359,14 @@ export function CreateGastoModalPremium({
                   >
                     <span className="text-2xl mb-1 block">{banco.icono}</span>
                     <p className={cn(
-                      "text-xs font-medium truncate",
-                      bancoOrigen === banco.id ? "text-white" : "text-gray-400"
+                      'text-xs font-medium truncate',
+                      bancoOrigen === banco.id ? 'text-white' : 'text-gray-400',
                     )}>
                       {banco.nombre}
                     </p>
                     <p className={cn(
-                      "text-[10px]",
-                      bancoOrigen === banco.id ? "text-green-400" : "text-gray-500"
+                      'text-[10px]',
+                      bancoOrigen === banco.id ? 'text-green-400' : 'text-gray-500',
                     )}>
                       {formatearMonto(banco.capital)}
                     </p>
@@ -365,7 +375,7 @@ export function CreateGastoModalPremium({
                         layoutId="banco-indicator"
                         className="absolute inset-0 border-2 border-blue-500 rounded-xl"
                         initial={false}
-                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                       />
                     )}
                   </motion.button>
@@ -376,7 +386,7 @@ export function CreateGastoModalPremium({
               {bancoSeleccionado && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
+                  animate={{ opacity: 1, height: 'auto' }}
                   className="p-4 rounded-xl bg-white/5 border border-white/10"
                 >
                   <div className="flex items-center justify-between">
@@ -393,8 +403,8 @@ export function CreateGastoModalPremium({
                       </p>
                       {monto > 0 && (
                         <p className={cn(
-                          "text-sm",
-                          saldoSuficiente ? "text-yellow-400" : "text-red-400"
+                          'text-sm',
+                          saldoSuficiente ? 'text-yellow-400' : 'text-red-400',
                         )}>
                           → {formatearMonto(nuevoSaldo)}
                         </p>
@@ -415,22 +425,22 @@ export function CreateGastoModalPremium({
               </div>
 
               <div className={cn(
-                "p-5 rounded-2xl border",
-                "bg-gradient-to-br from-white/5 to-transparent",
-                "border-white/10"
+                'p-5 rounded-2xl border',
+                'bg-gradient-to-br from-white/5 to-transparent',
+                'border-white/10',
               )}>
                 {/* Input grande */}
                 <div className="relative mb-4">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-3xl text-gray-500">$</span>
                   <Input
                     type="number"
-                    {...form.register("monto", { valueAsNumber: true })}
+                    {...form.register('monto', { valueAsNumber: true })}
                     className={cn(
-                      "pl-12 h-20 text-4xl font-bold text-center",
-                      "bg-red-500/5 border-red-500/20 text-red-300",
-                      "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
-                      !saldoSuficiente && "border-red-500 animate-pulse",
-                      errors.monto && "border-red-500/50"
+                      'pl-12 h-20 text-4xl font-bold text-center',
+                      'bg-red-500/5 border-red-500/20 text-red-300',
+                      '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+                      !saldoSuficiente && 'border-red-500 animate-pulse',
+                      errors.monto && 'border-red-500/50',
                     )}
                     placeholder="0"
                   />
@@ -456,9 +466,9 @@ export function CreateGastoModalPremium({
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-400">Impacto en el capital</span>
                       <span className={cn(
-                        "font-bold",
-                        porcentajeGasto > 50 ? "text-red-400" :
-                        porcentajeGasto > 25 ? "text-orange-400" : "text-yellow-400"
+                        'font-bold',
+                        porcentajeGasto > 50 ? 'text-red-400' :
+                        porcentajeGasto > 25 ? 'text-orange-400' : 'text-yellow-400',
                       )}>
                         -{porcentajeGasto.toFixed(1)}%
                       </span>
@@ -466,10 +476,10 @@ export function CreateGastoModalPremium({
                     <div className="h-3 rounded-full bg-white/10 overflow-hidden">
                       <motion.div
                         className={cn(
-                          "h-full",
-                          porcentajeGasto > 50 ? "bg-gradient-to-r from-red-500 to-orange-500" :
-                          porcentajeGasto > 25 ? "bg-gradient-to-r from-orange-500 to-yellow-500" :
-                          "bg-gradient-to-r from-yellow-500 to-green-500"
+                          'h-full',
+                          porcentajeGasto > 50 ? 'bg-gradient-to-r from-red-500 to-orange-500' :
+                          porcentajeGasto > 25 ? 'bg-gradient-to-r from-orange-500 to-yellow-500' :
+                          'bg-gradient-to-r from-yellow-500 to-green-500',
                         )}
                         initial={{ width: 0 }}
                         animate={{ width: `${Math.min(100, porcentajeGasto)}%` }}
@@ -488,19 +498,19 @@ export function CreateGastoModalPremium({
                     <motion.button
                       key={cat.id}
                       type="button"
-                      onClick={() => setValue("categoria", cat.id)}
+                      onClick={() => setValue('categoria', cat.id)}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       className={cn(
-                        "p-3 rounded-xl border text-center transition-all",
+                        'p-3 rounded-xl border text-center transition-all',
                         categoria === cat.id
-                          ? "bg-white/10 border-white/30 text-white"
-                          : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+                          ? 'bg-white/10 border-white/30 text-white'
+                          : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10',
                       )}
                     >
                       <cat.icono className={cn(
-                        "w-5 h-5 mx-auto mb-1",
-                        categoria === cat.id && "text-white"
+                        'w-5 h-5 mx-auto mb-1',
+                        categoria === cat.id && 'text-white',
                       )} />
                       <p className="text-[10px] font-medium">{cat.nombre}</p>
                     </motion.button>
@@ -530,7 +540,7 @@ export function CreateGastoModalPremium({
                   </Label>
                   <Input
                     type="date"
-                    {...form.register("fecha")}
+                    {...form.register('fecha')}
                     className="h-11 bg-white/5 border-white/10 text-white [color-scheme:dark]"
                   />
                 </div>
@@ -543,12 +553,12 @@ export function CreateGastoModalPremium({
                       <button
                         key={metodo.id}
                         type="button"
-                        onClick={() => setValue("metodoPago", metodo.id as "efectivo" | "transferencia" | "tarjeta")}
+                        onClick={() => setValue('metodoPago', metodo.id as 'efectivo' | 'transferencia' | 'tarjeta')}
                         className={cn(
-                          "p-2 rounded-lg border text-center transition-all",
+                          'p-2 rounded-lg border text-center transition-all',
                           metodoPago === metodo.id
-                            ? "bg-white/10 border-white/30"
-                            : "bg-white/5 border-white/10 hover:bg-white/10"
+                            ? 'bg-white/10 border-white/30'
+                            : 'bg-white/5 border-white/10 hover:bg-white/10',
                         )}
                       >
                         <metodo.icono className="w-4 h-4 mx-auto mb-1" />
@@ -563,11 +573,11 @@ export function CreateGastoModalPremium({
               <div className="space-y-2">
                 <Label className="text-sm text-gray-400">Concepto *</Label>
                 <Input
-                  {...form.register("concepto")}
+                  {...form.register('concepto')}
                   placeholder="Describe el gasto (ej: Pago de flete OC0008, Gasolina, etc.)"
                   className={cn(
-                    "h-11 bg-white/5 border-white/10 text-white placeholder:text-gray-500",
-                    errors.concepto && "border-red-500/50"
+                    'h-11 bg-white/5 border-white/10 text-white placeholder:text-gray-500',
+                    errors.concepto && 'border-red-500/50',
                   )}
                 />
                 {errors.concepto && (
@@ -580,7 +590,7 @@ export function CreateGastoModalPremium({
                 <div className="space-y-2">
                   <Label className="text-sm text-gray-400">Referencia (opcional)</Label>
                   <Input
-                    {...form.register("referencia")}
+                    {...form.register('referencia')}
                     placeholder="No. factura, ticket, etc."
                     className="h-11 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
                   />
@@ -588,7 +598,7 @@ export function CreateGastoModalPremium({
                 <div className="space-y-2">
                   <Label className="text-sm text-gray-400">Notas (opcional)</Label>
                   <Input
-                    {...form.register("notas")}
+                    {...form.register('notas')}
                     placeholder="Notas adicionales..."
                     className="h-11 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
                   />
@@ -601,9 +611,9 @@ export function CreateGastoModalPremium({
               <motion.div 
                 variants={itemVariants}
                 className={cn(
-                  "p-5 rounded-2xl border",
-                  "bg-gradient-to-br from-red-500/10 to-orange-500/10",
-                  "border-red-500/30"
+                  'p-5 rounded-2xl border',
+                  'bg-gradient-to-br from-red-500/10 to-orange-500/10',
+                  'border-red-500/30',
                 )}
               >
                 <div className="flex items-center justify-between mb-4">
@@ -654,9 +664,9 @@ export function CreateGastoModalPremium({
 
           {/* ===== FOOTER ===== */}
           <div className={cn(
-            "shrink-0 h-20 border-t border-white/10",
-            "bg-gradient-to-r from-black/50 via-white/5 to-black/50",
-            "px-6 flex items-center justify-between"
+            'shrink-0 h-20 border-t border-white/10',
+            'bg-gradient-to-r from-black/50 via-white/5 to-black/50',
+            'px-6 flex items-center justify-between',
           )}>
             <Button
               type="button"
@@ -672,12 +682,12 @@ export function CreateGastoModalPremium({
               type="submit"
               disabled={isSubmitting || !saldoSuficiente || monto <= 0}
               className={cn(
-                "min-w-[180px]",
-                "bg-gradient-to-r from-red-600 to-orange-600",
-                "hover:from-red-500 hover:to-orange-500",
-                "text-white font-bold",
-                "shadow-[0_0_30px_rgba(239,68,68,0.4)]",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
+                'min-w-[180px]',
+                'bg-gradient-to-r from-red-600 to-orange-600',
+                'hover:from-red-500 hover:to-orange-500',
+                'text-white font-bold',
+                'shadow-[0_0_30px_rgba(239,68,68,0.4)]',
+                'disabled:opacity-50 disabled:cursor-not-allowed',
               )}
             >
               {isSubmitting ? (

@@ -8,28 +8,28 @@
  */
 
 // ===== CLIENTES =====
-export { CreateClienteModalPremium } from "./CreateClienteModalPremium"
+export { CreateClienteModalPremium } from './CreateClienteModalPremium'
 
 // ===== VENTAS =====
-export { CreateVentaModalPremium } from "./CreateVentaModalPremium"
+export { CreateVentaModalPremium } from './CreateVentaModalPremium'
 
 // ===== ÓRDENES DE COMPRA =====
-export { CreateOrdenCompraModalPremium } from "./CreateOrdenCompraModalPremium"
+export { CreateOrdenCompraModalPremium } from './CreateOrdenCompraModalPremium'
 
 // ===== ABONOS =====
-export { CreateAbonoModalPremium } from "./CreateAbonoModalPremium"
+export { CreateAbonoModalPremium } from './CreateAbonoModalPremium'
 
 // ===== GASTOS =====
-export { CreateGastoModalPremium } from "./CreateGastoModalPremium"
+export { CreateGastoModalPremium } from './CreateGastoModalPremium'
 
 // ===== PAGOS A DISTRIBUIDORES =====
-export { CreatePagoDistribuidorModalPremium } from "./CreatePagoDistribuidorModalPremium"
+export { CreatePagoDistribuidorModalPremium } from './CreatePagoDistribuidorModalPremium'
 
 // ===== TRANSFERENCIAS ENTRE BANCOS =====
-export { CreateTransferenciaModalPremium } from "./CreateTransferenciaModalPremium"
+export { CreateTransferenciaModalPremium } from './CreateTransferenciaModalPremium'
 
 // ===== DISTRIBUIDORES =====
-export { CreateDistribuidorModalPremium } from "./CreateDistribuidorModalPremium"
+export { CreateDistribuidorModalPremium } from './CreateDistribuidorModalPremium'
 
 // ===== INGRESOS =====
-export { CreateIngresoModalPremium } from "./CreateIngresoModalPremium"
+export { CreateIngresoModalPremium } from './CreateIngresoModalPremium'

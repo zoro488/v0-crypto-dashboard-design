@@ -18,14 +18,14 @@ import {
   PerspectiveCamera,
   Preload,
   AdaptiveDpr,
-  AdaptiveEvents
+  AdaptiveEvents,
 } from '@react-three/drei'
 import { 
   EffectComposer, 
   Bloom, 
   Noise, 
   Vignette,
-  ChromaticAberration
+  ChromaticAberration,
 } from '@react-three/postprocessing'
 import { BlendFunction } from 'postprocessing'
 import * as THREE from 'three'
@@ -42,7 +42,7 @@ function ProceduralNebula() {
       uTime: { value: 0 },
       uColor1: { value: new THREE.Color('#1a0a2e') },
       uColor2: { value: new THREE.Color('#16213e') },
-      uColor3: { value: new THREE.Color('#0f3460') }
+      uColor3: { value: new THREE.Color('#0f3460') },
     },
     vertexShader: /* glsl */ `
       varying vec2 vUv;
@@ -107,7 +107,7 @@ function ProceduralNebula() {
         
         gl_FragColor = vec4(color, noise * 0.15 * vignette);
       }
-    `
+    `,
   }), [])
 
   useFrame((state) => {
@@ -303,14 +303,14 @@ export default function ImmersiveWrapper() {
           alpha: false,
           powerPreference: 'high-performance',
           stencil: false,
-          depth: true
+          depth: true,
         }}
         style={{ 
           position: 'absolute',
           top: 0,
           left: 0,
           width: '100%',
-          height: '100%'
+          height: '100%',
         }}
       >
         <AdaptiveDpr pixelated />

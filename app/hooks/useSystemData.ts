@@ -11,7 +11,7 @@
  * - Manejo de estados de carga
  */
 
-"use client"
+'use client'
 
 import { useEffect, useMemo, useCallback } from 'react'
 import { useFirestoreCRUD } from '@/app/hooks/useFirestoreCRUD'
@@ -22,7 +22,7 @@ import {
   useClientesData, 
   useDistribuidoresData,
   useOrdenesCompraData,
-  useBancoData
+  useBancoData,
 } from '@/app/lib/firebase/firestore-hooks.service'
 
 // ===================================================================
@@ -117,7 +117,7 @@ export function useSystemData(): SystemDataResult {
                    typeof p.precioVenta === 'number' ? p.precioVenta : 0
       return {
         total: acc.total + stock,
-        value: acc.value + (stock * valor)
+        value: acc.value + (stock * valor),
       }
     }, { total: 0, value: 0 })
     
@@ -129,7 +129,7 @@ export function useSystemData(): SystemDataResult {
     
     // Órdenes pendientes
     const pendingOrders = ordenesCompra.filter(oc => 
-      oc.estado === 'pendiente' || oc.estado === 'parcial'
+      oc.estado === 'pendiente' || oc.estado === 'parcial',
     ).length
     
     // Ventas de hoy
@@ -163,7 +163,7 @@ export function useSystemData(): SystemDataResult {
       pendingOrders,
       pendingPayments,
       todaySales,
-      monthSales
+      monthSales,
     }
   }, [productos, ventas, clientes, distribuidores, ordenesCompra])
   
@@ -174,7 +174,7 @@ export function useSystemData(): SystemDataResult {
       refreshVentas(),
       refreshClientes(),
       refreshDist(),
-      refreshOC()
+      refreshOC(),
     ])
   }, [refreshProd, refreshVentas, refreshClientes, refreshDist, refreshOC])
   
@@ -188,7 +188,7 @@ export function useSystemData(): SystemDataResult {
     isLoading,
     hasError,
     errors,
-    refreshAll
+    refreshAll,
   }
 }
 
@@ -229,7 +229,7 @@ export function useDashboardStats() {
     lowStockProducts,
     outOfStockProducts,
     recentSales,
-    isLoading
+    isLoading,
   }
 }
 
@@ -243,7 +243,7 @@ export function useBancosData(bancoId: string) {
     movimientos,
     stats,
     loading,
-    refresh
+    refresh,
   }
 }
 
@@ -256,7 +256,7 @@ export function useAlmacenStats() {
   const stats = useMemo(() => {
     let totalItems = 0
     let totalValue = 0
-    let categorias: Record<string, number> = {}
+    const categorias: Record<string, number> = {}
     
     productos.forEach(p => {
       const stock = typeof p.stockActual === 'number' ? p.stockActual : 
@@ -273,14 +273,14 @@ export function useAlmacenStats() {
       totalItems,
       totalValue,
       categorias,
-      productCount: productos.length
+      productCount: productos.length,
     }
   }, [productos])
   
   return {
     productos,
     stats,
-    isLoading
+    isLoading,
   }
 }
 
@@ -316,7 +316,7 @@ export function useVentasStats() {
       pendientes: pendientes.length,
       totalVendido,
       totalCobrado,
-      totalPorCobrar
+      totalPorCobrar,
     }
   }, [ventas])
   
@@ -324,7 +324,7 @@ export function useVentasStats() {
     ventas,
     clientes,
     stats,
-    isLoading
+    isLoading,
   }
 }
 

@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 /**
  * TrendForecastChart - Gráfico de Tendencia con Proyección
@@ -7,7 +7,7 @@
  * con una línea de proyección basada en SMA-50.
  */
 
-import React, { useMemo } from 'react';
+import React, { useMemo } from 'react'
 import {
   LineChart,
   Line,
@@ -20,11 +20,11 @@ import {
   Area,
   ComposedChart,
   Legend,
-} from 'recharts';
-import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { cn } from '@/app/lib/utils';
-import type { MarketLiveFeed } from '@/app/lib/profit-engine/types/profit-engine.types';
+} from 'recharts'
+import { motion } from 'framer-motion'
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
+import { cn } from '@/app/lib/utils'
+import type { MarketLiveFeed } from '@/app/lib/profit-engine/types/profit-engine.types'
 
 // ============================================
 // TIPOS
@@ -58,18 +58,18 @@ interface ChartDataPoint {
  * Calcula la Media Móvil Simple (SMA)
  */
 function calculateSMA(data: number[], period: number): (number | undefined)[] {
-  const result: (number | undefined)[] = [];
+  const result: (number | undefined)[] = []
   
   for (let i = 0; i < data.length; i++) {
     if (i < period - 1) {
-      result.push(undefined);
+      result.push(undefined)
     } else {
-      const sum = data.slice(i - period + 1, i + 1).reduce((a, b) => a + b, 0);
-      result.push(Math.round((sum / period) * 100) / 100);
+      const sum = data.slice(i - period + 1, i + 1).reduce((a, b) => a + b, 0)
+      result.push(Math.round((sum / period) * 100) / 100)
     }
   }
   
-  return result;
+  return result
 }
 
 /**
@@ -78,64 +78,64 @@ function calculateSMA(data: number[], period: number): (number | undefined)[] {
 function generateProjection(
   lastPrice: number,
   lastSMA: number,
-  days: number
+  days: number,
 ): { projected: number; low: number; high: number }[] {
-  const results: { projected: number; low: number; high: number }[] = [];
-  const trend = (lastPrice - lastSMA) / lastSMA; // Tendencia actual
-  const volatility = 0.005; // 0.5% volatilidad diaria promedio
+  const results: { projected: number; low: number; high: number }[] = []
+  const trend = (lastPrice - lastSMA) / lastSMA // Tendencia actual
+  const volatility = 0.005 // 0.5% volatilidad diaria promedio
   
-  let currentPrice = lastPrice;
+  let currentPrice = lastPrice
   
   for (let i = 1; i <= days; i++) {
     // Proyección con tendencia decreciente (mean reversion)
-    const dailyChange = trend * Math.exp(-i * 0.1) * 0.003;
-    currentPrice = currentPrice * (1 + dailyChange);
+    const dailyChange = trend * Math.exp(-i * 0.1) * 0.003
+    currentPrice = currentPrice * (1 + dailyChange)
     
     // Rango de confianza
-    const confidenceRange = volatility * Math.sqrt(i);
+    const confidenceRange = volatility * Math.sqrt(i)
     
     results.push({
       projected: Math.round(currentPrice * 100) / 100,
       low: Math.round(currentPrice * (1 - confidenceRange) * 100) / 100,
       high: Math.round(currentPrice * (1 + confidenceRange) * 100) / 100,
-    });
+    })
   }
   
-  return results;
+  return results
 }
 
 /**
  * Genera datos mock si no hay histórico real
  */
 function generateMockData(currentPrice: number, days: number = 30): ChartDataPoint[] {
-  const data: ChartDataPoint[] = [];
-  const basePrice = currentPrice * 0.98; // Empezar 2% abajo
-  const volatility = 0.008;
+  const data: ChartDataPoint[] = []
+  const basePrice = currentPrice * 0.98 // Empezar 2% abajo
+  const volatility = 0.008
   
-  let price = basePrice;
-  const today = new Date();
+  let price = basePrice
+  const today = new Date()
   
   for (let i = days; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - i);
+    const date = new Date(today)
+    date.setDate(date.getDate() - i)
     
     // Simular movimiento random con tendencia alcista ligera
-    const change = (Math.random() - 0.48) * volatility;
-    price = price * (1 + change);
+    const change = (Math.random() - 0.48) * volatility
+    price = price * (1 + change)
     
     data.push({
       date: date.toISOString(),
       dateLabel: date.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }),
       price: Math.round(price * 100) / 100,
-    });
+    })
   }
   
   // Asegurar que el último punto sea el precio actual
   if (data.length > 0) {
-    data[data.length - 1].price = currentPrice;
+    data[data.length - 1].price = currentPrice
   }
   
-  return data;
+  return data
 }
 
 // ============================================
@@ -154,12 +154,12 @@ interface CustomTooltipProps {
 }
 
 const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label }) => {
-  if (!active || !payload?.length) return null;
+  if (!active || !payload?.length) return null
 
-  const mainPrice = payload.find(p => p.dataKey === 'price' || p.dataKey === 'projected');
-  const sma7 = payload.find(p => p.dataKey === 'sma7');
-  const sma30 = payload.find(p => p.dataKey === 'sma30');
-  const isProjection = payload.some(p => p.dataKey === 'projected');
+  const mainPrice = payload.find(p => p.dataKey === 'price' || p.dataKey === 'projected')
+  const sma7 = payload.find(p => p.dataKey === 'sma7')
+  const sma30 = payload.find(p => p.dataKey === 'sma30')
+  const isProjection = payload.some(p => p.dataKey === 'projected')
 
   return (
     <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-3 shadow-xl">
@@ -196,8 +196,8 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label })
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
 // ============================================
 // COMPONENTE PRINCIPAL
@@ -213,43 +213,43 @@ export const TrendForecastChart: React.FC<TrendForecastChartProps> = ({
   // Preparar datos del gráfico
   const chartData = useMemo(() => {
     // Usar datos históricos o generar mock
-    let baseData: ChartDataPoint[];
+    let baseData: ChartDataPoint[]
     
     if (historicalData.length > 5) {
       baseData = historicalData.map(feed => ({
         date: feed.timestamp,
         dateLabel: new Date(feed.timestamp).toLocaleDateString('es-MX', { 
           day: '2-digit', 
-          month: 'short' 
+          month: 'short', 
         }),
         price: feed.sources.banxico_fix,
-      }));
+      }))
     } else {
-      baseData = generateMockData(currentPrice, 30);
+      baseData = generateMockData(currentPrice, 30)
     }
 
     // Calcular SMAs
-    const prices = baseData.map(d => d.price);
-    const sma7Values = calculateSMA(prices, 7);
-    const sma30Values = calculateSMA(prices, Math.min(30, prices.length));
+    const prices = baseData.map(d => d.price)
+    const sma7Values = calculateSMA(prices, 7)
+    const sma30Values = calculateSMA(prices, Math.min(30, prices.length))
 
     // Añadir SMAs a los datos
     baseData = baseData.map((d, i) => ({
       ...d,
       sma7: sma7Values[i],
       sma30: sma30Values[i],
-    }));
+    }))
 
     // Generar proyección si está habilitada
     if (showProjection && baseData.length > 0) {
-      const lastPoint = baseData[baseData.length - 1];
-      const lastSMA = lastPoint.sma30 ?? lastPoint.sma7 ?? lastPoint.price;
-      const projections = generateProjection(lastPoint.price, lastSMA, projectionDays);
+      const lastPoint = baseData[baseData.length - 1]
+      const lastSMA = lastPoint.sma30 ?? lastPoint.sma7 ?? lastPoint.price
+      const projections = generateProjection(lastPoint.price, lastSMA, projectionDays)
 
-      const today = new Date();
+      const today = new Date()
       projections.forEach((proj, i) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() + i + 1);
+        const date = new Date(today)
+        date.setDate(date.getDate() + i + 1)
         
         baseData.push({
           date: date.toISOString(),
@@ -259,29 +259,29 @@ export const TrendForecastChart: React.FC<TrendForecastChartProps> = ({
           projectedLow: proj.low,
           projectedHigh: proj.high,
           isProjection: true,
-        });
-      });
+        })
+      })
     }
 
-    return baseData;
-  }, [historicalData, currentPrice, showProjection, projectionDays]);
+    return baseData
+  }, [historicalData, currentPrice, showProjection, projectionDays])
 
   // Calcular tendencia
   const trend = useMemo(() => {
-    if (chartData.length < 2) return { direction: 'neutral' as const, percent: 0 };
+    if (chartData.length < 2) return { direction: 'neutral' as const, percent: 0 }
     
-    const historicalOnly = chartData.filter(d => !d.isProjection);
-    if (historicalOnly.length < 2) return { direction: 'neutral' as const, percent: 0 };
+    const historicalOnly = chartData.filter(d => !d.isProjection)
+    if (historicalOnly.length < 2) return { direction: 'neutral' as const, percent: 0 }
     
-    const first = historicalOnly[0].price;
-    const last = historicalOnly[historicalOnly.length - 1].price;
-    const percent = ((last - first) / first) * 100;
+    const first = historicalOnly[0].price
+    const last = historicalOnly[historicalOnly.length - 1].price
+    const percent = ((last - first) / first) * 100
     
     return {
       direction: percent > 0.5 ? 'up' as const : percent < -0.5 ? 'down' as const : 'neutral' as const,
       percent: Math.round(percent * 100) / 100,
-    };
-  }, [chartData]);
+    }
+  }, [chartData])
 
   // Calcular dominio del eje Y
   const yDomain = useMemo(() => {
@@ -291,17 +291,17 @@ export const TrendForecastChart: React.FC<TrendForecastChartProps> = ({
       d.projectedHigh,
       d.sma7,
       d.sma30,
-    ]).filter((v): v is number => v !== undefined);
+    ]).filter((v): v is number => v !== undefined)
     
-    const min = Math.min(...allPrices);
-    const max = Math.max(...allPrices);
-    const padding = (max - min) * 0.1;
+    const min = Math.min(...allPrices)
+    const max = Math.max(...allPrices)
+    const padding = (max - min) * 0.1
     
     return [
       Math.floor((min - padding) * 100) / 100,
       Math.ceil((max + padding) * 100) / 100,
-    ];
-  }, [chartData]);
+    ]
+  }, [chartData])
 
   return (
     <div className="space-y-4">
@@ -321,7 +321,7 @@ export const TrendForecastChart: React.FC<TrendForecastChartProps> = ({
             'text-sm font-medium',
             trend.direction === 'up' && 'text-emerald-400',
             trend.direction === 'down' && 'text-red-400',
-            trend.direction === 'neutral' && 'text-zinc-400'
+            trend.direction === 'neutral' && 'text-zinc-400',
           )}>
             {trend.direction === 'up' && `+${trend.percent}% en 30 días`}
             {trend.direction === 'down' && `${trend.percent}% en 30 días`}
@@ -477,7 +477,7 @@ export const TrendForecastChart: React.FC<TrendForecastChartProps> = ({
         </p>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default TrendForecastChart;
+export default TrendForecastChart

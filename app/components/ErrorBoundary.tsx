@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import React, { Component, type ReactNode, type ErrorInfo } from "react"
-import { motion } from "framer-motion"
-import { logger } from "@/app/lib/utils/logger"
+import React, { Component, type ReactNode, type ErrorInfo } from 'react'
+import { motion } from 'framer-motion'
+import { logger } from '@/app/lib/utils/logger'
 
 interface Props {
   children: ReactNode
@@ -25,9 +25,9 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    logger.error("ErrorBoundary caught an error", error, { 
-      context: "ErrorBoundary",
-      data: errorInfo 
+    logger.error('ErrorBoundary caught an error', error, { 
+      context: 'ErrorBoundary',
+      data: errorInfo, 
     })
   }
 
@@ -61,7 +61,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </div>
             <h2 className="text-2xl font-bold text-white">Algo salió mal</h2>
             <p className="text-slate-400">
-              {this.state.error?.message || "Ha ocurrido un error inesperado"}
+              {this.state.error?.message || 'Ha ocurrido un error inesperado'}
             </p>
             <button
               onClick={() => window.location.reload()}

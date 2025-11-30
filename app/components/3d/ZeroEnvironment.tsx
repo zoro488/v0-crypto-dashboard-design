@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * ZeroEnvironment - Efectos de Post-Procesamiento Cinematográficos
@@ -23,7 +23,7 @@ import {
   Scanline,
   Glitch,
   DepthOfField,
-  ToneMapping
+  ToneMapping,
 } from '@react-three/postprocessing'
 import { BlendFunction, GlitchMode, ToneMappingMode } from 'postprocessing'
 import { ZeroState } from './ZeroAvatar'
@@ -88,14 +88,14 @@ interface EffectSettings {
 
 const getEffectSettings = (
   state: ZeroState, 
-  intensity: ZeroEnvironmentProps['intensity']
+  intensity: ZeroEnvironmentProps['intensity'],
 ): EffectSettings => {
   // Multiplicadores base según intensidad
   const intensityMultipliers = {
     minimal: 0.3,
     normal: 1,
     intense: 1.5,
-    cinematic: 2
+    cinematic: 2,
   }
   
   const mult = intensityMultipliers[intensity || 'normal']
@@ -107,36 +107,36 @@ const getEffectSettings = (
         intensity: 0.3 * mult,
         luminanceThreshold: 0.9,
         luminanceSmoothing: 0.9,
-        radius: 0.5
+        radius: 0.5,
       },
       glitch: {
         enabled: false,
         delay: [1.5, 3.5],
         duration: [0.1, 0.3],
         strength: [0.01, 0.02],
-        mode: GlitchMode.SPORADIC
+        mode: GlitchMode.SPORADIC,
       },
       noise: {
         opacity: 0.02 * mult,
-        blendFunction: BlendFunction.OVERLAY
+        blendFunction: BlendFunction.OVERLAY,
       },
       vignette: {
         offset: 0.3,
-        darkness: 0.5
+        darkness: 0.5,
       },
       scanline: {
         density: 1.5,
-        opacity: 0.03 * mult
+        opacity: 0.03 * mult,
       },
       chromaticAberration: {
-        offset: [0.0002 * mult, 0.0002 * mult]
+        offset: [0.0002 * mult, 0.0002 * mult],
       },
       dof: {
         enabled: false,
         focusDistance: 0.02,
         focalLength: 0.5,
-        bokehScale: 2
-      }
+        bokehScale: 2,
+      },
     },
     
     listening: {
@@ -144,36 +144,36 @@ const getEffectSettings = (
         intensity: 0.4 * mult,
         luminanceThreshold: 0.85,
         luminanceSmoothing: 0.8,
-        radius: 0.6
+        radius: 0.6,
       },
       glitch: {
         enabled: false,
         delay: [2, 4],
         duration: [0.05, 0.15],
         strength: [0.005, 0.01],
-        mode: GlitchMode.SPORADIC
+        mode: GlitchMode.SPORADIC,
       },
       noise: {
         opacity: 0.03 * mult,
-        blendFunction: BlendFunction.OVERLAY
+        blendFunction: BlendFunction.OVERLAY,
       },
       vignette: {
         offset: 0.25,
-        darkness: 0.55
+        darkness: 0.55,
       },
       scanline: {
         density: 1.8,
-        opacity: 0.04 * mult
+        opacity: 0.04 * mult,
       },
       chromaticAberration: {
-        offset: [0.0003 * mult, 0.0003 * mult]
+        offset: [0.0003 * mult, 0.0003 * mult],
       },
       dof: {
         enabled: true,
         focusDistance: 0.02,
         focalLength: 0.4,
-        bokehScale: 3
-      }
+        bokehScale: 3,
+      },
     },
     
     speaking: {
@@ -181,36 +181,36 @@ const getEffectSettings = (
         intensity: 0.5 * mult,
         luminanceThreshold: 0.8,
         luminanceSmoothing: 0.7,
-        radius: 0.7
+        radius: 0.7,
       },
       glitch: {
         enabled: false,
         delay: [3, 5],
         duration: [0.02, 0.08],
         strength: [0.002, 0.005],
-        mode: GlitchMode.SPORADIC
+        mode: GlitchMode.SPORADIC,
       },
       noise: {
         opacity: 0.025 * mult,
-        blendFunction: BlendFunction.OVERLAY
+        blendFunction: BlendFunction.OVERLAY,
       },
       vignette: {
         offset: 0.2,
-        darkness: 0.5
+        darkness: 0.5,
       },
       scanline: {
         density: 1.5,
-        opacity: 0.035 * mult
+        opacity: 0.035 * mult,
       },
       chromaticAberration: {
-        offset: [0.0002 * mult, 0.0002 * mult]
+        offset: [0.0002 * mult, 0.0002 * mult],
       },
       dof: {
         enabled: false,
         focusDistance: 0.02,
         focalLength: 0.5,
-        bokehScale: 2
-      }
+        bokehScale: 2,
+      },
     },
     
     processing: {
@@ -218,36 +218,36 @@ const getEffectSettings = (
         intensity: 0.6 * mult,
         luminanceThreshold: 0.75,
         luminanceSmoothing: 0.65,
-        radius: 0.8
+        radius: 0.8,
       },
       glitch: {
         enabled: true,
         delay: [0.5, 1.5],
         duration: [0.1, 0.2],
         strength: [0.02, 0.05],
-        mode: GlitchMode.SPORADIC
+        mode: GlitchMode.SPORADIC,
       },
       noise: {
         opacity: 0.04 * mult,
-        blendFunction: BlendFunction.OVERLAY
+        blendFunction: BlendFunction.OVERLAY,
       },
       vignette: {
         offset: 0.15,
-        darkness: 0.6
+        darkness: 0.6,
       },
       scanline: {
         density: 2,
-        opacity: 0.05 * mult
+        opacity: 0.05 * mult,
       },
       chromaticAberration: {
-        offset: [0.0005 * mult, 0.0005 * mult]
+        offset: [0.0005 * mult, 0.0005 * mult],
       },
       dof: {
         enabled: true,
         focusDistance: 0.015,
         focalLength: 0.3,
-        bokehScale: 4
-      }
+        bokehScale: 4,
+      },
     },
     
     combat: {
@@ -255,36 +255,36 @@ const getEffectSettings = (
         intensity: 1.0 * mult,
         luminanceThreshold: 0.6,
         luminanceSmoothing: 0.5,
-        radius: 1.0
+        radius: 1.0,
       },
       glitch: {
         enabled: true,
         delay: [0.2, 0.8],
         duration: [0.15, 0.4],
         strength: [0.05, 0.15],
-        mode: GlitchMode.CONSTANT_WILD
+        mode: GlitchMode.CONSTANT_WILD,
       },
       noise: {
         opacity: 0.06 * mult,
-        blendFunction: BlendFunction.OVERLAY
+        blendFunction: BlendFunction.OVERLAY,
       },
       vignette: {
         offset: 0.1,
-        darkness: 0.7
+        darkness: 0.7,
       },
       scanline: {
         density: 2.5,
-        opacity: 0.08 * mult
+        opacity: 0.08 * mult,
       },
       chromaticAberration: {
-        offset: [0.001 * mult, 0.001 * mult]
+        offset: [0.001 * mult, 0.001 * mult],
       },
       dof: {
         enabled: false,
         focusDistance: 0.01,
         focalLength: 0.2,
-        bokehScale: 5
-      }
+        bokehScale: 5,
+      },
     },
     
     success: {
@@ -292,36 +292,36 @@ const getEffectSettings = (
         intensity: 0.8 * mult,
         luminanceThreshold: 0.65,
         luminanceSmoothing: 0.6,
-        radius: 0.9
+        radius: 0.9,
       },
       glitch: {
         enabled: false,
         delay: [5, 10],
         duration: [0.02, 0.05],
         strength: [0.001, 0.003],
-        mode: GlitchMode.SPORADIC
+        mode: GlitchMode.SPORADIC,
       },
       noise: {
         opacity: 0.02 * mult,
-        blendFunction: BlendFunction.OVERLAY
+        blendFunction: BlendFunction.OVERLAY,
       },
       vignette: {
         offset: 0.25,
-        darkness: 0.4
+        darkness: 0.4,
       },
       scanline: {
         density: 1.2,
-        opacity: 0.02 * mult
+        opacity: 0.02 * mult,
       },
       chromaticAberration: {
-        offset: [0.0001 * mult, 0.0001 * mult]
+        offset: [0.0001 * mult, 0.0001 * mult],
       },
       dof: {
         enabled: true,
         focusDistance: 0.025,
         focalLength: 0.6,
-        bokehScale: 3
-      }
+        bokehScale: 3,
+      },
     },
     
     error: {
@@ -329,37 +329,37 @@ const getEffectSettings = (
         intensity: 0.9 * mult,
         luminanceThreshold: 0.5,
         luminanceSmoothing: 0.4,
-        radius: 1.1
+        radius: 1.1,
       },
       glitch: {
         enabled: true,
         delay: [0.1, 0.5],
         duration: [0.2, 0.5],
         strength: [0.08, 0.2],
-        mode: GlitchMode.CONSTANT_WILD
+        mode: GlitchMode.CONSTANT_WILD,
       },
       noise: {
         opacity: 0.08 * mult,
-        blendFunction: BlendFunction.OVERLAY
+        blendFunction: BlendFunction.OVERLAY,
       },
       vignette: {
         offset: 0.05,
-        darkness: 0.8
+        darkness: 0.8,
       },
       scanline: {
         density: 3,
-        opacity: 0.1 * mult
+        opacity: 0.1 * mult,
       },
       chromaticAberration: {
-        offset: [0.002 * mult, 0.002 * mult]
+        offset: [0.002 * mult, 0.002 * mult],
       },
       dof: {
         enabled: false,
         focusDistance: 0.01,
         focalLength: 0.15,
-        bokehScale: 6
-      }
-    }
+        bokehScale: 6,
+      },
+    },
   }
   
   return baseSettings[state]
@@ -377,7 +377,7 @@ function DynamicEffects({
   enableVignette = true,
   enableScanlines = true,
   enableChromaticAberration = true,
-  enableDepthOfField = false
+  enableDepthOfField = false,
 }: { 
   settings: EffectSettings 
 } & Omit<ZeroEnvironmentProps, 'state' | 'intensity'>) {
@@ -386,9 +386,9 @@ function DynamicEffects({
   const chromaticOffset = useMemo(() => 
     new THREE.Vector2(
       settings.chromaticAberration.offset[0], 
-      settings.chromaticAberration.offset[1]
+      settings.chromaticAberration.offset[1],
     ), 
-    [settings.chromaticAberration.offset]
+    [settings.chromaticAberration.offset],
   )
   
   // Renderizar solo los efectos habilitados
@@ -396,7 +396,7 @@ function DynamicEffects({
   
   // Tone Mapping siempre activo
   effects.push(
-    <ToneMapping key="tone" mode={ToneMappingMode.ACES_FILMIC} />
+    <ToneMapping key="tone" mode={ToneMappingMode.ACES_FILMIC} />,
   )
   
   // Bloom
@@ -408,7 +408,7 @@ function DynamicEffects({
         luminanceThreshold={settings.bloom.luminanceThreshold}
         luminanceSmoothing={settings.bloom.luminanceSmoothing}
         mipmapBlur
-      />
+      />,
     )
   }
   
@@ -420,7 +420,7 @@ function DynamicEffects({
         focusDistance={settings.dof.focusDistance}
         focalLength={settings.dof.focalLength}
         bokehScale={settings.dof.bokehScale}
-      />
+      />,
     )
   }
   
@@ -432,7 +432,7 @@ function DynamicEffects({
         offset={chromaticOffset}
         radialModulation={false}
         modulationOffset={0}
-      />
+      />,
     )
   }
   
@@ -443,7 +443,7 @@ function DynamicEffects({
         key="scanline"
         density={settings.scanline.density}
         blendFunction={BlendFunction.OVERLAY}
-      />
+      />,
     )
   }
   
@@ -458,7 +458,7 @@ function DynamicEffects({
         mode={settings.glitch.mode}
         active
         ratio={0.85}
-      />
+      />,
     )
   }
   
@@ -469,7 +469,7 @@ function DynamicEffects({
         key="noise"
         opacity={settings.noise.opacity}
         blendFunction={settings.noise.blendFunction}
-      />
+      />,
     )
   }
   
@@ -481,7 +481,7 @@ function DynamicEffects({
         offset={settings.vignette.offset}
         darkness={settings.vignette.darkness}
         eskil={false}
-      />
+      />,
     )
   }
   
@@ -505,13 +505,13 @@ export function ZeroEnvironment({
   enableVignette = true,
   enableScanlines = true,
   enableChromaticAberration = true,
-  enableDepthOfField = false
+  enableDepthOfField = false,
 }: ZeroEnvironmentProps) {
   
   // Obtener configuración de efectos basada en estado e intensidad
   const settings = useMemo(() => 
     getEffectSettings(state, intensity), 
-    [state, intensity]
+    [state, intensity],
   )
   
   return (

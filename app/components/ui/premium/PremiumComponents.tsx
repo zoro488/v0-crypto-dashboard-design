@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion"
-import React, { forwardRef, createContext, useContext, ReactNode, useState, useRef, useEffect } from "react"
-import { cn } from "@/app/lib/utils"
-import { LucideIcon } from "lucide-react"
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion'
+import React, { forwardRef, createContext, useContext, ReactNode, useState, useRef, useEffect } from 'react'
+import { cn } from '@/app/lib/utils'
+import { LucideIcon } from 'lucide-react'
 
 // ============================================
 // CONTEXTO Y TIPOS
@@ -11,12 +11,12 @@ import { LucideIcon } from "lucide-react"
 
 interface GlowContextType {
   glowColor: string
-  intensity: "low" | "medium" | "high"
+  intensity: 'low' | 'medium' | 'high'
 }
 
 const GlowContext = createContext<GlowContextType>({
-  glowColor: "rgba(59, 130, 246, 0.5)",
-  intensity: "medium",
+  glowColor: 'rgba(59, 130, 246, 0.5)',
+  intensity: 'medium',
 })
 
 // ============================================
@@ -39,7 +39,7 @@ interface PremiumCardProps {
 export const PremiumCard = forwardRef<HTMLDivElement, PremiumCardProps>(({
   children,
   className,
-  glowColor = "rgba(59, 130, 246, 0.5)",
+  glowColor = 'rgba(59, 130, 246, 0.5)',
   glowOnHover = true,
   floatOnHover = true,
   shine = true,
@@ -69,11 +69,11 @@ export const PremiumCard = forwardRef<HTMLDivElement, PremiumCardProps>(({
     <motion.div
       ref={cardRef}
       className={cn(
-        "relative overflow-hidden rounded-3xl",
-        "bg-gradient-to-br from-white/[0.08] to-white/[0.02]",
-        "backdrop-blur-xl border border-white/10",
-        borderGlow && "border-transparent",
-        className
+        'relative overflow-hidden rounded-3xl',
+        'bg-gradient-to-br from-white/[0.08] to-white/[0.02]',
+        'backdrop-blur-xl border border-white/10',
+        borderGlow && 'border-transparent',
+        className,
       )}
       style={{
         background: gradient || undefined,
@@ -83,12 +83,12 @@ export const PremiumCard = forwardRef<HTMLDivElement, PremiumCardProps>(({
       transition={{ 
         duration: 0.6, 
         delay, 
-        ease: [0.16, 1, 0.3, 1] 
+        ease: [0.16, 1, 0.3, 1], 
       }}
       whileHover={floatOnHover ? { 
         y: -8, 
         scale: 1.02,
-        transition: { duration: 0.3, ease: "easeOut" }
+        transition: { duration: 0.3, ease: 'easeOut' },
       } : undefined}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
@@ -103,9 +103,9 @@ export const PremiumCard = forwardRef<HTMLDivElement, PremiumCardProps>(({
             background: `linear-gradient(135deg, ${glowColor}, transparent 50%, ${glowColor})`,
           }}
           animate={{
-            backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"],
+            backgroundPosition: ['0% 0%', '100% 100%', '0% 0%'],
           }}
-          transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
         />
       )}
       
@@ -130,23 +130,23 @@ export const PremiumCard = forwardRef<HTMLDivElement, PremiumCardProps>(({
         <motion.div
           className="absolute inset-0 -z-5"
           style={{
-            background: "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%)",
-            backgroundSize: "200% 100%",
+            background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%)',
+            backgroundSize: '200% 100%',
           }}
-          initial={{ backgroundPosition: "200% 0" }}
-          animate={isHovered ? { backgroundPosition: "-200% 0" } : {}}
-          transition={{ duration: 0.8, ease: "easeInOut" }}
+          initial={{ backgroundPosition: '200% 0' }}
+          animate={isHovered ? { backgroundPosition: '-200% 0' } : {}}
+          transition={{ duration: 0.8, ease: 'easeInOut' }}
         />
       )}
 
       {/* Contenido */}
-      <GlowContext.Provider value={{ glowColor, intensity: "medium" }}>
+      <GlowContext.Provider value={{ glowColor, intensity: 'medium' }}>
         {children}
       </GlowContext.Provider>
     </motion.div>
   )
 })
-PremiumCard.displayName = "PremiumCard"
+PremiumCard.displayName = 'PremiumCard'
 
 // ============================================
 // KPI CARD - Tarjeta de métricas premium
@@ -156,7 +156,7 @@ interface KPICardProps {
   title: string
   value: string | number
   change?: number
-  trend?: "up" | "down" | "neutral"
+  trend?: 'up' | 'down' | 'neutral'
   icon?: LucideIcon
   iconColor?: string
   gradient?: string
@@ -173,32 +173,32 @@ export const KPICard: React.FC<KPICardProps> = ({
   title,
   value,
   change,
-  trend = "neutral",
+  trend = 'neutral',
   icon: Icon,
-  iconColor = "from-blue-500 to-cyan-500",
+  iconColor = 'from-blue-500 to-cyan-500',
   gradient,
   sparklineData,
-  suffix = "",
-  prefix = "",
+  suffix = '',
+  prefix = '',
   description,
   delay = 0,
   onClick,
   className,
 }) => {
   const trendConfig = {
-    up: { color: "text-emerald-400", bg: "bg-emerald-500/10", symbol: "↑" },
-    down: { color: "text-rose-400", bg: "bg-rose-500/10", symbol: "↓" },
-    neutral: { color: "text-white/50", bg: "bg-white/5", symbol: "→" },
+    up: { color: 'text-emerald-400', bg: 'bg-emerald-500/10', symbol: '↑' },
+    down: { color: 'text-rose-400', bg: 'bg-rose-500/10', symbol: '↓' },
+    neutral: { color: 'text-white/50', bg: 'bg-white/5', symbol: '→' },
   }
 
   const { color: trendColor, bg: trendBg, symbol: trendSymbol } = trendConfig[trend]
 
   return (
     <PremiumCard
-      className={cn("p-6 cursor-pointer", className)}
-      glowColor={gradient?.includes("emerald") ? "rgba(16, 185, 129, 0.3)" : 
-                gradient?.includes("purple") ? "rgba(147, 51, 234, 0.3)" : 
-                "rgba(59, 130, 246, 0.3)"}
+      className={cn('p-6 cursor-pointer', className)}
+      glowColor={gradient?.includes('emerald') ? 'rgba(16, 185, 129, 0.3)' : 
+                gradient?.includes('purple') ? 'rgba(147, 51, 234, 0.3)' : 
+                'rgba(59, 130, 246, 0.3)'}
       delay={delay}
       onClick={onClick}
     >
@@ -206,7 +206,7 @@ export const KPICard: React.FC<KPICardProps> = ({
       <motion.div
         className="absolute inset-0 opacity-30"
         style={{
-          background: gradient || "radial-gradient(circle at top right, rgba(59,130,246,0.15), transparent 60%)",
+          background: gradient || 'radial-gradient(circle at top right, rgba(59,130,246,0.15), transparent 60%)',
         }}
       />
 
@@ -216,11 +216,11 @@ export const KPICard: React.FC<KPICardProps> = ({
           {Icon && (
             <motion.div
               className={cn(
-                "p-3 rounded-2xl bg-gradient-to-br shadow-lg",
-                iconColor
+                'p-3 rounded-2xl bg-gradient-to-br shadow-lg',
+                iconColor,
               )}
               whileHover={{ scale: 1.1, rotate: 5 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 10 }}
             >
               <Icon className="w-5 h-5 text-white" />
             </motion.div>
@@ -229,9 +229,9 @@ export const KPICard: React.FC<KPICardProps> = ({
           {change !== undefined && (
             <motion.div
               className={cn(
-                "px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1",
+                'px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1',
                 trendBg,
-                trendColor
+                trendColor,
               )}
               initial={{ opacity: 0, x: 10 }}
               animate={{ opacity: 1, x: 0 }}
@@ -307,13 +307,13 @@ interface AnimatedValueProps {
 const AnimatedValue: React.FC<AnimatedValueProps> = ({ 
   value, 
   duration = 1000,
-  className 
+  className, 
 }) => {
   const [displayValue, setDisplayValue] = useState(value)
   
   useEffect(() => {
-    if (typeof value === "number") {
-      const startValue = typeof displayValue === "number" ? displayValue : 0
+    if (typeof value === 'number') {
+      const startValue = typeof displayValue === 'number' ? displayValue : 0
       const endValue = value
       const startTime = Date.now()
       
@@ -340,8 +340,8 @@ const AnimatedValue: React.FC<AnimatedValueProps> = ({
   }, [value, duration])
 
   return (
-    <span className={cn("tabular-nums", className)}>
-      {typeof displayValue === "number" ? displayValue.toLocaleString() : displayValue}
+    <span className={cn('tabular-nums', className)}>
+      {typeof displayValue === 'number' ? displayValue.toLocaleString() : displayValue}
     </span>
   )
 }
@@ -358,8 +358,8 @@ interface MiniSparklineProps {
 
 const MiniSparkline: React.FC<MiniSparklineProps> = ({ 
   data, 
-  color = "from-blue-500 to-cyan-500",
-  className 
+  color = 'from-blue-500 to-cyan-500',
+  className, 
 }) => {
   const max = Math.max(...data)
   const min = Math.min(...data)
@@ -369,11 +369,11 @@ const MiniSparkline: React.FC<MiniSparklineProps> = ({
     const x = (index / (data.length - 1)) * 100
     const y = 100 - ((value - min) / range) * 80
     return `${x},${y}`
-  }).join(" ")
+  }).join(' ')
 
   return (
     <svg 
-      className={cn("w-full h-full", className)} 
+      className={cn('w-full h-full', className)} 
       viewBox="0 0 100 100" 
       preserveAspectRatio="none"
     >
@@ -407,7 +407,7 @@ const MiniSparkline: React.FC<MiniSparklineProps> = ({
         strokeLinejoin="round"
         initial={{ pathLength: 0 }}
         animate={{ pathLength: 1 }}
-        transition={{ duration: 1, ease: "easeOut" }}
+        transition={{ duration: 1, ease: 'easeOut' }}
       />
       
       {/* Punto final */}
@@ -418,7 +418,7 @@ const MiniSparkline: React.FC<MiniSparklineProps> = ({
         fill="#fff"
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
-        transition={{ delay: 1, type: "spring" }}
+        transition={{ delay: 1, type: 'spring' }}
       />
     </svg>
   )
@@ -430,10 +430,10 @@ const MiniSparkline: React.FC<MiniSparklineProps> = ({
 
 interface GlowButtonProps {
   children: ReactNode
-  variant?: "primary" | "secondary" | "ghost" | "danger"
-  size?: "sm" | "md" | "lg"
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
+  size?: 'sm' | 'md' | 'lg'
   icon?: LucideIcon
-  iconPosition?: "left" | "right"
+  iconPosition?: 'left' | 'right'
   loading?: boolean
   disabled?: boolean
   fullWidth?: boolean
@@ -444,10 +444,10 @@ interface GlowButtonProps {
 
 export const GlowButton: React.FC<GlowButtonProps> = ({
   children,
-  variant = "primary",
-  size = "md",
+  variant = 'primary',
+  size = 'md',
   icon: Icon,
-  iconPosition = "left",
+  iconPosition = 'left',
   loading = false,
   disabled = false,
   fullWidth = false,
@@ -457,35 +457,35 @@ export const GlowButton: React.FC<GlowButtonProps> = ({
 }) => {
   const variants = {
     primary: {
-      bg: "bg-gradient-to-r from-blue-600 to-cyan-500",
-      hover: "hover:from-blue-500 hover:to-cyan-400",
-      glow: "rgba(59, 130, 246, 0.5)",
-      text: "text-white",
+      bg: 'bg-gradient-to-r from-blue-600 to-cyan-500',
+      hover: 'hover:from-blue-500 hover:to-cyan-400',
+      glow: 'rgba(59, 130, 246, 0.5)',
+      text: 'text-white',
     },
     secondary: {
-      bg: "bg-white/5 border border-white/10",
-      hover: "hover:bg-white/10 hover:border-white/20",
-      glow: "rgba(255, 255, 255, 0.2)",
-      text: "text-white",
+      bg: 'bg-white/5 border border-white/10',
+      hover: 'hover:bg-white/10 hover:border-white/20',
+      glow: 'rgba(255, 255, 255, 0.2)',
+      text: 'text-white',
     },
     ghost: {
-      bg: "bg-transparent",
-      hover: "hover:bg-white/5",
-      glow: "rgba(255, 255, 255, 0.1)",
-      text: "text-white/70 hover:text-white",
+      bg: 'bg-transparent',
+      hover: 'hover:bg-white/5',
+      glow: 'rgba(255, 255, 255, 0.1)',
+      text: 'text-white/70 hover:text-white',
     },
     danger: {
-      bg: "bg-gradient-to-r from-rose-600 to-pink-500",
-      hover: "hover:from-rose-500 hover:to-pink-400",
-      glow: "rgba(244, 63, 94, 0.5)",
-      text: "text-white",
+      bg: 'bg-gradient-to-r from-rose-600 to-pink-500',
+      hover: 'hover:from-rose-500 hover:to-pink-400',
+      glow: 'rgba(244, 63, 94, 0.5)',
+      text: 'text-white',
     },
   }
 
   const sizes = {
-    sm: "px-4 py-2 text-sm",
-    md: "px-6 py-2.5 text-base",
-    lg: "px-8 py-3 text-lg",
+    sm: 'px-4 py-2 text-sm',
+    md: 'px-6 py-2.5 text-base',
+    lg: 'px-8 py-3 text-lg',
   }
 
   const { bg, hover, glow: glowColor, text } = variants[variant]
@@ -493,16 +493,16 @@ export const GlowButton: React.FC<GlowButtonProps> = ({
   return (
     <motion.button
       className={cn(
-        "relative inline-flex items-center justify-center gap-2 font-semibold rounded-xl",
-        "transition-all duration-300 overflow-hidden",
-        "focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-black",
+        'relative inline-flex items-center justify-center gap-2 font-semibold rounded-xl',
+        'transition-all duration-300 overflow-hidden',
+        'focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-black',
         bg,
         hover,
         text,
         sizes[size],
-        fullWidth && "w-full",
-        disabled && "opacity-50 cursor-not-allowed",
-        className
+        fullWidth && 'w-full',
+        disabled && 'opacity-50 cursor-not-allowed',
+        className,
       )}
       whileHover={disabled ? {} : { scale: 1.02, y: -2 }}
       whileTap={disabled ? {} : { scale: 0.98 }}
@@ -526,12 +526,12 @@ export const GlowButton: React.FC<GlowButtonProps> = ({
         <motion.div
           className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
           animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
         />
       )}
 
       {/* Icon left */}
-      {Icon && iconPosition === "left" && !loading && (
+      {Icon && iconPosition === 'left' && !loading && (
         <Icon className="w-4 h-4" />
       )}
 
@@ -539,7 +539,7 @@ export const GlowButton: React.FC<GlowButtonProps> = ({
       <span>{children}</span>
 
       {/* Icon right */}
-      {Icon && iconPosition === "right" && !loading && (
+      {Icon && iconPosition === 'right' && !loading && (
         <Icon className="w-4 h-4" />
       )}
     </motion.button>
@@ -552,7 +552,7 @@ export const GlowButton: React.FC<GlowButtonProps> = ({
 
 interface AnimatedBadgeProps {
   children: ReactNode
-  variant?: "default" | "success" | "warning" | "error" | "info"
+  variant?: 'default' | 'success' | 'warning' | 'error' | 'info'
   pulse?: boolean
   glow?: boolean
   className?: string
@@ -560,17 +560,17 @@ interface AnimatedBadgeProps {
 
 export const AnimatedBadge: React.FC<AnimatedBadgeProps> = ({
   children,
-  variant = "default",
+  variant = 'default',
   pulse = false,
   glow = false,
   className,
 }) => {
   const variants = {
-    default: { bg: "bg-white/10", text: "text-white/80", border: "border-white/20", glow: "rgba(255,255,255,0.3)" },
-    success: { bg: "bg-emerald-500/15", text: "text-emerald-400", border: "border-emerald-500/30", glow: "rgba(16,185,129,0.5)" },
-    warning: { bg: "bg-amber-500/15", text: "text-amber-400", border: "border-amber-500/30", glow: "rgba(245,158,11,0.5)" },
-    error: { bg: "bg-rose-500/15", text: "text-rose-400", border: "border-rose-500/30", glow: "rgba(244,63,94,0.5)" },
-    info: { bg: "bg-blue-500/15", text: "text-blue-400", border: "border-blue-500/30", glow: "rgba(59,130,246,0.5)" },
+    default: { bg: 'bg-white/10', text: 'text-white/80', border: 'border-white/20', glow: 'rgba(255,255,255,0.3)' },
+    success: { bg: 'bg-emerald-500/15', text: 'text-emerald-400', border: 'border-emerald-500/30', glow: 'rgba(16,185,129,0.5)' },
+    warning: { bg: 'bg-amber-500/15', text: 'text-amber-400', border: 'border-amber-500/30', glow: 'rgba(245,158,11,0.5)' },
+    error: { bg: 'bg-rose-500/15', text: 'text-rose-400', border: 'border-rose-500/30', glow: 'rgba(244,63,94,0.5)' },
+    info: { bg: 'bg-blue-500/15', text: 'text-blue-400', border: 'border-blue-500/30', glow: 'rgba(59,130,246,0.5)' },
   }
 
   const config = variants[variant]
@@ -578,22 +578,22 @@ export const AnimatedBadge: React.FC<AnimatedBadgeProps> = ({
   return (
     <motion.span
       className={cn(
-        "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold",
-        "border backdrop-blur-sm",
+        'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold',
+        'border backdrop-blur-sm',
         config.bg,
         config.text,
         config.border,
-        className
+        className,
       )}
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       whileHover={{ scale: 1.05 }}
       style={glow ? { boxShadow: `0 0 15px ${config.glow}` } : undefined}
-      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
     >
       {pulse && (
         <motion.span
-          className={cn("w-1.5 h-1.5 rounded-full", config.text.replace("text-", "bg-"))}
+          className={cn('w-1.5 h-1.5 rounded-full', config.text.replace('text-', 'bg-'))}
           animate={{
             scale: [1, 1.3, 1],
             opacity: [1, 0.5, 1],
@@ -614,8 +614,8 @@ interface FloatingPanelProps {
   children: ReactNode
   isOpen: boolean
   onClose: () => void
-  position?: "bottom-right" | "bottom-left" | "top-right" | "top-left" | "center"
-  size?: "sm" | "md" | "lg" | "xl" | "full"
+  position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left' | 'center'
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
   title?: string
   subtitle?: string
   className?: string
@@ -625,26 +625,26 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
   children,
   isOpen,
   onClose,
-  position = "bottom-right",
-  size = "md",
+  position = 'bottom-right',
+  size = 'md',
   title,
   subtitle,
   className,
 }) => {
   const positions = {
-    "bottom-right": "bottom-6 right-6",
-    "bottom-left": "bottom-6 left-6",
-    "top-right": "top-6 right-6",
-    "top-left": "top-6 left-6",
-    "center": "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
+    'bottom-right': 'bottom-6 right-6',
+    'bottom-left': 'bottom-6 left-6',
+    'top-right': 'top-6 right-6',
+    'top-left': 'top-6 left-6',
+    'center': 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
   }
 
   const sizes = {
-    sm: "w-[320px] max-h-[400px]",
-    md: "w-[400px] max-h-[500px]",
-    lg: "w-[500px] max-h-[600px]",
-    xl: "w-[600px] max-h-[700px]",
-    full: "w-[90vw] h-[90vh]",
+    sm: 'w-[320px] max-h-[400px]',
+    md: 'w-[400px] max-h-[500px]',
+    lg: 'w-[500px] max-h-[600px]',
+    xl: 'w-[600px] max-h-[700px]',
+    full: 'w-[90vw] h-[90vh]',
   }
 
   return (
@@ -663,15 +663,15 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
           {/* Panel */}
           <motion.div
             className={cn(
-              "fixed z-50",
+              'fixed z-50',
               positions[position],
               sizes[size],
-              className
+              className,
             )}
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
             <PremiumCard className="h-full flex flex-col">
               {/* Header */}

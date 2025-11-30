@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Calendar,
   Clock,
@@ -25,8 +25,8 @@ import {
   Wallet,
   Package,
   Truck,
-} from "lucide-react"
-import { cn } from "@/app/lib/utils"
+} from 'lucide-react'
+import { cn } from '@/app/lib/utils'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // INTERFACES Y TIPOS
@@ -42,7 +42,7 @@ interface ReporteProgramado {
   diaDelMes?: number // 1-31 para mensual
   hora: string // HH:mm
   destinatarios: string[]
-  formato: "pdf" | "excel" | "csv" | "json"
+  formato: 'pdf' | 'excel' | 'csv' | 'json'
   filtros: Record<string, unknown>
   activo: boolean
   ultimaEjecucion?: Date
@@ -55,57 +55,57 @@ interface ReporteProgramado {
 interface HistorialEjecucion {
   id: string
   fecha: Date
-  estado: "exito" | "error" | "pendiente"
+  estado: 'exito' | 'error' | 'pendiente'
   mensaje?: string
   archivoUrl?: string
   duracionMs?: number
 }
 
 type TipoReporte =
-  | "ventas-diario"
-  | "ventas-semanal"
-  | "ventas-mensual"
-  | "inventario"
-  | "distribuidores"
-  | "clientes"
-  | "bancos"
-  | "utilidades"
-  | "general"
-  | "personalizado"
+  | 'ventas-diario'
+  | 'ventas-semanal'
+  | 'ventas-mensual'
+  | 'inventario'
+  | 'distribuidores'
+  | 'clientes'
+  | 'bancos'
+  | 'utilidades'
+  | 'general'
+  | 'personalizado'
 
-type Frecuencia = "diaria" | "semanal" | "mensual" | "trimestral" | "anual" | "una-vez"
+type Frecuencia = 'diaria' | 'semanal' | 'mensual' | 'trimestral' | 'anual' | 'una-vez'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // CONFIGURACIONES
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const TIPOS_REPORTE = [
-  { id: "ventas-diario", label: "Ventas Diarias", icon: TrendingUp, color: "from-green-500 to-emerald-500" },
-  { id: "ventas-semanal", label: "Ventas Semanales", icon: BarChart3, color: "from-blue-500 to-cyan-500" },
-  { id: "ventas-mensual", label: "Ventas Mensuales", icon: FileText, color: "from-purple-500 to-pink-500" },
-  { id: "inventario", label: "Estado de Inventario", icon: Package, color: "from-orange-500 to-amber-500" },
-  { id: "distribuidores", label: "Reporte Distribuidores", icon: Truck, color: "from-indigo-500 to-violet-500" },
-  { id: "clientes", label: "Cartera de Clientes", icon: Users, color: "from-teal-500 to-cyan-500" },
-  { id: "bancos", label: "Estado de Bancos", icon: Wallet, color: "from-rose-500 to-red-500" },
-  { id: "utilidades", label: "Reporte de Utilidades", icon: TrendingUp, color: "from-yellow-500 to-orange-500" },
+  { id: 'ventas-diario', label: 'Ventas Diarias', icon: TrendingUp, color: 'from-green-500 to-emerald-500' },
+  { id: 'ventas-semanal', label: 'Ventas Semanales', icon: BarChart3, color: 'from-blue-500 to-cyan-500' },
+  { id: 'ventas-mensual', label: 'Ventas Mensuales', icon: FileText, color: 'from-purple-500 to-pink-500' },
+  { id: 'inventario', label: 'Estado de Inventario', icon: Package, color: 'from-orange-500 to-amber-500' },
+  { id: 'distribuidores', label: 'Reporte Distribuidores', icon: Truck, color: 'from-indigo-500 to-violet-500' },
+  { id: 'clientes', label: 'Cartera de Clientes', icon: Users, color: 'from-teal-500 to-cyan-500' },
+  { id: 'bancos', label: 'Estado de Bancos', icon: Wallet, color: 'from-rose-500 to-red-500' },
+  { id: 'utilidades', label: 'Reporte de Utilidades', icon: TrendingUp, color: 'from-yellow-500 to-orange-500' },
 ] as const
 
 const FRECUENCIAS = [
-  { id: "diaria", label: "Diaria" },
-  { id: "semanal", label: "Semanal" },
-  { id: "mensual", label: "Mensual" },
-  { id: "trimestral", label: "Trimestral" },
-  { id: "anual", label: "Anual" },
-  { id: "una-vez", label: "Una vez" },
+  { id: 'diaria', label: 'Diaria' },
+  { id: 'semanal', label: 'Semanal' },
+  { id: 'mensual', label: 'Mensual' },
+  { id: 'trimestral', label: 'Trimestral' },
+  { id: 'anual', label: 'Anual' },
+  { id: 'una-vez', label: 'Una vez' },
 ] as const
 
-const DIAS_SEMANA = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
+const DIAS_SEMANA = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 
 const FORMATOS = [
-  { id: "pdf", label: "PDF", ext: ".pdf" },
-  { id: "excel", label: "Excel", ext: ".xlsx" },
-  { id: "csv", label: "CSV", ext: ".csv" },
-  { id: "json", label: "JSON", ext: ".json" },
+  { id: 'pdf', label: 'PDF', ext: '.pdf' },
+  { id: 'excel', label: 'Excel', ext: '.xlsx' },
+  { id: 'csv', label: 'CSV', ext: '.csv' },
+  { id: 'json', label: 'JSON', ext: '.json' },
 ] as const
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -120,79 +120,79 @@ export function ScheduledReports() {
 
   // Estado del formulario
   const [formData, setFormData] = useState<Partial<ReporteProgramado>>({
-    nombre: "",
-    descripcion: "",
-    tipo: "ventas-diario",
-    frecuencia: "diaria",
-    hora: "08:00",
+    nombre: '',
+    descripcion: '',
+    tipo: 'ventas-diario',
+    frecuencia: 'diaria',
+    hora: '08:00',
     destinatarios: [],
-    formato: "pdf",
+    formato: 'pdf',
     filtros: {},
     activo: true,
     diasSemana: [1], // Lunes por defecto
     diaDelMes: 1,
   })
 
-  const [nuevoDestinatario, setNuevoDestinatario] = useState("")
+  const [nuevoDestinatario, setNuevoDestinatario] = useState('')
 
   // Simular carga de reportes desde Firestore
   useEffect(() => {
     const mockReportes: ReporteProgramado[] = [
       {
-        id: "1",
-        nombre: "Reporte de Ventas Diario",
-        descripcion: "Resumen de ventas del día anterior con desglose por distribuidor",
-        tipo: "ventas-diario",
-        frecuencia: "diaria",
-        hora: "07:00",
-        destinatarios: ["admin@chronos.com", "gerencia@chronos.com"],
-        formato: "pdf",
+        id: '1',
+        nombre: 'Reporte de Ventas Diario',
+        descripcion: 'Resumen de ventas del día anterior con desglose por distribuidor',
+        tipo: 'ventas-diario',
+        frecuencia: 'diaria',
+        hora: '07:00',
+        destinatarios: ['admin@chronos.com', 'gerencia@chronos.com'],
+        formato: 'pdf',
         filtros: {},
         activo: true,
         ultimaEjecucion: new Date(Date.now() - 86400000),
         proximaEjecucion: new Date(Date.now() + 86400000),
         historial: [
-          { id: "h1", fecha: new Date(Date.now() - 86400000), estado: "exito", duracionMs: 2340 },
-          { id: "h2", fecha: new Date(Date.now() - 172800000), estado: "exito", duracionMs: 2150 },
+          { id: 'h1', fecha: new Date(Date.now() - 86400000), estado: 'exito', duracionMs: 2340 },
+          { id: 'h2', fecha: new Date(Date.now() - 172800000), estado: 'exito', duracionMs: 2150 },
         ],
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        id: "2",
-        nombre: "Inventario Semanal",
-        descripcion: "Estado completo del inventario con alertas de stock bajo",
-        tipo: "inventario",
-        frecuencia: "semanal",
+        id: '2',
+        nombre: 'Inventario Semanal',
+        descripcion: 'Estado completo del inventario con alertas de stock bajo',
+        tipo: 'inventario',
+        frecuencia: 'semanal',
         diasSemana: [1], // Lunes
-        hora: "06:00",
-        destinatarios: ["almacen@chronos.com"],
-        formato: "excel",
+        hora: '06:00',
+        destinatarios: ['almacen@chronos.com'],
+        formato: 'excel',
         filtros: {},
         activo: true,
         ultimaEjecucion: new Date(Date.now() - 604800000),
         proximaEjecucion: new Date(Date.now() + 172800000),
         historial: [
-          { id: "h3", fecha: new Date(Date.now() - 604800000), estado: "exito", duracionMs: 4520 },
+          { id: 'h3', fecha: new Date(Date.now() - 604800000), estado: 'exito', duracionMs: 4520 },
         ],
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        id: "3",
-        nombre: "Utilidades Mensuales",
-        descripcion: "Resumen de utilidades del mes con comparativo histórico",
-        tipo: "utilidades",
-        frecuencia: "mensual",
+        id: '3',
+        nombre: 'Utilidades Mensuales',
+        descripcion: 'Resumen de utilidades del mes con comparativo histórico',
+        tipo: 'utilidades',
+        frecuencia: 'mensual',
         diaDelMes: 1,
-        hora: "05:00",
-        destinatarios: ["contabilidad@chronos.com", "gerencia@chronos.com"],
-        formato: "pdf",
+        hora: '05:00',
+        destinatarios: ['contabilidad@chronos.com', 'gerencia@chronos.com'],
+        formato: 'pdf',
         filtros: {},
         activo: false,
         ultimaEjecucion: new Date(Date.now() - 2592000000),
         historial: [
-          { id: "h4", fecha: new Date(Date.now() - 2592000000), estado: "error", mensaje: "Timeout en generación" },
+          { id: 'h4', fecha: new Date(Date.now() - 2592000000), estado: 'error', mensaje: 'Timeout en generación' },
         ],
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -206,13 +206,13 @@ export function ScheduledReports() {
     setIsCreating(true)
     setEditingId(null)
     setFormData({
-      nombre: "",
-      descripcion: "",
-      tipo: "ventas-diario",
-      frecuencia: "diaria",
-      hora: "08:00",
+      nombre: '',
+      descripcion: '',
+      tipo: 'ventas-diario',
+      frecuencia: 'diaria',
+      hora: '08:00',
       destinatarios: [],
-      formato: "pdf",
+      formato: 'pdf',
       filtros: {},
       activo: true,
       diasSemana: [1],
@@ -235,20 +235,20 @@ export function ScheduledReports() {
         prev.map((r) =>
           r.id === editingId
             ? { ...r, ...formData, updatedAt: new Date() } as ReporteProgramado
-            : r
-        )
+            : r,
+        ),
       )
     } else {
       // Crear nuevo
       const nuevoReporte: ReporteProgramado = {
         id: Date.now().toString(),
-        nombre: formData.nombre || "",
-        descripcion: formData.descripcion || "",
+        nombre: formData.nombre || '',
+        descripcion: formData.descripcion || '',
         tipo: formData.tipo as TipoReporte,
         frecuencia: formData.frecuencia as Frecuencia,
-        hora: formData.hora || "08:00",
+        hora: formData.hora || '08:00',
         destinatarios: formData.destinatarios || [],
-        formato: formData.formato || "pdf",
+        formato: formData.formato || 'pdf',
         filtros: formData.filtros || {},
         activo: formData.activo ?? true,
         diasSemana: formData.diasSemana,
@@ -270,7 +270,7 @@ export function ScheduledReports() {
 
   const handleToggleActive = (id: string) => {
     setReportes((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, activo: !r.activo } : r))
+      prev.map((r) => (r.id === id ? { ...r, activo: !r.activo } : r)),
     )
   }
 
@@ -289,25 +289,25 @@ export function ScheduledReports() {
                 {
                   id: Date.now().toString(),
                   fecha: new Date(),
-                  estado: "exito" as const,
+                  estado: 'exito' as const,
                   duracionMs: 2345,
                 },
                 ...r.historial,
               ],
             }
-          : r
-      )
+          : r,
+      ),
     )
     setLoading(false)
   }
 
   const handleAddDestinatario = () => {
-    if (nuevoDestinatario && nuevoDestinatario.includes("@")) {
+    if (nuevoDestinatario && nuevoDestinatario.includes('@')) {
       setFormData((prev) => ({
         ...prev,
         destinatarios: [...(prev.destinatarios || []), nuevoDestinatario],
       }))
-      setNuevoDestinatario("")
+      setNuevoDestinatario('')
     }
   }
 
@@ -331,21 +331,21 @@ export function ScheduledReports() {
   // Calcular próxima ejecución (simplificado)
   const calcularProximaEjecucion = (reporte: ReporteProgramado): string => {
     const ahora = new Date()
-    const [horas, minutos] = reporte.hora.split(":").map(Number)
+    const [horas, minutos] = reporte.hora.split(':').map(Number)
 
-    let proxima = new Date(ahora)
+    const proxima = new Date(ahora)
     proxima.setHours(horas, minutos, 0, 0)
 
     if (proxima <= ahora) {
       proxima.setDate(proxima.getDate() + 1)
     }
 
-    return proxima.toLocaleDateString("es-MX", {
-      weekday: "short",
-      day: "numeric",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
+    return proxima.toLocaleDateString('es-MX', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
     })
   }
 
@@ -388,15 +388,15 @@ export function ScheduledReports() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 className={cn(
-                  "crystal-card p-6 relative overflow-hidden",
-                  !reporte.activo && "opacity-60"
+                  'crystal-card p-6 relative overflow-hidden',
+                  !reporte.activo && 'opacity-60',
                 )}
               >
                 {/* Indicador de color */}
                 <div
                   className={cn(
-                    "absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b",
-                    tipoConfig?.color || "from-gray-500 to-gray-600"
+                    'absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b',
+                    tipoConfig?.color || 'from-gray-500 to-gray-600',
                   )}
                 />
 
@@ -404,8 +404,8 @@ export function ScheduledReports() {
                   {/* Icono */}
                   <div
                     className={cn(
-                      "p-3 rounded-xl bg-gradient-to-br flex-shrink-0",
-                      tipoConfig?.color || "from-gray-500 to-gray-600"
+                      'p-3 rounded-xl bg-gradient-to-br flex-shrink-0',
+                      tipoConfig?.color || 'from-gray-500 to-gray-600',
                     )}
                   >
                     <IconoTipo className="w-5 h-5 text-white" />
@@ -470,7 +470,7 @@ export function ScheduledReports() {
                     {reporte.historial.length > 0 && (
                       <div className="mt-3 flex items-center gap-2">
                         <span className="text-xs text-white/40">Última:</span>
-                        {reporte.historial[0].estado === "exito" ? (
+                        {reporte.historial[0].estado === 'exito' ? (
                           <span className="flex items-center gap-1 text-xs text-green-400">
                             <CheckCircle className="w-3 h-3" />
                             Éxito ({reporte.historial[0].duracionMs}ms)
@@ -503,12 +503,12 @@ export function ScheduledReports() {
                       whileTap={{ scale: 0.9 }}
                       onClick={() => handleToggleActive(reporte.id)}
                       className={cn(
-                        "p-2 rounded-lg transition-colors",
+                        'p-2 rounded-lg transition-colors',
                         reporte.activo
-                          ? "bg-white/5 hover:bg-orange-500/20 text-white/60 hover:text-orange-400"
-                          : "bg-white/5 hover:bg-green-500/20 text-white/60 hover:text-green-400"
+                          ? 'bg-white/5 hover:bg-orange-500/20 text-white/60 hover:text-orange-400'
+                          : 'bg-white/5 hover:bg-green-500/20 text-white/60 hover:text-green-400',
                       )}
-                      title={reporte.activo ? "Pausar" : "Activar"}
+                      title={reporte.activo ? 'Pausar' : 'Activar'}
                     >
                       {reporte.activo ? (
                         <Pause className="w-4 h-4" />
@@ -583,7 +583,7 @@ export function ScheduledReports() {
               onClick={(e) => e.stopPropagation()}
             >
               <h3 className="text-xl font-bold text-white mb-6">
-                {editingId ? "Editar Reporte" : "Nuevo Reporte Programado"}
+                {editingId ? 'Editar Reporte' : 'Nuevo Reporte Programado'}
               </h3>
 
               <div className="space-y-6">
@@ -689,7 +689,7 @@ export function ScheduledReports() {
                       onChange={(e) =>
                         setFormData((prev) => ({
                           ...prev,
-                          formato: e.target.value as ReporteProgramado["formato"],
+                          formato: e.target.value as ReporteProgramado['formato'],
                         }))
                       }
                       className="w-full bg-white/5 text-white px-4 py-2.5 rounded-xl border border-white/10 focus:outline-none focus:border-blue-500"
@@ -704,7 +704,7 @@ export function ScheduledReports() {
                 </div>
 
                 {/* Días de semana (solo para semanal) */}
-                {formData.frecuencia === "semanal" && (
+                {formData.frecuencia === 'semanal' && (
                   <div>
                     <label className="block text-sm text-white/60 mb-2">
                       Días de la Semana
@@ -715,10 +715,10 @@ export function ScheduledReports() {
                           key={index}
                           onClick={() => handleToggleDiaSemana(index)}
                           className={cn(
-                            "w-10 h-10 rounded-lg text-sm font-medium transition-all",
+                            'w-10 h-10 rounded-lg text-sm font-medium transition-all',
                             formData.diasSemana?.includes(index)
-                              ? "bg-blue-500 text-white"
-                              : "bg-white/5 text-white/60 hover:bg-white/10"
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-white/5 text-white/60 hover:bg-white/10',
                           )}
                         >
                           {dia}
@@ -729,7 +729,7 @@ export function ScheduledReports() {
                 )}
 
                 {/* Día del mes (solo para mensual) */}
-                {formData.frecuencia === "mensual" && (
+                {formData.frecuencia === 'mensual' && (
                   <div>
                     <label className="block text-sm text-white/60 mb-2">
                       Día del Mes
@@ -763,7 +763,7 @@ export function ScheduledReports() {
                       type="email"
                       value={nuevoDestinatario}
                       onChange={(e) => setNuevoDestinatario(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleAddDestinatario()}
+                      onKeyDown={(e) => e.key === 'Enter' && handleAddDestinatario()}
                       className="flex-1 bg-white/5 text-white px-4 py-2.5 rounded-xl border border-white/10 focus:outline-none focus:border-blue-500"
                       placeholder="email@ejemplo.com"
                     />
@@ -806,19 +806,19 @@ export function ScheduledReports() {
                       setFormData((prev) => ({ ...prev, activo: !prev.activo }))
                     }
                     className={cn(
-                      "w-12 h-6 rounded-full transition-colors relative",
-                      formData.activo ? "bg-green-500" : "bg-white/10"
+                      'w-12 h-6 rounded-full transition-colors relative',
+                      formData.activo ? 'bg-green-500' : 'bg-white/10',
                     )}
                   >
                     <span
                       className={cn(
-                        "absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform",
-                        formData.activo ? "left-6" : "left-0.5"
+                        'absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform',
+                        formData.activo ? 'left-6' : 'left-0.5',
                       )}
                     />
                   </button>
                   <span className="text-white/70 text-sm">
-                    {formData.activo ? "Reporte activo" : "Reporte pausado"}
+                    {formData.activo ? 'Reporte activo' : 'Reporte pausado'}
                   </span>
                 </div>
               </div>
@@ -840,7 +840,7 @@ export function ScheduledReports() {
                   disabled={!formData.nombre}
                   className="btn-premium px-6 py-2.5 rounded-xl text-white disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {editingId ? "Guardar Cambios" : "Crear Reporte"}
+                  {editingId ? 'Guardar Cambios' : 'Crear Reporte'}
                 </motion.button>
               </div>
             </motion.div>

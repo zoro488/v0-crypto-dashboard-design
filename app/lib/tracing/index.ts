@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * 🔍 CHRONOS TRACING SERVICE
@@ -69,8 +69,8 @@ export function initTracing(): void {
         // Usar SimpleSpanProcessor en desarrollo para ver spans inmediatamente
         process.env.NODE_ENV === 'development'
           ? new SimpleSpanProcessor(exporter)
-          : new BatchSpanProcessor(exporter)
-      ]
+          : new BatchSpanProcessor(exporter),
+      ],
     })
 
     // Registrar el provider globalmente
@@ -78,11 +78,11 @@ export function initTracing(): void {
 
     tracingEnabled = true
     logger.info('[Tracing] ✅ OpenTelemetry initialized', { 
-      context: 'Tracing'
+      context: 'Tracing',
     })
   } catch (error) {
     logger.error('[Tracing] ❌ Failed to initialize', error as Error, { 
-      context: 'Tracing' 
+      context: 'Tracing', 
     })
   }
 }
@@ -119,7 +119,7 @@ export function getTracer(name: string = 'chronos') {
 export async function traceAsync<T>(
   operationName: string,
   operation: (span: Span) => Promise<T>,
-  attributes?: Record<string, string | number | boolean>
+  attributes?: Record<string, string | number | boolean>,
 ): Promise<T> {
   if (!tracingEnabled) {
     return operation({} as Span)
@@ -142,7 +142,7 @@ export async function traceAsync<T>(
     } catch (error) {
       span.setStatus({ 
         code: SpanStatusCode.ERROR, 
-        message: error instanceof Error ? error.message : 'Unknown error' 
+        message: error instanceof Error ? error.message : 'Unknown error', 
       })
       span.recordException(error as Error)
       throw error
@@ -158,7 +158,7 @@ export async function traceAsync<T>(
 export function traceSync<T>(
   operationName: string,
   operation: (span: Span) => T,
-  attributes?: Record<string, string | number | boolean>
+  attributes?: Record<string, string | number | boolean>,
 ): T {
   if (!tracingEnabled) {
     return operation({} as Span)
@@ -180,7 +180,7 @@ export function traceSync<T>(
   } catch (error) {
     span.setStatus({ 
       code: SpanStatusCode.ERROR, 
-      message: error instanceof Error ? error.message : 'Unknown error' 
+      message: error instanceof Error ? error.message : 'Unknown error', 
     })
     span.recordException(error as Error)
     throw error
@@ -199,7 +199,7 @@ export function traceSync<T>(
 export async function traceFirestore<T>(
   operation: string,
   collection: string,
-  fn: () => Promise<T>
+  fn: () => Promise<T>,
 ): Promise<T> {
   return traceAsync(
     `firestore.${operation}`,
@@ -208,7 +208,7 @@ export async function traceFirestore<T>(
       span.setAttribute('db.collection', collection)
       span.setAttribute('db.operation', operation)
       return fn()
-    }
+    },
   )
 }
 
@@ -218,7 +218,7 @@ export async function traceFirestore<T>(
 export function traceComponent(
   componentName: string,
   action: string,
-  attributes?: Record<string, string | number | boolean>
+  attributes?: Record<string, string | number | boolean>,
 ): void {
   if (!tracingEnabled) return
 
@@ -246,7 +246,7 @@ export async function traceBusinessLogic<T>(
   domain: string,
   operation: string,
   fn: () => Promise<T>,
-  metadata?: Record<string, string | number | boolean>
+  metadata?: Record<string, string | number | boolean>,
 ): Promise<T> {
   return traceAsync(
     `business.${domain}.${operation}`,
@@ -259,7 +259,7 @@ export async function traceBusinessLogic<T>(
         })
       }
       return fn()
-    }
+    },
   )
 }
 

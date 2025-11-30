@@ -13,10 +13,10 @@
  * - NEXT_PUBLIC_FIREBASE_APP_ID
  */
 
-import { initializeApp, getApps, type FirebaseApp } from "firebase/app"
-import { getFirestore, type Firestore } from "firebase/firestore"
-import { getAuth, type Auth } from "firebase/auth"
-import { logger } from "../utils/logger"
+import { initializeApp, getApps, type FirebaseApp } from 'firebase/app'
+import { getFirestore, type Firestore } from 'firebase/firestore'
+import { getAuth, type Auth } from 'firebase/auth'
+import { logger } from '../utils/logger'
 
 // Validar que las variables de entorno estén configuradas
 const validateEnvVars = (): boolean => {
@@ -27,14 +27,14 @@ const validateEnvVars = (): boolean => {
   ]
   
   const missingVars = requiredVars.filter(
-    varName => !process.env[varName]
+    varName => !process.env[varName],
   )
   
   if (missingVars.length > 0 && typeof window !== 'undefined') {
     logger.warn(
       `[Firebase] Variables de entorno faltantes: ${missingVars.join(', ')}. ` +
       'El sistema funcionará en modo mock.',
-      { context: 'FirebaseConfig' }
+      { context: 'FirebaseConfig' },
     )
     return false
   }
@@ -73,7 +73,7 @@ try {
     if (typeof window !== 'undefined') {
       logger.warn(
         '[Firebase] ⚠️ Sin configuración - usando modo mock',
-        { context: 'FirebaseConfig' }
+        { context: 'FirebaseConfig' },
       )
     }
   }

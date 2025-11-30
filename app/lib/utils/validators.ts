@@ -3,7 +3,7 @@
  * Validaciones para todos los formularios y datos del sistema
  */
 
-import { z } from 'zod';
+import { z } from 'zod'
 
 // ==========================================
 // VALIDACIONES BASE
@@ -12,38 +12,38 @@ import { z } from 'zod';
 // Validación de teléfono mexicano
 export const telefonoSchema = z.string()
   .regex(/^(\+52)?[1-9]\d{9}$/, 'Teléfono inválido (10 dígitos)')
-  .or(z.literal(''));
+  .or(z.literal(''))
 
 // Validación de email
 export const emailSchema = z.string()
   .email('Email inválido')
-  .or(z.literal(''));
+  .or(z.literal(''))
 
 // Validación de monto positivo
 export const montoPositivoSchema = z.number()
   .min(0, 'El monto debe ser mayor o igual a 0')
-  .finite('Monto inválido');
+  .finite('Monto inválido')
 
 // Validación de cantidad entera positiva
 export const cantidadSchema = z.number()
   .int('La cantidad debe ser un número entero')
-  .min(1, 'La cantidad debe ser al menos 1');
+  .min(1, 'La cantidad debe ser al menos 1')
 
 // Validación de fecha
 export const fechaSchema = z.string()
   .regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato de fecha inválido (YYYY-MM-DD)')
-  .or(z.date());
+  .or(z.date())
 
 // Validación de ID
 export const idSchema = z.string()
   .min(1, 'ID requerido')
-  .max(100, 'ID demasiado largo');
+  .max(100, 'ID demasiado largo')
 
 // Validación de nombre
 export const nombreSchema = z.string()
   .min(2, 'Nombre demasiado corto (mínimo 2 caracteres)')
   .max(100, 'Nombre demasiado largo (máximo 100 caracteres)')
-  .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-\.]+$/, 'Nombre contiene caracteres inválidos');
+  .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-\.]+$/, 'Nombre contiene caracteres inválidos')
 
 // ==========================================
 // ESQUEMAS DE VENTA
@@ -64,8 +64,8 @@ export const ventaSchema = z.object({
   {
     message: 'El precio de venta debe ser mayor o igual al precio de compra',
     path: ['precioVentaUnidad'],
-  }
-);
+  },
+)
 
 export type VentaInput = z.infer<typeof ventaSchema>;
 
@@ -75,7 +75,7 @@ export const abonoClienteSchema = z.object({
   monto: montoPositivoSchema.min(0.01, 'El monto debe ser mayor a 0'),
   metodoPago: z.enum(['efectivo', 'transferencia', 'cheque']).optional(),
   referencia: z.string().max(50).optional(),
-});
+})
 
 export type AbonoClienteInput = z.infer<typeof abonoClienteSchema>;
 
@@ -95,14 +95,14 @@ export const ordenCompraSchema = z.object({
   pagoInicial: montoPositivoSchema.optional().default(0),
 }).refine(
   (data) => {
-    const total = (data.costoDistribuidor * data.cantidad) + data.costoTransporte;
-    return (data.pagoInicial || 0) <= total;
+    const total = (data.costoDistribuidor * data.cantidad) + data.costoTransporte
+    return (data.pagoInicial || 0) <= total
   },
   {
     message: 'El pago inicial no puede ser mayor al costo total',
     path: ['pagoInicial'],
-  }
-);
+  },
+)
 
 export type OrdenCompraInput = z.infer<typeof ordenCompraSchema>;
 
@@ -111,7 +111,7 @@ export const abonoDistribuidorSchema = z.object({
   distribuidorId: idSchema,
   monto: montoPositivoSchema.min(0.01, 'El monto debe ser mayor a 0'),
   bancoOrigen: idSchema,
-});
+})
 
 export type AbonoDistribuidorInput = z.infer<typeof abonoDistribuidorSchema>;
 
@@ -127,7 +127,7 @@ export const clienteSchema = z.object({
   notas: z.string().max(500).optional(),
   limiteCredito: montoPositivoSchema.optional(),
   estado: z.enum(['activo', 'inactivo', 'suspendido']).default('activo'),
-});
+})
 
 export type ClienteInput = z.infer<typeof clienteSchema>;
 
@@ -145,7 +145,7 @@ export const distribuidorSchema = z.object({
   banco: z.string().max(50).optional(),
   clabe: z.string().regex(/^\d{18}$/, 'CLABE debe tener 18 dígitos').optional().or(z.literal('')),
   notas: z.string().max(500).optional(),
-});
+})
 
 export type DistribuidorInput = z.infer<typeof distribuidorSchema>;
 
@@ -164,7 +164,7 @@ export const productoSchema = z.object({
   unidadMedida: z.enum(['pieza', 'kg', 'litro', 'metro', 'caja']).default('pieza'),
   codigoBarras: z.string().max(50).optional(),
   ubicacion: z.string().max(50).optional(),
-});
+})
 
 export type ProductoInput = z.infer<typeof productoSchema>;
 
@@ -175,7 +175,7 @@ export const movimientoAlmacenSchema = z.object({
   cantidad: cantidadSchema,
   motivo: z.string().min(1, 'Motivo requerido').max(200),
   referencia: z.string().max(50).optional(),
-});
+})
 
 export type MovimientoAlmacenInput = z.infer<typeof movimientoAlmacenSchema>;
 
@@ -189,7 +189,7 @@ export const bancoSchema = z.object({
   saldoInicial: montoPositivoSchema.default(0),
   descripcion: z.string().max(200).optional(),
   color: z.string().regex(/^from-\w+-\d+ to-\w+-\d+$/).optional(),
-});
+})
 
 export type BancoInput = z.infer<typeof bancoSchema>;
 
@@ -204,8 +204,8 @@ export const transferenciaSchema = z.object({
   {
     message: 'El banco origen y destino deben ser diferentes',
     path: ['bancoDestino'],
-  }
-);
+  },
+)
 
 export type TransferenciaInput = z.infer<typeof transferenciaSchema>;
 
@@ -220,10 +220,10 @@ export const gastoSchema = z.object({
     'personal',
     'transporte',
     'servicios',
-    'otros'
+    'otros',
   ]).default('operativo'),
   fecha: fechaSchema.optional(),
-});
+})
 
 export type GastoInput = z.infer<typeof gastoSchema>;
 
@@ -234,7 +234,7 @@ export type GastoInput = z.infer<typeof gastoSchema>;
 export const loginSchema = z.object({
   email: z.string().email('Email inválido'),
   password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
-});
+})
 
 export type LoginInput = z.infer<typeof loginSchema>;
 
@@ -253,8 +253,8 @@ export const registroSchema = z.object({
   {
     message: 'Las contraseñas no coinciden',
     path: ['confirmPassword'],
-  }
-);
+  },
+)
 
 export type RegistroInput = z.infer<typeof registroSchema>;
 
@@ -273,8 +273,8 @@ export const filtroReporteSchema = z.object({
   {
     message: 'La fecha de inicio debe ser anterior a la fecha de fin',
     path: ['fechaFin'],
-  }
-);
+  },
+)
 
 export type FiltroReporteInput = z.infer<typeof filtroReporteSchema>;
 
@@ -291,7 +291,7 @@ export const reporteProgramadoSchema = z.object({
   diaMes: z.number().int().min(1).max(31).optional(),
   destinatarios: z.array(emailSchema.pipe(z.string().email())).min(1, 'Al menos un destinatario'),
   activo: z.boolean().default(true),
-});
+})
 
 export type ReporteProgramadoInput = z.infer<typeof reporteProgramadoSchema>;
 
@@ -304,21 +304,21 @@ export type ReporteProgramadoInput = z.infer<typeof reporteProgramadoSchema>;
  */
 export function validarDatos<T>(
   schema: z.ZodSchema<T>,
-  datos: unknown
+  datos: unknown,
 ): { success: true; data: T } | { success: false; errors: Record<string, string> } {
-  const result = schema.safeParse(datos);
+  const result = schema.safeParse(datos)
   
   if (result.success) {
-    return { success: true, data: result.data };
+    return { success: true, data: result.data }
   }
   
-  const errors: Record<string, string> = {};
+  const errors: Record<string, string> = {}
   result.error.errors.forEach((err) => {
-    const path = err.path.join('.');
-    errors[path] = err.message;
-  });
+    const path = err.path.join('.')
+    errors[path] = err.message
+  })
   
-  return { success: false, errors };
+  return { success: false, errors }
 }
 
 /**
@@ -326,15 +326,15 @@ export function validarDatos<T>(
  */
 export function validarCampo<T>(
   schema: z.ZodSchema<T>,
-  valor: unknown
+  valor: unknown,
 ): { valid: boolean; error?: string } {
-  const result = schema.safeParse(valor);
+  const result = schema.safeParse(valor)
   
   if (result.success) {
-    return { valid: true };
+    return { valid: true }
   }
   
-  return { valid: false, error: result.error.errors[0]?.message };
+  return { valid: false, error: result.error.errors[0]?.message }
 }
 
 /**
@@ -347,7 +347,7 @@ export function sanitizarString(input: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;')
-    .trim();
+    .trim()
 }
 
 /**
@@ -359,18 +359,18 @@ export function normalizarNombre(nombre: string): string {
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
-    .trim();
+    .trim()
 }
 
 /**
  * Formatea teléfono a formato estándar
  */
 export function formatearTelefono(telefono: string): string {
-  const numeros = telefono.replace(/\D/g, '');
+  const numeros = telefono.replace(/\D/g, '')
   if (numeros.length === 10) {
-    return `(${numeros.slice(0, 3)}) ${numeros.slice(3, 6)}-${numeros.slice(6)}`;
+    return `(${numeros.slice(0, 3)}) ${numeros.slice(3, 6)}-${numeros.slice(6)}`
   }
-  return telefono;
+  return telefono
 }
 
 // Export de todos los schemas
@@ -390,6 +390,6 @@ export const schemas = {
   registro: registroSchema,
   filtroReporte: filtroReporteSchema,
   reporteProgramado: reporteProgramadoSchema,
-};
+}
 
-export default schemas;
+export default schemas

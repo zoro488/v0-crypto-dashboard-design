@@ -9,7 +9,7 @@
  * Referencia: ARQUITECTURA_FIRESTORE_QUIRURGICA.md
  */
 
-import type { BancoId } from "@/app/types"
+import type { BancoId } from '@/app/types'
 
 // ============================================================
 // NOMBRES DE COLECCIONES - FUENTE ÚNICA DE VERDAD
@@ -17,36 +17,36 @@ import type { BancoId } from "@/app/types"
 
 export const COLLECTIONS = {
   // 📊 Entidades principales
-  VENTAS: "ventas",                    // 193 docs - Todas las ventas
-  CLIENTES: "clientes",                // 64 docs - Clientes únicos
-  DISTRIBUIDORES: "distribuidores",    // 14 docs - Proveedores
-  ORDENES_COMPRA: "ordenes_compra",    // 300 docs - Órdenes de compra (snake_case!)
+  VENTAS: 'ventas',                    // 193 docs - Todas las ventas
+  CLIENTES: 'clientes',                // 64 docs - Clientes únicos
+  DISTRIBUIDORES: 'distribuidores',    // 14 docs - Proveedores
+  ORDENES_COMPRA: 'ordenes_compra',    // 300 docs - Órdenes de compra (snake_case!)
   
   // 💰 Sistema financiero
-  BANCOS: "bancos",                    // 8 docs - Configuración de bancos
-  MOVIMIENTOS: "movimientos",          // Colección UNIFICADA de movimientos financieros
-  CORTES_BANCARIOS: "cortes_bancarios",// Cierres periódicos
+  BANCOS: 'bancos',                    // 8 docs - Configuración de bancos
+  MOVIMIENTOS: 'movimientos',          // Colección UNIFICADA de movimientos financieros
+  CORTES_BANCARIOS: 'cortes_bancarios',// Cierres periódicos
   
   // 📦 Almacén
-  ALMACEN: "almacen_productos",        // Alias para compatibilidad
-  ALMACEN_PRODUCTOS: "almacen_productos", // Inventario actual
-  ALMACEN_ENTRADAS: "almacen_entradas",   // Histórico de entradas
-  ALMACEN_SALIDAS: "almacen_salidas",     // Histórico de salidas
+  ALMACEN: 'almacen_productos',        // Alias para compatibilidad
+  ALMACEN_PRODUCTOS: 'almacen_productos', // Inventario actual
+  ALMACEN_ENTRADAS: 'almacen_entradas',   // Histórico de entradas
+  ALMACEN_SALIDAS: 'almacen_salidas',     // Histórico de salidas
   
   // 🔄 Sistema
-  TRANSFERENCIAS: "transferencias",    // Transferencias entre bancos
-  ABONOS: "abonos",                    // Abonos de clientes/distribuidores
-  GASTOS_ABONOS: "gastos_abonos",      // GYA del Excel (302 registros)
+  TRANSFERENCIAS: 'transferencias',    // Transferencias entre bancos
+  ABONOS: 'abonos',                    // Abonos de clientes/distribuidores
+  GASTOS_ABONOS: 'gastos_abonos',      // GYA del Excel (302 registros)
   
   // 📈 Reportes y auditoría
-  REPORTES: "reportes",
-  AUDIT_LOGS: "audit_logs",
+  REPORTES: 'reportes',
+  AUDIT_LOGS: 'audit_logs',
   
   // ⚠️ LEGACY - NO USAR (para migración)
   /** @deprecated Usar ORDENES_COMPRA */
-  ORDENES_COMPRA_LEGACY: "ordenesCompra",
+  ORDENES_COMPRA_LEGACY: 'ordenesCompra',
   /** @deprecated Usar ALMACEN_PRODUCTOS */
-  ALMACEN_LEGACY: "almacen",
+  ALMACEN_LEGACY: 'almacen',
 } as const
 
 // Tipo para nombres de colección
@@ -57,24 +57,24 @@ export type CollectionName = typeof COLLECTIONS[keyof typeof COLLECTIONS]
 // ============================================================
 
 export const BANCO_IDS: Record<string, BancoId> = {
-  BOVEDA_MONTE: "boveda_monte",
-  BOVEDA_USA: "boveda_usa",
-  PROFIT: "profit",
-  LEFTIE: "leftie",
-  AZTECA: "azteca",
-  FLETE_SUR: "flete_sur",
-  UTILIDADES: "utilidades",
+  BOVEDA_MONTE: 'boveda_monte',
+  BOVEDA_USA: 'boveda_usa',
+  PROFIT: 'profit',
+  LEFTIE: 'leftie',
+  AZTECA: 'azteca',
+  FLETE_SUR: 'flete_sur',
+  UTILIDADES: 'utilidades',
 } as const
 
 // Array de todos los IDs de banco
 export const ALL_BANCO_IDS: BancoId[] = [
-  "boveda_monte",
-  "boveda_usa",
-  "profit",
-  "leftie",
-  "azteca",
-  "flete_sur",
-  "utilidades"
+  'boveda_monte',
+  'boveda_usa',
+  'profit',
+  'leftie',
+  'azteca',
+  'flete_sur',
+  'utilidades',
 ]
 
 // ============================================================
@@ -87,37 +87,37 @@ export const ALL_BANCO_IDS: BancoId[] = [
  */
 export const BANCO_NAME_TO_ID: Record<string, BancoId> = {
   // Snake case (correcto)
-  "boveda_monte": "boveda_monte",
-  "boveda_usa": "boveda_usa",
-  "profit": "profit",
-  "leftie": "leftie",
-  "azteca": "azteca",
-  "flete_sur": "flete_sur",
-  "utilidades": "utilidades",
+  'boveda_monte': 'boveda_monte',
+  'boveda_usa': 'boveda_usa',
+  'profit': 'profit',
+  'leftie': 'leftie',
+  'azteca': 'azteca',
+  'flete_sur': 'flete_sur',
+  'utilidades': 'utilidades',
   
   // Kebab case (legacy)
-  "boveda-monte": "boveda_monte",
-  "boveda-usa": "boveda_usa",
-  "flete-sur": "flete_sur",
+  'boveda-monte': 'boveda_monte',
+  'boveda-usa': 'boveda_usa',
+  'flete-sur': 'flete_sur',
   
   // Camel case (legacy)
-  "bovedaMonte": "boveda_monte",
-  "bovedaUsa": "boveda_usa",
-  "bovedaUSA": "boveda_usa",
-  "fleteSur": "flete_sur",
-  "fletes": "flete_sur",
+  'bovedaMonte': 'boveda_monte',
+  'bovedaUsa': 'boveda_usa',
+  'bovedaUSA': 'boveda_usa',
+  'fleteSur': 'flete_sur',
+  'fletes': 'flete_sur',
   
   // Nombres display
-  "Bóveda Monte": "boveda_monte",
-  "Boveda Monte": "boveda_monte",
-  "Bóveda USA": "boveda_usa",
-  "Boveda USA": "boveda_usa",
-  "Profit": "profit",
-  "Leftie": "leftie",
-  "Azteca": "azteca",
-  "Flete Sur": "flete_sur",
-  "Fletes": "flete_sur",
-  "Utilidades": "utilidades",
+  'Bóveda Monte': 'boveda_monte',
+  'Boveda Monte': 'boveda_monte',
+  'Bóveda USA': 'boveda_usa',
+  'Boveda USA': 'boveda_usa',
+  'Profit': 'profit',
+  'Leftie': 'leftie',
+  'Azteca': 'azteca',
+  'Flete Sur': 'flete_sur',
+  'Fletes': 'flete_sur',
+  'Utilidades': 'utilidades',
 }
 
 /**
@@ -154,13 +154,13 @@ export function normalizeBancoId(input: string): BancoId | null {
  */
 export const DISTRIBUCION_VENTA = {
   // Monto base (costo) va a Bóveda Monte
-  BOVEDA_MONTE: "boveda_monte" as BancoId,
+  BOVEDA_MONTE: 'boveda_monte' as BancoId,
   
   // Flete va a Flete Sur
-  FLETE: "flete_sur" as BancoId,
+  FLETE: 'flete_sur' as BancoId,
   
   // Utilidad/Ganancia va a Utilidades
-  UTILIDADES: "utilidades" as BancoId,
+  UTILIDADES: 'utilidades' as BancoId,
 } as const
 
 // ============================================================
@@ -168,12 +168,12 @@ export const DISTRIBUCION_VENTA = {
 // ============================================================
 
 export const TIPOS_MOVIMIENTO = {
-  INGRESO: "ingreso",
-  GASTO: "gasto",
-  TRANSFERENCIA_ENTRADA: "transferencia_entrada",
-  TRANSFERENCIA_SALIDA: "transferencia_salida",
-  ABONO_CLIENTE: "abono_cliente",
-  PAGO_DISTRIBUIDOR: "pago_distribuidor",
+  INGRESO: 'ingreso',
+  GASTO: 'gasto',
+  TRANSFERENCIA_ENTRADA: 'transferencia_entrada',
+  TRANSFERENCIA_SALIDA: 'transferencia_salida',
+  ABONO_CLIENTE: 'abono_cliente',
+  PAGO_DISTRIBUIDOR: 'pago_distribuidor',
 } as const
 
 export type TipoMovimientoValue = typeof TIPOS_MOVIMIENTO[keyof typeof TIPOS_MOVIMIENTO]
@@ -183,22 +183,22 @@ export type TipoMovimientoValue = typeof TIPOS_MOVIMIENTO[keyof typeof TIPOS_MOV
 // ============================================================
 
 export const ESTADOS_PAGO = {
-  COMPLETO: "completo",
-  PARCIAL: "parcial",
-  PENDIENTE: "pendiente",
+  COMPLETO: 'completo',
+  PARCIAL: 'parcial',
+  PENDIENTE: 'pendiente',
 } as const
 
 export const ESTADOS_ORDEN = {
-  PENDIENTE: "pendiente",
-  PARCIAL: "parcial",
-  PAGADO: "pagado",
-  CANCELADO: "cancelado",
+  PENDIENTE: 'pendiente',
+  PARCIAL: 'parcial',
+  PAGADO: 'pagado',
+  CANCELADO: 'cancelado',
 } as const
 
 export const ESTADOS_VENTA = {
-  PAGADO: "Pagado",
-  PENDIENTE: "Pendiente",
-  PARCIAL: "Parcial",
+  PAGADO: 'Pagado',
+  PENDIENTE: 'Pendiente',
+  PARCIAL: 'Parcial',
 } as const
 
 // ============================================================
@@ -209,24 +209,24 @@ export const ESTADOS_VENTA = {
  * Colecciones fragmentadas que deben migrarse a 'movimientos'
  */
 export const COLECCIONES_INGRESOS_LEGACY = [
-  "boveda_monte_ingresos",
-  "boveda_usa_ingresos",
-  "profit_ingresos",
-  "leftie_ingresos",
-  "azteca_ingresos",
-  "flete_sur_ingresos",
-  "utilidades_ingresos",
+  'boveda_monte_ingresos',
+  'boveda_usa_ingresos',
+  'profit_ingresos',
+  'leftie_ingresos',
+  'azteca_ingresos',
+  'flete_sur_ingresos',
+  'utilidades_ingresos',
 ] as const
 
 /**
  * Colecciones que deben eliminarse después de migración
  */
 export const COLECCIONES_OBSOLETAS = [
-  "ordenesCompra",           // Legacy camelCase
-  "gya",                     // Duplica movimientos
-  "transaccionesBoveda",     // Obsoleta
-  "transaccionesBanco",      // Obsoleta
-  "almacen",                 // Migrar a almacen_productos
+  'ordenesCompra',           // Legacy camelCase
+  'gya',                     // Duplica movimientos
+  'transaccionesBoveda',     // Obsoleta
+  'transaccionesBanco',      // Obsoleta
+  'almacen',                 // Migrar a almacen_productos
   ...COLECCIONES_INGRESOS_LEGACY,
 ] as const
 

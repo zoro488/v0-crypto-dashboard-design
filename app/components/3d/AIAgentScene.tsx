@@ -1,26 +1,26 @@
-"use client"
+'use client'
 
-import { Suspense, useRef, useState, useEffect, useMemo, useCallback } from "react"
-import { Canvas, useFrame, useThree } from "@react-three/fiber"
+import { Suspense, useRef, useState, useEffect, useMemo, useCallback } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import {
   EffectComposer,
   Glitch,
   Bloom,
   ChromaticAberration,
-} from "@react-three/postprocessing"
-import { GlitchMode, BlendFunction } from "postprocessing"
-import useSpline from "@splinetool/r3f-spline"
-import * as THREE from "three"
-import { motion, AnimatePresence } from "framer-motion"
-import { MessageCircle, X, Minimize2, Maximize2 } from "lucide-react"
+} from '@react-three/postprocessing'
+import { GlitchMode, BlendFunction } from 'postprocessing'
+import useSpline from '@splinetool/r3f-spline'
+import * as THREE from 'three'
+import { motion, AnimatePresence } from 'framer-motion'
+import { MessageCircle, X, Minimize2, Maximize2 } from 'lucide-react'
 
 // URL del bot IA en Spline - USAR LA ESCENA REAL
-const SPLINE_BOT_URL = "https://prod.spline.design/X2wQi1Id1gUKP4Od/scene.splinecode"
+const SPLINE_BOT_URL = 'https://prod.spline.design/X2wQi1Id1gUKP4Od/scene.splinecode'
 
 // Interface para las props del componente
 interface AIAgentSceneProps {
   className?: string
-  size?: "sm" | "md" | "lg" | "xl"
+  size?: 'sm' | 'md' | 'lg' | 'xl'
   showChat?: boolean
   onMessageSend?: (message: string) => void
   isProcessing?: boolean
@@ -50,8 +50,8 @@ function SplineBot({
     
     // Buscar posibles nombres del nodo del bot en la escena
     const possibleNames = [
-      "Bot", "Robot", "AI", "Agent", "Character", 
-      "Scene", "Group", "bot", "robot", "ai"
+      'Bot', 'Robot', 'AI', 'Agent', 'Character', 
+      'Scene', 'Group', 'bot', 'robot', 'ai',
     ]
     
     for (const name of possibleNames) {
@@ -82,12 +82,12 @@ function SplineBot({
     groupRef.current.rotation.y = THREE.MathUtils.lerp(
       groupRef.current.rotation.y,
       targetRotationY,
-      0.05
+      0.05,
     )
     groupRef.current.rotation.x = THREE.MathUtils.lerp(
       groupRef.current.rotation.x,
       targetRotationX,
-      0.05
+      0.05,
     )
     
     // Flotación suave
@@ -101,7 +101,7 @@ function SplineBot({
       groupRef.current.scale.setScalar(pulse)
     } else {
       groupRef.current.scale.setScalar(
-        THREE.MathUtils.lerp(groupRef.current.scale.x, 1, 0.1)
+        THREE.MathUtils.lerp(groupRef.current.scale.x, 1, 0.1),
       )
     }
   })
@@ -143,8 +143,8 @@ function ProceduralBot({
       uniforms: {
         uTime: { value: 0 },
         uThinking: { value: 0 },
-        uColor1: { value: new THREE.Color("#4a90d9") },
-        uColor2: { value: new THREE.Color("#9333ea") },
+        uColor1: { value: new THREE.Color('#4a90d9') },
+        uColor2: { value: new THREE.Color('#9333ea') },
       },
       vertexShader: `
         varying vec2 vUv;
@@ -229,12 +229,12 @@ function ProceduralBot({
     groupRef.current.rotation.y = THREE.MathUtils.lerp(
       groupRef.current.rotation.y,
       targetRotationY,
-      0.05
+      0.05,
     )
     groupRef.current.rotation.x = THREE.MathUtils.lerp(
       groupRef.current.rotation.x,
       targetRotationX,
-      0.05
+      0.05,
     )
     
     // Flotación
@@ -264,7 +264,7 @@ function ProceduralBot({
           <mesh key={i} rotation={[Math.PI / 4 * i, 0, Math.PI / 6 * i]}>
             <torusGeometry args={[radius, 0.02, 16, 64]} />
             <meshBasicMaterial
-              color={i === 1 ? "#9333ea" : "#4a90d9"}
+              color={i === 1 ? '#9333ea' : '#4a90d9'}
               transparent
               opacity={0.6}
             />
@@ -321,7 +321,7 @@ function AIBot({
 // Error boundary simple para capturar errores de Spline
 function ErrorBoundary({ 
   children, 
-  onError 
+  onError, 
 }: { 
   children: React.ReactNode
   onError: () => void 
@@ -524,7 +524,7 @@ function AIBotScene({
 // Componente de chat integrado
 interface ChatMessage {
   id: string
-  type: "user" | "bot"
+  type: 'user' | 'bot'
   content: string
   timestamp: Date
 }
@@ -538,19 +538,19 @@ function ChatInterface({
   onSendMessage: (message: string) => void
   isProcessing: boolean
 }) {
-  const [input, setInput] = useState("")
+  const [input, setInput] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   
   // Auto-scroll al último mensaje
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (input.trim() && !isProcessing) {
       onSendMessage(input.trim())
-      setInput("")
+      setInput('')
     }
   }
   
@@ -563,22 +563,22 @@ function ChatInterface({
             key={msg.id}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}
+            className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
               className={`
                 max-w-[80%] px-4 py-2 rounded-2xl
-                ${msg.type === "user"
-                  ? "bg-blue-500/80 text-white rounded-br-md"
-                  : "bg-white/10 text-white/90 rounded-bl-md border border-white/10"
+                ${msg.type === 'user'
+                  ? 'bg-blue-500/80 text-white rounded-br-md'
+                  : 'bg-white/10 text-white/90 rounded-bl-md border border-white/10'
                 }
               `}
             >
               <p className="text-sm">{msg.content}</p>
               <span className="text-[10px] opacity-50 mt-1 block">
-                {msg.timestamp.toLocaleTimeString("es-MX", { 
-                  hour: "2-digit", 
-                  minute: "2-digit" 
+                {msg.timestamp.toLocaleTimeString('es-MX', { 
+                  hour: '2-digit', 
+                  minute: '2-digit', 
                 })}
               </span>
             </div>
@@ -594,9 +594,9 @@ function ChatInterface({
           >
             <div className="bg-white/10 px-4 py-2 rounded-2xl rounded-bl-md border border-white/10">
               <div className="flex gap-1">
-                <span className="w-2 h-2 bg-white/50 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                <span className="w-2 h-2 bg-white/50 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                <span className="w-2 h-2 bg-white/50 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                <span className="w-2 h-2 bg-white/50 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-2 h-2 bg-white/50 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-2 h-2 bg-white/50 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
               </div>
             </div>
           </motion.div>
@@ -644,8 +644,8 @@ function ChatInterface({
 
 // Componente principal exportado
 export function AIAgentScene({
-  className = "",
-  size = "md",
+  className = '',
+  size = 'md',
   showChat = false,
   onMessageSend,
   isProcessing = false,
@@ -657,9 +657,9 @@ export function AIAgentScene({
   const [isChatOpen, setIsChatOpen] = useState(showChat)
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
-      id: "welcome",
-      type: "bot",
-      content: "¡Hola! Soy tu asistente de IA. ¿En qué puedo ayudarte hoy?",
+      id: 'welcome',
+      type: 'bot',
+      content: '¡Hola! Soy tu asistente de IA. ¿En qué puedo ayudarte hoy?',
       timestamp: new Date(),
     },
   ])
@@ -683,7 +683,7 @@ export function AIAgentScene({
     // Añadir mensaje del usuario
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
-      type: "user",
+      type: 'user',
       content,
       timestamp: new Date(),
     }
@@ -704,7 +704,7 @@ export function AIAgentScene({
       
       const botMessage: ChatMessage = {
         id: `bot-${Date.now()}`,
-        type: "bot",
+        type: 'bot',
         content: `Procesé tu mensaje: "${content}". ¿Necesitas algo más?`,
         timestamp: new Date(),
       }
@@ -740,9 +740,9 @@ export function AIAgentScene({
             gl={{
               antialias: true,
               alpha: true,
-              powerPreference: "high-performance",
+              powerPreference: 'high-performance',
             }}
-            style={{ background: "transparent" }}
+            style={{ background: 'transparent' }}
           >
             <AIBotScene
               isThinking={isThinking || isProcessing}
@@ -817,10 +817,10 @@ export function AIAgentScene({
         <div className="absolute bottom-3 left-3 flex items-center gap-2">
           <div className={`
             w-2 h-2 rounded-full
-            ${isThinking ? "bg-yellow-500 animate-pulse" : "bg-green-500"}
+            ${isThinking ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'}
           `} />
           <span className="text-xs text-white/60">
-            {isThinking ? "Procesando..." : "En línea"}
+            {isThinking ? 'Procesando...' : 'En línea'}
           </span>
         </div>
       </div>

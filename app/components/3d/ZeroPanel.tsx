@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * ZeroPanel - Interfaz Táctica Completa de Zero Force
@@ -29,7 +29,7 @@ import {
   Activity,
   Cpu,
   Shield,
-  Crosshair
+  Crosshair,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { ZeroState } from './ZeroAvatar'
@@ -39,12 +39,12 @@ import { useVoiceInput, VoiceCommand } from '@/app/hooks/useVoiceInput'
 // Cargar componentes 3D de forma dinámica (solo cliente)
 const ZeroCombatScene = dynamic(
   () => import('./ZeroCombatScene').then(mod => mod.ZeroCombatScene),
-  { ssr: false, loading: () => <SceneLoader /> }
+  { ssr: false, loading: () => <SceneLoader /> },
 )
 
 const ZeroEnvironment = dynamic(
   () => import('./ZeroEnvironment').then(mod => mod.ZeroEnvironment),
-  { ssr: false }
+  { ssr: false },
 )
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -101,7 +101,7 @@ function SceneLoader() {
             className="w-24 h-4 rounded-full animate-pulse"
             style={{ 
               backgroundColor: '#ef4444',
-              boxShadow: '0 0 30px #ef4444, 0 0 60px #ef4444'
+              boxShadow: '0 0 30px #ef4444, 0 0 60px #ef4444',
             }}
           />
           {/* Efecto de scan */}
@@ -140,7 +140,7 @@ function TacticalHUD({ stats }: TacticalHUDProps) {
     processing: 'text-purple-400',
     combat: 'text-red-400',
     success: 'text-emerald-400',
-    error: 'text-orange-400'
+    error: 'text-orange-400',
   }), [])
   
   return (
@@ -272,7 +272,7 @@ function LogsPanel({ logs, expanded, onToggleExpand, onClear }: LogsPanelProps) 
     warn: <AlertTriangle className="w-3.5 h-3.5 text-yellow-400" />,
     error: <AlertTriangle className="w-3.5 h-3.5 text-red-400" />,
     success: <CheckCircle className="w-3.5 h-3.5 text-green-400" />,
-    combat: <Target className="w-3.5 h-3.5 text-red-400 animate-pulse" />
+    combat: <Target className="w-3.5 h-3.5 text-red-400 animate-pulse" />,
   }
   
   const levelColors = {
@@ -280,7 +280,7 @@ function LogsPanel({ logs, expanded, onToggleExpand, onClear }: LogsPanelProps) 
     warn: 'text-yellow-400',
     error: 'text-red-400',
     success: 'text-green-400',
-    combat: 'text-red-400'
+    combat: 'text-red-400',
   }
   
   return (
@@ -328,7 +328,7 @@ function LogsPanel({ logs, expanded, onToggleExpand, onClear }: LogsPanelProps) 
                 {log.timestamp.toLocaleTimeString('es-ES', { 
                   hour: '2-digit', 
                   minute: '2-digit',
-                  second: '2-digit'
+                  second: '2-digit',
                 })}
               </span>
               <span className={levelColors[log.level]}>{log.message}</span>
@@ -357,7 +357,7 @@ export function ZeroPanel({
   showHUD = true,
   showLogs = true,
   showScene = true,
-  effectsIntensity = 'normal'
+  effectsIntensity = 'normal',
 }: ZeroPanelProps) {
   // Estado
   const [zeroState, setZeroState] = useState<ZeroState>('idle')
@@ -375,7 +375,7 @@ export function ZeroPanel({
     { trigger: ['modo combate', 'alerta roja', 'combat mode'], action: 'combat', description: 'Activar modo combate' },
     { trigger: ['cancelar', 'detente', 'para'], action: 'stop', description: 'Detener acción actual' },
     { trigger: ['exportar', 'guardar', 'descargar'], action: 'export', description: 'Exportar datos' },
-    { trigger: ['limpiar', 'borrar chat', 'nuevo chat'], action: 'clear', description: 'Limpiar chat' }
+    { trigger: ['limpiar', 'borrar chat', 'nuevo chat'], action: 'clear', description: 'Limpiar chat' },
   ], [])
   
   // Hook de voz
@@ -413,7 +413,7 @@ export function ZeroPanel({
     },
     onError: (error) => {
       addLog('error', `Error de voz: ${error}`)
-    }
+    },
   })
   
   // Stats del HUD
@@ -423,7 +423,7 @@ export function ZeroPanel({
     messagesCount: messages.filter(m => m.role === 'user').length,
     processingTime: 150, // Placeholder
     accuracy: 94,
-    threatLevel: zeroState === 'combat' ? 85 : zeroState === 'error' ? 60 : 15
+    threatLevel: zeroState === 'combat' ? 85 : zeroState === 'error' ? 60 : 15,
   }), [zeroState, uptime, messages])
   
   // Actualizar uptime
@@ -446,14 +446,14 @@ export function ZeroPanel({
   const addLog = useCallback((
     level: LogEntry['level'], 
     message: string, 
-    details?: string
+    details?: string,
   ) => {
     setLogs(prev => [...prev, {
       id: `log-${Date.now()}-${Math.random()}`,
       timestamp: new Date(),
       level,
       message,
-      details
+      details,
     }])
   }, [])
   
@@ -464,7 +464,7 @@ export function ZeroPanel({
       role: 'user',
       content,
       timestamp: new Date(),
-      status: 'complete'
+      status: 'complete',
     }
     setMessages(prev => [...prev, userMessage])
     addLog('info', 'Mensaje recibido', content.substring(0, 50))
@@ -478,7 +478,7 @@ export function ZeroPanel({
       role: 'assistant',
       content: '',
       timestamp: new Date(),
-      status: 'pending'
+      status: 'pending',
     }
     setMessages(prev => [...prev, pendingMessage])
     
@@ -491,7 +491,7 @@ export function ZeroPanel({
       'Análisis completado. Los datos han sido evaluados.',
       'Afirmativo. Ejecutando protocolo de respuesta.',
       'Sistema en línea. ¿En qué puedo asistirte?',
-      'Datos recibidos. Iniciando procesamiento.'
+      'Datos recibidos. Iniciando procesamiento.',
     ]
     const response = responses[Math.floor(Math.random() * responses.length)]
     
@@ -499,7 +499,7 @@ export function ZeroPanel({
     setMessages(prev => prev.map(m => 
       m.id === pendingMessage.id 
         ? { ...m, content: response, status: 'complete' as const }
-        : m
+        : m,
     ))
     
     setZeroState('speaking')
@@ -528,7 +528,7 @@ export function ZeroPanel({
       messages,
       logs,
       timestamp: new Date(),
-      sessionId
+      sessionId,
     }
     
     // Crear y descargar archivo JSON
