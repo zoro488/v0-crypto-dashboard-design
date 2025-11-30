@@ -14,7 +14,7 @@
  * </SafeChartContainer>
  */
 
-import { useState, useEffect, useRef, useCallback, type ReactNode } from "react"
+import { useState, useEffect, useRef, useCallback, type ReactNode, type ReactElement, isValidElement } from "react"
 import { ResponsiveContainer } from "recharts"
 
 interface SafeChartContainerProps {
@@ -198,7 +198,7 @@ export function SafeChartContainer({
           aspect={aspect}
           debounce={debounceMs}
         >
-          {children}
+          {isValidElement(children) ? children : <></>}
         </ResponsiveContainer>
       ) : (
         <Skeleton />
