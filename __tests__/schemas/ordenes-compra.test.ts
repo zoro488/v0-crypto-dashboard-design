@@ -9,7 +9,7 @@ import {
   generarKeywordsOrdenCompra,
   CrearOrdenCompraSchema,
   ActualizarOrdenCompraSchema,
-} from '@/app/lib/schemas/ordenes-compra.schema'
+} from '../../app/lib/schemas/ordenes-compra.schema'
 
 describe('Órdenes de Compra Schema - Validaciones', () => {
   
