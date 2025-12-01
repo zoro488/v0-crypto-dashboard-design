@@ -51,6 +51,7 @@ import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
 import { registrarPagoDistribuidor } from '@/app/lib/services/business-logic.service'
+import { useDistribuidores, useBancosData } from '@/app/lib/firebase/firestore-hooks.service'
 
 // ============================================
 // SCHEMA ZOD
@@ -89,26 +90,47 @@ interface CreatePagoDistribuidorModalProps {
   }
 }
 
-// Distribuidores del CSV con deuda simulada
-const DISTRIBUIDORES = [
-  { id: 'Q-MAYA', nombre: 'Q-MAYA', icono: '🌴', deudaTotal: 6098400, ordenesAbiertas: 3 },
-  { id: 'PACMAN', nombre: 'PACMAN', icono: '🎮', deudaTotal: 6142500, ordenesAbiertas: 2 },
-  { id: 'CH-MONTE', nombre: 'CH-MONTE', icono: '⛰️', deudaTotal: 0, ordenesAbiertas: 1 },
-  { id: 'VALLE-MONTE', nombre: 'VALLE-MONTE', icono: '🏔️', deudaTotal: 140000, ordenesAbiertas: 1 },
-  { id: 'A/X', nombre: 'A/X 🌶️🦀', icono: '🦀', deudaTotal: 207900, ordenesAbiertas: 1 },
-  { id: 'Q-MAYA-MP', nombre: 'Q-MAYA-MP', icono: '🌴', deudaTotal: 1260000, ordenesAbiertas: 1 },
-]
+// Interfaz para distribuidores de Firestore
+interface DistribuidorFirestore {
+  id: string
+  nombre: string
+  deudaTotal?: number
+  deudaActual?: number
+  totalCompras?: number
+  totalPagado?: number
+  [key: string]: unknown
+}
 
-// 7 Bancos disponibles
-const BANCOS = [
-  { id: 'boveda_monte', nombre: 'Bóveda Monte', icono: '🏦', capital: 2500000 },
-  { id: 'boveda_usa', nombre: 'Bóveda USA', icono: '🇺🇸', capital: 850000 },
-  { id: 'profit', nombre: 'Profit', icono: '💰', capital: 1200000 },
-  { id: 'leftie', nombre: 'Leftie', icono: '🎯', capital: 450000 },
-  { id: 'azteca', nombre: 'Azteca', icono: '🌮', capital: 320000 },
-  { id: 'flete_sur', nombre: 'Flete Sur', icono: '🚚', capital: 180000 },
-  { id: 'utilidades', nombre: 'Utilidades', icono: '💎', capital: 750000 },
-]
+// Interfaz para bancos de Firestore
+interface BancoFirestore {
+  id: string
+  nombre: string
+  capitalActual?: number
+  historicoIngresos?: number
+  historicoGastos?: number
+  [key: string]: unknown
+}
+
+// Iconos por defecto para distribuidores
+const DIST_ICONOS: Record<string, string> = {
+  'Q-MAYA': '🌴',
+  'PACMAN': '🎮',
+  'CH-MONTE': '⛰️',
+  'VALLE-MONTE': '🏔️',
+  'A/X': '🦀',
+  'Q-MAYA-MP': '🌴',
+}
+
+// Iconos por defecto para bancos
+const BANCO_ICONOS: Record<string, string> = {
+  'boveda_monte': '🏦',
+  'boveda_usa': '🇺🇸',
+  'profit': '💰',
+  'leftie': '🎯',
+  'azteca': '🌮',
+  'flete_sur': '🚚',
+  'utilidades': '💎',
+}
 
 const containerVariants = {
   hidden: { opacity: 0, scale: 0.95 },
@@ -136,10 +158,43 @@ export function CreatePagoDistribuidorModalPremium({
 }: CreatePagoDistribuidorModalProps) {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
-  const [selectedDistribuidor, setSelectedDistribuidor] = React.useState<typeof DISTRIBUIDORES[0] | null>(
+  
+  // 🔥 Cargar distribuidores y bancos reales de Firestore
+  const { data: distribuidoresRaw, loading: loadingDist } = useDistribuidores()
+  const { data: bancosRaw, loading: loadingBancos } = useBancosData()
+  
+  // Convertir distribuidores de Firestore al formato esperado
+  const distribuidoresFormateados = React.useMemo(() => {
+    if (!distribuidoresRaw) return []
+    return (distribuidoresRaw as DistribuidorFirestore[]).map(d => ({
+      id: d.id,
+      nombre: d.nombre || d.id,
+      icono: DIST_ICONOS[d.id] || '📦',
+      deudaTotal: d.deudaTotal ?? d.deudaActual ?? ((d.totalCompras ?? 0) - (d.totalPagado ?? 0)),
+      ordenesAbiertas: 1, // TODO: calcular desde órdenes
+    }))
+  }, [distribuidoresRaw])
+  
+  // Convertir bancos de Firestore al formato esperado
+  const bancosFormateados = React.useMemo(() => {
+    if (!bancosRaw) return []
+    return (bancosRaw as BancoFirestore[]).map(b => ({
+      id: b.id,
+      nombre: b.nombre || b.id,
+      icono: BANCO_ICONOS[b.id] || '🏦',
+      capital: b.capitalActual ?? ((b.historicoIngresos ?? 0) - (b.historicoGastos ?? 0)),
+    }))
+  }, [bancosRaw])
+  
+  // Distribuidores con deuda
+  const distribuidoresConDeuda = React.useMemo(() => {
+    return distribuidoresFormateados.filter(d => d.deudaTotal > 0)
+  }, [distribuidoresFormateados])
+  
+  const [selectedDistribuidor, setSelectedDistribuidor] = React.useState<typeof distribuidoresFormateados[0] | null>(
     preselectedDistribuidor ? {
       ...preselectedDistribuidor,
-      icono: DISTRIBUIDORES.find(d => d.id === preselectedDistribuidor.id)?.icono || '📦',
+      icono: DIST_ICONOS[preselectedDistribuidor.id] || '📦',
     } : null,
   )
 
@@ -166,8 +221,8 @@ export function CreatePagoDistribuidorModalPremium({
 
   // Banco seleccionado
   const bancoSeleccionado = React.useMemo(() => {
-    return BANCOS.find(b => b.id === bancoOrigen)
-  }, [bancoOrigen])
+    return bancosFormateados.find(b => b.id === bancoOrigen)
+  }, [bancoOrigen, bancosFormateados])
 
   // Validar saldo
   const saldoSuficiente = React.useMemo(() => {
@@ -188,7 +243,7 @@ export function CreatePagoDistribuidorModalPremium({
   }, [selectedDistribuidor, monto])
 
   // Seleccionar distribuidor
-  const handleSelectDistribuidor = (dist: typeof DISTRIBUIDORES[0]) => {
+  const handleSelectDistribuidor = (dist: typeof distribuidoresFormateados[0]) => {
     setSelectedDistribuidor(dist)
     setValue('distribuidorId', dist.id)
     setValue('distribuidorNombre', dist.nombre)
@@ -262,9 +317,6 @@ export function CreatePagoDistribuidorModalPremium({
       setIsSubmitting(false)
     }
   }
-
-  // Distribuidores con deuda
-  const distribuidoresConDeuda = DISTRIBUIDORES.filter(d => d.deudaTotal > 0)
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -528,7 +580,7 @@ export function CreatePagoDistribuidorModalPremium({
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {BANCOS.filter(b => b.capital >= monto || b.id === bancoOrigen).map((banco) => (
+                  {bancosFormateados.filter(b => b.capital >= monto || b.id === bancoOrigen).map((banco) => (
                     <motion.button
                       key={banco.id}
                       type="button"

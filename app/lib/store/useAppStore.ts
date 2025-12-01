@@ -273,9 +273,9 @@ export const useAppStore = create<AppState>()(
 
           // Si hubo pago inicial, registrar en banco
           if (data.pagoInicial > 0) {
-            const bancoBovedaMonte = state.bancos.find((b) => b.id === 'boveda-monte')
+            const bancoBovedaMonte = state.bancos.find((b) => b.id === 'boveda_monte')
             if (bancoBovedaMonte) {
-              get().updateBancoSaldo('boveda-monte', bancoBovedaMonte.saldo - data.pagoInicial)
+              get().updateBancoSaldo('boveda_monte', bancoBovedaMonte.saldo - data.pagoInicial)
             }
           }
         },
@@ -333,14 +333,14 @@ export const useAppStore = create<AppState>()(
           if (data.montoPagado > 0) {
             const proporcionPagada = data.montoPagado / data.precioTotalVenta
 
-            const bancoBovedaMonte = state.bancos.find((b) => b.id === 'boveda-monte')
+            const bancoBovedaMonte = state.bancos.find((b) => b.id === 'boveda_monte')
             if (bancoBovedaMonte) {
-              get().updateBancoSaldo('boveda-monte', bancoBovedaMonte.saldo + montoBovedaMonte * proporcionPagada)
+              get().updateBancoSaldo('boveda_monte', bancoBovedaMonte.saldo + montoBovedaMonte * proporcionPagada)
             }
 
-            const bancoFletes = state.bancos.find((b) => b.id === 'fletes')
+            const bancoFletes = state.bancos.find((b) => b.id === 'flete_sur')
             if (bancoFletes) {
-              get().updateBancoSaldo('fletes', bancoFletes.saldo + montoFletes * proporcionPagada)
+              get().updateBancoSaldo('flete_sur', bancoFletes.saldo + montoFletes * proporcionPagada)
             }
 
             const bancoUtilidades = state.bancos.find((b) => b.id === 'utilidades')
@@ -417,15 +417,15 @@ export const useAppStore = create<AppState>()(
             const proporcionAbono = montoAAplicar / venta.precioTotalVenta
 
             // Distribuir proporcionalmente a los bancos
-            const bancoBovedaMonte = state.bancos.find((b) => b.id === 'boveda-monte')
-            const bancoFletes = state.bancos.find((b) => b.id === 'fletes')
+            const bancoBovedaMonte = state.bancos.find((b) => b.id === 'boveda_monte')
+            const bancoFletes = state.bancos.find((b) => b.id === 'flete_sur')
             const bancoUtilidades = state.bancos.find((b) => b.id === 'utilidades')
 
             if (bancoBovedaMonte) {
-              get().updateBancoSaldo('boveda-monte', bancoBovedaMonte.saldo + montoBovedaMonte * proporcionAbono)
+              get().updateBancoSaldo('boveda_monte', bancoBovedaMonte.saldo + montoBovedaMonte * proporcionAbono)
             }
             if (bancoFletes) {
-              get().updateBancoSaldo('fletes', bancoFletes.saldo + montoFletes * proporcionAbono)
+              get().updateBancoSaldo('flete_sur', bancoFletes.saldo + montoFletes * proporcionAbono)
             }
             if (bancoUtilidades) {
               get().updateBancoSaldo('utilidades', bancoUtilidades.saldo + montoUtilidades * proporcionAbono)

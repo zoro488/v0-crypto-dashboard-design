@@ -1,6 +1,6 @@
 'use client'
 
-import type React from 'react'
+import { useState, useMemo, useCallback, useEffect, type FC, type ReactNode } from 'react'
 
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -24,7 +24,6 @@ import {
   Trash2,
   MoreHorizontal,
 } from 'lucide-react'
-import { useState, useMemo, useCallback, useEffect } from 'react'
 import { BANCOS } from '@/app/lib/constants'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import SimpleCurrencyWidget from '@/app/components/widgets/SimpleCurrencyWidget'

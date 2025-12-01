@@ -12,7 +12,7 @@
  * - Analytics overlay con predicciones IA
  */
 
-import React from 'react'
+import React, { useState, useEffect, useRef, useMemo, useCallback, lazy, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Sparkles, 
@@ -35,7 +35,6 @@ import {
   Settings,
   RefreshCw,
 } from 'lucide-react'
-import { useState, useEffect, useRef, useMemo, useCallback, lazy, Suspense } from 'react'
 import { useVoiceAgent } from '@/app/hooks/useVoiceAgent'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { AIAnalyticsOverlay } from '@/app/components/3d/AIAnalyticsOverlay'

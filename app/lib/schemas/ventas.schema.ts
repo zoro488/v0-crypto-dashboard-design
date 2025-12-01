@@ -41,12 +41,13 @@ export const FechaSchema = z
 
 /**
  * IDs de bancos válidos en el sistema
+ * IMPORTANTE: Usar snake_case para consistencia con Firestore y types
  */
 export const BancoIdSchema = z.enum([
-  'boveda-monte',
-  'boveda-usa', 
+  'boveda_monte',
+  'boveda_usa', 
   'utilidades',
-  'fletes',
+  'flete_sur',
   'azteca',
   'leftie',
   'profit',
