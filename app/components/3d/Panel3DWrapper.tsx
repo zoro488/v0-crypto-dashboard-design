@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, lazy, useState, useEffect, memo, ReactNode } from 'react'
+import React, { Suspense, lazy, useState, useEffect, memo, ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Loader2, AlertCircle, Sparkles } from 'lucide-react'
 import { logger } from '@/app/lib/utils/logger'
@@ -272,8 +272,6 @@ export const Panel3DWrapper = memo(function Panel3DWrapper({
 // ═══════════════════════════════════════════════════════════════════════════════
 // ERROR BOUNDARY
 // ═══════════════════════════════════════════════════════════════════════════════
-
-import React from 'react'
 
 interface ErrorBoundaryProps {
   children: ReactNode

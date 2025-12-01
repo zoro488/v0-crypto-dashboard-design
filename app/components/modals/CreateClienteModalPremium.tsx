@@ -59,7 +59,7 @@ import { useToast } from '@/app/hooks/use-toast'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
-import { crearCliente } from '@/app/lib/firebase/firestore-service'
+import { crearCliente, actualizarCliente } from '@/app/lib/firebase/firestore-service'
 
 // ============================================
 // SCHEMA ZOD - Basado en clientes.csv
@@ -208,14 +208,28 @@ export function CreateClienteModalPremium({
         telefono: data.telefono || undefined,
         email: data.email || undefined,
         direccion: data.direccion || undefined,
+        deudaTotal: data.deuda,
+        totalPagado: data.abonos,
       }
 
-      logger.info('Creando cliente en Firestore', { 
-        data: clienteData,
-        context: 'CreateClienteModalPremium',
-      })
+      let result: string | null = null
 
-      const result = await crearCliente(clienteData)
+      if (isEdit && editData?.id) {
+        // Modo edición - actualizar cliente existente
+        logger.info('Actualizando cliente en Firestore', { 
+          clienteId: editData.id,
+          data: clienteData,
+          context: 'CreateClienteModalPremium',
+        })
+        result = await actualizarCliente(editData.id, clienteData)
+      } else {
+        // Modo creación - crear nuevo cliente
+        logger.info('Creando cliente en Firestore', { 
+          data: clienteData,
+          context: 'CreateClienteModalPremium',
+        })
+        result = await crearCliente(clienteData)
+      }
 
       if (result) {
         toast({
@@ -227,7 +241,7 @@ export function CreateClienteModalPremium({
         onSuccess?.()
         useAppStore.getState().triggerDataRefresh()
       } else {
-        throw new Error('No se pudo crear el cliente')
+        throw new Error(isEdit ? 'No se pudo actualizar el cliente' : 'No se pudo crear el cliente')
       }
 
     } catch (error) {
