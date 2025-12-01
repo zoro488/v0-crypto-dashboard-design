@@ -5,14 +5,14 @@ import {
   ShoppingCart, Plus, TrendingUp, AlertCircle, CheckCircle2, Clock, Package,
   Building2, DollarSign, Calendar, Search, Filter, Download, Eye, Edit,
   ArrowUpRight, ArrowDownRight, Truck, BarChart3, PieChart as PieChartIcon,
-  CreditCard, Receipt, RefreshCw, ChevronRight,
+  CreditCard, Receipt, RefreshCw, ChevronRight, Sparkles,
   type LucideIcon,
 } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 import { Badge } from '@/app/components/ui/badge'
 import { Input } from '@/app/components/ui/input'
 import { Skeleton } from '@/app/components/ui/skeleton'
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, Suspense } from 'react'
 import { suscribirOrdenesCompra } from '@/app/lib/firebase/firestore-service'
 import type { OrdenCompra, FirestoreTimestamp } from '@/app/types'
 import { CreateOrdenCompraModalPremium } from '@/app/components/modals/CreateOrdenCompraModalPremium'
@@ -22,6 +22,13 @@ import {
   AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, 
   Tooltip, PieChart, Pie, Cell, CartesianGrid, Legend, 
 } from 'recharts'
+import dynamic from 'next/dynamic'
+
+// 🎨 Componente 3D Premium cargado dinámicamente
+const PremiumSplineOrb = dynamic(
+  () => import('@/app/components/3d/PremiumSplineOrb').then(mod => mod.PremiumSplineOrb),
+  { ssr: false, loading: () => <div className="w-full h-full bg-gradient-to-br from-purple-500/10 to-violet-500/10 rounded-2xl animate-pulse" /> }
+)
 
 // ============================================================================
 // HELPERS
@@ -412,6 +419,71 @@ export default function BentoOrdenesCompra() {
             icon={Package}
             color="from-amber-500/20 to-orange-500/20"
           />
+        </div>
+
+        {/* 3D Premium Orb + Resumen Visual */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          {/* Orb 3D de Órdenes */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3 }}
+            className="relative group"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-violet-500/10 rounded-2xl blur-xl" />
+            <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-4 hover:border-purple-500/30 transition-all h-[180px] flex flex-col items-center justify-center">
+              <Suspense fallback={<div className="w-20 h-20 bg-purple-500/10 rounded-full animate-pulse" />}>
+                <div className="w-full h-24 flex items-center justify-center">
+                  <PremiumSplineOrb 
+                    size={70}
+                    state={totalDeuda > 0 ? 'pulse' : 'success'}
+                    primaryColor="#8b5cf6"
+                    secondaryColor="#a78bfa"
+                    showParticles={true}
+                  />
+                </div>
+              </Suspense>
+              <div className="text-center mt-2">
+                <p className="text-xs text-zinc-400">Tasa de Pago</p>
+                <p className="text-lg font-bold text-purple-400">
+                  {Math.round((totalPagado / (totalCompras || 1)) * 100)}%
+                </p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Métricas Rápidas */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="lg:col-span-3 relative group"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-cyan-500/5 rounded-2xl blur-xl" />
+            <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-4 hover:border-blue-500/30 transition-all">
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles className="w-4 h-4 text-cyan-400" />
+                <h3 className="text-sm font-bold text-white">Estado de Órdenes</h3>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-center">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 mx-auto mb-1" />
+                  <p className="text-lg font-bold text-emerald-400">{ordenesPagadas}</p>
+                  <p className="text-[10px] text-emerald-400/60">Pagadas</p>
+                </div>
+                <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 text-center">
+                  <Clock className="w-5 h-5 text-amber-400 mx-auto mb-1" />
+                  <p className="text-lg font-bold text-amber-400">{ordenesParciales}</p>
+                  <p className="text-[10px] text-amber-400/60">Parciales</p>
+                </div>
+                <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-3 text-center">
+                  <AlertCircle className="w-5 h-5 text-rose-400 mx-auto mb-1" />
+                  <p className="text-lg font-bold text-rose-400">{ordenesPendientes}</p>
+                  <p className="text-[10px] text-rose-400/60">Pendientes</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
 
         {/* Gráficos */}
