@@ -414,7 +414,7 @@ export default function BentoReportes() {
     setGenerandoReporte(null)
     toast({
       title: '✅ Reporte Generado',
-      description: `El reporte ha sido generado exitosamente`,
+      description: 'El reporte ha sido generado exitosamente',
     })
   }
 

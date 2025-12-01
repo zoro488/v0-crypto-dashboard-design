@@ -262,7 +262,7 @@ export function CreateOrdenCompraModalPremium({
 
         toast({
           title: '⚠️ Modo Local',
-          description: `Orden registrada localmente (Firebase no disponible)`,
+          description: 'Orden registrada localmente (Firebase no disponible)',
         })
 
         onClose()

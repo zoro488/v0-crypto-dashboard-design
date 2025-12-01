@@ -9,8 +9,7 @@
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { Locale } from './config'
-import { defaultLocale } from './config'
+import { defaultLocale, type Locale } from './config'
 import es from './locales/es'
 import en from './locales/en'
 

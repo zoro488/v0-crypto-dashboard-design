@@ -42,8 +42,8 @@ export const telefonoSchema = z
   .string()
   .min(10, 'El teléfono debe tener al menos 10 dígitos')
   .max(15, 'El teléfono no puede tener más de 15 caracteres')
-  .regex(/^[\d\s\-\+\(\)]+$/, 'Formato de teléfono inválido')
-  .transform((val) => val.replace(/[\s\-\(\)]/g, ''))
+  .regex(/^[\d\s\-+()]+$/, 'Formato de teléfono inválido')
+  .transform((val) => val.replace(/[\s\-()]/g, ''))
   .optional()
 
 /**

@@ -92,7 +92,7 @@ export interface SingularityLogoProps {
   particleCount?: number
   interactive?: boolean
   onLoad?: () => void
-  onError?: (error: Error) => void
+  onError?: (_error: Error) => void
 }
 
 // ============================================
@@ -127,7 +127,7 @@ export interface NavIcons3DProps {
   isActive?: boolean
   isHovered?: boolean
   onClick?: () => void
-  onHover?: (hovering: boolean) => void
+  onHover?: (_hovering: boolean) => void
   size?: number
   className?: string
 }
@@ -138,7 +138,7 @@ export interface NavIcons3DProps {
 export interface NavBar3DProps {
   items: NavItem3D[]
   activeSection: string
-  onSectionChange: (section: string) => void
+  onSectionChange: (_section: string) => void
   orientation?: 'horizontal' | 'vertical'
   className?: string
 }
@@ -186,8 +186,8 @@ export interface AIAgentSceneProps {
   className?: string
   size?: 'sm' | 'md' | 'lg' | 'xl'
   showChat?: boolean
-  onMessageSend?: (message: string) => void
-  onMessageReceive?: (message: ChatMessage) => void
+  onMessageSend?: (_message: string) => void
+  onMessageReceive?: (_message: ChatMessage) => void
   isProcessing?: boolean
   enableGlitch?: boolean
   enableFloating?: boolean

@@ -1,13 +1,15 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Building2, AlertCircle, CheckCircle2, Clock, DollarSign, Package, Plus, TrendingUp, BarChart3, Activity, Truck } from 'lucide-react'
+import { Building2, AlertCircle, CheckCircle2, Clock, DollarSign, Package, Plus, TrendingUp, BarChart3, Activity, Truck, Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 import { Badge } from '@/app/components/ui/badge'
 import { useDistribuidores, useOrdenesCompra } from '@/app/lib/firebase/firestore-hooks.service'
+import { eliminarDistribuidor } from '@/app/lib/firebase/firestore-service'
 import { CreateDistribuidorModalPremium } from '@/app/components/modals/CreateDistribuidorModalPremium'
 import { CreatePagoDistribuidorModalPremium } from '@/app/components/modals/CreatePagoDistribuidorModalPremium'
+import { DeleteConfirmModal } from '@/app/components/modals/DeleteConfirmModal'
 import { Skeleton } from '@/app/components/ui/skeleton'
 import { Alert, AlertDescription, AlertTitle } from '@/app/components/ui/alert'
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from 'recharts'
@@ -15,6 +17,9 @@ import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/
 import { QuickStatWidget } from '@/app/components/widgets/QuickStatWidget'
 import { MiniChartWidget } from '@/app/components/widgets/MiniChartWidget'
 import { ActivityFeedWidget, ActivityItem } from '@/app/components/widgets/ActivityFeedWidget'
+import { useToast } from '@/app/hooks/use-toast'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+import { logger } from '@/app/lib/utils/logger'
 
 // Interface para distribuidor
 interface DistribuidorData {
@@ -27,8 +32,13 @@ interface DistribuidorData {
 }
 
 export default function BentoDistribuidores() {
+  const { toast } = useToast()
+  const { triggerDataRefresh } = useAppStore()
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showAbonoModal, setShowAbonoModal] = useState(false)
+  const [editingDistribuidor, setEditingDistribuidor] = useState<DistribuidorData | null>(null)
+  const [deletingDistribuidor, setDeletingDistribuidor] = useState<DistribuidorData | null>(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const { data: distribuidoresRaw, loading: loadingDist, error: errorDist } = useDistribuidores()
   const { data: ordenesCompra = [], loading: loadingOC, error: errorOC } = useOrdenesCompra()
 
@@ -54,6 +64,42 @@ export default function BentoDistribuidores() {
   }, [internalLoading])
 
   const isLoading = internalLoading || (loadingDist && loadingOC) // Show loading if both are strictly loading, otherwise show what we have
+
+  // Handlers para editar/eliminar
+  const handleEditDistribuidor = useCallback((dist: DistribuidorData) => {
+    setEditingDistribuidor(dist)
+    setShowCreateModal(true)
+  }, [])
+
+  const handleDeleteDistribuidor = useCallback((dist: DistribuidorData) => {
+    setDeletingDistribuidor(dist)
+    setShowDeleteModal(true)
+  }, [])
+
+  const confirmDeleteDistribuidor = useCallback(async () => {
+    if (!deletingDistribuidor?.id) return
+    
+    try {
+      await eliminarDistribuidor(deletingDistribuidor.id)
+      toast({
+        title: '✅ Distribuidor eliminado',
+        description: `${deletingDistribuidor.nombre} ha sido eliminado exitosamente`,
+      })
+      triggerDataRefresh()
+    } catch (error) {
+      logger.error('Error eliminando distribuidor', error)
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'No se pudo eliminar el distribuidor',
+        variant: 'destructive',
+      })
+    }
+  }, [deletingDistribuidor, toast, triggerDataRefresh])
+
+  const handleCloseModal = useCallback(() => {
+    setShowCreateModal(false)
+    setEditingDistribuidor(null)
+  }, [])
 
   const topDistribuidores = distribuidores
     ? [...distribuidores].sort((a, b) => (b.totalOrdenesCompra ?? 0) - (a.totalOrdenesCompra ?? 0)).slice(0, 5)
@@ -373,6 +419,7 @@ export default function BentoDistribuidores() {
                   <th className="text-right py-4 px-4 text-sm font-medium text-zinc-400">Pagado</th>
                   <th className="text-center py-4 px-4 text-sm font-medium text-zinc-400">Órdenes</th>
                   <th className="text-center py-4 px-4 text-sm font-medium text-zinc-400">Estado</th>
+                  <th className="text-center py-4 px-4 text-sm font-medium text-zinc-400">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -424,6 +471,26 @@ export default function BentoDistribuidores() {
                         </Badge>
                       )}
                     </td>
+                    <td className="py-4 px-4 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditDistribuidor(dist)}
+                          className="h-8 w-8 p-0 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteDistribuidor(dist)}
+                          className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </td>
                   </motion.tr>
                 ))}
               </tbody>
@@ -435,9 +502,23 @@ export default function BentoDistribuidores() {
       {/* Create Distribuidor Modal */}
       <CreateDistribuidorModalPremium 
         open={showCreateModal} 
-        onClose={() => setShowCreateModal(false)} 
+        onClose={handleCloseModal} 
       />
       <CreatePagoDistribuidorModalPremium open={showAbonoModal} onClose={() => setShowAbonoModal(false)} />
+
+      {/* Modal de confirmación de eliminación */}
+      <DeleteConfirmModal
+        open={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false)
+          setDeletingDistribuidor(null)
+        }}
+        onConfirm={confirmDeleteDistribuidor}
+        title="¿Eliminar distribuidor?"
+        description="Esta acción eliminará permanentemente el distribuidor. No se pueden eliminar distribuidores con órdenes pendientes."
+        itemName={deletingDistribuidor?.nombre || ''}
+        itemType="distribuidor"
+      />
     </div>
   )
 }

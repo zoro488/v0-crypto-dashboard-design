@@ -59,12 +59,18 @@ interface ClienteProfileModalProps {
 // ============================================
 
 function ClienteProfileModal({ cliente, isOpen, onClose, onEdit, ventas }: ClienteProfileModalProps) {
-  if (!cliente) return null
+  // Calculamos los datos del cliente - hooks deben estar antes de cualquier return
+  const clienteVentas = useMemo(() => {
+    if (!cliente) return []
+    return ventas.filter(v => v.clienteId === cliente.id)
+  }, [cliente, ventas])
 
-  const clienteVentas = ventas.filter(v => v.clienteId === cliente.id)
-  const tasaCobro = cliente.totalVentas > 0 
-    ? Math.round((cliente.totalPagado / cliente.totalVentas) * 100) 
-    : 0
+  const tasaCobro = useMemo(() => {
+    if (!cliente) return 0
+    return cliente.totalVentas > 0 
+      ? Math.round((cliente.totalPagado / cliente.totalVentas) * 100) 
+      : 0
+  }, [cliente])
 
   // Datos para mini gráficos del perfil
   const ventasPorMes = useMemo(() => {
@@ -76,6 +82,8 @@ function ClienteProfileModal({ cliente, isOpen, onClose, onEdit, ventas }: Clien
     })
     return Object.entries(meses).map(([name, value]) => ({ name, value }))
   }, [clienteVentas])
+
+  if (!cliente) return null
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
