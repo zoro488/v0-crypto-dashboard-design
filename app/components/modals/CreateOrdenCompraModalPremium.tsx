@@ -289,7 +289,7 @@ export function CreateOrdenCompraModalPremium({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          'max-w-4xl h-[90vh] p-0 overflow-hidden',
+          'max-w-4xl max-h-[85vh] p-0 overflow-hidden',
           'bg-black/60 backdrop-blur-2xl',
           'border border-white/10',
           'text-white',
@@ -317,7 +317,7 @@ export function CreateOrdenCompraModalPremium({
           />
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="relative flex flex-col h-full">
+        <form onSubmit={handleSubmit(onSubmit)} className="relative flex flex-col min-h-0 flex-1">
           {/* ===== HEADER ===== */}
           <div className="relative h-24 border-b border-white/10 bg-gradient-to-r from-emerald-500/10 via-transparent to-blue-500/10">
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
