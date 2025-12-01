@@ -276,7 +276,7 @@ export const PremiumAreaChart = memo(function PremiumAreaChart({
   }, [])
 
   return (
-    <div ref={containerRef} className={cn("relative w-full", className)} style={{ height }}>
+    <div ref={containerRef} className={cn('relative w-full', className)} style={{ height }}>
       <canvas
         ref={canvasRef}
         className="w-full h-full cursor-crosshair"
@@ -292,10 +292,10 @@ export const PremiumAreaChart = memo(function PremiumAreaChart({
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.9 }}
           className={cn(
-            "absolute pointer-events-none z-50",
-            "bg-black/90 backdrop-blur-xl",
-            "border border-white/10 rounded-xl",
-            "px-3 py-2 shadow-2xl"
+            'absolute pointer-events-none z-50',
+            'bg-black/90 backdrop-blur-xl',
+            'border border-white/10 rounded-xl',
+            'px-3 py-2 shadow-2xl',
           )}
           style={{
             left: tooltipPos.x,
@@ -346,7 +346,7 @@ export const PremiumPieChart = memo(function PremiumPieChart({
   const segments = useMemo(() => {
     let currentAngle = -90 // Start from top
 
-    return data.map((d, i) => {
+    return data.map((d, _i) => {
       const angle = (d.value / total) * 360
       const segment = {
         ...d,
@@ -363,7 +363,7 @@ export const PremiumPieChart = memo(function PremiumPieChart({
   const innerR = radius * innerRadius
 
   return (
-    <div ref={containerRef} className={cn("flex flex-col items-center gap-4", className)}>
+    <div ref={containerRef} className={cn('flex flex-col items-center gap-4', className)}>
       <div className="relative" style={{ width: size, height: size }}>
         <svg
           viewBox={`0 0 ${size} ${size}`}
@@ -461,8 +461,8 @@ export const PremiumPieChart = memo(function PremiumPieChart({
               onMouseEnter={() => setHoveredIndex(i)}
               onMouseLeave={() => setHoveredIndex(null)}
               className={cn(
-                "flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors",
-                hoveredIndex === i ? "bg-white/10" : "hover:bg-white/5"
+                'flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors',
+                hoveredIndex === i ? 'bg-white/10' : 'hover:bg-white/5',
               )}
             >
               <div

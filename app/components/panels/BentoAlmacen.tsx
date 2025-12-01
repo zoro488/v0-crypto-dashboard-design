@@ -236,7 +236,7 @@ function DataTable<T extends Record<string, unknown>>({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={(e) => { e.stopPropagation(); onEdit(item); }}
+                          onClick={(e) => { e.stopPropagation(); onEdit(item) }}
                           className="h-7 w-7 p-0 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
                         >
                           <Pencil size={14} />
@@ -246,7 +246,7 @@ function DataTable<T extends Record<string, unknown>>({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={(e) => { e.stopPropagation(); onDelete(item); }}
+                          onClick={(e) => { e.stopPropagation(); onDelete(item) }}
                           className="h-7 w-7 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
                         >
                           <Trash2 size={14} />

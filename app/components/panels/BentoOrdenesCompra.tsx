@@ -207,7 +207,7 @@ function OrdenCompraCard({ orden, onView, onEdit, onDelete }: {
         <Button
           variant="ghost"
           size="sm"
-          onClick={(e) => { e.stopPropagation(); onEdit(orden); }}
+          onClick={(e) => { e.stopPropagation(); onEdit(orden) }}
           className="h-7 w-7 p-0 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
         >
           <Pencil size={14} />
@@ -215,7 +215,7 @@ function OrdenCompraCard({ orden, onView, onEdit, onDelete }: {
         <Button
           variant="ghost"
           size="sm"
-          onClick={(e) => { e.stopPropagation(); onDelete(orden); }}
+          onClick={(e) => { e.stopPropagation(); onDelete(orden) }}
           className="h-7 w-7 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
         >
           <Trash2 size={14} />

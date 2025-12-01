@@ -193,7 +193,7 @@ export default memo(function BentoVentas() {
       await eliminarVenta(deletingVenta.id)
       toast({
         title: '✅ Venta eliminada',
-        description: `La venta ha sido eliminada exitosamente`,
+        description: 'La venta ha sido eliminada exitosamente',
       })
       triggerDataRefresh()
     } catch (error) {
