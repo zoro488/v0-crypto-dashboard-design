@@ -31,7 +31,7 @@ export const PremiumBankCard = memo(function PremiumBankCard({
   const [isHovered, setIsHovered] = useState(false)
   
   const isNegative = saldo < 0
-  const trend = isNegative ? 'down' : 'up'
+  const _trend = isNegative ? 'down' : 'up'
   
   // Magnetic effect
   const mouseX = useMotionValue(0)
@@ -87,19 +87,19 @@ export const PremiumBankCard = memo(function PremiumBankCard({
       className="group relative cursor-pointer"
     >
       <div className={cn(
-        "relative flex items-center justify-between",
-        "p-3 md:p-4 rounded-xl md:rounded-2xl",
-        "bg-white/[0.03] hover:bg-white/[0.06]",
-        "border border-white/[0.06] hover:border-white/[0.1]",
-        "transition-all duration-300",
-        "overflow-hidden"
+        'relative flex items-center justify-between',
+        'p-3 md:p-4 rounded-xl md:rounded-2xl',
+        'bg-white/[0.03] hover:bg-white/[0.06]',
+        'border border-white/[0.06] hover:border-white/[0.1]',
+        'transition-all duration-300',
+        'overflow-hidden',
       )}>
         {/* Animated Gradient Background */}
         <motion.div
           className={cn(
-            "absolute inset-0 opacity-0 group-hover:opacity-100",
-            "transition-opacity duration-500",
-            `bg-gradient-to-r ${color}`
+            'absolute inset-0 opacity-0 group-hover:opacity-100',
+            'transition-opacity duration-500',
+            `bg-gradient-to-r ${color}`,
           )}
           style={{ opacity: 0.05 }}
         />
@@ -123,11 +123,11 @@ export const PremiumBankCard = memo(function PremiumBankCard({
           {/* Icon Container */}
           <motion.div 
             className={cn(
-              "w-10 h-10 md:w-12 md:h-12",
-              "rounded-xl md:rounded-2xl",
-              "flex items-center justify-center",
-              "shadow-lg",
-              `bg-gradient-to-br ${color}`
+              'w-10 h-10 md:w-12 md:h-12',
+              'rounded-xl md:rounded-2xl',
+              'flex items-center justify-center',
+              'shadow-lg',
+              `bg-gradient-to-br ${color}`,
             )}
             animate={{
               scale: isHovered ? 1.05 : 1,
@@ -157,8 +157,8 @@ export const PremiumBankCard = memo(function PremiumBankCard({
           <div className="text-right">
             <motion.p 
               className={cn(
-                "font-bold text-sm md:text-base",
-                isNegative ? 'text-red-400' : 'text-white'
+                'font-bold text-sm md:text-base',
+                isNegative ? 'text-red-400' : 'text-white',
               )}
               animate={{
                 textShadow: isHovered && !isNegative
@@ -169,9 +169,9 @@ export const PremiumBankCard = memo(function PremiumBankCard({
               {isNegative && '-'}{formatCurrency(saldo)}
             </motion.p>
             <div className={cn(
-              "flex items-center justify-end gap-1",
-              "text-[10px] md:text-xs",
-              isNegative ? 'text-red-400' : 'text-emerald-400'
+              'flex items-center justify-end gap-1',
+              'text-[10px] md:text-xs',
+              isNegative ? 'text-red-400' : 'text-emerald-400',
             )}>
               {isNegative 
                 ? <TrendingDown className="w-3 h-3" /> 
@@ -258,19 +258,19 @@ export const PremiumActivityItem = memo(function PremiumActivityItem({
       onMouseLeave={() => setIsHovered(false)}
       onClick={onClick}
       className={cn(
-        "flex items-start gap-3 p-3 rounded-xl",
-        "hover:bg-white/[0.04] transition-colors cursor-pointer",
-        "group relative"
+        'flex items-start gap-3 p-3 rounded-xl',
+        'hover:bg-white/[0.04] transition-colors cursor-pointer',
+        'group relative',
       )}
     >
       {/* Icon */}
       <div className="relative">
         <motion.div 
           className={cn(
-            "w-10 h-10 rounded-xl",
-            "bg-white/[0.05] group-hover:bg-white/[0.08]",
-            "flex items-center justify-center",
-            "transition-colors"
+            'w-10 h-10 rounded-xl',
+            'bg-white/[0.05] group-hover:bg-white/[0.08]',
+            'flex items-center justify-center',
+            'transition-colors',
           )}
           animate={{ scale: isHovered ? 1.05 : 1 }}
         >
@@ -280,11 +280,11 @@ export const PremiumActivityItem = memo(function PremiumActivityItem({
         {/* Status Indicator */}
         <motion.div 
           className={cn(
-            "absolute -bottom-0.5 -right-0.5",
-            "w-3 h-3 rounded-full",
-            "border-2 border-black/80",
+            'absolute -bottom-0.5 -right-0.5',
+            'w-3 h-3 rounded-full',
+            'border-2 border-black/80',
             bg,
-            isHovered && `shadow-lg ${glow}`
+            isHovered && `shadow-lg ${glow}`,
           )}
           animate={{
             scale: isHovered ? [1, 1.2, 1] : 1,
@@ -306,8 +306,8 @@ export const PremiumActivityItem = memo(function PremiumActivityItem({
         {amount !== undefined && (
           <motion.p 
             className={cn(
-              "text-sm font-bold",
-              amount >= 0 ? 'text-emerald-400' : 'text-red-400'
+              'text-sm font-bold',
+              amount >= 0 ? 'text-emerald-400' : 'text-red-400',
             )}
             animate={{
               textShadow: isHovered 
@@ -326,9 +326,9 @@ export const PremiumActivityItem = memo(function PremiumActivityItem({
       {/* Hover Line */}
       <motion.div
         className={cn(
-          "absolute left-0 top-1/2 -translate-y-1/2",
-          "w-0.5 h-8 rounded-full",
-          `bg-gradient-to-b ${color}`
+          'absolute left-0 top-1/2 -translate-y-1/2',
+          'w-0.5 h-8 rounded-full',
+          `bg-gradient-to-b ${color}`,
         )}
         initial={{ scaleY: 0, opacity: 0 }}
         animate={{ 
@@ -410,16 +410,16 @@ export const PremiumQuickAction = memo(function PremiumQuickAction({
       whileHover={{ scale: 1.02, y: -2 }}
       whileTap={{ scale: 0.98 }}
       className={cn(
-        "relative rounded-lg md:rounded-xl font-bold",
-        "flex items-center justify-center",
-        "transition-all duration-300",
-        "border border-white/[0.1]",
-        "overflow-hidden",
+        'relative rounded-lg md:rounded-xl font-bold',
+        'flex items-center justify-center',
+        'transition-all duration-300',
+        'border border-white/[0.1]',
+        'overflow-hidden',
         bg,
         shadow,
         text,
         sizes[size],
-        disabled && 'opacity-50 cursor-not-allowed'
+        disabled && 'opacity-50 cursor-not-allowed',
       )}
     >
       {/* Shine Effect */}

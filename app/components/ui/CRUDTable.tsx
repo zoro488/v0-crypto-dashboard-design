@@ -13,7 +13,6 @@ import {
   Eye,
   Edit2,
   Trash2,
-  MoreHorizontal,
   ChevronDown,
   ChevronUp,
   AlertTriangle,
@@ -21,13 +20,6 @@ import {
 } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 import { Badge } from '@/app/components/ui/badge'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from '@/app/components/ui/dropdown-menu'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,7 +39,7 @@ import { cn } from '@/app/lib/utils'
 export interface Column<T> {
   key: keyof T | string
   header: string
-  render?: (value: unknown, row: T) => React.ReactNode
+  render?: (_value: unknown, _row: T) => React.ReactNode
   className?: string
   sortable?: boolean
 }
@@ -58,9 +50,9 @@ export interface CRUDTableProps<T extends { id?: string }> {
   loading?: boolean
   emptyMessage?: string
   emptyIcon?: React.ReactNode
-  onView?: (item: T) => void
-  onEdit?: (item: T) => void
-  onDelete?: (item: T) => Promise<boolean>
+  onView?: (_item: T) => void
+  onEdit?: (_item: T) => void
+  onDelete?: (_item: T) => Promise<boolean>
   deleteConfirmTitle?: string
   deleteConfirmMessage?: string
   className?: string

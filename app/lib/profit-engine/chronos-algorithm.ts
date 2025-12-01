@@ -12,14 +12,14 @@
  * - Precios de mercado en tiempo real
  */
 
-import { profitLogger as logger } from './utils/logger';
+import { profitLogger as logger } from './utils/logger'
 import type {
   MarketLiveFeed,
   StrategyMode,
   ArbitrageOpportunity,
   ChronosDecision,
   MacroIndicators,
-} from './types/profit-engine.types';
+} from './types/profit-engine.types'
 
 // ============================================
 // CONSTANTES DE CONFIGURACIÓN
@@ -49,7 +49,7 @@ export const CHRONOS_THRESHOLDS = {
   // Velocidad de rotación de inventario
   HIGH_VELOCITY_DAYS: 3,     // Menos de 3 días = alta velocidad
   LOW_VELOCITY_DAYS: 10,     // Más de 10 días = baja velocidad
-} as const;
+} as const
 
 /**
  * Tasas de referencia (actualizables)
@@ -59,7 +59,7 @@ export const REFERENCE_RATES = {
   FED_RATE: 5.25,    // Tasa de referencia Fed
   INFLATION_MX: 4.5, // Inflación anual México
   INFLATION_US: 3.2, // Inflación anual USA
-} as const;
+} as const
 
 // ============================================
 // MÓDULO DE DETECCIÓN DE TENDENCIA MACRO
@@ -71,14 +71,14 @@ export const REFERENCE_RATES = {
 export function detectMacroTrend(
   tiieRate: number = REFERENCE_RATES.TIIE_MX,
   fedRate: number = REFERENCE_RATES.FED_RATE,
-  dxyIndex: number = 104
+  dxyIndex: number = 104,
 ): {
   trend: 'bullish_usd' | 'bearish_usd' | 'neutral';
   spreadBps: number;
   confidence: number;
   reason: string;
 } {
-  const spreadBps = (tiieRate - fedRate) * 100;
+  const spreadBps = (tiieRate - fedRate) * 100
   
   // Análisis del spread de tasas
   if (spreadBps < CHRONOS_THRESHOLDS.SPREAD_BULLISH_USD) {
@@ -89,7 +89,7 @@ export function detectMacroTrend(
       spreadBps,
       confidence: Math.min(90, 60 + (CHRONOS_THRESHOLDS.SPREAD_BULLISH_USD - spreadBps) / 5),
       reason: `Spread de tasas bajo (${spreadBps} bps). Carry trade menos atractivo. USD al alza.`,
-    };
+    }
   }
   
   if (spreadBps > CHRONOS_THRESHOLDS.SPREAD_BEARISH_USD) {
@@ -100,7 +100,7 @@ export function detectMacroTrend(
       spreadBps,
       confidence: Math.min(90, 60 + (spreadBps - CHRONOS_THRESHOLDS.SPREAD_BEARISH_USD) / 5),
       reason: `Spread de tasas alto (${spreadBps} bps). Carry trade muy atractivo. Peso fuerte.`,
-    };
+    }
   }
   
   // Factor adicional: DXY
@@ -110,7 +110,7 @@ export function detectMacroTrend(
       spreadBps,
       confidence: 70,
       reason: `DXY fuerte (${dxyIndex}). Dólar global al alza.`,
-    };
+    }
   }
   
   if (dxyIndex < CHRONOS_THRESHOLDS.DXY_WEAK) {
@@ -119,7 +119,7 @@ export function detectMacroTrend(
       spreadBps,
       confidence: 65,
       reason: `DXY débil (${dxyIndex}). Dólar global a la baja.`,
-    };
+    }
   }
   
   return {
@@ -127,7 +127,7 @@ export function detectMacroTrend(
     spreadBps,
     confidence: 50,
     reason: 'Condiciones de mercado equilibradas. Sin tendencia clara.',
-  };
+  }
 }
 
 // ============================================
@@ -140,9 +140,9 @@ export function detectMacroTrend(
 export function calculateStrategyMode(
   macroTrend: ReturnType<typeof detectMacroTrend>,
   inventoryHealthScore: number,
-  liquidityNeed: 'low' | 'medium' | 'high' = 'medium'
+  liquidityNeed: 'low' | 'medium' | 'high' = 'medium',
 ): { mode: StrategyMode; reason: string; actions: string[] } {
-  const actions: string[] = [];
+  const actions: string[] = []
   
   // Caso 1: Tendencia alcista USD + bajo inventario
   if (macroTrend.trend === 'bullish_usd' && inventoryHealthScore > 0.6) {
@@ -155,7 +155,7 @@ export function calculateStrategyMode(
         'Considerar transferir a cuentas USA para protección',
         'Reducir exposición a MXN',
       ],
-    };
+    }
   }
   
   // Caso 2: Tendencia bajista USD + necesidad de liquidez
@@ -169,7 +169,7 @@ export function calculateStrategyMode(
         'Rotar inventario en menos de 3 días',
         'Bajar precios 5-10 centavos para acelerar ventas',
       ],
-    };
+    }
   }
   
   // Caso 3: Inventario crítico
@@ -182,7 +182,7 @@ export function calculateStrategyMode(
         'Transferir fondos entre ubicaciones',
         'Ajustar precios de compra para atraer vendedores',
       ],
-    };
+    }
   }
   
   // Caso default: Neutral
@@ -194,7 +194,7 @@ export function calculateStrategyMode(
       'Monitorear cambios en tasas',
       'Ajustar según flujo de clientes',
     ],
-  };
+  }
 }
 
 // ============================================
@@ -207,7 +207,7 @@ export function calculateStrategyMode(
 export function evaluateArbitrageChannels(
   marketFeed: MarketLiveFeed,
   inventoryUsdPercent: number,
-  operatingCosts: number = 0.02 // 2 centavos por default
+  operatingCosts: number = 0.02, // 2 centavos por default
 ): {
   bestChannel: 'physical' | 'crypto' | 'hold';
   channels: {
@@ -217,16 +217,16 @@ export function evaluateArbitrageChannels(
   };
   arbitrageOpportunity: ArbitrageOpportunity | null;
 } {
-  const { sources, computed_arbitrage } = marketFeed;
+  const { sources, computed_arbitrage } = marketFeed
   
   // Calcular precios netos (después de costos)
-  const physicalNetPrice = sources.street_average_sell - operatingCosts;
-  const cryptoNetPrice = sources.binance_usdt_bid - operatingCosts - 0.005; // 0.5% fee Binance aprox
-  const banxicoPrice = sources.banxico_fix;
+  const physicalNetPrice = sources.street_average_sell - operatingCosts
+  const cryptoNetPrice = sources.binance_usdt_bid - operatingCosts - 0.005 // 0.5% fee Binance aprox
+  const banxicoPrice = sources.banxico_fix
   
   // Calcular márgenes
-  const physicalMargin = ((physicalNetPrice - banxicoPrice) / banxicoPrice) * 100;
-  const cryptoMargin = ((cryptoNetPrice - banxicoPrice) / banxicoPrice) * 100;
+  const physicalMargin = ((physicalNetPrice - banxicoPrice) / banxicoPrice) * 100
+  const cryptoMargin = ((cryptoNetPrice - banxicoPrice) / banxicoPrice) * 100
   
   // Evaluar cada canal
   const channels = {
@@ -252,33 +252,33 @@ export function evaluateArbitrageChannels(
         ? 'Inventario bajo - no recomendado mantener más'
         : 'Posible si tendencia es alcista',
     },
-  };
+  }
   
   // Determinar mejor canal
-  let bestChannel: 'physical' | 'crypto' | 'hold' = 'hold';
+  let bestChannel: 'physical' | 'crypto' | 'hold' = 'hold'
   
   if (cryptoMargin > physicalMargin + 0.2 && cryptoMargin >= CHRONOS_THRESHOLDS.MIN_MARGIN_PERCENT) {
-    bestChannel = 'crypto';
+    bestChannel = 'crypto'
   } else if (physicalMargin >= CHRONOS_THRESHOLDS.MIN_MARGIN_PERCENT) {
-    bestChannel = 'physical';
+    bestChannel = 'physical'
   }
   
   // Ajustar por inventario
   if (inventoryUsdPercent > 0.8) {
     // Inventario alto - forzar venta
-    bestChannel = cryptoMargin > physicalMargin ? 'crypto' : 'physical';
+    bestChannel = cryptoMargin > physicalMargin ? 'crypto' : 'physical'
   }
   
   // Generar oportunidad de arbitraje si aplica
-  let arbitrageOpportunity: ArbitrageOpportunity | null = null;
+  let arbitrageOpportunity: ArbitrageOpportunity | null = null
   
   if (computed_arbitrage.is_profitable_to_convert) {
-    const profitPercent = Math.max(cryptoMargin, physicalMargin);
-    let level: 'low' | 'medium' | 'high' | 'excellent' = 'low';
+    const profitPercent = Math.max(cryptoMargin, physicalMargin)
+    let level: 'low' | 'medium' | 'high' | 'excellent' = 'low'
     
-    if (profitPercent >= 2.0) level = 'excellent';
-    else if (profitPercent >= 1.0) level = 'high';
-    else if (profitPercent >= 0.5) level = 'medium';
+    if (profitPercent >= 2.0) level = 'excellent'
+    else if (profitPercent >= 1.0) level = 'high'
+    else if (profitPercent >= 0.5) level = 'medium'
     
     arbitrageOpportunity = {
       id: `arb-${Date.now()}`,
@@ -290,14 +290,14 @@ export function evaluateArbitrageChannels(
       opportunity_level: level,
       expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
       is_actionable: profitPercent >= CHRONOS_THRESHOLDS.MIN_MARGIN_PERCENT,
-    };
+    }
   }
   
   return {
     bestChannel,
     channels,
     arbitrageOpportunity,
-  };
+  }
 }
 
 // ============================================
@@ -308,7 +308,7 @@ export function evaluateArbitrageChannels(
  * Clase principal que orquesta el algoritmo Chronos
  */
 export class ChronosAlgorithm {
-  private macroIndicators: MacroIndicators;
+  private macroIndicators: MacroIndicators
   
   constructor(indicators?: Partial<MacroIndicators>) {
     this.macroIndicators = {
@@ -317,15 +317,15 @@ export class ChronosAlgorithm {
       dxy_index: indicators?.dxy_index ?? 104,
       inflation_mx: indicators?.inflation_mx ?? REFERENCE_RATES.INFLATION_MX,
       inflation_us: indicators?.inflation_us ?? REFERENCE_RATES.INFLATION_US,
-    };
+    }
   }
   
   /**
    * Actualiza los indicadores macro
    */
   updateIndicators(indicators: Partial<MacroIndicators>): void {
-    this.macroIndicators = { ...this.macroIndicators, ...indicators };
-    logger.info('chronos', 'Indicadores macro actualizados', this.macroIndicators);
+    this.macroIndicators = { ...this.macroIndicators, ...indicators }
+    logger.info('chronos', 'Indicadores macro actualizados', this.macroIndicators)
   }
   
   /**
@@ -335,27 +335,27 @@ export class ChronosAlgorithm {
     marketFeed: MarketLiveFeed,
     inventoryHealthScore: number,
     inventoryUsdPercent: number,
-    liquidityNeed: 'low' | 'medium' | 'high' = 'medium'
+    liquidityNeed: 'low' | 'medium' | 'high' = 'medium',
   ): ChronosDecision {
     // 1. Detectar tendencia macro
     const macroTrend = detectMacroTrend(
       this.macroIndicators.tiie_rate,
       this.macroIndicators.fed_rate,
-      this.macroIndicators.dxy_index
-    );
+      this.macroIndicators.dxy_index,
+    )
     
     // 2. Calcular estrategia
     const strategy = calculateStrategyMode(
       macroTrend,
       inventoryHealthScore,
-      liquidityNeed
-    );
+      liquidityNeed,
+    )
     
     // 3. Evaluar canales de arbitraje
     const channelEvaluation = evaluateArbitrageChannels(
       marketFeed,
-      inventoryUsdPercent
-    );
+      inventoryUsdPercent,
+    )
     
     // 4. Generar decisión final
     const decision: ChronosDecision = {
@@ -374,15 +374,15 @@ export class ChronosAlgorithm {
         street_price: marketFeed.sources.street_average_sell,
         spread_bps: macroTrend.spreadBps,
       },
-    };
+    }
     
     logger.info('chronos', 'Decisión generada', {
       mode: decision.strategy_mode,
       channel: decision.best_channel,
       confidence: decision.macro_confidence,
-    });
+    })
     
-    return decision;
+    return decision
   }
   
   /**
@@ -391,32 +391,32 @@ export class ChronosAlgorithm {
   calculateOptimalPrice(
     competitorPrice: number,
     inventoryPercent: number,
-    mode: 'buy' | 'sell'
+    mode: 'buy' | 'sell',
   ): { price: number; adjustment: number; reason: string } {
-    let adjustment = 0;
-    let reason = 'Precio estándar';
+    let adjustment = 0
+    let reason = 'Precio estándar'
     
     if (mode === 'sell') {
       if (inventoryPercent > 0.80) {
-        adjustment = -0.10;
-        reason = 'Inventario alto - liquidar';
+        adjustment = -0.10
+        reason = 'Inventario alto - liquidar'
       } else if (inventoryPercent > 0.95) {
-        adjustment = -0.15;
-        reason = 'Inventario crítico - liquidar urgente';
+        adjustment = -0.15
+        reason = 'Inventario crítico - liquidar urgente'
       } else if (inventoryPercent < 0.20) {
-        adjustment = 0.05;
-        reason = 'Inventario bajo - retener';
+        adjustment = 0.05
+        reason = 'Inventario bajo - retener'
       }
     } else {
       if (inventoryPercent < 0.20) {
-        adjustment = 0.10;
-        reason = 'Escasez - atraer vendedores';
+        adjustment = 0.10
+        reason = 'Escasez - atraer vendedores'
       } else if (inventoryPercent < 0.10) {
-        adjustment = 0.15;
-        reason = 'Escasez crítica - atraer urgente';
+        adjustment = 0.15
+        reason = 'Escasez crítica - atraer urgente'
       } else if (inventoryPercent > 0.80) {
-        adjustment = -0.05;
-        reason = 'Inventario suficiente';
+        adjustment = -0.05
+        reason = 'Inventario suficiente'
       }
     }
     
@@ -424,11 +424,11 @@ export class ChronosAlgorithm {
       price: Math.round((competitorPrice + adjustment) * 100) / 100,
       adjustment,
       reason,
-    };
+    }
   }
 }
 
 // Exportar instancia singleton para uso global
-export const chronosAlgorithm = new ChronosAlgorithm();
+export const chronosAlgorithm = new ChronosAlgorithm()
 
-export default ChronosAlgorithm;
+export default ChronosAlgorithm

@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useMotionValue, useSpring, useTransform, animate } from 'framer-motion'
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import { type LucideIcon, TrendingUp, TrendingDown } from 'lucide-react'
 import { useEffect, useRef, useState, memo, useCallback } from 'react'
 import { cn } from '@/lib/utils'
@@ -79,7 +79,7 @@ const Sparkline = memo(function Sparkline({ data, trend, height = 40 }: Sparklin
     const color = trend === 'up' ? '#10b981' : '#ef4444'
     const colorLight = trend === 'up' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'
 
-    const animate = (timestamp: number) => {
+    const animate = (_timestamp: number) => {
       progressRef.current = Math.min(progressRef.current + 0.03, 1)
       const progress = progressRef.current
 
@@ -236,7 +236,7 @@ export const PremiumStatCard = memo(function PremiumStatCard({
       transition={{ 
         duration: 0.6, 
         delay: index * 0.1, 
-        ease: [0.16, 1, 0.3, 1] 
+        ease: [0.16, 1, 0.3, 1],
       }}
       style={{
         rotateX: isHovered ? rotateX : 0,
@@ -249,28 +249,28 @@ export const PremiumStatCard = memo(function PremiumStatCard({
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
       className={cn(
-        "relative group cursor-pointer",
-        "will-change-transform"
+        'relative group cursor-pointer',
+        'will-change-transform',
       )}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
     >
       {/* Glassmorphism Card */}
       <div className={cn(
-        "relative overflow-hidden rounded-2xl md:rounded-3xl",
-        "bg-white/[0.03] backdrop-blur-xl",
-        "border border-white/[0.08]",
-        "p-4 md:p-6",
-        "transition-all duration-500",
-        isHovered && "bg-white/[0.05] border-white/[0.12]"
+        'relative overflow-hidden rounded-2xl md:rounded-3xl',
+        'bg-white/[0.03] backdrop-blur-xl',
+        'border border-white/[0.08]',
+        'p-4 md:p-6',
+        'transition-all duration-500',
+        isHovered && 'bg-white/[0.05] border-white/[0.12]',
       )}>
         {/* Animated Gradient Background */}
         <motion.div
           className={cn(
-            "absolute -top-20 -right-20 w-40 h-40",
-            "rounded-full blur-3xl opacity-30",
-            "transition-opacity duration-500",
-            `bg-gradient-to-br ${gradient}`
+            'absolute -top-20 -right-20 w-40 h-40',
+            'rounded-full blur-3xl opacity-30',
+            'transition-opacity duration-500',
+            `bg-gradient-to-br ${gradient}`,
           )}
           animate={{
             scale: isHovered ? 1.3 : 1,
@@ -282,7 +282,7 @@ export const PremiumStatCard = memo(function PremiumStatCard({
         <div 
           className="absolute inset-0 opacity-[0.02] pointer-events-none"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+            backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
           }}
         />
 
@@ -293,9 +293,9 @@ export const PremiumStatCard = memo(function PremiumStatCard({
             {/* Icon */}
             <motion.div
               className={cn(
-                "p-2.5 md:p-3 rounded-xl md:rounded-2xl",
-                "shadow-lg",
-                `bg-gradient-to-br ${gradient}`
+                'p-2.5 md:p-3 rounded-xl md:rounded-2xl',
+                'shadow-lg',
+                `bg-gradient-to-br ${gradient}`,
               )}
               whileHover={{ scale: 1.1, rotate: 5 }}
               transition={{ type: 'spring', stiffness: 400, damping: 10 }}
@@ -311,12 +311,12 @@ export const PremiumStatCard = memo(function PremiumStatCard({
             {/* Change Badge */}
             <motion.div
               className={cn(
-                "flex items-center gap-1",
-                "px-2 md:px-3 py-1 rounded-full",
-                "text-[10px] md:text-xs font-semibold",
+                'flex items-center gap-1',
+                'px-2 md:px-3 py-1 rounded-full',
+                'text-[10px] md:text-xs font-semibold',
                 trend === 'up' 
-                  ? "bg-emerald-500/15 text-emerald-400" 
-                  : "bg-rose-500/15 text-rose-400"
+                  ? 'bg-emerald-500/15 text-emerald-400' 
+                  : 'bg-rose-500/15 text-rose-400',
               )}
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -361,12 +361,12 @@ export const PremiumStatCard = memo(function PremiumStatCard({
         {/* Hover Glow Border */}
         <motion.div
           className={cn(
-            "absolute inset-0 rounded-2xl md:rounded-3xl",
-            "opacity-0 transition-opacity duration-500",
-            isHovered && "opacity-100"
+            'absolute inset-0 rounded-2xl md:rounded-3xl',
+            'opacity-0 transition-opacity duration-500',
+            isHovered && 'opacity-100',
           )}
           style={{
-            background: `linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.1) 50%, transparent 60%)`,
+            background: 'linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.1) 50%, transparent 60%)',
             backgroundSize: '200% 200%',
           }}
           animate={{

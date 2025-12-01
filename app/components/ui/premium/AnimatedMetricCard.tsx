@@ -14,7 +14,7 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import { motion, AnimatePresence, useSpring, useTransform } from 'framer-motion'
 import { cn } from '@/app/lib/utils'
-import { ArrowUpRight, ArrowDownRight, Minus, TrendingUp, type LucideIcon } from 'lucide-react'
+import { ArrowUpRight, ArrowDownRight, Minus, type LucideIcon } from 'lucide-react'
 import { AreaChart, Area, ResponsiveContainer } from 'recharts'
 
 interface AnimatedMetricCardProps {
@@ -35,7 +35,7 @@ interface AnimatedMetricCardProps {
 }
 
 // Hook para animar números
-function useAnimatedNumber(value: number, duration: number = 1000) {
+function useAnimatedNumber(value: number, _duration: number = 1000) {
   const spring = useSpring(0, { 
     stiffness: 100, 
     damping: 30,
@@ -71,7 +71,6 @@ function MiniSparkline({
   [data])
 
   const strokeColor = trend === 'up' ? '#10b981' : trend === 'down' ? '#ef4444' : '#6b7280'
-  const fillColor = trend === 'up' ? '#10b98120' : trend === 'down' ? '#ef444420' : '#6b728020'
 
   return (
     <div className="h-10 w-full">

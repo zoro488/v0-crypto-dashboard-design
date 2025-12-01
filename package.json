@@ -125,6 +125,7 @@
     "@types/three": "^0.171.0",
     "@typescript-eslint/eslint-plugin": "^8.48.0",
     "@typescript-eslint/parser": "^8.48.0",
+    "baseline-browser-mapping": "^2.8.32",
     "canvas": "^3.2.0",
     "csv-parser": "^3.2.0",
     "dotenv": "^17.2.3",

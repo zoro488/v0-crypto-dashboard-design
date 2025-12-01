@@ -5,7 +5,7 @@
  */
 
 // Tipos
-export * from './types/profit-engine.types';
+export * from './types/profit-engine.types'
 
 // Market Feed
 export {
@@ -16,7 +16,7 @@ export {
   recordMarketHistory,
   calculateArbitrageSignal,
   MARKET_FEED_CONFIG,
-} from './market-feed';
+} from './market-feed'
 
 // Treasury
 export {
@@ -31,7 +31,7 @@ export {
   calculateInventoryHealthScore,
   TREASURY_THRESHOLDS,
   DEFAULT_VAULT_CAPACITIES,
-} from './treasury';
+} from './treasury'
 
 // Chronos Algorithm (Detector de Tendencia Macro)
 export {
@@ -39,4 +39,4 @@ export {
   detectMacroTrend,
   calculateStrategyMode,
   evaluateArbitrageChannels,
-} from './chronos-algorithm';
+} from './chronos-algorithm'
