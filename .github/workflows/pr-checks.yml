@@ -4,6 +4,12 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+# Permisos necesarios para comentar en PRs
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 jobs:
   # ============================================================================
   # PR Validation
@@ -56,44 +62,50 @@ jobs:
           
       - name: Comment PR
         uses: actions/github-script@v7
+        # Continuar aunque falle - algunos forks no tienen permisos de comentar
+        continue-on-error: true
         with:
           script: |
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            })
-            
-            const botComment = comments.find(comment => 
-              comment.user.type === 'Bot' && 
-              comment.body.includes('PR Quality Check')
-            )
-            
-            const body = `## 🤖 PR Quality Check
-            
-            ✅ All quality checks passed!
-            
-            ### Checklist
-            - ✅ PR title follows conventional commits
-            - ✅ No large files (>1MB) added
-            - ⚠️  Checked for console.log usage
-            
-            Thank you for your contribution! 🎉`
-            
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body
-              })
-            } else {
-              await github.rest.issues.createComment({
+            try {
+              const { data: comments } = await github.rest.issues.listComments({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.issue.number,
-                body
               })
+              
+              const botComment = comments.find(comment => 
+                comment.user.type === 'Bot' && 
+                comment.body.includes('PR Quality Check')
+              )
+              
+              const body = `## 🤖 PR Quality Check
+              
+              ✅ All quality checks passed!
+              
+              ### Checklist
+              - ✅ PR title follows conventional commits
+              - ✅ No large files (>1MB) added
+              - ⚠️  Checked for console.log usage
+              
+              Thank you for your contribution! 🎉`
+              
+              if (botComment) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: botComment.id,
+                  body
+                })
+              } else {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body
+                })
+              }
+            } catch (error) {
+              console.log('Unable to comment on PR (permissions may be limited):', error.message)
             }
 
   # ============================================================================
