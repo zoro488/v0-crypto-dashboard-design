@@ -60,6 +60,15 @@ const nextConfig = {
       },
     };
     
+    // Ignorar warnings de exports deprecados de spline
+    config.ignoreWarnings = [
+      ...(config.ignoreWarnings || []),
+      {
+        module: /@splinetool/,
+        message: /sRGBEncoding/,
+      },
+    ];
+    
     // Optimizaciones de webpack
     config.optimization = {
       ...config.optimization,
