@@ -1,10 +1,9 @@
 'use client'
 
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Environment, MeshTransmissionMaterial, Float, Sparkles } from '@react-three/drei'
 import { EffectComposer, N8AO, Bloom } from '@react-three/postprocessing'
 import { useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
 import type * as THREE from 'three'
 
 function CrystalSphere() {

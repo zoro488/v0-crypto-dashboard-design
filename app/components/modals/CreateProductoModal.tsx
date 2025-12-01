@@ -1,7 +1,6 @@
 'use client'
 
-import type React from 'react'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Package, DollarSign, Tag } from 'lucide-react'
 import { useAppStore } from '@/app/lib/store/useAppStore'
