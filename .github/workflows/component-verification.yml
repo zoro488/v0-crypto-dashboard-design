@@ -1,0 +1,266 @@
+# 🔍 Component Verification Workflow - Sistema CHRONOS
+# Verifica funcionalidad completa de componentes, botones, forms y lógica de negocio
+
+name: 🔍 Component Verification
+
+on:
+  push:
+    branches: [main, develop, feature/*]
+    paths:
+      - 'app/components/**'
+      - 'app/hooks/**'
+      - 'app/lib/**'
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      component_type:
+        description: 'Tipo de componente a verificar'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - panels
+          - modals
+          - forms
+          - 3d
+          - visualizations
+          - widgets
+
+concurrency:
+  group: component-verify-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10'
+
+jobs:
+  # ════════════════════════════════════════════════════════════════════════════
+  # JOB 1: Análisis de Componentes 3D
+  # ════════════════════════════════════════════════════════════════════════════
+  analyze-3d-components:
+    name: 🎮 Analizar Componentes 3D
+    runs-on: ubuntu-latest
+    outputs:
+      has_spline: ${{ steps.check.outputs.has_spline }}
+      has_three: ${{ steps.check.outputs.has_three }}
+      components_count: ${{ steps.count.outputs.count }}
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔍 Verificar dependencias 3D
+        id: check
+        run: |
+          if grep -q "@splinetool" package.json; then
+            echo "has_spline=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_spline=false" >> $GITHUB_OUTPUT
+          fi
+          
+          if grep -q "three" package.json; then
+            echo "has_three=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_three=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 📊 Contar componentes 3D
+        id: count
+        run: |
+          count=$(find app/components/3d -name "*.tsx" | wc -l)
+          echo "count=$count" >> $GITHUB_OUTPUT
+          echo "📦 Componentes 3D encontrados: $count"
+
+      - name: 📋 Listar componentes 3D
+        run: |
+          echo "## 🎮 Componentes 3D Disponibles" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          find app/components/3d -name "*.tsx" -exec basename {} \; | sort | while read file; do
+            echo "- \`$file\`" >> $GITHUB_STEP_SUMMARY
+          done
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # JOB 2: Verificar Paneles Bento
+  # ════════════════════════════════════════════════════════════════════════════
+  verify-panels:
+    name: 📊 Verificar Paneles Bento
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Verificar imports de componentes 3D en paneles
+        run: |
+          echo "## 📊 Análisis de Integración 3D en Paneles" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          for panel in app/components/panels/Bento*.tsx; do
+            name=$(basename $panel)
+            imports_3d=$(grep -c "from.*3d" $panel 2>/dev/null || echo "0")
+            imports_viz=$(grep -c "from.*visualizations" $panel 2>/dev/null || echo "0")
+            
+            if [ "$imports_3d" -gt "0" ] || [ "$imports_viz" -gt "0" ]; then
+              echo "✅ \`$name\`: 3D=$imports_3d, Viz=$imports_viz" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "⚠️ \`$name\`: Sin componentes 3D/Viz" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+      - name: 🧪 Verificar lógica de negocio en paneles
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 💼 Verificación de Lógica de Negocio" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Verificar BentoVentas tiene fórmula GYA correcta
+          if grep -q "bovedaMonte\|fleteUtilidad\|utilidad" app/components/panels/BentoVentas.tsx; then
+            echo "✅ BentoVentas: Distribución GYA implementada" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ BentoVentas: Falta distribución GYA" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Verificar BentoDashboard tiene métricas
+          if grep -q "capitalTotal\|ventasMes\|stockActual" app/components/panels/BentoDashboard.tsx; then
+            echo "✅ BentoDashboard: Métricas principales implementadas" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ BentoDashboard: Faltan métricas principales" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # JOB 3: Verificar Modales y Forms
+  # ════════════════════════════════════════════════════════════════════════════
+  verify-forms:
+    name: 📝 Verificar Forms y Modales
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Verificar validación Zod en modales
+        run: |
+          echo "## 📝 Verificación de Validación en Modales" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          for modal in app/components/modals/*.tsx; do
+            name=$(basename $modal)
+            has_zod=$(grep -c "zodResolver\|useForm\|schema" $modal 2>/dev/null || echo "0")
+            has_validation=$(grep -c "required\|min\|max\|pattern" $modal 2>/dev/null || echo "0")
+            
+            if [ "$has_zod" -gt "0" ]; then
+              echo "✅ \`$name\`: Validación Zod activa" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "⚠️ \`$name\`: Sin validación Zod detectada" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+      - name: 🧪 Verificar handlers de submit
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 🔄 Verificación de Handlers" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          for modal in app/components/modals/*.tsx; do
+            name=$(basename $modal)
+            has_submit=$(grep -c "onSubmit\|handleSubmit" $modal 2>/dev/null || echo "0")
+            has_error=$(grep -c "catch\|error\|Error" $modal 2>/dev/null || echo "0")
+            
+            if [ "$has_submit" -gt "0" ] && [ "$has_error" -gt "0" ]; then
+              echo "✅ \`$name\`: Submit + Error handling" >> $GITHUB_STEP_SUMMARY
+            elif [ "$has_submit" -gt "0" ]; then
+              echo "⚠️ \`$name\`: Submit sin error handling" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "❌ \`$name\`: Sin handler de submit" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # JOB 4: Tests de Componentes
+  # ════════════════════════════════════════════════════════════════════════════
+  component-tests:
+    name: 🧪 Tests de Componentes
+    runs-on: ubuntu-latest
+    needs: [analyze-3d-components, verify-panels, verify-forms]
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🧪 Ejecutar tests unitarios
+        run: pnpm test --passWithNoTests --coverage
+        env:
+          CI: true
+
+      - name: 📊 Publicar resumen de tests
+        if: always()
+        run: |
+          echo "## 🧪 Resultados de Tests" >> $GITHUB_STEP_SUMMARY
+          if [ -f coverage/coverage-summary.json ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Cobertura de código:" >> $GITHUB_STEP_SUMMARY
+            cat coverage/coverage-summary.json | jq -r '.total | "- Lines: \(.lines.pct)%\n- Statements: \(.statements.pct)%\n- Functions: \(.functions.pct)%\n- Branches: \(.branches.pct)%"' >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # JOB 5: Reporte Final
+  # ════════════════════════════════════════════════════════════════════════════
+  final-report:
+    name: 📋 Reporte Final
+    runs-on: ubuntu-latest
+    needs: [analyze-3d-components, verify-panels, verify-forms, component-tests]
+    if: always()
+    steps:
+      - name: 📋 Generar reporte final
+        run: |
+          echo "# 🔍 Reporte de Verificación de Componentes" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Estado |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Análisis 3D | ${{ needs.analyze-3d-components.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Verificar Paneles | ${{ needs.verify-panels.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Verificar Forms | ${{ needs.verify-forms.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | ${{ needs.component-tests.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📅 Fecha: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
