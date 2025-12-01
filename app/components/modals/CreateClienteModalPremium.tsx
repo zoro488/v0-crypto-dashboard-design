@@ -217,8 +217,7 @@ export function CreateClienteModalPremium({
       if (isEdit && editData?.id) {
         // Modo edición - actualizar cliente existente
         logger.info('Actualizando cliente en Firestore', { 
-          clienteId: editData.id,
-          data: clienteData,
+          data: { clienteId: editData.id, clienteData },
           context: 'CreateClienteModalPremium',
         })
         result = await actualizarCliente(editData.id, clienteData)
