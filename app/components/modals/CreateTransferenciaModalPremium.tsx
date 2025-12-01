@@ -304,7 +304,7 @@ export function CreateTransferenciaModalPremium({
         data.bancoOrigen,
         data.bancoDestino,
         data.monto,
-        data.concepto || `Transferencia de ${origenData?.nombre} a ${destinoData?.nombre}`
+        data.concepto || `Transferencia de ${origenData?.nombre} a ${destinoData?.nombre}`,
       )
 
       if (result) {

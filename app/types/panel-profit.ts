@@ -6,8 +6,6 @@
  * de arbitraje financiero USD/MXN/USDT
  */
 
-import { Timestamp } from 'firebase/firestore'
-
 // ===================================================================
 // TIPOS BASE DE MERCADO
 // ===================================================================
@@ -318,9 +316,9 @@ export interface UseMarketDataResult {
 
 export interface UseArbitrageCalculatorResult {
   /** Calcular escenario de hold */
-  calculateHoldScenario: (amount: number, days: number) => HoldScenario;
+  calculateHoldScenario: (_amount: number, _days: number) => HoldScenario;
   /** Calcular precio óptimo */
-  calculateOptimalPrice: (competitionPrice: number, inventoryLevel: number) => OptimalPriceCalculation;
+  calculateOptimalPrice: (_competitionPrice: number, _inventoryLevel: number) => OptimalPriceCalculation;
   /** Detectar oportunidades de arbitraje */
   detectArbitrageOpportunities: () => ArbitrageComputed;
 }
@@ -333,9 +331,9 @@ export interface ProfitCommandCenterProps {
   /** Configuración personalizada */
   config?: Partial<PanelProfitConfig>;
   /** Callback cuando se detecta oportunidad de arbitraje */
-  onArbitrageOpportunity?: (opportunity: ArbitrageComputed) => void;
+  onArbitrageOpportunity?: (_opportunity: ArbitrageComputed) => void;
   /** Callback cuando se genera alerta */
-  onAlert?: (alert: MarketAlert) => void;
+  onAlert?: (_alert: MarketAlert) => void;
 }
 
 export interface ArbitrageGaugeProps {
@@ -353,7 +351,7 @@ export interface HoldCalculatorProps {
   /** Modo de estrategia actual */
   strategyMode: StrategyMode;
   /** Callback cuando se completa simulación */
-  onSimulate?: (scenario: HoldScenario) => void;
+  onSimulate?: (_scenario: HoldScenario) => void;
 }
 
 export interface TrendForecastChartProps {

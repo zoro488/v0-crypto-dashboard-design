@@ -5,7 +5,7 @@ import {
   ShoppingCart, Plus, TrendingUp, AlertCircle, CheckCircle2, Clock, Package,
   Building2, DollarSign, Calendar, Search, Filter, Download, Eye, Edit,
   ArrowUpRight, ArrowDownRight, Truck, BarChart3, PieChart as PieChartIcon,
-  CreditCard, Receipt, RefreshCw, ChevronRight, Sparkles,
+  CreditCard, Receipt, RefreshCw, ChevronRight, Sparkles, Pencil, Trash2,
   type LucideIcon,
 } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
@@ -13,7 +13,9 @@ import { Badge } from '@/app/components/ui/badge'
 import { Input } from '@/app/components/ui/input'
 import { Skeleton } from '@/app/components/ui/skeleton'
 import { useState, useEffect, useMemo, useCallback, Suspense } from 'react'
-import { suscribirOrdenesCompra } from '@/app/lib/firebase/firestore-service'
+import { suscribirOrdenesCompra, eliminarOrdenCompra } from '@/app/lib/firebase/firestore-service'
+import { DeleteConfirmModal } from '@/app/components/modals/DeleteConfirmModal'
+import { useAppStore } from '@/app/lib/store/useAppStore'
 import type { OrdenCompra, FirestoreTimestamp } from '@/app/types'
 import { CreateOrdenCompraModalPremium } from '@/app/components/modals/CreateOrdenCompraModalPremium'
 import { useToast } from '@/app/hooks/use-toast'
@@ -27,7 +29,7 @@ import dynamic from 'next/dynamic'
 // 🎨 Componente 3D Premium cargado dinámicamente
 const PremiumSplineOrb = dynamic(
   () => import('@/app/components/3d/PremiumSplineOrb').then(mod => mod.PremiumSplineOrb),
-  { ssr: false, loading: () => <div className="w-full h-full bg-gradient-to-br from-purple-500/10 to-violet-500/10 rounded-2xl animate-pulse" /> }
+  { ssr: false, loading: () => <div className="w-full h-full bg-gradient-to-br from-purple-500/10 to-violet-500/10 rounded-2xl animate-pulse" /> },
 )
 
 // ============================================================================
@@ -117,7 +119,12 @@ function StatCard({
 }
 
 // Tarjeta de Orden de Compra
-function OrdenCompraCard({ orden, onView }: { orden: OrdenCompra; onView: (oc: OrdenCompra) => void }) {
+function OrdenCompraCard({ orden, onView, onEdit, onDelete }: { 
+  orden: OrdenCompra
+  onView: (oc: OrdenCompra) => void
+  onEdit: (oc: OrdenCompra) => void
+  onDelete: (oc: OrdenCompra) => void
+}) {
   const getEstadoConfig = (estado: string) => {
     switch (estado) {
       case 'pagado':
@@ -195,8 +202,24 @@ function OrdenCompraCard({ orden, onView }: { orden: OrdenCompra; onView: (oc: O
         </div>
       </div>
 
-      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-        <ChevronRight size={20} className="text-white/40" />
+      {/* Botones de acción */}
+      <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={(e) => { e.stopPropagation(); onEdit(orden); }}
+          className="h-7 w-7 p-0 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
+        >
+          <Pencil size={14} />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={(e) => { e.stopPropagation(); onDelete(orden); }}
+          className="h-7 w-7 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+        >
+          <Trash2 size={14} />
+        </Button>
       </div>
     </motion.div>
   )
@@ -207,6 +230,7 @@ function OrdenCompraCard({ orden, onView }: { orden: OrdenCompra; onView: (oc: O
 // ============================================================================
 export default function BentoOrdenesCompra() {
   const { toast } = useToast()
+  const { triggerDataRefresh } = useAppStore()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [ordenesCompraData, setOrdenesCompraData] = useState<OrdenCompra[]>([])
   const [loading, setLoading] = useState(true)
@@ -214,6 +238,9 @@ export default function BentoOrdenesCompra() {
   const [filterEstado, setFilterEstado] = useState<string | null>(null)
   const [selectedOrden, setSelectedOrden] = useState<OrdenCompra | null>(null)
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
+  const [editingOrden, setEditingOrden] = useState<OrdenCompra | null>(null)
+  const [deletingOrden, setDeletingOrden] = useState<OrdenCompra | null>(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   useEffect(() => {
     const unsubscribe = suscribirOrdenesCompra((ordenes) => {
@@ -222,6 +249,42 @@ export default function BentoOrdenesCompra() {
     })
 
     return () => unsubscribe()
+  }, [])
+
+  // Handlers para editar/eliminar
+  const handleEditOrden = useCallback((orden: OrdenCompra) => {
+    setEditingOrden(orden)
+    setIsModalOpen(true)
+  }, [])
+
+  const handleDeleteOrden = useCallback((orden: OrdenCompra) => {
+    setDeletingOrden(orden)
+    setShowDeleteModal(true)
+  }, [])
+
+  const confirmDeleteOrden = useCallback(async () => {
+    if (!deletingOrden?.id) return
+    
+    try {
+      await eliminarOrdenCompra(deletingOrden.id)
+      toast({
+        title: '✅ Orden eliminada',
+        description: `La orden ${deletingOrden.id} ha sido eliminada exitosamente`,
+      })
+      triggerDataRefresh()
+    } catch (error) {
+      logger.error('Error eliminando orden de compra', error)
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'No se pudo eliminar la orden',
+        variant: 'destructive',
+      })
+    }
+  }, [deletingOrden, toast, triggerDataRefresh])
+
+  const handleCloseModal = useCallback(() => {
+    setIsModalOpen(false)
+    setEditingOrden(null)
   }, [])
 
   // Handler para exportar datos
@@ -620,10 +683,13 @@ export default function BentoOrdenesCompra() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ delay: idx * 0.05 }}
+                    className="group"
                   >
                     <OrdenCompraCard 
                       orden={orden} 
                       onView={(oc) => setSelectedOrden(oc)}
+                      onEdit={handleEditOrden}
+                      onDelete={handleDeleteOrden}
                     />
                   </motion.div>
                 ))}
@@ -662,9 +728,23 @@ export default function BentoOrdenesCompra() {
       {isModalOpen && (
         <CreateOrdenCompraModalPremium
           open={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={handleCloseModal}
         />
       )}
+
+      {/* Modal de confirmación de eliminación */}
+      <DeleteConfirmModal
+        open={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false)
+          setDeletingOrden(null)
+        }}
+        onConfirm={confirmDeleteOrden}
+        title="¿Eliminar orden de compra?"
+        description="Esta acción eliminará permanentemente la orden de compra y todos sus datos asociados."
+        itemName={deletingOrden?.id || ''}
+        itemType="orden de compra"
+      />
     </div>
   )
 }

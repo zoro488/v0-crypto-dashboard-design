@@ -47,7 +47,7 @@ import dynamic from 'next/dynamic'
 // 🎨 Importar componentes 3D dinámicamente para mejor performance
 const GlassNavIcon = dynamic(
   () => import('@/app/components/3d/GlassNavIcons').then(mod => mod.GlassNavIcon),
-  { ssr: false, loading: () => <div className="w-10 h-10 bg-white/5 rounded-xl animate-pulse" /> }
+  { ssr: false, loading: () => <div className="w-10 h-10 bg-white/5 rounded-xl animate-pulse" /> },
 )
 
 // ============================================================
@@ -236,7 +236,7 @@ const MegaDropdown = ({
               </div>
 
               {/* Items Grid con Iconos 3D */}
-              <div className={`p-3 grid gap-2`} style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
+              <div className={'p-3 grid gap-2'} style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
                 {items.map((item) => {
                   const ItemIcon = item.icon
                   const isActive = currentPanel === item.id

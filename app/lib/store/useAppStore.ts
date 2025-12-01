@@ -108,6 +108,9 @@ interface AppState {
   currentPanel: string
   sidebarCollapsed: boolean
   theme: 'light' | 'dark' | 'cyber'
+  
+  // User State
+  currentUserId: string | null
 
   // Voice Agent State
   voiceAgentActive: boolean
@@ -166,64 +169,6 @@ const BANCOS_INICIALES: BancoStore[] = [
   { id: 'leftie', nombre: 'Leftie', saldo: 0, color: 'from-yellow-500 to-orange-500' },
   { id: 'profit', nombre: 'Profit', saldo: 0, color: 'from-indigo-500 to-purple-500' },
 ]
-
-interface AppState {
-  // UI State
-  currentPanel: string
-  sidebarCollapsed: boolean
-  theme: 'light' | 'dark' | 'cyber'
-  
-  // User State
-  currentUserId: string | null
-
-  // Voice Agent State
-  voiceAgentActive: boolean
-  voiceAgentStatus: 'idle' | 'listening' | 'thinking' | 'speaking'
-  audioFrequencies: number[]
-
-  // 3D State
-  modelRotation: number
-  activeScene: string | null
-
-  // Financial Data
-  totalCapital: number
-  bancos: Array<{
-    id: string
-    nombre: string
-    saldo: number
-    color: string
-  }>
-
-  // New Data Structures for complete system
-  distribuidores: Distribuidor[]
-  clientes: Cliente[]
-  ordenesCompra: OrdenCompra[]
-  ventas: Venta[]
-  productos: Producto[]
-
-  // 🔄 Flag para refrescar datos en los hooks
-  dataRefreshTrigger: number
-  triggerDataRefresh: () => void
-
-  // Actions
-  setCurrentPanel: (panel: string) => void
-  toggleSidebar: () => void
-  setTheme: (theme: 'light' | 'dark' | 'cyber') => void
-  setVoiceAgentActive: (active: boolean) => void
-  setVoiceAgentStatus: (status: 'idle' | 'listening' | 'thinking' | 'speaking') => void
-  setAudioFrequencies: (frequencies: number[]) => void
-  setModelRotation: (rotation: number) => void
-  setActiveScene: (scene: string | null) => void
-  updateBancoSaldo: (id: string, saldo: number) => void
-  crearOrdenCompra: (data: Omit<OrdenCompra, 'id'>) => void
-  crearVenta: (data: Omit<Venta, 'id' | 'clienteId'>) => void
-  abonarDistribuidor: (distribuidorId: string, monto: number, bancoDestino: string) => void
-  abonarCliente: (clienteId: string, monto: number) => void
-  crearTransferencia: (origen: string, destino: string, monto: number) => void
-  registrarGasto: (banco: string, monto: number, concepto: string) => void
-  addEntradaAlmacen: (data: { productoNombre: string; cantidad: number; costoUnitario: number; tipo?: string; fecha?: string; origen?: string; valorTotal?: number; ordenCompraRef?: string }) => void
-  addSalidaAlmacen: (data: { productoId: string; cantidad: number; tipo?: string; fecha?: string; destino?: string; valorTotal?: number; productoNombre?: string; ventaRef?: string }) => void
-}
 
 export const useAppStore = create<AppState>()(
   devtools(

@@ -39,27 +39,27 @@ interface Panel3DWrapperProps {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const PremiumSplineOrb = lazy(() => 
-  import('@/app/components/3d/PremiumSplineOrb').then(m => ({ default: m.PremiumSplineOrb }))
+  import('@/app/components/3d/PremiumSplineOrb').then(m => ({ default: m.PremiumSplineOrb })),
 )
 
 const AnalyticsGlobe3D = lazy(() => 
-  import('@/app/components/3d/AnalyticsGlobe3D').then(m => ({ default: m.AnalyticsGlobe3D }))
+  import('@/app/components/3d/AnalyticsGlobe3D').then(m => ({ default: m.AnalyticsGlobe3D })),
 )
 
 const WorkflowVisualizer3D = lazy(() => 
-  import('@/app/components/3d/WorkflowVisualizer3D').then(m => ({ default: m.WorkflowVisualizer3D }))
+  import('@/app/components/3d/WorkflowVisualizer3D').then(m => ({ default: m.WorkflowVisualizer3D })),
 )
 
 const SingularityLogo = lazy(() => 
-  import('@/app/components/3d/SingularityLogo').then(m => ({ default: m.SingularityLogo }))
+  import('@/app/components/3d/SingularityLogo').then(m => ({ default: m.SingularityLogo })),
 )
 
 const AIAgentScene = lazy(() => 
-  import('@/app/components/3d/AIAgentScene').then(m => ({ default: m.AIAgentScene }))
+  import('@/app/components/3d/AIAgentScene').then(m => ({ default: m.AIAgentScene })),
 )
 
 const NavIcons3D = lazy(() => 
-  import('@/app/components/3d/NavIcons3D').then(m => ({ default: m.NavIcons3D }))
+  import('@/app/components/3d/NavIcons3D').then(m => ({ default: m.NavIcons3D })),
 )
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -318,7 +318,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
 /** Preset para panel de Dashboard */
 export const Dashboard3DPreset = memo(function Dashboard3DPreset({ 
-  fallback 
+  fallback, 
 }: { 
   fallback?: ReactNode 
 }) {
@@ -374,7 +374,7 @@ export const Workflow3DPreset = memo(function Workflow3DPreset({
 
 /** Preset para panel de IA */
 export const AI3DPreset = memo(function AI3DPreset({ 
-  fallback 
+  fallback, 
 }: { 
   fallback?: ReactNode 
 }) {

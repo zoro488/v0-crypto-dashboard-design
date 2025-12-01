@@ -1,24 +1,29 @@
 'use client'
 
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion'
-import { TrendingUp, Plus, DollarSign, Users, Package, CheckCircle2, Clock, ArrowUpRight, ArrowDownRight, Sparkles, Target, Zap, BarChart3, PieChart as PieChartIcon } from 'lucide-react'
+import { TrendingUp, Plus, DollarSign, Users, Package, CheckCircle2, Clock, ArrowUpRight, ArrowDownRight, Sparkles, Target, Zap, BarChart3, PieChart as PieChartIcon, Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 import { Badge } from '@/app/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/components/ui/tabs'
 import { useState, useEffect, useMemo, useRef, memo, Suspense } from 'react'
 import { useVentasData } from '@/app/lib/firebase/firestore-hooks.service'
 import { CreateVentaModalPremium } from '@/app/components/modals/CreateVentaModalPremium'
+import { DeleteConfirmModal } from '@/app/components/modals/DeleteConfirmModal'
 import { SalesFlowDiagram } from '@/app/components/visualizations/SalesFlowDiagram'
 import { 
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, 
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts'
 import dynamic from 'next/dynamic'
+import { eliminarVenta } from '@/app/lib/firebase/firestore-service'
+import { useToast } from '@/app/hooks/use-toast'
+import { logger } from '@/app/lib/utils/logger'
+import { useAppStore } from '@/app/lib/store/useAppStore'
 
 // 🎨 Componente 3D Premium cargado dinámicamente
 const PremiumSplineOrb = dynamic(
   () => import('@/app/components/3d/PremiumSplineOrb').then(mod => mod.PremiumSplineOrb),
-  { ssr: false, loading: () => <div className="w-full h-full bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-2xl animate-pulse" /> }
+  { ssr: false, loading: () => <div className="w-full h-full bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-2xl animate-pulse" /> },
 )
 
 interface VentaData {
@@ -160,9 +165,51 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
 export default memo(function BentoVentas() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedTimeRange, setSelectedTimeRange] = useState<'day' | 'week' | 'month'>('week')
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [editingVenta, setEditingVenta] = useState<VentaData | null>(null)
+  const [deletingVenta, setDeletingVenta] = useState<VentaData | null>(null)
+  
+  const { toast } = useToast()
+  const { triggerDataRefresh } = useAppStore()
 
   const { data: ventasDataRaw, loading, error } = useVentasData()
   const ventasData = ventasDataRaw as VentaData[]
+
+  // Handlers para editar/eliminar
+  const handleEditVenta = (venta: VentaData) => {
+    setEditingVenta(venta)
+    setIsModalOpen(true)
+  }
+
+  const handleDeleteVenta = (venta: VentaData) => {
+    setDeletingVenta(venta)
+    setShowDeleteModal(true)
+  }
+
+  const confirmDeleteVenta = async () => {
+    if (!deletingVenta?.id) return
+    
+    try {
+      await eliminarVenta(deletingVenta.id)
+      toast({
+        title: '✅ Venta eliminada',
+        description: `La venta ha sido eliminada exitosamente`,
+      })
+      triggerDataRefresh()
+    } catch (error) {
+      logger.error('Error eliminando venta', error)
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'No se pudo eliminar la venta',
+        variant: 'destructive',
+      })
+    }
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setEditingVenta(null)
+  }
 
   // ═══════════════════════════════════════════════════════════════════════════
   // CÁLCULOS OPTIMIZADOS CON useMemo - Solo se recalculan cuando cambian ventas
@@ -770,6 +817,7 @@ export default memo(function BentoVentas() {
                       <th className="text-right py-4 px-4 text-sm font-medium text-emerald-400" title="Ganancia neta">Utilidad</th>
                       <th className="text-right py-4 px-4 text-sm font-medium text-yellow-400">Pendiente</th>
                       <th className="text-center py-4 px-4 text-sm font-medium text-zinc-400">Estado</th>
+                      <th className="text-center py-4 px-4 text-sm font-medium text-zinc-400">Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -840,6 +888,26 @@ export default memo(function BentoVentas() {
                               Pendiente
                             </Badge>
                           )}
+                        </td>
+                        <td className="py-4 px-4 text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditVenta(venta)}
+                              className="h-8 w-8 p-0 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteVenta(venta)}
+                              className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </td>
                       </motion.tr>
                     ))}
