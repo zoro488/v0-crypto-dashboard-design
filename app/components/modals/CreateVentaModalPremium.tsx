@@ -331,11 +331,17 @@ export function CreateVentaModalPremium({
       const ventasCreadas: string[] = []
       
       for (const item of carrito) {
+        // Calcular distribución GYA correcta para este item
+        const montoBovedaMonte = item.precioCompra * item.cantidad
+        const montoFletes = aplicaFlete ? item.precioFlete * item.cantidad : 0
+        const montoUtilidades = (item.precioVenta - item.precioCompra - (aplicaFlete ? item.precioFlete : 0)) * item.cantidad
+        
         const ventaData = {
           cliente: clienteSeleccionado.nombre,
           clienteId: clienteSeleccionado.id,
           cantidad: item.cantidad,
           precioVenta: item.precioVenta,
+          precioCompra: item.precioCompra, // ✅ CRÍTICO: Pasar precio de compra para cálculo GYA
           precioTotalVenta: item.precioVenta * item.cantidad,
           producto: item.nombre,
           ocRelacionada: ocSeleccionada || undefined,
@@ -348,6 +354,12 @@ export function CreateVentaModalPremium({
             ? item.precioVenta * item.cantidad 
             : Math.round((montoRealPagado / totales.totalIngreso) * item.precioVenta * item.cantidad),
           notas,
+          // Distribución GYA precalculada para validación
+          distribucionBancos: {
+            bovedaMonte: montoBovedaMonte,
+            fletes: montoFletes,
+            utilidades: montoUtilidades,
+          },
         }
 
         logger.info('Creando venta en Firestore', { 
@@ -391,7 +403,7 @@ export function CreateVentaModalPremium({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          'max-w-4xl h-[90vh] p-0 overflow-hidden',
+          'max-w-4xl max-h-[85vh] p-0 overflow-hidden',
           'bg-black/60 backdrop-blur-2xl',
           'border border-white/10',
           'text-white',
@@ -417,7 +429,7 @@ export function CreateVentaModalPremium({
           />
         </div>
 
-        <div className="relative flex flex-col h-full">
+        <div className="relative flex flex-col min-h-0 flex-1">
           {/* ===== HEADER ===== */}
           <div className="relative h-24 border-b border-white/10 bg-gradient-to-r from-green-500/10 via-transparent to-emerald-500/10">
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />

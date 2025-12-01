@@ -24,11 +24,49 @@ import {
   Timestamp,
   writeBatch,
   increment,
+  setDoc,
   type Firestore,
 } from 'firebase/firestore'
 import { db } from './config'
 import type { Banco, OrdenCompra, Venta, Distribuidor, Cliente, Producto } from '@/app/types'
 import { logger } from '../utils/logger'
+
+// ============================================================
+// HELPER: Asegurar que un banco existe
+// ============================================================
+
+const BANCOS_DEFAULT: Record<string, Partial<Banco>> = {
+  boveda_monte: { nombre: 'Bóveda Monte', capitalActual: 0, historicoIngresos: 0, historicoGastos: 0 },
+  boveda_usa: { nombre: 'Bóveda USA', capitalActual: 0, historicoIngresos: 0, historicoGastos: 0 },
+  profit: { nombre: 'Profit', capitalActual: 0, historicoIngresos: 0, historicoGastos: 0 },
+  leftie: { nombre: 'Leftie', capitalActual: 0, historicoIngresos: 0, historicoGastos: 0 },
+  azteca: { nombre: 'Azteca', capitalActual: 0, historicoIngresos: 0, historicoGastos: 0 },
+  flete_sur: { nombre: 'Flete Sur', capitalActual: 0, historicoIngresos: 0, historicoGastos: 0 },
+  utilidades: { nombre: 'Utilidades', capitalActual: 0, historicoIngresos: 0, historicoGastos: 0 },
+}
+
+/**
+ * Asegura que un banco existe en Firestore, creándolo si es necesario
+ */
+const ensureBancoExists = async (bancoId: string): Promise<void> => {
+  if (!db) return
+  
+  const bancoRef = doc(db, COLLECTIONS.BANCOS, bancoId)
+  const bancoSnap = await getDoc(bancoRef)
+  
+  if (!bancoSnap.exists()) {
+    const defaultData = BANCOS_DEFAULT[bancoId] || { nombre: bancoId, capitalActual: 0, historicoIngresos: 0, historicoGastos: 0 }
+    await setDoc(bancoRef, {
+      id: bancoId,
+      ...defaultData,
+      historicoTransferencias: 0,
+      operaciones: [],
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    })
+    logger.info(`Banco ${bancoId} creado automáticamente`, { context: 'FirestoreService' })
+  }
+}
 
 // ============================================================
 // VERIFICACIÓN DE CONEXIÓN
@@ -292,6 +330,9 @@ export const crearOrdenCompra = async (data: CrearOrdenCompraInput) => {
 
     // Si hay pago, actualizar banco
     if ((ordenCompleta.pagoDistribuidor || 0) > 0 && ordenCompleta.bancoOrigen) {
+      // Asegurar que el banco existe
+      await ensureBancoExists(ordenCompleta.bancoOrigen)
+      
       const bancoRef = doc(db!, COLLECTIONS.BANCOS, ordenCompleta.bancoOrigen)
       batch.update(bancoRef, {
         capitalActual: increment(-(ordenCompleta.pagoDistribuidor || 0)),
@@ -353,10 +394,16 @@ type CrearVentaInput = Partial<Omit<Venta, 'id'>> & {
   cantidad: number
   precioTotalVenta?: number
   precioVenta?: number      // Precio unitario de venta
+  precioCompra?: number     // ✅ CRÍTICO: Precio de compra/costo para cálculo GYA
   producto?: string
   ocRelacionada?: string    // OC de donde viene el producto (para obtener costo)
   precioFlete?: number      // Flete por unidad
   fleteUtilidad?: number    // Flete total (alternativa)
+  distribucionBancos?: {    // Distribución precalculada (opcional, para validación)
+    bovedaMonte: number
+    fletes: number
+    utilidades: number
+  }
 }
 
 export const crearVenta = async (data: CrearVentaInput) => {
@@ -375,8 +422,13 @@ export const crearVenta = async (data: CrearVentaInput) => {
     let costoUnitarioBase = 0 // Costo por unidad (de la OC)
     let prodSnapshot: Awaited<ReturnType<typeof getDocs>> | null = null
     
-    // Intentar obtener costo desde la OC relacionada
-    if (data.ocRelacionada) {
+    // PRIORIDAD 1: Usar precioCompra pasado directamente desde el formulario
+    if (data.precioCompra && data.precioCompra > 0) {
+      costoUnitarioBase = data.precioCompra
+      logger.info(`Costo obtenido del formulario: $${costoUnitarioBase}`, { context: 'FirestoreService' })
+    }
+    // PRIORIDAD 2: Intentar obtener costo desde la OC relacionada
+    else if (data.ocRelacionada) {
       try {
         const ocDoc = await getDoc(doc(db!, COLLECTIONS.ORDENES_COMPRA, data.ocRelacionada))
         if (ocDoc.exists()) {
@@ -595,6 +647,13 @@ export const crearVenta = async (data: CrearVentaInput) => {
       const montoBovedaMonteReal = montoBovedaMonte * proporcionPagada
       const montoFleteReal = montoFlete * proporcionPagada
       const montoUtilidadReal = montoUtilidad * proporcionPagada
+      
+      // ⚡ ASEGURAR QUE LOS BANCOS EXISTEN ANTES DE ACTUALIZAR
+      await Promise.all([
+        montoBovedaMonteReal > 0 ? ensureBancoExists('boveda_monte') : Promise.resolve(),
+        montoFleteReal > 0 ? ensureBancoExists('flete_sur') : Promise.resolve(),
+        montoUtilidadReal > 0 ? ensureBancoExists('utilidades') : Promise.resolve(),
+      ])
       
       // 1. Ingreso a Bóveda Monte (recuperación de costo)
       if (montoBovedaMonteReal > 0) {
@@ -1004,15 +1063,18 @@ export const cobrarCliente = async (clienteId: string, ventaId: string, monto: n
     // Actualizar bancos (distribución proporcional)
     const proporcion = monto / ventaData.precioTotalVenta
 
-    const bovedaMonteRef = doc(db!, COLLECTIONS.BANCOS, 'bovedaMonte')
+    // Distribución a los 3 bancos (snake_case IDs)
+    const bovedaMonteRef = doc(db!, COLLECTIONS.BANCOS, 'boveda_monte')
     batch.update(bovedaMonteRef, {
       capitalActual: increment(ventaData.distribucionBancos.bovedaMonte * proporcion),
+      historicoIngresos: increment(ventaData.distribucionBancos.bovedaMonte * proporcion),
       updatedAt: Timestamp.now(),
     })
 
-    const fletesRef = doc(db!, COLLECTIONS.BANCOS, 'fletes')
+    const fletesRef = doc(db!, COLLECTIONS.BANCOS, 'flete_sur')
     batch.update(fletesRef, {
       capitalActual: increment(ventaData.distribucionBancos.fletes * proporcion),
+      historicoIngresos: increment(ventaData.distribucionBancos.fletes * proporcion),
       updatedAt: Timestamp.now(),
     })
 
@@ -1273,6 +1335,9 @@ export const crearIngreso = async (data: {
   }
   
   try {
+    // Asegurar que el banco existe
+    await ensureBancoExists(data.bancoDestino)
+    
     const batch = writeBatch(db!)
 
     // Crear documento de ingreso
@@ -1324,6 +1389,9 @@ export const crearGasto = async (data: {
   }
   
   try {
+    // Asegurar que el banco existe
+    await ensureBancoExists(data.bancoOrigen)
+    
     const batch = writeBatch(db!)
 
     // Crear documento de gasto
@@ -1378,6 +1446,12 @@ export const addTransferencia = async (data: TransferenciaData): Promise<string 
   }
   
   try {
+    // Asegurar que ambos bancos existen
+    await Promise.all([
+      ensureBancoExists(data.bancoOrigenId),
+      ensureBancoExists(data.bancoDestinoId),
+    ])
+    
     const batch = writeBatch(db!)
 
     // Crear documento en colección transferencias

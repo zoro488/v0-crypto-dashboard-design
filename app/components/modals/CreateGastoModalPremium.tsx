@@ -262,7 +262,7 @@ export function CreateGastoModalPremium({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          'max-w-3xl h-[85vh] p-0 overflow-hidden',
+          'max-w-3xl max-h-[85vh] p-0 overflow-hidden',
           'bg-black/60 backdrop-blur-2xl',
           'border border-white/10',
           'text-white',
@@ -288,7 +288,7 @@ export function CreateGastoModalPremium({
           />
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="relative flex flex-col h-full">
+        <form onSubmit={handleSubmit(onSubmit)} className="relative flex flex-col min-h-0 flex-1">
           {/* ===== HEADER ===== */}
           <div className="relative h-24 border-b border-white/10 bg-gradient-to-r from-red-500/10 via-transparent to-orange-500/10">
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
