@@ -90,14 +90,8 @@ const gestionItems: PanelItem[] = [
   { id: 'ia', label: 'Asistente IA', icon: Sparkles, color: 'from-violet-500 to-purple-600', description: 'Inteligencia artificial' },
 ]
 
-const splineItems: DropdownItem[] = [
-  { id: '3d_dropdown', label: '3D Dropdown Menu', icon: Box, color: 'from-cyan-500 to-blue-500' },
-  { id: 'glass_buttons', label: 'Glass Buttons', icon: Layers, color: 'from-purple-500 to-pink-500' },
-  { id: 'ai_orb', label: 'AI Voice Orb', icon: Sparkles, color: 'from-violet-500 to-fuchsia-500' },
-  { id: 'fire_portal', label: 'Fire Portal', icon: Zap, color: 'from-orange-500 to-red-500' },
-  { id: 'nexbot', label: 'Nexbot Robot', icon: Activity, color: 'from-green-500 to-emerald-500' },
-  { id: 'particle_nebula', label: 'Particle Nebula', icon: Eye, color: 'from-indigo-500 to-purple-500' },
-]
+// Componentes 3D Spline ahora están integrados directamente en los paneles principales
+// Ver: BentoIA (AI Voice Orb), BentoDashboard (Glass Buttons), BentoVentas (Fire Portal), etc.
 
 // ============================================================
 // COMPONENTE: Dropdown Mega Menu
@@ -217,121 +211,6 @@ const MegaDropdown = ({
                     </motion.button>
                   )
                 })}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  )
-}
-
-// ============================================================
-// COMPONENTE: Spline Dropdown
-// ============================================================
-interface SplineDropdownProps {
-  isOpen: boolean
-  onToggle: () => void
-  onClose: () => void
-}
-
-const SplineDropdown = ({ isOpen, onToggle, onClose }: SplineDropdownProps) => {
-  const dropdownRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        onClose()
-      }
-    }
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [isOpen, onClose])
-
-  return (
-    <div ref={dropdownRef} className="relative">
-      <motion.button
-        onClick={onToggle}
-        className={`
-          flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all
-          bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20
-          ${isOpen ? 'text-white' : 'text-purple-300 hover:text-white'}
-        `}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-      >
-        <Box className="w-4 h-4" />
-        <span className="hidden md:inline">3D</span>
-        <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
-      </motion.button>
-
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="absolute top-full right-0 mt-2 z-50"
-          >
-            <div className="bg-black/90 backdrop-blur-2xl border border-purple-500/20 rounded-2xl shadow-2xl shadow-purple-500/10 overflow-hidden w-64">
-              {/* Header */}
-              <div className="px-4 py-3 border-b border-white/5 bg-gradient-to-r from-purple-500/10 to-pink-500/10">
-                <div className="flex items-center gap-2">
-                  <motion.div 
-                    className="p-1.5 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500"
-                    animate={{ rotate: [0, 360] }}
-                    transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                  >
-                    <Box className="w-4 h-4 text-white" />
-                  </motion.div>
-                  <span className="text-sm font-semibold text-white">Componentes 3D Spline</span>
-                </div>
-              </div>
-
-              {/* Items */}
-              <div className="p-2 space-y-1">
-                {splineItems.map((item, index) => {
-                  const ItemIcon = item.icon
-                  return (
-                    <motion.button
-                      key={item.id}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      onClick={() => {
-                        window.open(`/demo-3d?component=${item.id}`, '_blank')
-                        onClose()
-                      }}
-                      className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-white/5 transition-all group"
-                    >
-                      <div className={`p-2 rounded-lg bg-gradient-to-br ${item.color} shadow-lg group-hover:scale-110 transition-transform`}>
-                        <ItemIcon className="w-4 h-4 text-white" />
-                      </div>
-                      <span className="text-sm text-white/80 group-hover:text-white transition-colors">
-                        {item.label}
-                      </span>
-                    </motion.button>
-                  )
-                })}
-              </div>
-
-              {/* Footer */}
-              <div className="px-4 py-3 border-t border-white/5 bg-white/5">
-                <motion.button
-                  onClick={() => {
-                    window.open('/demo-3d', '_blank')
-                    onClose()
-                  }}
-                  className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-medium hover:opacity-90 transition-opacity"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Eye className="w-4 h-4" />
-                  Ver Galería Completa
-                </motion.button>
               </div>
             </div>
           </motion.div>
@@ -652,13 +531,6 @@ export default function ChronosHeader() {
               onSelect={setCurrentPanel}
               currentPanel={currentPanel}
               columns={1}
-            />
-
-            {/* Spline 3D Dropdown */}
-            <SplineDropdown
-              isOpen={activeDropdown === 'spline'}
-              onToggle={() => handleDropdownToggle('spline')}
-              onClose={() => setActiveDropdown(null)}
             />
           </nav>
 
