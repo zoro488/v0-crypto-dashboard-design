@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { Users, AlertTriangle, CheckCircle2, Clock, DollarSign, Plus, TrendingUp, BarChart3, Activity, Zap } from 'lucide-react'
+import { Users, AlertTriangle, CheckCircle2, Clock, DollarSign, Plus, TrendingUp, BarChart3, Activity, Zap, Sparkles } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 import { Badge } from '@/app/components/ui/badge'
 import { useClientes } from '@/app/lib/firebase/firestore-hooks.service'
@@ -15,6 +15,7 @@ import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/
 import { QuickStatWidget } from '@/app/components/widgets/QuickStatWidget'
 import { MiniChartWidget } from '@/app/components/widgets/MiniChartWidget'
 import { ActivityFeedWidget, ActivityItem } from '@/app/components/widgets/ActivityFeedWidget'
+import { Panel3DWrapper } from '@/app/components/3d/Panel3DWrapper'
 
 // Interface para cliente
 interface ClienteData {
@@ -392,18 +393,36 @@ export default function BentoClientes() {
       />
       <CreateAbonoModalPremium open={showAbonoModal} onClose={() => setShowAbonoModal(false)} /> {/* Add Abono Modal */}
 
-      {/* Client Network Graph - Premium Visualization */}
+      {/* Client Network Graph - Premium Visualization con 3D */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9 }}
         className="glass p-6 rounded-2xl border border-white/5 bg-black/20 mt-6"
       >
-        <div className="mb-4">
-          <h3 className="text-xl font-bold text-white">Red de Clientes</h3>
-          <p className="text-sm text-white/60">Grafo interactivo de relaciones comerciales</p>
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+              Red de Clientes
+              <Sparkles className="w-4 h-4 text-cyan-400" />
+            </h3>
+            <p className="text-sm text-white/60">Grafo interactivo de relaciones comerciales</p>
+          </div>
         </div>
-        <ClientNetworkGraph width={900} height={600} className="w-full" />
+        {/* Sección 3D Premium */}
+        <div className="mb-4 rounded-xl overflow-hidden border border-cyan-500/20">
+          <Panel3DWrapper
+            componentType="AnalyticsGlobe3D"
+            fallback={
+              <div className="h-[180px] bg-gradient-to-br from-cyan-500/5 to-blue-500/5 flex items-center justify-center">
+                <Users className="w-12 h-12 text-cyan-400/30" />
+              </div>
+            }
+            height="180px"
+            className="bg-black/40"
+          />
+        </div>
+        <ClientNetworkGraph width={900} height={500} className="w-full" />
       </motion.div>
     </div>
   )

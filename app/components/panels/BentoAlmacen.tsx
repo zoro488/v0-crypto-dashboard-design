@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Package, TrendingUp, TrendingDown, Archive, Scissors, Plus, Box, Activity, 
   BarChart3, Zap, RefreshCw, Search, Filter, Calendar, Download, Eye,
-  ArrowUpRight, ArrowDownRight, Layers, AlertTriangle, CheckCircle2,
+  ArrowUpRight, ArrowDownRight, Layers, AlertTriangle, CheckCircle2, Sparkles,
   type LucideIcon,
 } from 'lucide-react'
 import { useState, useMemo, useCallback } from 'react'
@@ -21,6 +21,7 @@ import {
   AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, 
   Tooltip, PieChart, Pie, Cell, CartesianGrid, Legend, 
 } from 'recharts'
+import { Panel3DWrapper } from '@/app/components/3d/Panel3DWrapper'
 
 // ============================================================================
 // INTERFACES
@@ -1017,6 +1018,29 @@ export default function BentoAlmacen() {
             color="from-amber-500/20 to-orange-500/20"
           />
         </div>
+
+        {/* Visualización 3D Premium */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="rounded-2xl border border-white/10 overflow-hidden bg-gradient-to-br from-cyan-500/5 to-purple-500/5"
+        >
+          <div className="p-4 border-b border-white/10 flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-cyan-400" />
+            <span className="text-white font-semibold">Visualización de Inventario</span>
+          </div>
+          <Panel3DWrapper
+            componentType="WorkflowVisualizer3D"
+            fallback={
+              <div className="h-[160px] bg-gradient-to-br from-cyan-500/5 to-blue-500/5 flex items-center justify-center">
+                <Package className="w-12 h-12 text-cyan-400/30" />
+              </div>
+            }
+            height="160px"
+            className="bg-black/40"
+          />
+        </motion.div>
 
         {/* Navegación de Tabs */}
         <div className="flex gap-2 p-1 rounded-xl bg-white/5 border border-white/10 overflow-x-auto">
