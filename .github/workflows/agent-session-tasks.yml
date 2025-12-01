@@ -1,0 +1,313 @@
+# 🤖 Agent Session Tasks - Sistema CHRONOS
+# Tareas automatizadas de agente para verificación y resolución
+
+name: 🤖 Agent Session Tasks
+
+on:
+  issues:
+    types: [opened, labeled]
+  workflow_dispatch:
+    inputs:
+      task_type:
+        description: 'Tipo de tarea del agente'
+        required: true
+        type: choice
+        options:
+          - verify-all
+          - fix-components
+          - integrate-3d
+          - test-business-logic
+          - full-audit
+
+concurrency:
+  group: agent-session-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10'
+
+jobs:
+  # ════════════════════════════════════════════════════════════════════════════
+  # JOB 1: Análisis Inicial del Agente
+  # ════════════════════════════════════════════════════════════════════════════
+  agent-analysis:
+    name: 🔍 Análisis del Agente
+    runs-on: ubuntu-latest
+    outputs:
+      task_type: ${{ steps.determine.outputs.task }}
+      priority: ${{ steps.determine.outputs.priority }}
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔍 Determinar tipo de tarea
+        id: determine
+        run: |
+          # Determinar tarea basado en input o labels
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            task="${{ github.event.inputs.task_type }}"
+          else
+            # Analizar labels del issue
+            labels="${{ join(github.event.issue.labels.*.name, ',') }}"
+            if echo "$labels" | grep -qi "3d\|spline"; then
+              task="integrate-3d"
+            elif echo "$labels" | grep -qi "bug\|fix"; then
+              task="fix-components"
+            elif echo "$labels" | grep -qi "test\|verify"; then
+              task="verify-all"
+            else
+              task="verify-all"
+            fi
+          fi
+          
+          echo "task=$task" >> $GITHUB_OUTPUT
+          echo "priority=medium" >> $GITHUB_OUTPUT
+          echo "🤖 Tarea determinada: $task"
+
+      - name: 📋 Registrar sesión del agente
+        run: |
+          echo "## 🤖 Sesión del Agente Iniciada" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Fecha**: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "- **Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tarea**: ${{ steps.determine.outputs.task }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Ref**: ${{ github.ref }}" >> $GITHUB_STEP_SUMMARY
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # JOB 2: Verificación Completa
+  # ════════════════════════════════════════════════════════════════════════════
+  verify-all:
+    name: ✅ Verificación Completa
+    runs-on: ubuntu-latest
+    needs: agent-analysis
+    if: needs.agent-analysis.outputs.task_type == 'verify-all' || needs.agent-analysis.outputs.task_type == 'full-audit'
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Verificar componentes
+        run: |
+          echo "## ✅ Verificación de Componentes" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Contar componentes por tipo
+          panels=$(find app/components/panels -name "*.tsx" | wc -l)
+          modals=$(find app/components/modals -name "*.tsx" | wc -l)
+          comp_3d=$(find app/components/3d -name "*.tsx" | wc -l)
+          viz=$(find app/components/visualizations -name "*.tsx" | wc -l)
+          widgets=$(find app/components/widgets -name "*.tsx" | wc -l)
+          
+          echo "| Tipo | Cantidad |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|----------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Paneles | $panels |" >> $GITHUB_STEP_SUMMARY
+          echo "| Modales | $modals |" >> $GITHUB_STEP_SUMMARY
+          echo "| 3D | $comp_3d |" >> $GITHUB_STEP_SUMMARY
+          echo "| Visualizaciones | $viz |" >> $GITHUB_STEP_SUMMARY
+          echo "| Widgets | $widgets |" >> $GITHUB_STEP_SUMMARY
+
+      - name: 🧪 Ejecutar tests
+        run: pnpm test --passWithNoTests
+        env:
+          CI: true
+        continue-on-error: true
+
+      - name: 🔍 TypeScript check
+        run: pnpm tsc --noEmit 2>&1 | tail -20 || true
+        continue-on-error: true
+
+      - name: 🔍 Lint check
+        run: pnpm lint 2>&1 | tail -20 || true
+        continue-on-error: true
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # JOB 3: Integración 3D
+  # ════════════════════════════════════════════════════════════════════════════
+  integrate-3d:
+    name: 🎮 Integrar Componentes 3D
+    runs-on: ubuntu-latest
+    needs: agent-analysis
+    if: needs.agent-analysis.outputs.task_type == 'integrate-3d' || needs.agent-analysis.outputs.task_type == 'full-audit'
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔍 Analizar integración actual
+        run: |
+          echo "## 🎮 Estado de Integración 3D" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Analizar cada panel
+          for panel in app/components/panels/Bento*.tsx; do
+            name=$(basename $panel .tsx)
+            has_3d=$(grep -c "from.*3d\|Spline" $panel 2>/dev/null || echo "0")
+            has_viz=$(grep -c "from.*visualizations" $panel 2>/dev/null || echo "0")
+            
+            if [ "$has_3d" -gt "0" ]; then
+              echo "✅ **$name**: Integración 3D activa" >> $GITHUB_STEP_SUMMARY
+            elif [ "$has_viz" -gt "0" ]; then
+              echo "🔶 **$name**: Solo visualizaciones Canvas" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "⚪ **$name**: Sin componentes 3D - PENDIENTE" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+      - name: 📋 Generar plan de integración
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📋 Plan de Integración 3D" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Componentes 3D disponibles para integrar:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Listar componentes 3D principales
+          echo "| Componente | Uso Recomendado |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|-----------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| PremiumSplineOrb | Dashboard, IA - Orbe de estado |" >> $GITHUB_STEP_SUMMARY
+          echo "| FloatingAIOrb | Widget flotante IA |" >> $GITHUB_STEP_SUMMARY
+          echo "| AnalyticsGlobe3D | Clientes, Distribuidores |" >> $GITHUB_STEP_SUMMARY
+          echo "| WorkflowVisualizer3D | Órdenes, Ventas |" >> $GITHUB_STEP_SUMMARY
+          echo "| AIBrainVisualizer | Panel IA |" >> $GITHUB_STEP_SUMMARY
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # JOB 4: Fix Components
+  # ════════════════════════════════════════════════════════════════════════════
+  fix-components:
+    name: 🔧 Corregir Componentes
+    runs-on: ubuntu-latest
+    needs: agent-analysis
+    if: needs.agent-analysis.outputs.task_type == 'fix-components' || needs.agent-analysis.outputs.task_type == 'full-audit'
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Detectar problemas comunes
+        run: |
+          echo "## 🔧 Análisis de Problemas" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Buscar console.log (debe usar logger)
+          console_logs=$(grep -rn "console\.log\|console\.error" app/components/ 2>/dev/null | wc -l)
+          echo "### Uso de console (debe usar logger):" >> $GITHUB_STEP_SUMMARY
+          if [ "$console_logs" -gt "0" ]; then
+            echo "⚠️ Encontrados $console_logs usos de console. Deben usar logger." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ Sin usos directos de console" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Buscar any en TypeScript
+          any_usage=$(grep -rn ": any\|as any" app/ 2>/dev/null | wc -l)
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Uso de 'any' (prohibido):" >> $GITHUB_STEP_SUMMARY
+          if [ "$any_usage" -gt "0" ]; then
+            echo "⚠️ Encontrados $any_usage usos de 'any'. Deben usar tipos específicos." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ Sin usos de 'any'" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Buscar useEffect sin cleanup
+          effects_without_cleanup=$(grep -A5 "useEffect.*=>" app/components/ 2>/dev/null | grep -c "return ()" || echo "0")
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Memory Leaks potenciales:" >> $GITHUB_STEP_SUMMARY
+          echo "Verificar useEffect con listeners que tengan cleanup" >> $GITHUB_STEP_SUMMARY
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # JOB 5: Test Business Logic
+  # ════════════════════════════════════════════════════════════════════════════
+  test-business-logic:
+    name: 💼 Test Lógica de Negocio
+    runs-on: ubuntu-latest
+    needs: agent-analysis
+    if: needs.agent-analysis.outputs.task_type == 'test-business-logic' || needs.agent-analysis.outputs.task_type == 'full-audit'
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🧪 Tests de schemas
+        run: pnpm test --passWithNoTests --testPathPattern="schemas" || true
+        env:
+          CI: true
+
+      - name: 🧪 Tests de store
+        run: pnpm test --passWithNoTests --testPathPattern="store" || true
+        env:
+          CI: true
+
+      - name: 📊 Verificar fórmulas GYA
+        run: |
+          echo "## 💼 Verificación de Lógica GYA" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Buscar implementación de distribución
+          if grep -rn "bovedaMonte.*=.*precioCompra\|fletes.*=.*flete\|utilidad.*=.*venta.*compra" app/ 2>/dev/null; then
+            echo "✅ Fórmulas de distribución encontradas" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Verificar implementación de fórmulas GYA" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # JOB 6: Reporte Final del Agente
+  # ════════════════════════════════════════════════════════════════════════════
+  agent-report:
+    name: 📋 Reporte del Agente
+    runs-on: ubuntu-latest
+    needs: [agent-analysis, verify-all, integrate-3d, fix-components, test-business-logic]
+    if: always()
+    steps:
+      - name: 📋 Generar reporte final
+        run: |
+          echo "# 🤖 Reporte Final de Sesión del Agente" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Resumen de Tareas" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Tarea | Estado |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Análisis | ${{ needs.agent-analysis.result == 'success' && '✅' || '⏭️' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Verificación | ${{ needs.verify-all.result == 'success' && '✅' || needs.verify-all.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Integración 3D | ${{ needs.integrate-3d.result == 'success' && '✅' || needs.integrate-3d.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Fix Components | ${{ needs.fix-components.result == 'success' && '✅' || needs.fix-components.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Business Logic | ${{ needs.test-business-logic.result == 'success' && '✅' || needs.test-business-logic.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📅 Completado: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY

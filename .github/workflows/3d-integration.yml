@@ -1,0 +1,223 @@
+# 🎮 3D Integration Workflow - Sistema CHRONOS
+# Integra componentes 3D de Spline en paneles principales
+
+name: 🎮 3D Integration
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'app/components/3d/**'
+      - 'app/components/panels/**'
+      - '*.spline'
+      - '*.splinecode'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app/components/3d/**'
+      - 'app/components/panels/**'
+  workflow_dispatch:
+
+concurrency:
+  group: 3d-integration-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10'
+
+jobs:
+  # ════════════════════════════════════════════════════════════════════════════
+  # JOB 1: Inventario de Assets 3D
+  # ════════════════════════════════════════════════════════════════════════════
+  inventory-3d-assets:
+    name: 📦 Inventario Assets 3D
+    runs-on: ubuntu-latest
+    outputs:
+      spline_count: ${{ steps.count.outputs.spline }}
+      components_3d: ${{ steps.components.outputs.list }}
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📊 Contar assets Spline
+        id: count
+        run: |
+          spline_count=$(find . -maxdepth 1 -name "*.spline" -o -name "*.splinecode" | wc -l)
+          echo "spline=$spline_count" >> $GITHUB_OUTPUT
+          echo "🎮 Assets Spline encontrados: $spline_count"
+
+      - name: 📋 Listar componentes 3D
+        id: components
+        run: |
+          # Generar lista de componentes
+          components=$(find app/components/3d -name "*.tsx" -exec basename {} .tsx \; | sort | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          echo "list=$components" >> $GITHUB_OUTPUT
+          
+          echo "## 🎮 Inventario 3D" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Assets Spline:" >> $GITHUB_STEP_SUMMARY
+          find . -maxdepth 1 \( -name "*.spline" -o -name "*.splinecode" \) -exec basename {} \; | while read f; do
+            echo "- 🎨 \`$f\`" >> $GITHUB_STEP_SUMMARY
+          done
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Componentes React 3D:" >> $GITHUB_STEP_SUMMARY
+          find app/components/3d -name "*.tsx" -exec basename {} .tsx \; | sort | while read f; do
+            echo "- 🧊 \`$f\`" >> $GITHUB_STEP_SUMMARY
+          done
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # JOB 2: Verificar Integración en Paneles
+  # ════════════════════════════════════════════════════════════════════════════
+  check-integration:
+    name: 🔗 Verificar Integración
+    runs-on: ubuntu-latest
+    needs: inventory-3d-assets
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔍 Analizar integración 3D en paneles
+        run: |
+          echo "## 🔗 Estado de Integración 3D" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Panel | 3D Components | Spline | Visualizations | Estado |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------------|--------|----------------|--------|" >> $GITHUB_STEP_SUMMARY
+          
+          for panel in app/components/panels/Bento*.tsx; do
+            name=$(basename $panel .tsx)
+            
+            # Contar imports
+            comp_3d=$(grep -c "from.*components/3d" $panel 2>/dev/null || echo "0")
+            spline=$(grep -c "Spline\|spline" $panel 2>/dev/null || echo "0")
+            viz=$(grep -c "from.*visualizations" $panel 2>/dev/null || echo "0")
+            
+            # Determinar estado
+            if [ "$comp_3d" -gt "0" ] || [ "$spline" -gt "0" ]; then
+              status="✅ Integrado"
+            elif [ "$viz" -gt "0" ]; then
+              status="🔶 Solo Viz"
+            else
+              status="⚪ Pendiente"
+            fi
+            
+            echo "| $name | $comp_3d | $spline | $viz | $status |" >> $GITHUB_STEP_SUMMARY
+          done
+
+      - name: 🎯 Componentes 3D recomendados por panel
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 🎯 Recomendaciones de Integración" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Panel | Componente 3D Recomendado | Descripción |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------------------------|-------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| BentoDashboard | PremiumSplineOrb, FloatingAIOrb | Orbe central de estado |" >> $GITHUB_STEP_SUMMARY
+          echo "| BentoVentas | SalesFlowDiagram, WorkflowVisualizer3D | Flujo de ventas animado |" >> $GITHUB_STEP_SUMMARY
+          echo "| BentoClientes | ClientNetworkGraph, AnalyticsGlobe3D | Red de clientes |" >> $GITHUB_STEP_SUMMARY
+          echo "| BentoAlmacen | InventoryHeatGrid | Mapa de calor de inventario |" >> $GITHUB_STEP_SUMMARY
+          echo "| BentoBanco | FinancialRiverFlow | Flujo de capital |" >> $GITHUB_STEP_SUMMARY
+          echo "| BentoIA | AIBrainVisualizer, AIAgentScene | Cerebro IA animado |" >> $GITHUB_STEP_SUMMARY
+          echo "| BentoOrdenesCompra | WorkflowVisualizer3D | Pipeline de órdenes |" >> $GITHUB_STEP_SUMMARY
+          echo "| BentoReportes | ReportsTimeline, ProfitWaterfallChart | Timeline de reportes |" >> $GITHUB_STEP_SUMMARY
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # JOB 3: Build y Verificar Renderizado
+  # ════════════════════════════════════════════════════════════════════════════
+  build-verify:
+    name: 🏗️ Build y Verificar
+    runs-on: ubuntu-latest
+    needs: [inventory-3d-assets, check-integration]
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 TypeScript Check componentes 3D
+        run: |
+          echo "## 🔍 TypeScript Check" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Check específico de componentes 3D
+          if pnpm tsc --noEmit 2>&1 | grep -E "app/components/3d|app/components/visualizations"; then
+            echo "⚠️ Errores TypeScript en componentes 3D detectados" >> $GITHUB_STEP_SUMMARY
+            pnpm tsc --noEmit 2>&1 | grep -E "app/components/3d|app/components/visualizations" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ Sin errores TypeScript en componentes 3D" >> $GITHUB_STEP_SUMMARY
+          fi
+        continue-on-error: true
+
+      - name: 🏗️ Build Application
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY || 'mock-api-key' }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'mock.firebaseapp.com' }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'mock-project' }}
+        continue-on-error: true
+
+      - name: 📊 Analizar bundle 3D
+        if: success()
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📊 Análisis de Bundle" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -d ".next" ]; then
+            echo "Build completado exitosamente ✅" >> $GITHUB_STEP_SUMMARY
+            
+            # Tamaño de chunks relacionados con 3D
+            find .next -name "*.js" -exec du -h {} \; 2>/dev/null | sort -rh | head -10 >> $GITHUB_STEP_SUMMARY || true
+          else
+            echo "⚠️ Build no generó output" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # JOB 4: Crear Issues para Paneles sin 3D
+  # ════════════════════════════════════════════════════════════════════════════
+  create-integration-issues:
+    name: 📝 Crear Issues de Integración
+    runs-on: ubuntu-latest
+    needs: check-integration
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📝 Identificar paneles sin integración 3D
+        id: identify
+        run: |
+          # Lista de paneles que necesitan integración
+          panels_needing_3d=""
+          
+          for panel in app/components/panels/Bento*.tsx; do
+            name=$(basename $panel .tsx)
+            comp_3d=$(grep -c "from.*components/3d" $panel 2>/dev/null || echo "0")
+            
+            if [ "$comp_3d" -eq "0" ]; then
+              panels_needing_3d="$panels_needing_3d $name"
+            fi
+          done
+          
+          echo "panels=$panels_needing_3d" >> $GITHUB_OUTPUT
+
+      - name: 📋 Resumen de trabajo pendiente
+        run: |
+          echo "## 📋 Paneles Pendientes de Integración 3D" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.identify.outputs.panels }}" | tr ' ' '\n' | while read panel; do
+            if [ -n "$panel" ]; then
+              echo "- [ ] $panel" >> $GITHUB_STEP_SUMMARY
+            fi
+          done

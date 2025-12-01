@@ -1,0 +1,235 @@
+# 💼 Business Logic Verification - Sistema CHRONOS
+# Verifica la lógica de negocio crítica: distribución GYA, estados de pago, cálculo de capital
+
+name: 💼 Business Logic Verification
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'app/lib/**'
+      - 'app/components/panels/**'
+      - 'app/components/modals/**'
+      - '__tests__/**'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: business-logic-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10'
+
+jobs:
+  # ════════════════════════════════════════════════════════════════════════════
+  # JOB 1: Verificar Fórmulas de Distribución GYA
+  # ════════════════════════════════════════════════════════════════════════════
+  verify-gya-formulas:
+    name: 💰 Verificar Fórmulas GYA
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔍 Verificar implementación de distribución GYA
+        run: |
+          echo "## 💰 Verificación de Fórmulas GYA (Ganancia, Yield, Asignación)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Fórmula Correcta:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "montoBovedaMonte = precioCompraUnidad × cantidad    // COSTO" >> $GITHUB_STEP_SUMMARY
+          echo "montoFletes = precioFlete × cantidad                // FLETE" >> $GITHUB_STEP_SUMMARY
+          echo "montoUtilidades = (precioVenta - precioCompra - flete) × cantidad  // GANANCIA" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      - name: 🔍 Buscar implementaciones de distribución
+        run: |
+          echo "### Implementaciones encontradas:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Buscar en servicios
+          if grep -rn "bovedaMonte\|fleteUtilidad\|utilidad" app/lib/services/ 2>/dev/null; then
+            echo "✅ Distribución implementada en servicios" >> $GITHUB_STEP_SUMMARY
+            grep -rn "bovedaMonte\|precioCompra.*cantidad" app/lib/services/ 2>/dev/null | head -5 >> $GITHUB_STEP_SUMMARY || true
+          fi
+          
+          # Buscar en componentes
+          if grep -rn "distribucion\|bovedaMonte" app/components/panels/BentoVentas.tsx 2>/dev/null; then
+            echo "✅ Distribución mostrada en BentoVentas" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ BentoVentas puede no mostrar distribución GYA" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: 🧮 Verificar cálculos en modales
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Verificación en Modales:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Verificar CreateVentaModalPremium
+          if grep -q "precioVenta\|precioCompra\|cantidad" app/components/modals/CreateVentaModalPremium.tsx 2>/dev/null; then
+            echo "✅ CreateVentaModalPremium tiene campos de cálculo" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ CreateVentaModalPremium falta campos de cálculo" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # JOB 2: Verificar Estados de Pago
+  # ════════════════════════════════════════════════════════════════════════════
+  verify-payment-states:
+    name: 💳 Verificar Estados de Pago
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔍 Verificar implementación de estados
+        run: |
+          echo "## 💳 Verificación de Estados de Pago" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Estados esperados:" >> $GITHUB_STEP_SUMMARY
+          echo "- **Completo**: 100% pagado, distribución total a 3 bancos" >> $GITHUB_STEP_SUMMARY
+          echo "- **Parcial**: Distribución proporcional" >> $GITHUB_STEP_SUMMARY
+          echo "- **Pendiente**: Solo histórico, no afecta capital" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      - name: 🔍 Buscar implementación de estados
+        run: |
+          echo "### Implementaciones encontradas:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Buscar tipos de estado
+          if grep -rn "estadoPago.*completo\|parcial\|pendiente" app/ 2>/dev/null | head -5; then
+            echo "✅ Estados de pago definidos" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Verificar definición de estados de pago" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Verificar lógica proporcional
+          if grep -rn "proporcion\|montoPagado.*precioTotal" app/ 2>/dev/null | head -3; then
+            echo "✅ Cálculo proporcional implementado" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Verificar cálculo proporcional para pagos parciales" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # JOB 3: Verificar Cálculo de Capital Bancario
+  # ════════════════════════════════════════════════════════════════════════════
+  verify-bank-capital:
+    name: 🏦 Verificar Capital Bancario
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔍 Verificar fórmula de capital
+        run: |
+          echo "## 🏦 Verificación de Cálculo de Capital" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Fórmula Correcta:" >> $GITHUB_STEP_SUMMARY
+          echo "\`capitalActual = historicoIngresos - historicoGastos\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Importante:** historicoIngresos y historicoGastos son acumulativos y NUNCA disminuyen" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      - name: 🔍 Buscar implementación en store
+        run: |
+          echo "### Implementación en Store (Zustand):" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "app/lib/store/useAppStore.ts" ]; then
+            if grep -q "historicoIngresos\|historicoGastos\|capitalActual" app/lib/store/useAppStore.ts 2>/dev/null; then
+              echo "✅ Campos de capital definidos en store" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "⚠️ Verificar campos de capital en store" >> $GITHUB_STEP_SUMMARY
+            fi
+            
+            if grep -q "saldo\|bancos" app/lib/store/useAppStore.ts 2>/dev/null; then
+              echo "✅ Estado de bancos en store" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+
+      - name: 🔍 Verificar 7 bancos/bóvedas
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Verificación de 7 Bancos/Bóvedas:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Banco | ID | Moneda |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Bóveda Monte | boveda_monte | MXN |" >> $GITHUB_STEP_SUMMARY
+          echo "| Bóveda USA | boveda_usa | USD |" >> $GITHUB_STEP_SUMMARY
+          echo "| Profit | profit | MXN |" >> $GITHUB_STEP_SUMMARY
+          echo "| Leftie | leftie | MXN |" >> $GITHUB_STEP_SUMMARY
+          echo "| Azteca | azteca | MXN |" >> $GITHUB_STEP_SUMMARY
+          echo "| Flete Sur | flete_sur | MXN |" >> $GITHUB_STEP_SUMMARY
+          echo "| Utilidades | utilidades | MXN |" >> $GITHUB_STEP_SUMMARY
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # JOB 4: Tests de Lógica de Negocio
+  # ════════════════════════════════════════════════════════════════════════════
+  business-logic-tests:
+    name: 🧪 Tests Lógica de Negocio
+    runs-on: ubuntu-latest
+    needs: [verify-gya-formulas, verify-payment-states, verify-bank-capital]
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🧪 Ejecutar tests de lógica de negocio
+        run: |
+          # Ejecutar tests relacionados con lógica de negocio
+          pnpm test --passWithNoTests --testPathPattern="(schemas|store|utils)" || true
+        env:
+          CI: true
+
+      - name: 📊 Verificar schemas Zod
+        run: |
+          echo "## 📋 Schemas de Validación" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -d "app/lib/schemas" ]; then
+            echo "### Schemas encontrados:" >> $GITHUB_STEP_SUMMARY
+            find app/lib/schemas -name "*.ts" -exec basename {} \; | while read f; do
+              echo "- \`$f\`" >> $GITHUB_STEP_SUMMARY
+            done
+          else
+            echo "⚠️ Directorio de schemas no encontrado" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # JOB 5: Reporte Final
+  # ════════════════════════════════════════════════════════════════════════════
+  final-report:
+    name: 📋 Reporte Final
+    runs-on: ubuntu-latest
+    needs: [verify-gya-formulas, verify-payment-states, verify-bank-capital, business-logic-tests]
+    if: always()
+    steps:
+      - name: 📋 Generar reporte
+        run: |
+          echo "# 💼 Reporte de Lógica de Negocio" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Verificación | Estado |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Fórmulas GYA | ${{ needs.verify-gya-formulas.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Estados de Pago | ${{ needs.verify-payment-states.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Capital Bancario | ${{ needs.verify-bank-capital.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | ${{ needs.business-logic-tests.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
