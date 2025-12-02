@@ -24,7 +24,7 @@ import {
 } from 'recharts'
 import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/components/ui/SafeChartContainer'
 import { useState, useEffect, useMemo, useCallback, memo } from 'react'
-import { useVentas, useOrdenesCompra, useProductos, useClientes } from '@/app/lib/firebase/firestore-hooks.service'
+import { useVentas, useOrdenesCompra, useProductos, useClientes, useBancosData } from '@/app/lib/firebase/firestore-hooks.service'
 import { Skeleton } from '@/app/components/ui/skeleton'
 import { CreateOrdenCompraModalPremium } from '@/app/components/modals/CreateOrdenCompraModalPremium'
 import { CreateVentaModalPremium } from '@/app/components/modals/CreateVentaModalPremium'
@@ -88,10 +88,23 @@ const CustomTooltip = memo(function CustomTooltip({ active, payload, label }: Cu
 })
 
 export default memo(function BentoDashboard() {
-  const { bancos } = useAppStore()
+  // 📦 Usar hook de bancos que lee de localStorage/Firebase
+  const { data: bancosData, loading: loadingBancos } = useBancosData()
   const { data: ventasRaw, loading: loadingVentas } = useVentas()
   const { data: ordenesCompraRaw, loading: loadingOC } = useOrdenesCompra()
   const { data: productosRaw, loading: loadingProductos } = useProductos()
+
+  // Transformar datos de bancos
+  const bancos = useMemo(() => {
+    return (bancosData || []).map((b: Record<string, unknown>) => ({
+      id: (b.id as string) || '',
+      nombre: (b.nombre as string) || 'Sin nombre',
+      saldo: typeof b.saldo === 'number' ? b.saldo : (typeof b.capitalActual === 'number' ? b.capitalActual : 0),
+      capitalActual: typeof b.capitalActual === 'number' ? b.capitalActual : 0,
+      historicoIngresos: typeof b.historicoIngresos === 'number' ? b.historicoIngresos : 0,
+      historicoGastos: typeof b.historicoGastos === 'number' ? b.historicoGastos : 0,
+    }))
+  }, [bancosData])
 
   // Casting seguro
   const ventas = ventasRaw as VentaData[] | undefined
