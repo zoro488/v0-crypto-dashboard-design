@@ -64,6 +64,20 @@
 <!-- Enlaza los issues que este PR cierra -->
 Closes #
 
+## 🤖 Comandos de Automatización
+
+<!-- Puedes usar estos comandos en los comentarios del PR -->
+| Comando | Descripción |
+|---------|-------------|
+| `/auto-fix` | Aplica auto-fix de ESLint y Prettier automáticamente |
+| `/rerun-tests` | Re-ejecuta todos los tests fallidos |
+| `/skip-e2e` | Omite los tests E2E en esta validación |
+
+## 📊 Estado de CI/CD
+
+<!-- Este bloque se actualizará automáticamente por el bot -->
+> ⏳ Esperando ejecución del workflow de CI/CD...
+
 ## 📝 Notas Adicionales
 
 <!-- Cualquier contexto adicional que los reviewers deban saber -->
