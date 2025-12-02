@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 import { Badge } from '@/app/components/ui/badge'
-import { useDistribuidores, useOrdenesCompra } from '@/app/lib/firebase/firestore-hooks.service'
+import { useRealtimeDistribuidores, useRealtimeOrdenesCompra } from '@/app/hooks/useRealtimeCollection'
 import { useFirestoreCRUD } from '@/app/hooks/useFirestoreCRUD'
 import {
   AnimatedCounter,
@@ -418,9 +418,16 @@ export default function BentoDistribuidoresPremium() {
   const [showEditModal, setShowEditModal] = useState(false)
   const [internalLoading, setInternalLoading] = useState(true)
 
-  // Data hooks
+  // Data hooks - TIEMPO REAL
   const { data: distribuidoresRaw, loading: loadingDist, error: errorDist, remove } = useFirestoreCRUD<Distribuidor>('distribuidores')
-  const { data: ordenesCompraRaw = [], loading: loadingOC, error: errorOC } = useOrdenesCompra()
+  const { data: ordenesCompraRaw = [], loading: loadingOC, error: errorOC, isConnected } = useRealtimeOrdenesCompra()
+
+  // Log para verificar tiempo real
+  useEffect(() => {
+    if (isConnected) {
+      logger.info(`[BentoDistribuidoresPremium] Conectado en tiempo real: ${distribuidoresRaw.length} distribuidores, ${ordenesCompraRaw.length} OC`, { context: 'BentoDistribuidoresPremium' })
+    }
+  }, [distribuidoresRaw.length, ordenesCompraRaw.length, isConnected])
 
   // Loading timeout
   useEffect(() => {
@@ -453,7 +460,8 @@ export default function BentoDistribuidoresPremium() {
     } as DistribuidorData))
   }, [distribuidoresRaw])
 
-  const ordenes = (ordenesCompraRaw || []) as OrdenCompra[]
+  // Cast seguro: ordenesCompraRaw tiene propiedades parciales, usamos unknown como paso intermedio
+  const ordenes = (ordenesCompraRaw || []) as unknown as OrdenCompra[]
 
   // Stats
   const totalDeuda = distribuidores.reduce((acc, d) => acc + d.deudaTotal, 0)

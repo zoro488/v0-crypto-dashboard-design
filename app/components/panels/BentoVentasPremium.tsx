@@ -32,8 +32,8 @@ import {
   ShineEffect,
   haptic,
 } from '@/app/components/ui/microinteractions'
-import { useState, useMemo, useCallback, memo } from 'react'
-import { useVentasData, useClientesData } from '@/app/lib/firebase/firestore-hooks.service'
+import { useState, useMemo, useCallback, memo, useEffect } from 'react'
+import { useRealtimeVentas } from '@/app/hooks/useRealtimeCollection'
 import { CreateVentaModalPremium } from '@/app/components/modals/CreateVentaModalPremium'
 import { SalesFlowDiagram } from '@/app/components/visualizations/SalesFlowDiagram'
 import { PremiumDataTable, Column, TableAction } from '@/app/components/ui/PremiumDataTable'
@@ -336,8 +336,15 @@ export default memo(function BentoVentasPremium() {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [selectedTimeRange, setSelectedTimeRange] = useState<'day' | 'week' | 'month'>('week')
 
-  const { data: ventasDataRaw, loading, error } = useVentasData()
+  const { data: ventasDataRaw, loading, error, isConnected } = useRealtimeVentas()
   const ventasData = ventasDataRaw as VentaData[]
+  
+  // Log para verificar tiempo real
+  useEffect(() => {
+    if (isConnected) {
+      logger.info(`[BentoVentasPremium] Conectado en tiempo real: ${ventasData.length} ventas`, { context: 'BentoVentasPremium' })
+    }
+  }, [ventasData.length, isConnected])
 
   // ═══════════════════════════════════════════════════════════════════════════
   // MÉTRICAS

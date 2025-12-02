@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Users, AlertTriangle, CheckCircle2, Clock, DollarSign, Plus, TrendingUp, 
@@ -20,7 +20,7 @@ import {
 } from '@/app/components/ui/tesla-index'
 import { Badge } from '@/app/components/ui/badge'
 import { Button } from '@/app/components/ui/button'
-import { useClientes, useVentas } from '@/app/lib/firebase/firestore-hooks.service'
+import { useRealtimeClientes, useRealtimeVentas } from '@/app/hooks/useRealtimeCollection'
 import { useFirestoreCRUD } from '@/app/hooks/useFirestoreCRUD'
 import { CreateClienteModalPremium } from '@/app/components/modals/CreateClienteModalPremium'
 import { CreateAbonoModalPremium } from '@/app/components/modals/CreateAbonoModalPremium'
@@ -392,9 +392,16 @@ export default function BentoClientesPremium() {
   const [showProfile, setShowProfile] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
 
-  // Data hooks
+  // Data hooks - TIEMPO REAL
   const { data: clientesRaw, loading, remove } = useFirestoreCRUD<Cliente>('clientes')
-  const { data: ventasRaw } = useVentas()
+  const { data: ventasRaw, isConnected } = useRealtimeVentas()
+  
+  // Log para verificar tiempo real
+  useEffect(() => {
+    if (isConnected) {
+      logger.info(`[BentoClientesPremium] Conectado en tiempo real: ${clientesRaw.length} clientes, ${ventasRaw.length} ventas`, { context: 'BentoClientesPremium' })
+    }
+  }, [clientesRaw.length, ventasRaw.length, isConnected])
   
   // Transform data
   const clientes = useMemo(() => {
@@ -414,7 +421,8 @@ export default function BentoClientesPremium() {
     } as ClienteData))
   }, [clientesRaw])
 
-  const ventas = (ventasRaw || []) as Venta[]
+  // Cast seguro: ventasRaw tiene propiedades parciales, usamos unknown como paso intermedio
+  const ventas = (ventasRaw || []) as unknown as Venta[]
 
   // Stats
   const totalDeuda = clientes.reduce((acc, c) => acc + c.deudaTotal, 0)
