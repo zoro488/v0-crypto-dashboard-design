@@ -41,6 +41,7 @@ interface ProductoVenta {
 }
 
 // Producto en orden de compra (multi-producto)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ProductoOC {
   producto: string
   cantidad: number
@@ -54,17 +55,18 @@ interface CrearVentaInput {
   productos: ProductoVenta[]  // MULTI-PRODUCTO
   producto?: string  // Legacy single product
   ocRelacionada?: string
-  cantidad?: number
-  precioVenta?: number
-  precioCompra?: number
-  precioFlete?: number
+  cantidad: number
+  precioVenta: number
+  precioCompra: number
+  precioFlete: number
   estadoPago: 'completo' | 'parcial' | 'pendiente'
   montoPagado: number
   metodoPago: 'efectivo' | 'transferencia' | 'deposito' | 'mixto'
   notas?: string
 }
 
-interface CrearOrdenCompraInput {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface _CrearOrdenCompraInput {
   distribuidor: string
   productos: ProductoOC[]  // MULTI-PRODUCTO
   pagoInicial?: number
@@ -90,21 +92,24 @@ interface PagoDistribuidorInput {
   concepto?: string
 }
 
-interface TransferenciaInput {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface _TransferenciaInput {
   bancoOrigen: BancoId
   bancoDestino: BancoId
   monto: number
   concepto: string
 }
 
-interface GastoInput {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface _GastoInput {
   bancoOrigen: BancoId
   monto: number
   concepto: string
   categoria?: string
 }
 
-interface IngresoInput {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface _IngresoInput {
   bancoDestino: BancoId  // Solo azteca, leftie, profit
   monto: number
   concepto: string
@@ -124,69 +129,79 @@ const BANCOS_CONFIG: Record<BancoId, { nombre: string; tipo: string }> = {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// HELPERS
+// HELPERS BLINDADOS
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
- * Actualizar banco con nuevo movimiento
+ * Asegurar que un banco existe, creándolo si es necesario
  */
-async function actualizarBanco(
+async function ensureBancoExists(
   transaction: admin.firestore.Transaction,
-  bancoId: string,
-  tipo: 'ingreso' | 'gasto',
-  monto: number,
-  concepto: string,
-  referencia?: string
+  bancoId: BancoId
 ): Promise<void> {
   const bancoRef = db.collection('bancos').doc(bancoId)
   const bancoDoc = await transaction.get(bancoRef)
   
   if (!bancoDoc.exists) {
-    // Crear banco si no existe
+    const config = BANCOS_CONFIG[bancoId]
     transaction.set(bancoRef, {
       id: bancoId,
-      nombre: bancoId.replace(/_/g, ' ').toUpperCase(),
-      historicoIngresos: tipo === 'ingreso' ? monto : 0,
-      historicoGastos: tipo === 'gasto' ? monto : 0,
-      capitalActual: tipo === 'ingreso' ? monto : -monto,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    })
-  } else {
-    // Actualizar banco existente
-    const data = bancoDoc.data()!
-    const nuevoHistoricoIngresos = (data.historicoIngresos || 0) + (tipo === 'ingreso' ? monto : 0)
-    const nuevoHistoricoGastos = (data.historicoGastos || 0) + (tipo === 'gasto' ? monto : 0)
-    
-    transaction.update(bancoRef, {
-      historicoIngresos: nuevoHistoricoIngresos,
-      historicoGastos: nuevoHistoricoGastos,
-      capitalActual: nuevoHistoricoIngresos - nuevoHistoricoGastos,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      nombre: config?.nombre || bancoId,
+      tipo: config?.tipo || 'operativo',
+      historicoIngresos: 0,
+      historicoGastos: 0,
+      historicoTransferencias: 0,
+      capitalActual: 0,
+      capitalInicial: 0,
+      estado: 'activo',
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
     })
   }
+}
 
-  // Registrar movimiento inmutable
+/**
+ * Actualizar banco con nuevo movimiento (ATÓMICO)
+ */
+async function actualizarBanco(
+  transaction: admin.firestore.Transaction,
+  bancoId: BancoId,
+  tipo: 'ingreso' | 'gasto',
+  monto: number,
+  concepto: string,
+  referencia?: string,
+  usuarioId?: string
+): Promise<void> {
+  await ensureBancoExists(transaction, bancoId)
+  
+  const bancoRef = db.collection('bancos').doc(bancoId)
+  const bancoDoc = await transaction.get(bancoRef)
+  const data = bancoDoc.data()!
+  
+  const nuevoHistoricoIngresos = (data.historicoIngresos || 0) + (tipo === 'ingreso' ? monto : 0)
+  const nuevoHistoricoGastos = (data.historicoGastos || 0) + (tipo === 'gasto' ? monto : 0)
+  
+  // FÓRMULA CRÍTICA: capitalActual = historicoIngresos - historicoGastos
+  transaction.update(bancoRef, {
+    historicoIngresos: nuevoHistoricoIngresos,
+    historicoGastos: nuevoHistoricoGastos,
+    capitalActual: nuevoHistoricoIngresos - nuevoHistoricoGastos,
+    updatedAt: FieldValue.serverTimestamp(),
+  })
+
+  // Registrar movimiento INMUTABLE
   const movimientoRef = db.collection('movimientos').doc()
   transaction.set(movimientoRef, {
     id: movimientoRef.id,
     bancoId,
-    tipo,
+    tipoMovimiento: tipo,
     monto,
     concepto,
-    referencia: referencia || null,
-    fecha: admin.firestore.FieldValue.serverTimestamp(),
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
-  })
-
-  // Registrar en tabla específica del banco
-  const tablaBanco = db.collection(`${bancoId}_${tipo}s`).doc()
-  transaction.set(tablaBanco, {
-    id: tablaBanco.id,
-    monto: tipo === 'ingreso' ? monto : -monto,
-    concepto,
-    referencia: referencia || null,
-    fecha: admin.firestore.FieldValue.serverTimestamp(),
+    referenciaId: referencia || null,
+    referenciaTipo: referencia ? 'venta' : 'manual',
+    fecha: FieldValue.serverTimestamp(),
+    usuarioId: usuarioId || null,
+    createdAt: FieldValue.serverTimestamp(),
   })
 }
 
@@ -293,7 +308,7 @@ export const crearVentaCompleta = functions
             utilidades: utilidadesEfectivo,
           },
           // Metadata
-          creadoPor: context.auth.uid,
+          creadoPor: context.auth!.uid,
           fecha: ahora,
           createdAt: ahora,
           updatedAt: ahora,
@@ -454,7 +469,7 @@ export const abonarCliente = functions
           concepto: data.concepto || 'Abono a cuenta',
           deudaAnterior: clienteData.deuda || 0,
           deudaNueva: nuevaDeuda,
-          creadoPor: context.auth.uid,
+          creadoPor: context.auth!.uid,
           fecha: admin.firestore.FieldValue.serverTimestamp(),
         })
 
@@ -551,8 +566,8 @@ export const pagarDistribuidor = functions
 export const transferirEntreBancos = functions
   .region('us-central1')
   .https.onCall(async (data: {
-    bancoOrigen: string
-    bancoDestino: string
+    bancoOrigen: BancoId
+    bancoDestino: BancoId
     monto: number
     concepto?: string
   }, context) => {

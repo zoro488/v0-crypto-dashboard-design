@@ -61,7 +61,10 @@ import { useToast } from '@/app/hooks/use-toast'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
-import { crearGasto } from '@/app/lib/services/unified-data-service'
+// ✅ USAR NUEVO SERVICIO DE BUSINESS OPERATIONS
+import { registrarGasto, type RegistrarGastoInput } from '@/app/lib/services/business-operations.service'
+import { useBancosData } from '@/app/lib/firebase/firestore-hooks.service'
+import type { BancoId } from '@/app/types'
 
 // ============================================
 // SCHEMA ZOD
@@ -93,16 +96,37 @@ interface CreateGastoModalProps {
   onSuccess?: () => void
 }
 
-// 7 Bancos del sistema
-const BANCOS = [
-  { id: 'boveda_monte', nombre: 'Bóveda Monte', icono: '🏦', color: 'blue', capital: 2500000 },
-  { id: 'boveda_usa', nombre: 'Bóveda USA', icono: '🇺🇸', color: 'indigo', capital: 850000 },
-  { id: 'profit', nombre: 'Profit', icono: '💰', color: 'green', capital: 1200000 },
-  { id: 'leftie', nombre: 'Leftie', icono: '🎯', color: 'orange', capital: 450000 },
-  { id: 'azteca', nombre: 'Azteca', icono: '🌮', color: 'red', capital: 320000 },
-  { id: 'flete_sur', nombre: 'Flete Sur', icono: '🚚', color: 'yellow', capital: 180000 },
-  { id: 'utilidades', nombre: 'Utilidades', icono: '💎', color: 'purple', capital: 750000 },
-]
+// Iconos por defecto para bancos
+const BANCO_ICONOS: Record<string, string> = {
+  'boveda_monte': '🏦',
+  'boveda_usa': '🇺🇸',
+  'profit': '💰',
+  'leftie': '🎯',
+  'azteca': '🌮',
+  'flete_sur': '🚚',
+  'utilidades': '💎',
+}
+
+// Colores por banco
+const BANCO_COLORES: Record<string, string> = {
+  'boveda_monte': 'blue',
+  'boveda_usa': 'indigo',
+  'profit': 'green',
+  'leftie': 'orange',
+  'azteca': 'red',
+  'flete_sur': 'yellow',
+  'utilidades': 'purple',
+}
+
+// Interfaz para bancos de Firestore
+interface BancoFirestore {
+  id: string
+  nombre: string
+  capitalActual?: number
+  historicoIngresos?: number
+  historicoGastos?: number
+  [key: string]: unknown
+}
 
 // Categorías de gastos
 const CATEGORIAS = [
@@ -148,6 +172,21 @@ export function CreateGastoModalPremium({
 }: CreateGastoModalProps) {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
+
+  // 🔥 Cargar bancos reales de Firestore
+  const { data: bancosRaw, loading: loadingBancos } = useBancosData()
+  
+  // Convertir bancos de Firestore al formato esperado
+  const BANCOS = React.useMemo(() => {
+    if (!bancosRaw) return []
+    return (bancosRaw as BancoFirestore[]).map(b => ({
+      id: b.id,
+      nombre: b.nombre || b.id,
+      icono: BANCO_ICONOS[b.id] || '🏦',
+      color: BANCO_COLORES[b.id] || 'gray',
+      capital: b.capitalActual ?? ((b.historicoIngresos ?? 0) - (b.historicoGastos ?? 0)),
+    }))
+  }, [bancosRaw])
 
   const form = useForm<GastoInput>({
     resolver: zodResolver(gastoSchema),
@@ -214,26 +253,41 @@ export function CreateGastoModalPremium({
     setIsSubmitting(true)
 
     try {
-      const gastoData = {
+      // ✅ Usar el nuevo servicio de business operations
+      const gastoInput: RegistrarGastoInput = {
+        bancoOrigen: data.bancoOrigen as BancoId,
         monto: data.monto,
         concepto: data.concepto,
-        bancoOrigen: data.bancoOrigen,
+        descripcion: data.notas,
         categoria: data.categoria || 'General',
-        referencia: data.referencia || undefined,
-        notas: data.notas || undefined,
       }
 
-      logger.info('Creando gasto en Firestore', { 
-        data: gastoData,
+      logger.info('[CreateGastoModalPremium] Registrando gasto con business-operations', { 
+        data: gastoInput,
         context: 'CreateGastoModalPremium',
       })
 
-      const result = await crearGasto(gastoData)
+      // ✅ El servicio business-operations.service.ts maneja automáticamente:
+      // - Actualización del banco (reduce capital, aumenta historicoGastos)
+      // - Registro del movimiento como 'gasto'
+      const result = await registrarGasto(gastoInput)
 
       if (result) {
+        logger.info('[CreateGastoModalPremium] Gasto registrado exitosamente', {
+          data: { movimientoId: result, monto: data.monto, banco: data.bancoOrigen },
+          context: 'CreateGastoModalPremium',
+        })
+
         toast({
           title: '✅ Gasto Registrado',
-          description: `${formatearMonto(data.monto)} de ${bancoSeleccionado?.nombre}`,
+          description: (
+            <div className="space-y-1">
+              <p>{formatearMonto(data.monto)} de {bancoSeleccionado?.nombre}</p>
+              <p className="text-xs text-gray-400">
+                Categoría: {data.categoria} • Nuevo saldo: {formatearMonto(nuevoSaldo)}
+              </p>
+            </div>
+          ) as unknown as string,
         })
 
         onClose()
@@ -244,7 +298,7 @@ export function CreateGastoModalPremium({
       }
 
     } catch (error) {
-      logger.error('Error al registrar gasto', error)
+      logger.error('[CreateGastoModalPremium] Error al registrar gasto', error)
       toast({
         title: 'Error',
         description: error instanceof Error ? error.message : 'No se pudo registrar el gasto',

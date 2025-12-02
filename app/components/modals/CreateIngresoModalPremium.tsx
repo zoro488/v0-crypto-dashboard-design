@@ -46,7 +46,8 @@ import { cn } from '@/app/lib/utils'
 import { useToast } from '@/app/hooks/use-toast'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
-import { crearIngreso } from '@/app/lib/services/unified-data-service'
+// ✅ USAR NUEVO SERVICIO DE BUSINESS OPERATIONS
+import { registrarIngreso, type RegistrarIngresoInput } from '@/app/lib/services/business-operations.service'
 import type { BancoId } from '@/app/types'
 
 // ============================================
@@ -226,41 +227,53 @@ export function CreateIngresoModalPremium({
     setIsSubmitting(true)
 
     try {
-      const ingresoData = {
-        bancoDestino: data.bancoDestino,
+      // ✅ Usar el nuevo servicio de business operations
+      const ingresoInput: RegistrarIngresoInput = {
+        bancoDestino: data.bancoDestino as BancoId,
         monto: data.monto,
         concepto: data.concepto.trim(),
+        descripcion: data.notas?.trim(),
         categoria: data.categoria || undefined,
-        referencia: data.referencia?.trim() || undefined,
-        notas: data.notas?.trim() || undefined,
       }
 
-      await crearIngreso(ingresoData)
-
-      logger.info('Ingreso registrado exitosamente', {
+      logger.info('[CreateIngresoModalPremium] Registrando ingreso con business-operations', {
         context: 'CreateIngresoModalPremium',
-        data: { banco: data.bancoDestino, monto: data.monto },
+        data: ingresoInput,
       })
 
-      setShowSuccess(true)
+      // ✅ El servicio business-operations.service.ts maneja automáticamente:
+      // - Actualización del banco (aumenta capital, aumenta historicoIngresos)
+      // - Registro del movimiento como 'ingreso'
+      const result = await registrarIngreso(ingresoInput)
 
-      setTimeout(() => {
-        toast({
-          title: '✅ Ingreso Registrado',
-          description: `$${data.monto.toLocaleString()} a ${BANCOS_CONFIG[data.bancoDestino as BancoId]?.nombre}`,
+      if (result) {
+        logger.info('[CreateIngresoModalPremium] Ingreso registrado exitosamente', {
+          context: 'CreateIngresoModalPremium',
+          data: { movimientoId: result, banco: data.bancoDestino, monto: data.monto },
         })
-        onClose()
-        onSuccess?.()
-        useAppStore.getState().triggerDataRefresh()
-      }, 1500)
+
+        setShowSuccess(true)
+
+        setTimeout(() => {
+          toast({
+            title: '✅ Ingreso Registrado',
+            description: `$${data.monto.toLocaleString()} a ${BANCOS_CONFIG[data.bancoDestino as BancoId]?.nombre}`,
+          })
+          onClose()
+          onSuccess?.()
+          useAppStore.getState().triggerDataRefresh()
+        }, 1500)
+      } else {
+        throw new Error('No se pudo registrar el ingreso')
+      }
 
     } catch (error) {
-      logger.error('Error al registrar ingreso', error, {
+      logger.error('[CreateIngresoModalPremium] Error al registrar ingreso', error, {
         context: 'CreateIngresoModalPremium',
       })
       toast({
         title: 'Error',
-        description: 'No se pudo registrar el ingreso',
+        description: error instanceof Error ? error.message : 'No se pudo registrar el ingreso',
         variant: 'destructive',
       })
     } finally {

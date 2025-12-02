@@ -89,16 +89,46 @@ interface CreateTransferenciaModalProps {
   onSuccess?: () => void
 }
 
-// 7 Bancos con sus capitales
-const BANCOS = [
-  { id: 'boveda_monte', nombre: 'Bóveda Monte', icono: '🏦', color: 'purple', capital: 2500000 },
-  { id: 'boveda_usa', nombre: 'Bóveda USA', icono: '🇺🇸', color: 'blue', capital: 850000 },
-  { id: 'profit', nombre: 'Profit', icono: '💰', color: 'green', capital: 1200000 },
-  { id: 'leftie', nombre: 'Leftie', icono: '🎯', color: 'orange', capital: 450000 },
-  { id: 'azteca', nombre: 'Azteca', icono: '🌮', color: 'yellow', capital: 320000 },
-  { id: 'flete_sur', nombre: 'Flete Sur', icono: '🚚', color: 'cyan', capital: 180000 },
-  { id: 'utilidades', nombre: 'Utilidades', icono: '💎', color: 'pink', capital: 750000 },
-]
+// Iconos por defecto para bancos
+const BANCO_ICONOS: Record<string, string> = {
+  'boveda_monte': '🏦',
+  'boveda_usa': '🇺🇸',
+  'profit': '💰',
+  'leftie': '🎯',
+  'azteca': '🌮',
+  'flete_sur': '🚚',
+  'utilidades': '💎',
+}
+
+// Colores por banco
+const BANCO_COLORES: Record<string, string> = {
+  'boveda_monte': 'purple',
+  'boveda_usa': 'blue',
+  'profit': 'green',
+  'leftie': 'orange',
+  'azteca': 'yellow',
+  'flete_sur': 'cyan',
+  'utilidades': 'pink',
+}
+
+// Interfaz para bancos de Firestore
+interface BancoFirestore {
+  id: string
+  nombre: string
+  capitalActual?: number
+  historicoIngresos?: number
+  historicoGastos?: number
+  [key: string]: unknown
+}
+
+// Interfaz para el formato de banco usado en el componente
+interface BancoDisplay {
+  id: string
+  nombre: string
+  icono: string
+  color: string
+  capital: number
+}
 
 type BancoId = 'boveda_monte' | 'boveda_usa' | 'profit' | 'leftie' | 'azteca' | 'flete_sur' | 'utilidades'
 
@@ -121,7 +151,7 @@ const itemVariants = {
 // ============================================
 
 interface BancoCardProps {
-  banco: typeof BANCOS[0]
+  banco: BancoDisplay
   tipo: 'origen' | 'destino'
   selected: boolean
   disabled?: boolean
@@ -229,6 +259,21 @@ export function CreateTransferenciaModalPremium({
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [showAnimation, setShowAnimation] = React.useState(false)
+
+  // 🔥 Cargar bancos reales de Firestore
+  const { data: bancosRaw, loading: loadingBancos } = useBancosData()
+  
+  // Convertir bancos de Firestore al formato esperado
+  const BANCOS = React.useMemo(() => {
+    if (!bancosRaw) return []
+    return (bancosRaw as BancoFirestore[]).map(b => ({
+      id: b.id,
+      nombre: b.nombre || b.id,
+      icono: BANCO_ICONOS[b.id] || '🏦',
+      color: BANCO_COLORES[b.id] || 'gray',
+      capital: b.capitalActual ?? ((b.historicoIngresos ?? 0) - (b.historicoGastos ?? 0)),
+    }))
+  }, [bancosRaw])
 
   const form = useForm<TransferenciaInput>({
     resolver: zodResolver(transferenciaSchema),
