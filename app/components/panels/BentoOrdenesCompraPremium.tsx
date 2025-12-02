@@ -44,7 +44,7 @@ import {
   haptic,
 } from '@/app/components/ui/microinteractions'
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
-import { suscribirOrdenesCompra } from '@/app/lib/services/unified-data-service'
+import { useRealtimeOrdenesCompra } from '@/app/hooks/useRealtimeCollection'
 import type { OrdenCompra, FirestoreTimestamp } from '@/app/types'
 import { CreateOrdenCompraModalPremium } from '@/app/components/modals/CreateOrdenCompraModalPremium'
 import { 
@@ -479,22 +479,22 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
 // COMPONENTE PRINCIPAL - BENTO ÓRDENES COMPRA PREMIUM 2025
 // ============================================================================
 export function BentoOrdenesCompraPremium() {
-  const [ordenes, setOrdenes] = useState<OrdenCompra[]>([])
-  const [loading, setLoading] = useState(true)
+  // 🔥 Tiempo real con onSnapshot - Casting al tipo OrdenCompra
+  const { data: ordenesRaw, loading, isConnected } = useRealtimeOrdenesCompra()
+  const ordenes = ordenesRaw as unknown as OrdenCompra[]
+  
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedOrden, setSelectedOrden] = useState<OrdenCompra | null>(null)
   const [filtroEstado, setFiltroEstado] = useState<string>('todos')
   const [searchTerm, setSearchTerm] = useState('')
   const [isRefreshing, setIsRefreshing] = useState(false)
 
-  // Suscripción en tiempo real
+  // Log para verificar tiempo real
   useEffect(() => {
-    const unsubscribe = suscribirOrdenesCompra((data) => {
-      setOrdenes(data as OrdenCompra[])
-      setLoading(false)
-    })
-    return () => unsubscribe()
-  }, [])
+    if (isConnected) {
+      console.log(`🔥 [BentoOrdenesCompraPremium] TIEMPO REAL: ${ordenes.length} órdenes de compra`)
+    }
+  }, [ordenes.length, isConnected])
 
   // Métricas calculadas
   const metricas = useMemo(() => {

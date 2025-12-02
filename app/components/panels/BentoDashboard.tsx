@@ -34,7 +34,13 @@ import {
 } from 'recharts'
 import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/components/ui/SafeChartContainer'
 import { useState, useEffect, useMemo, useCallback, memo } from 'react'
-import { useVentas, useOrdenesCompra, useProductos, useClientes, useBancosData } from '@/app/lib/firebase/firestore-hooks.service'
+import { 
+  useRealtimeVentas, 
+  useRealtimeOrdenesCompra, 
+  useRealtimeAlmacen, 
+  useRealtimeBancos 
+} from '@/app/hooks/useRealtimeCollection'
+import { useClientes } from '@/app/lib/firebase/firestore-hooks.service'
 import {
   AnimatedCounter,
   GlowButton,
@@ -104,11 +110,18 @@ const CustomTooltip = memo(function CustomTooltip({ active, payload, label }: Cu
 })
 
 export default memo(function BentoDashboard() {
-  // 📦 Usar hook de bancos que lee de localStorage/Firebase
-  const { data: bancosData, loading: loadingBancos } = useBancosData()
-  const { data: ventasRaw, loading: loadingVentas } = useVentas()
-  const { data: ordenesCompraRaw, loading: loadingOC } = useOrdenesCompra()
-  const { data: productosRaw, loading: loadingProductos } = useProductos()
+  // 📦 Hooks en TIEMPO REAL - onSnapshot
+  const { data: bancosData, loading: loadingBancos, isConnected: bancosConnected } = useRealtimeBancos()
+  const { data: ventasRaw, loading: loadingVentas, isConnected: ventasConnected } = useRealtimeVentas()
+  const { data: ordenesCompraRaw, loading: loadingOC, isConnected: ocConnected } = useRealtimeOrdenesCompra()
+  const { data: productosRaw, loading: loadingProductos } = useRealtimeAlmacen()
+  
+  // Log para verificar conexiones en tiempo real
+  useEffect(() => {
+    if (ventasConnected && ocConnected && bancosConnected) {
+      console.log(`🔥 [BentoDashboard] TIEMPO REAL ACTIVO: ${ventasRaw.length} ventas, ${ordenesCompraRaw.length} OC, ${bancosData.length} bancos`)
+    }
+  }, [ventasRaw.length, ordenesCompraRaw.length, bancosData.length, ventasConnected, ocConnected, bancosConnected])
 
   // Transformar datos de bancos
   const bancos = useMemo(() => {

@@ -32,7 +32,8 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
-import { useProductos, useEntradasAlmacen, useSalidasAlmacen } from '@/app/lib/firebase/firestore-hooks.service'
+import { useRealtimeAlmacen } from '@/app/hooks/useRealtimeCollection'
+import { useEntradasAlmacen, useSalidasAlmacen } from '@/app/lib/firebase/firestore-hooks.service'
 import { Skeleton } from '@/app/components/ui/skeleton'
 import { Button } from '@/app/components/ui/button'
 import { Badge } from '@/app/components/ui/badge'
@@ -1084,10 +1085,17 @@ export function BentoAlmacenPremium() {
   const [showSalidaModal, setShowSalidaModal] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
   
-  // Hooks de datos
-  const { data: productos = [], loading: loadingProductos } = useProductos()
+  // Hooks de datos - TIEMPO REAL
+  const { data: productos = [], loading: loadingProductos, isConnected } = useRealtimeAlmacen()
   const { data: entradas = [], loading: loadingEntradas } = useEntradasAlmacen()
   const { data: salidas = [], loading: loadingSalidas } = useSalidasAlmacen()
+  
+  // Log para verificar tiempo real
+  useEffect(() => {
+    if (isConnected) {
+      console.log(`🔥 [BentoAlmacenPremium] TIEMPO REAL: ${productos.length} productos`)
+    }
+  }, [productos.length, isConnected])
   
   // Métricas hero globales
   const heroMetrics = useMemo(() => {

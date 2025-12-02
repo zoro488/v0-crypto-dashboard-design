@@ -43,6 +43,22 @@ export { useTreasury } from './useTreasury'
 export { useFirestoreCRUD } from './useFirestoreCRUD'
 
 // ====================================================================
+// 🔥 HOOKS DE TIEMPO REAL (onSnapshot)
+// ====================================================================
+export {
+  useRealtimeCollection,
+  useRealtimeVentas,
+  useRealtimeClientes,
+  useRealtimeDistribuidores,
+  useRealtimeOrdenesCompra,
+  useRealtimeAlmacen,
+  useRealtimeBancos,
+  useRealtimeMovimientos,
+  type RealtimeOptions,
+  type RealtimeResult,
+} from './useRealtimeCollection'
+
+// ====================================================================
 // HOOKS DE UI Y EXPERIENCIA
 // ====================================================================
 export { useToast, toast } from './use-toast'
