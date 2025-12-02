@@ -62,7 +62,7 @@ import { useToast } from '@/app/hooks/use-toast'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
-import { crearOrdenCompra } from '@/app/lib/services/unified-data-service'
+import { crearOrdenCompra, obtenerSiguienteIdOrdenCompra } from '@/app/lib/services/unified-data-service'
 
 // ============================================
 // SCHEMA ZOD - Basado en ordenes_compra.csv
@@ -145,9 +145,26 @@ export function CreateOrdenCompraModalPremium({
 }: CreateOrdenCompraModalProps) {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
-  const [nextId, setNextId] = React.useState('OC0010') // TODO: Obtener de Firestore
+  const [nextId, setNextId] = React.useState('OC0001')
+  const [loadingNextId, setLoadingNextId] = React.useState(false)
   
   const isEdit = !!editData?.id
+
+  // 🔥 Obtener el siguiente ID de Firestore al abrir el modal
+  React.useEffect(() => {
+    if (open && !isEdit) {
+      setLoadingNextId(true)
+      obtenerSiguienteIdOrdenCompra()
+        .then(id => {
+          setNextId(id)
+          logger.info('Siguiente ID de orden obtenido', { id, context: 'CreateOrdenCompraModal' })
+        })
+        .catch(error => {
+          logger.error('Error obteniendo siguiente ID', error, { context: 'CreateOrdenCompraModal' })
+        })
+        .finally(() => setLoadingNextId(false))
+    }
+  }, [open, isEdit])
 
   const form = useForm<OrdenCompraInput>({
     resolver: zodResolver(ordenCompraSchema),

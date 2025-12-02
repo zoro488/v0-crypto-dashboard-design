@@ -23,6 +23,10 @@ import {
   Edit2,
   Trash2,
   MoreHorizontal,
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+  RefreshCw,
 } from 'lucide-react'
 import { BANCOS } from '@/app/lib/constants'
 import { useAppStore } from '@/app/lib/store/useAppStore'
@@ -375,26 +379,78 @@ export default function BentoBanco() {
           </div>
         </div>
 
-        {/* Selected Bank Stats Grid */}
+        {/* Selected Bank Stats Grid - NUEVO: Histórico Fijo vs Capital Actual */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Fila Principal: Histórico Fijo y Capital Actual */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Histórico Fijo (Acumulativo - NUNCA disminuye) */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="glass p-6 rounded-2xl border border-white/5 bg-black/20"
+              className="glass p-6 rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-transparent relative overflow-hidden"
             >
+              <div className="absolute top-2 right-2">
+                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-medium uppercase tracking-wider">
+                  Fijo
+                </span>
+              </div>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-white/60 text-sm font-medium">Saldo Disponible</span>
-                <Wallet className="w-5 h-5 text-emerald-400" />
+                <span className="text-amber-400/80 text-sm font-medium flex items-center gap-2">
+                  <Activity className="w-4 h-4" />
+                  Histórico Acumulado
+                </span>
               </div>
-              <p className="text-4xl font-bold text-white tracking-tight">${saldoActual.toLocaleString('en-US')}</p>
-              <div className="flex items-center gap-2 mt-2 text-sm text-emerald-400">
-                <TrendingUp className="w-4 h-4" />
-                <span>+12.5% vs mes anterior</span>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-white/40 text-xs uppercase mb-1">Total Ingresos</p>
+                  <p className="text-2xl font-bold text-emerald-400">${totalIngresos.toLocaleString('en-US')}</p>
+                </div>
+                <div>
+                  <p className="text-white/40 text-xs uppercase mb-1">Total Gastos</p>
+                  <p className="text-2xl font-bold text-rose-400">${totalGastos.toLocaleString('en-US')}</p>
+                </div>
               </div>
+              <p className="text-amber-400/60 text-xs mt-3 italic">
+                * Estos valores solo aumentan, nunca disminuyen
+              </p>
             </motion.div>
 
+            {/* Capital Actual (Dinámico = Ingresos - Gastos) */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="glass p-6 rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-transparent relative overflow-hidden"
+            >
+              <div className="absolute top-2 right-2">
+                <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 text-[10px] font-medium uppercase tracking-wider">
+                  Dinámico
+                </span>
+              </div>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-cyan-400/80 text-sm font-medium flex items-center gap-2">
+                  <Wallet className="w-4 h-4" />
+                  Capital Actual
+                </span>
+              </div>
+              <p className={`text-4xl font-bold tracking-tight ${saldoActual >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                ${saldoActual.toLocaleString('en-US')}
+              </p>
+              <div className="flex items-center gap-2 mt-3 text-sm text-cyan-400/60">
+                <span>=</span>
+                <span className="text-emerald-400/60">${totalIngresos.toLocaleString()}</span>
+                <span>-</span>
+                <span className="text-rose-400/60">${totalGastos.toLocaleString()}</span>
+              </div>
+              <p className="text-cyan-400/60 text-xs mt-2 italic">
+                * Las transferencias y gastos afectan este valor
+              </p>
+            </motion.div>
+          </div>
+          
+          {/* Fila Secundaria: Métricas de Movimiento */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -402,12 +458,38 @@ export default function BentoBanco() {
               className="glass p-6 rounded-2xl border border-white/5 bg-black/20"
             >
               <div className="flex items-center justify-between mb-4">
-                <span className="text-white/60 text-sm font-medium">Ingresos Totales</span>
-                <TrendingUp className="w-5 h-5 text-blue-400" />
+                <span className="text-white/60 text-sm font-medium">Ingresos Período</span>
+                <TrendingUp className="w-5 h-5 text-emerald-400" />
               </div>
-              <p className="text-3xl font-bold text-white tracking-tight">${totalIngresos.toLocaleString('en-US')}</p>
+              <p className="text-3xl font-bold text-emerald-400 tracking-tight">${totalIngresos.toLocaleString('en-US')}</p>
               <div className="w-full h-1 bg-white/10 rounded-full mt-4 overflow-hidden">
-                <div className="h-full w-[75%] bg-blue-500 rounded-full" />
+                <motion.div 
+                  className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full" 
+                  initial={{ width: 0 }}
+                  animate={{ width: totalIngresos > 0 ? `${Math.min(100, (totalIngresos / (totalIngresos + totalGastos)) * 100)}%` : '0%' }}
+                  transition={{ duration: 1, ease: 'easeOut' }}
+                />
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25 }}
+              className="glass p-6 rounded-2xl border border-white/5 bg-black/20"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-white/60 text-sm font-medium">Gastos Período</span>
+                <TrendingDown className="w-5 h-5 text-rose-400" />
+              </div>
+              <p className="text-3xl font-bold text-rose-400 tracking-tight">${totalGastos.toLocaleString('en-US')}</p>
+              <div className="w-full h-1 bg-white/10 rounded-full mt-4 overflow-hidden">
+                <motion.div 
+                  className="h-full bg-gradient-to-r from-rose-500 to-orange-400 rounded-full" 
+                  initial={{ width: 0 }}
+                  animate={{ width: totalGastos > 0 ? `${Math.min(100, (totalGastos / (totalIngresos + totalGastos)) * 100)}%` : '0%' }}
+                  transition={{ duration: 1, ease: 'easeOut' }}
+                />
               </div>
             </motion.div>
 
@@ -418,12 +500,20 @@ export default function BentoBanco() {
               className="glass p-6 rounded-2xl border border-white/5 bg-black/20"
             >
               <div className="flex items-center justify-between mb-4">
-                <span className="text-white/60 text-sm font-medium">Gastos Totales</span>
-                <TrendingDown className="w-5 h-5 text-red-400" />
+                <span className="text-white/60 text-sm font-medium">Ratio Salud</span>
+                <BarChart3 className="w-5 h-5 text-purple-400" />
               </div>
-              <p className="text-3xl font-bold text-white tracking-tight">${totalGastos.toLocaleString('en-US')}</p>
-              <div className="w-full h-1 bg-white/10 rounded-full mt-4 overflow-hidden">
-                <div className="h-full w-[35%] bg-red-500 rounded-full" />
+              <p className={`text-3xl font-bold tracking-tight ${
+                totalGastos > 0 && totalIngresos / totalGastos >= 1.5 ? 'text-emerald-400' :
+                totalGastos > 0 && totalIngresos / totalGastos >= 1 ? 'text-amber-400' : 'text-rose-400'
+              }`}>
+                {totalGastos > 0 ? (totalIngresos / totalGastos).toFixed(2) : '∞'}x
+              </p>
+              <div className="flex items-center gap-2 mt-2 text-sm text-white/40">
+                <span>Ingresos / Gastos</span>
+                {totalGastos > 0 && totalIngresos / totalGastos >= 1.5 && (
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs">Saludable</span>
+                )}
               </div>
             </motion.div>
           </div>

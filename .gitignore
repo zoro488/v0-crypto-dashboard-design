@@ -238,3 +238,5 @@ security-audit.json
 !firebase-admin-key.example.json
 google-cloud-cli-linux-x86_64.tar.gz
 *.tar.gz
+google-cloud-sdk/
+*.xlsx

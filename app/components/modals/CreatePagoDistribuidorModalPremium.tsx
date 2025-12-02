@@ -51,7 +51,7 @@ import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
 import { registrarPagoDistribuidor } from '@/app/lib/services/business-logic.service'
-import { useDistribuidores, useBancosData } from '@/app/lib/firebase/firestore-hooks.service'
+import { useDistribuidores, useBancosData, useOrdenesCompra } from '@/app/lib/firebase/firestore-hooks.service'
 
 // ============================================
 // SCHEMA ZOD
@@ -98,6 +98,16 @@ interface DistribuidorFirestore {
   deudaActual?: number
   totalCompras?: number
   totalPagado?: number
+  [key: string]: unknown
+}
+
+// Interfaz para órdenes de compra
+interface OrdenCompraFirestore {
+  id: string
+  distribuidor?: string
+  origen?: string
+  estado?: 'pendiente' | 'parcial' | 'pagado'
+  deuda?: number
   [key: string]: unknown
 }
 
@@ -159,9 +169,24 @@ export function CreatePagoDistribuidorModalPremium({
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   
-  // 🔥 Cargar distribuidores y bancos reales de Firestore
+  // 🔥 Cargar distribuidores, bancos y órdenes de compra reales de Firestore
   const { data: distribuidoresRaw, loading: loadingDist } = useDistribuidores()
   const { data: bancosRaw, loading: loadingBancos } = useBancosData()
+  const { data: ordenesCompraRaw } = useOrdenesCompra()
+  
+  // Contar órdenes abiertas por distribuidor
+  const ordenesAbiertasPorDistribuidor = React.useMemo(() => {
+    if (!ordenesCompraRaw) return new Map<string, number>()
+    
+    const contador = new Map<string, number>()
+    ;(ordenesCompraRaw as OrdenCompraFirestore[]).forEach(orden => {
+      const distribuidorId = orden.distribuidor || orden.origen || ''
+      if (orden.estado !== 'pagado' && (orden.deuda ?? 0) > 0) {
+        contador.set(distribuidorId, (contador.get(distribuidorId) || 0) + 1)
+      }
+    })
+    return contador
+  }, [ordenesCompraRaw])
   
   // Convertir distribuidores de Firestore al formato esperado
   const distribuidoresFormateados = React.useMemo(() => {
@@ -171,9 +196,9 @@ export function CreatePagoDistribuidorModalPremium({
       nombre: d.nombre || d.id,
       icono: DIST_ICONOS[d.id] || '📦',
       deudaTotal: d.deudaTotal ?? d.deudaActual ?? ((d.totalCompras ?? 0) - (d.totalPagado ?? 0)),
-      ordenesAbiertas: 1, // TODO: calcular desde órdenes
+      ordenesAbiertas: ordenesAbiertasPorDistribuidor.get(d.id) || ordenesAbiertasPorDistribuidor.get(d.nombre) || 0,
     }))
-  }, [distribuidoresRaw])
+  }, [distribuidoresRaw, ordenesAbiertasPorDistribuidor])
   
   // Convertir bancos de Firestore al formato esperado
   const bancosFormateados = React.useMemo(() => {

@@ -273,6 +273,51 @@ export const suscribirOrdenesCompra = (callback: (ordenes: unknown[]) => void) =
   return firestoreService.suscribirOrdenesCompra(callback)
 }
 
+/**
+ * Obtiene el siguiente ID para una nueva orden de compra
+ * Formato: OC0001, OC0002, etc.
+ */
+export const obtenerSiguienteIdOrdenCompra = async (): Promise<string> => {
+  try {
+    // Obtener órdenes existentes
+    const ordenes: Array<{ id: string }> = []
+    
+    await new Promise<void>((resolve) => {
+      const unsubscribe = suscribirOrdenesCompra((data) => {
+        ordenes.push(...(data as Array<{ id: string }>))
+        unsubscribe()
+        resolve()
+      })
+      // Timeout de seguridad
+      setTimeout(() => {
+        unsubscribe()
+        resolve()
+      }, 2000)
+    })
+    
+    if (ordenes.length === 0) {
+      return 'OC0001'
+    }
+    
+    // Encontrar el mayor número
+    const numeros = ordenes
+      .map(o => {
+        const match = o.id?.match(/OC(\d+)/)
+        return match ? parseInt(match[1], 10) : 0
+      })
+      .filter(n => !isNaN(n))
+    
+    const maxNum = numeros.length > 0 ? Math.max(...numeros) : 0
+    const siguiente = maxNum + 1
+    
+    return `OC${siguiente.toString().padStart(4, '0')}`
+  } catch (error) {
+    logger.error('Error obteniendo siguiente ID de orden', error, { context: 'UnifiedDataService' })
+    // Fallback: usar timestamp
+    return `OC${Date.now().toString().slice(-4)}`
+  }
+}
+
 export const actualizarOrdenCompra = async (ordenId: string, data: Partial<unknown>): Promise<string | null> => {
   if (useLocalStorage) {
     logger.warn('actualizarOrdenCompra no implementada en modo local', { context: 'UnifiedDataService' })
@@ -506,6 +551,7 @@ export const unifiedDataService = {
   // Órdenes de Compra
   crearOrdenCompra,
   suscribirOrdenesCompra,
+  obtenerSiguienteIdOrdenCompra,
   actualizarOrdenCompra,
   eliminarOrdenCompra,
   // Almacén

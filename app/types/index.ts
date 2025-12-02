@@ -597,6 +597,7 @@ export type PanelId =
   | 'profit'
   | 'ventas'
   | 'ordenes'
+  | 'ordenes_compra'  // Panel de Órdenes de Compra
   | 'clientes'
   | 'distribuidores'
   | 'almacen'
