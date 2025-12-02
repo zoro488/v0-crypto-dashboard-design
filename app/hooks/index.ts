@@ -59,6 +59,40 @@ export {
 } from './useRealtimeCollection'
 
 // ====================================================================
+// 🚀 HOOKS TANSTACK QUERY + FIREBASE REALTIME (El Santo Grial)
+// ====================================================================
+export {
+  useRealtimeQuery,
+  useRealtimeVentasQuery,
+  useRealtimeClientesQuery,
+  useRealtimeDistribuidoresQuery,
+  useRealtimeOrdenesCompraQuery,
+  useRealtimeBancosQuery,
+  useRealtimeMovimientosQuery,
+  useRealtimeAlmacenQuery,
+  type RealtimeQueryOptions,
+  type RealtimeQueryResult,
+} from './useRealtimeQuery'
+
+// ====================================================================
+// ⚡ HOOKS OPTIMISTIC MUTATIONS (Velocidad Luz)
+// ====================================================================
+export {
+  useOptimisticCreate,
+  useOptimisticUpdate,
+  useOptimisticDelete,
+  useVentasMutations,
+  useClientesMutations,
+  useDistribuidoresMutations,
+  useOrdenesCompraMutations,
+  useBancosMutations,
+  useMovimientosMutations,
+  useAlmacenMutations,
+  type MutationContext,
+  type CreateMutationOptions,
+} from './useOptimisticMutation'
+
+// ====================================================================
 // HOOKS DE UI Y EXPERIENCIA
 // ====================================================================
 export { useToast, toast } from './use-toast'
