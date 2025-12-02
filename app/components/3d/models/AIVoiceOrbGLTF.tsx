@@ -41,37 +41,37 @@ const STATE_COLORS: Record<OrbState, {
     primary: '#3b82f6', 
     secondary: '#60a5fa', 
     emissive: '#1d4ed8',
-    glow: 'rgba(59, 130, 246, 0.5)'
+    glow: 'rgba(59, 130, 246, 0.5)',
   },
   listening: { 
     primary: '#22c55e', 
     secondary: '#4ade80', 
     emissive: '#16a34a',
-    glow: 'rgba(34, 197, 94, 0.5)'
+    glow: 'rgba(34, 197, 94, 0.5)',
   },
   thinking: { 
     primary: '#a855f7', 
     secondary: '#c084fc', 
     emissive: '#7c3aed',
-    glow: 'rgba(168, 85, 247, 0.5)'
+    glow: 'rgba(168, 85, 247, 0.5)',
   },
   speaking: { 
     primary: '#06b6d4', 
     secondary: '#22d3ee', 
     emissive: '#0891b2',
-    glow: 'rgba(6, 182, 212, 0.5)'
+    glow: 'rgba(6, 182, 212, 0.5)',
   },
   success: { 
     primary: '#10b981', 
     secondary: '#34d399', 
     emissive: '#059669',
-    glow: 'rgba(16, 185, 129, 0.5)'
+    glow: 'rgba(16, 185, 129, 0.5)',
   },
   error: { 
     primary: '#ef4444', 
     secondary: '#f87171', 
     emissive: '#dc2626',
-    glow: 'rgba(239, 68, 68, 0.5)'
+    glow: 'rgba(239, 68, 68, 0.5)',
   },
 }
 

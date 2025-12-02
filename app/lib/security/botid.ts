@@ -3,9 +3,9 @@
  * Funciones de verificación de bots para rutas del servidor
  */
 
-import { checkBotId } from 'botid/server';
-import { NextResponse } from 'next/server';
-import { logger } from '@/app/lib/utils/logger';
+import { checkBotId } from 'botid/server'
+import { NextResponse } from 'next/server'
+import { logger } from '@/app/lib/utils/logger'
 
 interface BotCheckResult {
   isBot: boolean;
@@ -19,22 +19,22 @@ interface BotCheckResult {
  */
 export async function verifyBotId(): Promise<BotCheckResult> {
   try {
-    const verification = await checkBotId();
+    const verification = await checkBotId()
     
     if (verification.isBot) {
       logger.warn('Bot detectado', { 
         context: 'BotID',
-        data: { isBot: true }
-      });
+        data: { isBot: true },
+      })
     }
     
     return {
       isBot: verification.isBot,
-    };
+    }
   } catch (error) {
-    logger.error('Error verificando BotID', error as Error, { context: 'BotID' });
+    logger.error('Error verificando BotID', error as Error, { context: 'BotID' })
     // En caso de error, permitir la request (fail open)
-    return { isBot: false, reason: 'error' };
+    return { isBot: false, reason: 'error' }
   }
 }
 
@@ -43,35 +43,35 @@ export async function verifyBotId(): Promise<BotCheckResult> {
  * Retorna NextResponse de error si es bot, null si es humano
  */
 export async function botGuard(): Promise<NextResponse | null> {
-  const result = await verifyBotId();
+  const result = await verifyBotId()
   
   if (result.isBot) {
     return NextResponse.json(
       { 
         error: 'Acceso denegado', 
         code: 'BOT_DETECTED',
-        message: 'Esta acción no está permitida para solicitudes automatizadas' 
+        message: 'Esta acción no está permitida para solicitudes automatizadas', 
       },
-      { status: 403 }
-    );
+      { status: 403 },
+    )
   }
   
-  return null;
+  return null
 }
 
 /**
  * Wrapper para rutas API con protección BotID
  */
 export function withBotProtection<T>(
-  handler: () => Promise<NextResponse<T>>
+  handler: () => Promise<NextResponse<T>>,
 ): () => Promise<NextResponse<T | { error: string }>> {
   return async () => {
-    const guardResult = await botGuard();
+    const guardResult = await botGuard()
     if (guardResult) {
-      return guardResult as NextResponse<{ error: string }>;
+      return guardResult as NextResponse<{ error: string }>
     }
-    return handler();
-  };
+    return handler()
+  }
 }
 
 /**
@@ -85,11 +85,11 @@ export const developmentOptions = {
   
   // Bypass BotID en desarrollo
   bypassInDev: process.env.NODE_ENV === 'development',
-};
+}
 
 export default {
   verifyBotId,
   botGuard,
   withBotProtection,
   developmentOptions,
-};
+}

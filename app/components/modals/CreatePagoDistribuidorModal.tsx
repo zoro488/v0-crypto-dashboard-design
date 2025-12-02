@@ -168,13 +168,18 @@ export default function CreatePagoDistribuidorModal({
     }
 
     try {
+      // Construir notas incluyendo metodo y referencia si existen
+      const notasCompletas = [
+        data.metodo ? `Método: ${data.metodo}` : '',
+        data.referencia ? `Ref: ${data.referencia}` : '',
+        data.notas || '',
+      ].filter(Boolean).join('. ')
+
       const result = await registrarPago({
         distribuidorId: data.distribuidorId,
         bancoOrigen: data.bancoOrigen as BancoId,
         monto: data.monto,
-        metodo: data.metodo,
-        referencia: data.referencia,
-        notas: data.notas,
+        notas: notasCompletas || undefined,
       })
 
       if (result.success) {

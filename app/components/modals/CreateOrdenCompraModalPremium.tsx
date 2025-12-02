@@ -62,7 +62,11 @@ import { useToast } from '@/app/hooks/use-toast'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
-import { crearOrdenCompra, obtenerSiguienteIdOrdenCompra } from '@/app/lib/services/unified-data-service'
+// ✅ USAR NUEVO SERVICIO DE BUSINESS OPERATIONS
+import { crearOrdenCompraCompleta, type CrearOrdenCompraInput } from '@/app/lib/services/business-operations.service'
+import { obtenerSiguienteIdOrdenCompra } from '@/app/lib/services/unified-data-service'
+import { BANCOS_LIST } from '@/app/hooks/useBusinessOperations'
+import type { BancoId } from '@/app/types'
 
 // ============================================
 // SCHEMA ZOD - Basado en ordenes_compra.csv
@@ -72,6 +76,7 @@ const ordenCompraSchema = z.object({
   // ID se genera automáticamente (OC0001, OC0002, etc.)
   fecha: z.string().min(1, 'La fecha es requerida'),
   origen: z.string().min(1, 'Selecciona un distribuidor'),
+  producto: z.string().optional(),
   cantidad: z.number().min(1, 'La cantidad debe ser mayor a 0'),
   costoDistribuidor: z.number().min(0, 'El costo debe ser mayor o igual a 0'),
   costoTransporte: z.number().min(0),
@@ -79,6 +84,7 @@ const ordenCompraSchema = z.object({
   // costoTotal se calcula: costoPorUnidad × cantidad
   // stockActual inicialmente = cantidad
   pagoDistribuidor: z.number().min(0),
+  bancoOrigen: z.string().optional(), // ✅ NUEVO: Banco del cual sale el pago inicial
   // deuda se calcula: costoTotal - pagoDistribuidor
   notas: z.string().max(500).optional(),
 })
@@ -171,10 +177,12 @@ export function CreateOrdenCompraModalPremium({
     defaultValues: {
       fecha: editData?.fecha || new Date().toISOString().split('T')[0],
       origen: editData?.origen || '',
+      producto: 'Producto Principal',
       cantidad: editData?.cantidad || 100,
       costoDistribuidor: editData?.costoDistribuidor || 6100,
       costoTransporte: editData?.costoTransporte || 200,
       pagoDistribuidor: editData?.pagoDistribuidor || 0,
+      bancoOrigen: '', // ✅ NUEVO: Por defecto vacío
       notas: editData?.notas || '',
     },
   })
@@ -187,6 +195,7 @@ export function CreateOrdenCompraModalPremium({
   const costoTransporte = watch('costoTransporte')
   const pagoDistribuidor = watch('pagoDistribuidor')
   const origen = watch('origen')
+  const bancoOrigen = watch('bancoOrigen') // ✅ NUEVO
 
   // Cálculos automáticos basados en CSV
   const calculos = React.useMemo(() => {
@@ -229,69 +238,69 @@ export function CreateOrdenCompraModalPremium({
     setIsSubmitting(true)
 
     try {
-      // Determinar estado basado en pago
-      const estadoOrden: 'pagado' | 'parcial' | 'pendiente' = 
-        calculos.deuda <= 0 ? 'pagado' : 
-        data.pagoDistribuidor > 0 ? 'parcial' : 'pendiente'
-      
-      const ordenData = {
-        fecha: data.fecha,
+      // ✅ Usar el nuevo servicio de business operations
+      const ordenInput: CrearOrdenCompraInput = {
         distribuidor: data.origen,
-        origen: data.origen,
-        producto: 'Producto Principal', // Por defecto según el negocio
+        producto: data.producto || 'Producto Principal',
         cantidad: data.cantidad,
         costoDistribuidor: data.costoDistribuidor,
         costoTransporte: data.costoTransporte,
-        costoPorUnidad: calculos.costoPorUnidad,
-        costoTotal: calculos.costoTotal,
-        stockActual: calculos.stockActual,
-        stockInicial: calculos.stockActual,
-        pagoDistribuidor: data.pagoDistribuidor,
         pagoInicial: data.pagoDistribuidor,
-        deuda: calculos.deuda,
-        estado: estadoOrden,
-        notas: data.notas || '',
+        bancoOrigen: data.bancoOrigen && data.pagoDistribuidor > 0 
+          ? data.bancoOrigen as BancoId 
+          : undefined,
+        notas: data.notas,
+        fecha: data.fecha,
       }
 
-      // Guardar en Firestore
-      const result = await crearOrdenCompra(ordenData)
+      logger.info('[CreateOrdenCompraModal] Creando OC con business-operations', { 
+        data: ordenInput,
+        context: 'CreateOrdenCompraModalPremium',
+      })
+
+      // ✅ El servicio business-operations.service.ts maneja automáticamente:
+      // - Creación de la orden de compra
+      // - Creación/actualización del perfil del distribuidor con deuda
+      // - Registro de entrada en almacén (aumento de stock)
+      // - Si hay pago inicial, descuento del banco seleccionado
+      const result = await crearOrdenCompraCompleta(ordenInput)
       
       if (result) {
-        logger.info('Orden de Compra guardada en Firestore', { 
-          data: ordenData,
+        logger.info('[CreateOrdenCompraModal] OC creada exitosamente', {
+          data: {
+            ordenId: result.ordenId,
+            distribuidorId: result.distribuidorId,
+            costoTotal: result.costoTotal,
+            deudaGenerada: result.deudaGenerada,
+          },
           context: 'CreateOrdenCompraModalPremium',
         })
 
         toast({
-          title: isEdit ? '✅ Orden Actualizada' : '✅ Orden Creada',
-          description: `${data.cantidad} unidades de ${data.origen} - Total: ${formatearMonto(calculos.costoTotal)}`,
+          title: isEdit ? '✅ Orden Actualizada' : '✅ Orden de Compra Creada',
+          description: (
+            <div className="space-y-1">
+              <p>{data.cantidad} unidades de {data.origen}</p>
+              <p className="text-xs text-gray-400">
+                Total: {formatearMonto(result.costoTotal)} • 
+                {result.deudaGenerada > 0 ? ` Deuda: ${formatearMonto(result.deudaGenerada)}` : ' Pagado'}
+              </p>
+            </div>
+          ) as unknown as string,
         })
 
         onClose()
         onSuccess?.()
         useAppStore.getState().triggerDataRefresh()
       } else {
-        // Si Firestore no está disponible, guardar solo en store local
-        logger.warn('Firestore no disponible, orden guardada localmente', { 
-          data: ordenData,
-          context: 'CreateOrdenCompraModalPremium',
-        })
-
-        toast({
-          title: '⚠️ Modo Local',
-          description: 'Orden registrada localmente (Firebase no disponible)',
-        })
-
-        onClose()
-        onSuccess?.()
-        useAppStore.getState().triggerDataRefresh()
+        throw new Error('No se pudo crear la orden de compra')
       }
 
     } catch (error) {
-      logger.error('Error al guardar orden', error)
+      logger.error('[CreateOrdenCompraModal] Error al guardar orden', error)
       toast({
         title: 'Error',
-        description: 'No se pudo guardar la orden de compra',
+        description: error instanceof Error ? error.message : 'No se pudo guardar la orden de compra',
         variant: 'destructive',
       })
     } finally {
@@ -636,7 +645,7 @@ export function CreateOrdenCompraModalPremium({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Pago Realizado */}
                   <div className="space-y-3">
-                    <Label className="text-sm text-gray-400">Pago Realizado</Label>
+                    <Label className="text-sm text-gray-400">Pago Inicial Realizado</Label>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                       <Input
@@ -667,8 +676,63 @@ export function CreateOrdenCompraModalPremium({
                     </div>
                   </div>
 
+                  {/* ✅ NUEVO: Selector de Banco para Pago Inicial */}
+                  {pagoDistribuidor > 0 && (
+                    <motion.div 
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="space-y-3"
+                    >
+                      <Label className="text-sm text-gray-400 flex items-center gap-2">
+                        <Banknote className="w-3 h-3 text-purple-400" />
+                        ¿De qué banco sale el pago?
+                      </Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {BANCOS_LIST.slice(0, 4).map((banco) => (
+                          <motion.button
+                            key={banco.id}
+                            type="button"
+                            onClick={() => setValue('bancoOrigen', banco.id)}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className={cn(
+                              'p-3 rounded-xl border text-left transition-all',
+                              bancoOrigen === banco.id
+                                ? 'bg-purple-500/20 border-purple-500 shadow-lg shadow-purple-500/20'
+                                : 'bg-white/5 border-white/10 hover:bg-white/10',
+                            )}
+                          >
+                            <div className="flex items-center gap-2">
+                              <div className={cn(
+                                'w-8 h-8 rounded-lg flex items-center justify-center',
+                                bancoOrigen === banco.id ? 'bg-purple-500' : 'bg-white/10',
+                              )}>
+                                <Banknote className="w-4 h-4 text-white" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-white">{banco.nombre}</p>
+                              </div>
+                            </div>
+                            {bancoOrigen === banco.id && (
+                              <CheckCircle2 className="absolute top-2 right-2 w-4 h-4 text-purple-400" />
+                            )}
+                          </motion.button>
+                        ))}
+                      </div>
+                      {!bancoOrigen && pagoDistribuidor > 0 && (
+                        <div className="flex items-center gap-2 p-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                          <AlertTriangle className="w-4 h-4 text-yellow-400" />
+                          <span className="text-xs text-yellow-300">
+                            Selecciona el banco del cual se descontará el pago
+                          </span>
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+
                   {/* Deuda Generada */}
-                  <div className="space-y-3">
+                  <div className={cn('space-y-3', pagoDistribuidor > 0 && 'md:col-span-2')}>
                     <Label className="text-sm text-gray-400">Deuda con Distribuidor</Label>
                     <motion.div 
                       className={cn(

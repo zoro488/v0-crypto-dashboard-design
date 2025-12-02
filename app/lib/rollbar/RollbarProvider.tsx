@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 /**
  * 🛡️ ROLLBAR PROVIDER - Client Component
@@ -6,9 +6,9 @@
  * Provider para Rollbar en el cliente con error boundary.
  */
 
-import { Provider, ErrorBoundary } from '@rollbar/react';
-import { rollbarClientConfig } from '@/app/lib/rollbar/config';
-import { ReactNode, Component, ErrorInfo } from 'react';
+import { Provider, ErrorBoundary } from '@rollbar/react'
+import { rollbarClientConfig } from '@/app/lib/rollbar/config'
+import { ReactNode, Component, ErrorInfo } from 'react'
 
 interface RollbarProviderProps {
   children: ReactNode;
@@ -44,7 +44,7 @@ function ErrorFallback({ error, resetError }: { error: Error | null; resetError:
         </button>
       </div>
     </div>
-  );
+  )
 }
 
 // Class component para error boundary custom
@@ -53,16 +53,16 @@ class CustomErrorBoundary extends Component<
   { hasError: boolean; error: Error | null }
 > {
   constructor(props: { children: ReactNode }) {
-    super(props);
-    this.state = { hasError: false, error: null };
+    super(props)
+    this.state = { hasError: false, error: null }
   }
 
   static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error };
+    return { hasError: true, error }
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Error capturado:', error, errorInfo);
+    console.error('Error capturado:', error, errorInfo)
   }
 
   render() {
@@ -72,10 +72,10 @@ class CustomErrorBoundary extends Component<
           error={this.state.error} 
           resetError={() => this.setState({ hasError: false, error: null })} 
         />
-      );
+      )
     }
 
-    return this.props.children;
+    return this.props.children
   }
 }
 
@@ -86,7 +86,7 @@ export function RollbarProvider({ children }: RollbarProviderProps) {
       <CustomErrorBoundary>
         {children}
       </CustomErrorBoundary>
-    );
+    )
   }
 
   return (
@@ -95,7 +95,7 @@ export function RollbarProvider({ children }: RollbarProviderProps) {
         {children}
       </ErrorBoundary>
     </Provider>
-  );
+  )
 }
 
-export default RollbarProvider;
+export default RollbarProvider

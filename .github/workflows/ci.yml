@@ -43,12 +43,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🔍 Run ESLint
-        run: pnpm lint || true
-        continue-on-error: true
+        run: pnpm lint
 
       - name: 📝 TypeScript Check
-        run: pnpm tsc --noEmit || true
-        continue-on-error: true
+        run: pnpm type-check
 
   # ============================================
   # JOB 2: Unit Tests

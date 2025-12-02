@@ -183,9 +183,8 @@ export default function CreateAbonoClienteModal({
       const result = await registrarAbono({
         clienteId: data.clienteId,
         monto: data.monto,
-        metodo: data.metodo,
-        referencia: data.referencia,
-        notas: data.notas,
+        metodoPago: data.metodo, // Mapear metodo del form a metodoPago del servicio
+        notas: data.notas ? `${data.referencia ? `Ref: ${data.referencia}. ` : ''}${data.notas}` : data.referencia,
       })
 
       if (result.success) {

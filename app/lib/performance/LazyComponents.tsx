@@ -3,10 +3,10 @@
  * Componentes de carga diferida para optimización de rendimiento
  */
 
-'use client';
+'use client'
 
-import React, { Suspense, lazy, ComponentType } from 'react';
-import { useIntersectionObserver } from './optimizations';
+import React, { Suspense, lazy, ComponentType } from 'react'
+import { useIntersectionObserver } from './optimizations'
 
 // ===================================================================
 // SKELETON LOADERS
@@ -27,32 +27,32 @@ export function Skeleton({
   height,
   animation = 'pulse',
 }: SkeletonProps) {
-  const baseClasses = 'bg-muted';
+  const baseClasses = 'bg-muted'
   
   const variantClasses = {
     text: 'rounded',
     circular: 'rounded-full',
     rectangular: '',
     rounded: 'rounded-lg',
-  };
+  }
   
   const animationClasses = {
     pulse: 'animate-pulse',
     wave: 'animate-shimmer bg-gradient-to-r from-muted via-muted-foreground/10 to-muted',
     none: '',
-  };
+  }
 
   const style = {
     width: typeof width === 'number' ? `${width}px` : width,
     height: typeof height === 'number' ? `${height}px` : height,
-  };
+  }
 
   return (
     <div
       className={`${baseClasses} ${variantClasses[variant]} ${animationClasses[animation]} ${className}`}
       style={style}
     />
-  );
+  )
 }
 
 // ===================================================================
@@ -85,7 +85,7 @@ export function PanelSkeleton({ className = '' }: { className?: string }) {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 // ===================================================================
@@ -107,7 +107,7 @@ export function ChartSkeleton({ height = 300 }: { height?: number }) {
         ))}
       </div>
     </div>
-  );
+  )
 }
 
 // ===================================================================
@@ -133,7 +133,7 @@ export function TableSkeleton({ rows = 5 }: { rows?: number }) {
         </div>
       ))}
     </div>
-  );
+  )
 }
 
 // ===================================================================
@@ -162,7 +162,7 @@ export function Scene3DSkeleton() {
         <Skeleton variant="circular" width={40} height={40} />
       </div>
     </div>
-  );
+  )
 }
 
 // ===================================================================
@@ -180,13 +180,13 @@ export function LazyComponent({
   fallback = <PanelSkeleton />,
   props = {},
 }: LazyComponentProps) {
-  const Component = lazy(loader);
+  const Component = lazy(loader)
 
   return (
     <Suspense fallback={fallback}>
       <Component {...props} />
     </Suspense>
-  );
+  )
 }
 
 // ===================================================================
@@ -210,13 +210,13 @@ export function LazyOnViewport({
     rootMargin,
     threshold,
     triggerOnce: true,
-  });
+  })
 
   return (
     <div ref={ref as React.RefObject<HTMLDivElement>}>
       {isIntersecting ? children : fallback}
     </div>
-  );
+  )
 }
 
 // ===================================================================
@@ -234,29 +234,29 @@ export function PrefetchOnHover({
   prefetch,
   delay = 100,
 }: PrefetchOnHoverProps) {
-  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-  const hasPrefetched = React.useRef(false);
+  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  const hasPrefetched = React.useRef(false)
 
   const handleMouseEnter = React.useCallback(() => {
-    if (hasPrefetched.current) return;
+    if (hasPrefetched.current) return
     
     timeoutRef.current = setTimeout(() => {
-      prefetch();
-      hasPrefetched.current = true;
-    }, delay);
-  }, [delay, prefetch]);
+      prefetch()
+      hasPrefetched.current = true
+    }, delay)
+  }, [delay, prefetch])
 
   const handleMouseLeave = React.useCallback(() => {
     if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
+      clearTimeout(timeoutRef.current)
     }
-  }, []);
+  }, [])
 
   return (
     <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       {children}
     </div>
-  );
+  )
 }
 
 export default {
@@ -268,4 +268,4 @@ export default {
   LazyComponent,
   LazyOnViewport,
   PrefetchOnHover,
-};
+}

@@ -10,7 +10,7 @@
  * - Animation optimizations
  */
 
-import { useEffect, useCallback, useRef, useState } from 'react';
+import { useEffect, useCallback, useRef, useState } from 'react'
 
 // ===================================================================
 // INTERSECTION OBSERVER HOOK - Lazy Loading
@@ -23,35 +23,35 @@ interface UseIntersectionOptions {
 }
 
 export function useIntersectionObserver(
-  options: UseIntersectionOptions = {}
+  options: UseIntersectionOptions = {},
 ) {
-  const { threshold = 0, rootMargin = '50px', triggerOnce = true } = options;
-  const [isIntersecting, setIsIntersecting] = useState(false);
-  const [hasIntersected, setHasIntersected] = useState(false);
-  const ref = useRef<HTMLElement>(null);
+  const { threshold = 0, rootMargin = '50px', triggerOnce = true } = options
+  const [isIntersecting, setIsIntersecting] = useState(false)
+  const [hasIntersected, setHasIntersected] = useState(false)
+  const ref = useRef<HTMLElement>(null)
 
   useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
+    const element = ref.current
+    if (!element) return
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        const intersecting = entry.isIntersecting;
-        setIsIntersecting(intersecting);
+        const intersecting = entry.isIntersecting
+        setIsIntersecting(intersecting)
         
         if (intersecting && triggerOnce) {
-          setHasIntersected(true);
-          observer.disconnect();
+          setHasIntersected(true)
+          observer.disconnect()
         }
       },
-      { threshold, rootMargin }
-    );
+      { threshold, rootMargin },
+    )
 
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [threshold, rootMargin, triggerOnce]);
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [threshold, rootMargin, triggerOnce])
 
-  return { ref, isIntersecting: triggerOnce ? hasIntersected : isIntersecting };
+  return { ref, isIntersecting: triggerOnce ? hasIntersected : isIntersecting }
 }
 
 // ===================================================================
@@ -59,43 +59,43 @@ export function useIntersectionObserver(
 // ===================================================================
 
 export function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+  const [debouncedValue, setDebouncedValue] = useState<T>(value)
 
   useEffect(() => {
-    const handler = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(handler);
-  }, [value, delay]);
+    const handler = setTimeout(() => setDebouncedValue(value), delay)
+    return () => clearTimeout(handler)
+  }, [value, delay])
 
-  return debouncedValue;
+  return debouncedValue
 }
 
 export function useThrottle<T extends (...args: unknown[]) => unknown>(
   callback: T,
-  delay: number
+  delay: number,
 ): T {
-  const lastRan = useRef(Date.now());
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastRan = useRef(Date.now())
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   return useCallback(
     ((...args: unknown[]) => {
-      const now = Date.now();
+      const now = Date.now()
       
       if (now - lastRan.current >= delay) {
-        lastRan.current = now;
-        return callback(...args);
+        lastRan.current = now
+        return callback(...args)
       }
       
       if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+        clearTimeout(timeoutRef.current)
       }
       
       timeoutRef.current = setTimeout(() => {
-        lastRan.current = Date.now();
-        callback(...args);
-      }, delay - (now - lastRan.current));
+        lastRan.current = Date.now()
+        callback(...args)
+      }, delay - (now - lastRan.current))
     }) as T,
-    [callback, delay]
-  );
+    [callback, delay],
+  )
 }
 
 // ===================================================================
@@ -103,26 +103,26 @@ export function useThrottle<T extends (...args: unknown[]) => unknown>(
 // ===================================================================
 
 export function useAnimationFrame(callback: (deltaTime: number) => void) {
-  const requestRef = useRef<number | null>(null);
-  const previousTimeRef = useRef<number | undefined>(undefined);
+  const requestRef = useRef<number | null>(null)
+  const previousTimeRef = useRef<number | undefined>(undefined)
 
   useEffect(() => {
     const animate = (time: number) => {
       if (previousTimeRef.current !== undefined) {
-        const deltaTime = time - previousTimeRef.current;
-        callback(deltaTime);
+        const deltaTime = time - previousTimeRef.current
+        callback(deltaTime)
       }
-      previousTimeRef.current = time;
-      requestRef.current = requestAnimationFrame(animate);
-    };
+      previousTimeRef.current = time
+      requestRef.current = requestAnimationFrame(animate)
+    }
 
-    requestRef.current = requestAnimationFrame(animate);
+    requestRef.current = requestAnimationFrame(animate)
     return () => {
       if (requestRef.current) {
-        cancelAnimationFrame(requestRef.current);
+        cancelAnimationFrame(requestRef.current)
       }
-    };
-  }, [callback]);
+    }
+  }, [callback])
 }
 
 // ===================================================================
@@ -134,44 +134,44 @@ export function useAnimationFrame(callback: (deltaTime: number) => void) {
  */
 export function useCleanup(cleanup: () => void) {
   useEffect(() => {
-    return cleanup;
-  }, [cleanup]);
+    return cleanup
+  }, [cleanup])
 }
 
 /**
  * Pool de objetos reutilizables para reducir garbage collection
  */
 export class ObjectPool<T> {
-  private pool: T[] = [];
-  private factory: () => T;
-  private reset: (obj: T) => T;
-  private maxSize: number;
+  private pool: T[] = []
+  private factory: () => T
+  private reset: (obj: T) => T
+  private maxSize: number
 
   constructor(
     factory: () => T,
     reset: (obj: T) => T,
-    maxSize = 100
+    maxSize = 100,
   ) {
-    this.factory = factory;
-    this.reset = reset;
-    this.maxSize = maxSize;
+    this.factory = factory
+    this.reset = reset
+    this.maxSize = maxSize
   }
 
   acquire(): T {
     if (this.pool.length > 0) {
-      return this.pool.pop()!;
+      return this.pool.pop()!
     }
-    return this.factory();
+    return this.factory()
   }
 
   release(obj: T): void {
     if (this.pool.length < this.maxSize) {
-      this.pool.push(this.reset(obj));
+      this.pool.push(this.reset(obj))
     }
   }
 
   clear(): void {
-    this.pool = [];
+    this.pool = []
   }
 }
 
@@ -193,21 +193,21 @@ interface OptimizedImageProps {
  */
 export function generateResponsiveImageUrls(
   baseSrc: string,
-  widths: number[] = [320, 640, 1024, 1920]
+  widths: number[] = [320, 640, 1024, 1920],
 ): { srcSet: string; sizes: string } {
   // Para imágenes de Firebase Storage o Spline
   if (baseSrc.includes('firebasestorage') || baseSrc.includes('spline')) {
     return {
       srcSet: widths.map(w => `${baseSrc} ${w}w`).join(', '),
       sizes: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
-    };
+    }
   }
 
   // Para imágenes locales, usar el Image Optimization de Next.js
   return {
     srcSet: widths.map(w => `/_next/image?url=${encodeURIComponent(baseSrc)}&w=${w}&q=75 ${w}w`).join(', '),
     sizes: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
-  };
+  }
 }
 
 // ===================================================================
@@ -223,52 +223,52 @@ export function preloadCriticalAssets(assets: {
   images?: string[];
   fonts?: string[];
 }) {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined') return
 
-  const head = document.head;
+  const head = document.head
 
   // Preload fonts
   assets.fonts?.forEach(font => {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'font';
-    link.type = 'font/woff2';
-    link.crossOrigin = 'anonymous';
-    link.href = font;
-    head.appendChild(link);
-  });
+    const link = document.createElement('link')
+    link.rel = 'preload'
+    link.as = 'font'
+    link.type = 'font/woff2'
+    link.crossOrigin = 'anonymous'
+    link.href = font
+    head.appendChild(link)
+  })
 
   // Preload images
   assets.images?.forEach(img => {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'image';
-    link.href = img;
-    head.appendChild(link);
-  });
+    const link = document.createElement('link')
+    link.rel = 'preload'
+    link.as = 'image'
+    link.href = img
+    head.appendChild(link)
+  })
 
   // Prefetch scripts
   assets.scripts?.forEach(script => {
-    const link = document.createElement('link');
-    link.rel = 'prefetch';
-    link.as = 'script';
-    link.href = script;
-    head.appendChild(link);
-  });
+    const link = document.createElement('link')
+    link.rel = 'prefetch'
+    link.as = 'script'
+    link.href = script
+    head.appendChild(link)
+  })
 }
 
 /**
  * DNS Prefetch para dominios externos
  */
 export function dnsPrefetch(domains: string[]) {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined') return
 
   domains.forEach(domain => {
-    const link = document.createElement('link');
-    link.rel = 'dns-prefetch';
-    link.href = domain;
-    document.head.appendChild(link);
-  });
+    const link = document.createElement('link')
+    link.rel = 'dns-prefetch'
+    link.href = domain
+    document.head.appendChild(link)
+  })
 }
 
 // Dominios comunes para CHRONOS
@@ -278,7 +278,7 @@ export const CHRONOS_EXTERNAL_DOMAINS = [
   'https://models.github.ai',
   'https://api.openai.com',
   'https://mockend.com',
-];
+]
 
 // ===================================================================
 // CANVAS/WEBGL OPTIMIZATIONS
@@ -289,34 +289,34 @@ export const CHRONOS_EXTERNAL_DOMAINS = [
  */
 export function getDeviceCapabilities() {
   if (typeof window === 'undefined') {
-    return { isLowEnd: false, supportsWebGL2: true, maxTextureSize: 4096 };
+    return { isLowEnd: false, supportsWebGL2: true, maxTextureSize: 4096 }
   }
 
-  const canvas = document.createElement('canvas');
-  const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+  const canvas = document.createElement('canvas')
+  const gl = canvas.getContext('webgl2') || canvas.getContext('webgl')
   
-  let maxTextureSize = 4096;
-  let supportsWebGL2 = false;
+  let maxTextureSize = 4096
+  let supportsWebGL2 = false
 
   if (gl) {
-    maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-    supportsWebGL2 = !!(canvas.getContext('webgl2'));
+    maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE)
+    supportsWebGL2 = !!(canvas.getContext('webgl2'))
   }
 
   // Detectar dispositivo de gama baja
   const isLowEnd = 
     navigator.hardwareConcurrency <= 4 ||
     (navigator as Navigator & { deviceMemory?: number }).deviceMemory! <= 4 ||
-    maxTextureSize < 4096;
+    maxTextureSize < 4096
 
-  return { isLowEnd, supportsWebGL2, maxTextureSize };
+  return { isLowEnd, supportsWebGL2, maxTextureSize }
 }
 
 /**
  * Configuración adaptativa para Three.js/Spline
  */
 export function getAdaptive3DConfig() {
-  const { isLowEnd, supportsWebGL2, maxTextureSize } = getDeviceCapabilities();
+  const { isLowEnd, supportsWebGL2, maxTextureSize } = getDeviceCapabilities()
 
   return {
     // Reducir calidad en dispositivos de gama baja
@@ -331,7 +331,7 @@ export function getAdaptive3DConfig() {
     
     // Animation
     targetFPS: isLowEnd ? 30 : 60,
-  };
+  }
 }
 
 // ===================================================================
@@ -350,20 +350,20 @@ export interface VirtualListConfig {
 export function calculateVisibleRange(
   scrollTop: number,
   totalItems: number,
-  config: VirtualListConfig
+  config: VirtualListConfig,
 ) {
-  const { itemHeight, containerHeight, overscan = 3 } = config;
+  const { itemHeight, containerHeight, overscan = 3 } = config
 
-  const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
-  const visibleCount = Math.ceil(containerHeight / itemHeight);
-  const endIndex = Math.min(totalItems - 1, startIndex + visibleCount + overscan * 2);
+  const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan)
+  const visibleCount = Math.ceil(containerHeight / itemHeight)
+  const endIndex = Math.min(totalItems - 1, startIndex + visibleCount + overscan * 2)
 
   return {
     startIndex,
     endIndex,
     offsetY: startIndex * itemHeight,
     visibleItems: endIndex - startIndex + 1,
-  };
+  }
 }
 
 export default {
@@ -380,4 +380,4 @@ export default {
   getAdaptive3DConfig,
   calculateVisibleRange,
   CHRONOS_EXTERNAL_DOMAINS,
-};
+}

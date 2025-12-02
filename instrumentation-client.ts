@@ -5,7 +5,7 @@
  * Este archivo se carga automáticamente en Next.js 15.3+
  * para proteger endpoints críticos del sistema CHRONOS
  */
-import { initBotId } from 'botid/client/core';
+import { initBotId } from 'botid/client/core'
 
 // 🛡️ Definir rutas que necesitan protección contra bots
 // Estas son rutas críticas para operaciones financieras y auth
@@ -70,4 +70,4 @@ initBotId({
       method: 'DELETE',
     },
   ],
-});
+})

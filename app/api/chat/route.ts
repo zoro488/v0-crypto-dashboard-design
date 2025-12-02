@@ -20,6 +20,7 @@ import { z } from 'zod'
 import { NextRequest } from 'next/server'
 import { checkBotId } from 'botid/server'
 import { logger } from '@/app/lib/utils/logger'
+import type { Venta, Banco, OrdenCompra } from '@/app/types'
 
 // Configuración de Vercel AI Gateway
 import { 
@@ -125,8 +126,8 @@ const tools = {
         // Filtrar por fecha si se proporciona
         let filtradas = ventas
         if (params.startDate || params.endDate) {
-          filtradas = ventas.filter((v: any) => {
-            const fecha = new Date(v.fecha)
+          filtradas = ventas.filter((v: Venta) => {
+            const fecha = v.fecha instanceof Date ? v.fecha : new Date(v.fecha as string)
             if (params.startDate && fecha < new Date(params.startDate)) return false
             if (params.endDate && fecha > new Date(params.endDate)) return false
             return true
@@ -137,7 +138,7 @@ const tools = {
         const resultado = filtradas.slice(0, params.limitCount)
         
         // Calcular estadísticas
-        const total = resultado.reduce((sum: number, v: any) => sum + (v.precioTotalVenta || 0), 0)
+        const total = resultado.reduce((sum: number, v: Venta) => sum + (v.precioTotalVenta || 0), 0)
         const promedio = resultado.length > 0 ? total / resultado.length : 0
         
         return {
@@ -182,7 +183,7 @@ const tools = {
     execute: async () => {
       try {
         const bancos = await obtenerBancos()
-        const totalCapital = bancos.reduce((sum: number, b: any) => 
+        const totalCapital = bancos.reduce((sum: number, b: Banco) => 
           sum + (b.capitalActual || 0), 0,
         )
         
@@ -210,10 +211,10 @@ const tools = {
         let ordenes = await obtenerOrdenesCompra()
         
         if (params.estado !== 'todas') {
-          ordenes = ordenes.filter((o: any) => o.estado === params.estado)
+          ordenes = ordenes.filter((o: OrdenCompra) => o.estado === params.estado)
         }
         
-        const totalDeuda = ordenes.reduce((sum: number, o: any) => 
+        const totalDeuda = ordenes.reduce((sum: number, o: OrdenCompra) => 
           sum + (o.deuda || 0), 0,
         )
         
@@ -437,25 +438,26 @@ const tools = {
         }
         
         // Filtrar ventas del período
-        const ventasPeriodo = ventas.filter((v: any) => 
-          new Date(v.fecha) >= startDate,
-        )
+        const ventasPeriodo = ventas.filter((v: Venta) => {
+          const fecha = v.fecha instanceof Date ? v.fecha : new Date(v.fecha as string)
+          return fecha >= startDate
+        })
         
         // Calcular métricas
-        const totalVentas = ventasPeriodo.reduce((sum: number, v: any) => 
+        const totalVentas = ventasPeriodo.reduce((sum: number, v: Venta) => 
           sum + (v.precioTotalVenta || 0), 0,
         )
-        const totalPagado = ventasPeriodo.reduce((sum: number, v: any) => 
+        const totalPagado = ventasPeriodo.reduce((sum: number, v: Venta) => 
           sum + (v.montoPagado || 0), 0,
         )
         const totalPendiente = totalVentas - totalPagado
         const ticketPromedio = ventasPeriodo.length > 0 ? totalVentas / ventasPeriodo.length : 0
         
         // Top clientes
-        const clientesMap = new Map()
-        ventasPeriodo.forEach((v: any) => {
-          const current = clientesMap.get(v.clienteNombre) || 0
-          clientesMap.set(v.clienteNombre, current + v.precioTotalVenta)
+        const clientesMap = new Map<string, number>()
+        ventasPeriodo.forEach((v: Venta) => {
+          const current = clientesMap.get(v.cliente) || 0
+          clientesMap.set(v.cliente, current + (v.precioTotalVenta || 0))
         })
         const topClientes = Array.from(clientesMap.entries())
           .sort((a, b) => b[1] - a[1])
@@ -498,7 +500,7 @@ export async function POST(request: NextRequest) {
       logger.warn('Bot detectado en /api/chat', { context: 'ChatAPI' })
       return new Response(
         JSON.stringify({ error: 'Acceso denegado. Bot detectado.' }),
-        { status: 403, headers: { 'Content-Type': 'application/json' } }
+        { status: 403, headers: { 'Content-Type': 'application/json' } },
       )
     }
 

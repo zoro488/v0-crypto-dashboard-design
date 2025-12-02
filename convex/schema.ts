@@ -5,8 +5,8 @@
  * Convex proporciona sincronización automática, consultas reactivas y baja latencia.
  */
 
-import { defineSchema, defineTable } from "convex/server";
-import { v } from "convex/values";
+import { defineSchema, defineTable } from 'convex/server'
+import { v } from 'convex/values'
 
 export default defineSchema({
   // ===== BANCOS =====
@@ -15,14 +15,14 @@ export default defineSchema({
     nombre: v.string(),
     icon: v.string(),
     color: v.string(),
-    tipo: v.union(v.literal("boveda"), v.literal("operativo"), v.literal("gastos"), v.literal("utilidades")),
-    moneda: v.union(v.literal("MXN"), v.literal("USD")),
+    tipo: v.union(v.literal('boveda'), v.literal('operativo'), v.literal('gastos'), v.literal('utilidades')),
+    moneda: v.union(v.literal('MXN'), v.literal('USD')),
     capitalActual: v.number(),
     capitalInicial: v.number(),
     historicoIngresos: v.number(),
     historicoGastos: v.number(),
-    estado: v.union(v.literal("activo"), v.literal("inactivo")),
-  }).index("by_bancoId", ["bancoId"]),
+    estado: v.union(v.literal('activo'), v.literal('inactivo')),
+  }).index('by_bancoId', ['bancoId']),
 
   // ===== CLIENTES =====
   clientes: defineTable({
@@ -34,11 +34,11 @@ export default defineSchema({
     deuda: v.number(),
     abonos: v.number(),
     pendiente: v.number(),
-    estado: v.union(v.literal("activo"), v.literal("inactivo")),
+    estado: v.union(v.literal('activo'), v.literal('inactivo')),
     keywords: v.array(v.string()),
   })
-    .index("by_nombre", ["nombre"])
-    .searchIndex("search_nombre", { searchField: "nombre" }),
+    .index('by_nombre', ['nombre'])
+    .searchIndex('search_nombre', { searchField: 'nombre' }),
 
   // ===== DISTRIBUIDORES =====
   distribuidores: defineTable({
@@ -49,16 +49,16 @@ export default defineSchema({
     costoTotal: v.number(),
     abonos: v.number(),
     pendiente: v.number(),
-    estado: v.union(v.literal("activo"), v.literal("inactivo")),
+    estado: v.union(v.literal('activo'), v.literal('inactivo')),
   })
-    .index("by_nombre", ["nombre"])
-    .searchIndex("search_nombre", { searchField: "nombre" }),
+    .index('by_nombre', ['nombre'])
+    .searchIndex('search_nombre', { searchField: 'nombre' }),
 
   // ===== ÓRDENES DE COMPRA =====
   ordenes_compra: defineTable({
     ordenId: v.string(), // OC0001, OC0002, etc.
     fecha: v.string(),
-    distribuidorId: v.optional(v.id("distribuidores")),
+    distribuidorId: v.optional(v.id('distribuidores')),
     distribuidor: v.string(),
     cantidad: v.number(),
     costoDistribuidor: v.number(),
@@ -69,40 +69,40 @@ export default defineSchema({
     stockInicial: v.number(),
     pagoDistribuidor: v.number(),
     deuda: v.number(),
-    estado: v.union(v.literal("pendiente"), v.literal("parcial"), v.literal("pagado")),
+    estado: v.union(v.literal('pendiente'), v.literal('parcial'), v.literal('pagado')),
   })
-    .index("by_ordenId", ["ordenId"])
-    .index("by_estado", ["estado"])
-    .index("by_fecha", ["fecha"]),
+    .index('by_ordenId', ['ordenId'])
+    .index('by_estado', ['estado'])
+    .index('by_fecha', ['fecha']),
 
   // ===== VENTAS =====
   ventas: defineTable({
     ventaId: v.string(), // VTA00001, VTA00002, etc.
     fecha: v.string(),
     ocRelacionada: v.optional(v.string()),
-    clienteId: v.optional(v.id("clientes")),
+    clienteId: v.optional(v.id('clientes')),
     cliente: v.string(),
     cantidad: v.number(),
     precioVenta: v.number(),
     precioCompra: v.number(),
     ingreso: v.number(),
-    flete: v.union(v.literal("Aplica"), v.literal("NoAplica")),
+    flete: v.union(v.literal('Aplica'), v.literal('NoAplica')),
     fleteUtilidad: v.number(),
     utilidad: v.number(),
     bovedaMonte: v.number(),
-    estatus: v.union(v.literal("Pagado"), v.literal("Pendiente"), v.literal("Parcial")),
+    estatus: v.union(v.literal('Pagado'), v.literal('Pendiente'), v.literal('Parcial')),
     montoPagado: v.number(),
     montoRestante: v.number(),
   })
-    .index("by_ventaId", ["ventaId"])
-    .index("by_cliente", ["cliente"])
-    .index("by_fecha", ["fecha"])
-    .index("by_estatus", ["estatus"]),
+    .index('by_ventaId', ['ventaId'])
+    .index('by_cliente', ['cliente'])
+    .index('by_fecha', ['fecha'])
+    .index('by_estatus', ['estatus']),
 
   // ===== MOVIMIENTOS =====
   movimientos: defineTable({
     bancoId: v.string(),
-    tipo: v.union(v.literal("ingreso"), v.literal("gasto"), v.literal("transferencia")),
+    tipo: v.union(v.literal('ingreso'), v.literal('gasto'), v.literal('transferencia')),
     fecha: v.string(),
     monto: v.number(),
     concepto: v.string(),
@@ -112,26 +112,26 @@ export default defineSchema({
     referenciaId: v.optional(v.string()),
     referenciaTipo: v.optional(v.string()),
   })
-    .index("by_bancoId", ["bancoId"])
-    .index("by_fecha", ["fecha"])
-    .index("by_tipo", ["tipo"]),
+    .index('by_bancoId', ['bancoId'])
+    .index('by_fecha', ['fecha'])
+    .index('by_tipo', ['tipo']),
 
   // ===== GASTOS Y ABONOS =====
   gastos_abonos: defineTable({
     fecha: v.string(),
-    tipo: v.union(v.literal("gasto"), v.literal("abono")),
+    tipo: v.union(v.literal('gasto'), v.literal('abono')),
     origen: v.string(),
     monto: v.number(),
     destino: v.string(),
     bancoId: v.optional(v.string()),
     concepto: v.optional(v.string()),
   })
-    .index("by_tipo", ["tipo"])
-    .index("by_fecha", ["fecha"]),
+    .index('by_tipo', ['tipo'])
+    .index('by_fecha', ['fecha']),
 
   // ===== CHAT/IA =====
   messages: defineTable({
-    role: v.union(v.literal("user"), v.literal("assistant"), v.literal("system")),
+    role: v.union(v.literal('user'), v.literal('assistant'), v.literal('system')),
     content: v.string(),
     toolCalls: v.optional(v.array(v.object({
       name: v.string(),
@@ -141,8 +141,8 @@ export default defineSchema({
     timestamp: v.number(),
     userId: v.optional(v.string()),
   })
-    .index("by_timestamp", ["timestamp"])
-    .index("by_userId", ["userId"]),
+    .index('by_timestamp', ['timestamp'])
+    .index('by_userId', ['userId']),
 
   // ===== ANALYTICS =====
   analytics_events: defineTable({
@@ -152,6 +152,6 @@ export default defineSchema({
     userId: v.optional(v.string()),
     sessionId: v.optional(v.string()),
   })
-    .index("by_event", ["event"])
-    .index("by_timestamp", ["timestamp"]),
-});
+    .index('by_event', ['event'])
+    .index('by_timestamp', ['timestamp']),
+})

@@ -1,19 +1,26 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { TrendingUp, TrendingDown, DollarSign, Package, Users, Activity } from 'lucide-react'
+import { TrendingUp, TrendingDown, Package, Users, Activity } from 'lucide-react'
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts'
 import { SafeChartContainer, SAFE_ANIMATION_PROPS } from '@/app/components/ui/SafeChartContainer'
 
+interface AnalyticsData {
+  salesData?: Array<{ month: string; value: number; prev: number }>
+  inventoryData?: Array<{ product: string; stock: number }>
+  clientsData?: Array<{ name: string; value: number }>
+  predictions?: Array<{ period: string; predicted: number; confidence: number }>
+}
+
 interface AIAnalyticsOverlayProps {
   isVisible: boolean
-  data?: any
+  data?: AnalyticsData
   type?: 'sales' | 'inventory' | 'clients' | 'predictions'
 }
 
 export function AIAnalyticsOverlay({ 
   isVisible, 
-  data, 
+  data: _data, 
   type = 'sales', 
 }: AIAnalyticsOverlayProps) {
   const mockSalesData = [

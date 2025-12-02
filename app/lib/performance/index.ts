@@ -18,7 +18,7 @@ export {
   getAdaptive3DConfig,
   calculateVisibleRange,
   CHRONOS_EXTERNAL_DOMAINS,
-} from './optimizations';
+} from './optimizations'
 
 // Lazy loading components
 export {
@@ -30,4 +30,4 @@ export {
   LazyComponent,
   LazyOnViewport,
   PrefetchOnHover,
-} from './LazyComponents';
+} from './LazyComponents'

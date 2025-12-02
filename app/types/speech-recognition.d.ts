@@ -50,7 +50,7 @@ declare global {
   }
 
   // Constructor de SpeechRecognition
-  // eslint-disable-next-line no-var
+   
   var SpeechRecognition: {
     prototype: SpeechRecognition
     new (): SpeechRecognition

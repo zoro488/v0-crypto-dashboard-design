@@ -50,8 +50,10 @@ import { useToast } from '@/app/hooks/use-toast'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
-import { registrarPagoDistribuidor } from '@/app/lib/services/business-logic.service'
+// ✅ USAR NUEVO SERVICIO DE BUSINESS OPERATIONS
+import { pagarDistribuidor, type PagarDistribuidorInput as BizPagarDistInput } from '@/app/lib/services/business-operations.service'
 import { useDistribuidores, useBancosData, useOrdenesCompra } from '@/app/lib/firebase/firestore-hooks.service'
+import type { BancoId } from '@/app/types'
 
 // ============================================
 // SCHEMA ZOD
@@ -303,25 +305,43 @@ export function CreatePagoDistribuidorModalPremium({
     setIsSubmitting(true)
 
     try {
-      const pagoData = {
+      // ✅ Usar el nuevo servicio de business operations
+      const pagoInput: BizPagarDistInput = {
         distribuidorId: data.distribuidorId,
+        ordenCompraId: data.ordenesRelacionadas?.[0],
         monto: data.monto,
-        bancoOrigen: data.bancoOrigen,
-        ordenCompraRelacionada: data.ordenesRelacionadas?.[0],
-        concepto: data.concepto || `Pago a ${data.distribuidorNombre}`,
+        bancoOrigen: data.bancoOrigen as BancoId,
+        notas: data.concepto || `Pago a ${data.distribuidorNombre}`,
       }
 
-      logger.info('Registrando pago a distribuidor en Firestore', { 
-        data: pagoData,
+      logger.info('[CreatePagoDistribuidorModal] Registrando pago con business-operations', { 
+        data: pagoInput,
         context: 'CreatePagoDistribuidorModalPremium',
       })
 
-      const result = await registrarPagoDistribuidor(pagoData)
+      // ✅ El servicio business-operations.service.ts maneja automáticamente:
+      // - Actualización del perfil del distribuidor (reduce deuda)
+      // - Actualización del banco origen (reduce capital, aumenta historicoGastos)
+      // - Registro del movimiento como 'pago_distribuidor'
+      // - Si hay OC específica, actualiza su estado
+      const result = await pagarDistribuidor(pagoInput)
 
       if (result) {
+        logger.info('[CreatePagoDistribuidorModal] Pago procesado exitosamente', {
+          data: { distribuidorId: data.distribuidorId, monto: data.monto },
+          context: 'CreatePagoDistribuidorModalPremium',
+        })
+
         toast({
           title: '✅ Pago Registrado',
-          description: `${formatearMonto(data.monto)} pagado a ${data.distribuidorNombre}`,
+          description: (
+            <div className="space-y-1">
+              <p>{formatearMonto(data.monto)} pagado a {data.distribuidorNombre}</p>
+              <p className="text-xs text-gray-400">
+                Descontado de {bancoSeleccionado?.nombre} • Nueva deuda: {formatearMonto(nuevaDeuda)}
+              </p>
+            </div>
+          ) as unknown as string,
         })
 
         onClose()
@@ -332,7 +352,7 @@ export function CreatePagoDistribuidorModalPremium({
       }
 
     } catch (error) {
-      logger.error('Error al registrar pago', error)
+      logger.error('[CreatePagoDistribuidorModal] Error al registrar pago', error)
       toast({
         title: 'Error',
         description: error instanceof Error ? error.message : 'No se pudo registrar el pago',

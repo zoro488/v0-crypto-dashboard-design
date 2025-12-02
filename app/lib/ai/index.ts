@@ -27,7 +27,7 @@ export const GITHUB_MODELS = {
   GPT4O_MINI: 'openai/gpt-4o-mini',
   CLAUDE_SONNET: 'anthropic/claude-3.5-sonnet',
   PHI4: 'microsoft/Phi-4',
-} as const;
+} as const
 
 export const AI_MODELS = {
   GROK_2: 'grok-2-1212',
@@ -35,4 +35,4 @@ export const AI_MODELS = {
   GPT_4O_MINI: 'gpt-4o-mini',
   CLAUDE_SONNET: 'claude-3-5-sonnet-20241022',
   GEMINI_PRO: 'gemini-1.5-pro',
-} as const;
+} as const

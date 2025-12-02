@@ -182,7 +182,7 @@ export class AIAutomationService {
       operation: 'execute_action',
       target,
       data: params,
-      message: `Esta acción requiere confirmación adicional.`,
+      message: 'Esta acción requiere confirmación adicional.',
     }
   }
 

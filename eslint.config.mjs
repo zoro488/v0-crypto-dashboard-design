@@ -180,6 +180,7 @@ export default [
       'coverage/**',
       '*.config.js',
       '*.config.mjs',
+      '*.config.ts',
       'public/**',
       '.git/**',
       '__tests__/**', // Opcional: no lintear tests si usan reglas diferentes
@@ -190,6 +191,7 @@ export default [
       'automation/**', // Scripts de automatización
       'csv/**', // Datos CSV
       'dataconnect/**', // Firebase DataConnect
+      'convex/**', // Convex generados automáticamente
       'e2e/**', // E2E tests con Playwright (reglas diferentes)
       'gg/**', // Assets
       'hooks/**', // Hooks duplicados en raíz (usar app/hooks)
@@ -200,6 +202,7 @@ export default [
       'tailwind.config.ts', // Config de Tailwind
       'playwright.config.ts', // Config de Playwright
       'next.config.*.js', // Configs adicionales de Next
+      'next.config.ts', // Config de Next
       'sentry.*.config.ts', // Configs de Sentry
       'evaluation/**', // Evaluación de AI
       'next-env.d.ts', // Autogenerado por Next.js - no editar

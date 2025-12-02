@@ -484,12 +484,23 @@ export interface CalculoVentaResult {
   gananciaDesdeCSV: number     // Ganancia directa del CSV si existe
   
   // Para pagos parciales
-  proporcionPagada: number     // montoPagado / ingresoVenta
-  distribucionParcial: {
+  proporcionPagada?: number     // montoPagado / ingresoVenta
+  distribucionParcial?: {
     bovedaMonte: number
     fletes: number
     utilidades: number
   }
+
+  // Margen de ganancia
+  margenPorcentaje?: number     // (utilidades / totalVenta) * 100
+
+  // Propiedades legacy para compatibilidad con componentes existentes
+  precioTotalVenta?: number     // Alias de totalVenta
+  bovedaMonte?: number          // Alias de montoBovedaMonte
+  fletes?: number               // Alias de montoFletes
+  utilidades?: number           // Alias de montoUtilidades
+  totalDistribuido?: number     // Suma de distribución
+  ganancia?: number             // Alias de gananciaBruta
 }
 
 /**

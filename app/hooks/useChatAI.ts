@@ -9,8 +9,8 @@
  * - Memoria de conversación
  */
 
-import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { useChatMessages, useChatMutations } from './useConvex';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
+import { useChatMessages, useChatMutations } from './useConvex'
 
 // Tipos para el chat
 export interface ChatMessage {
@@ -43,18 +43,18 @@ export function useChatAI(options: UseChatAIOptions = {}) {
     onToolCall,
     maxHistoryLength = 50,
     persistHistory = true,
-  } = options;
+  } = options
 
   // Estado local
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [streamingContent, setStreamingContent] = useState('');
-  const abortControllerRef = useRef<AbortController | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [streamingContent, setStreamingContent] = useState('')
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   // Convex para persistencia
-  const convexMessages = useChatMessages(userId, maxHistoryLength);
-  const { addMessage: addConvexMessage, clearHistory: clearConvexHistory } = useChatMutations();
+  const convexMessages = useChatMessages(userId, maxHistoryLength)
+  const { addMessage: addConvexMessage, clearHistory: clearConvexHistory } = useChatMutations()
 
   // Sincronizar con Convex cuando los mensajes cambian
   useEffect(() => {
@@ -71,18 +71,18 @@ export function useChatAI(options: UseChatAIOptions = {}) {
             : tc.arguments as Record<string, unknown>,
           result: tc.result,
         })),
-      }));
-      setMessages(formattedMessages);
+      }))
+      setMessages(formattedMessages)
     }
-  }, [convexMessages]);
+  }, [convexMessages])
 
   // Enviar mensaje con streaming
   const sendMessage = useCallback(async (content: string) => {
-    if (!content.trim() || isLoading) return;
+    if (!content.trim() || isLoading) return
 
-    setError(null);
-    setIsLoading(true);
-    setStreamingContent('');
+    setError(null)
+    setIsLoading(true)
+    setStreamingContent('')
 
     // Agregar mensaje del usuario
     const userMessage: ChatMessage = {
@@ -90,9 +90,9 @@ export function useChatAI(options: UseChatAIOptions = {}) {
       role: 'user',
       content,
       timestamp: new Date(),
-    };
+    }
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages(prev => [...prev, userMessage])
 
     // Persistir en Convex si está habilitado
     if (persistHistory) {
@@ -101,9 +101,9 @@ export function useChatAI(options: UseChatAIOptions = {}) {
           role: 'user',
           content,
           userId,
-        });
+        })
       } catch (e) {
-        console.warn('Error persistiendo mensaje:', e);
+        console.warn('Error persistiendo mensaje:', e)
       }
     }
 
@@ -111,10 +111,10 @@ export function useChatAI(options: UseChatAIOptions = {}) {
     const historyForApi = messages.slice(-10).map(m => ({
       role: m.role,
       content: m.content,
-    }));
+    }))
 
     try {
-      abortControllerRef.current = new AbortController();
+      abortControllerRef.current = new AbortController()
 
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -127,16 +127,16 @@ export function useChatAI(options: UseChatAIOptions = {}) {
           ],
         }),
         signal: abortControllerRef.current.signal,
-      });
+      })
 
       if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
+        throw new Error(`Error: ${response.status}`)
       }
 
       // Procesar streaming
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let fullContent = '';
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+      let fullContent = ''
 
       // Agregar mensaje vacío del asistente para streaming
       const assistantMessage: ChatMessage = {
@@ -145,27 +145,27 @@ export function useChatAI(options: UseChatAIOptions = {}) {
         content: '',
         timestamp: new Date(),
         isStreaming: true,
-      };
+      }
 
-      setMessages(prev => [...prev, assistantMessage]);
+      setMessages(prev => [...prev, assistantMessage])
 
       if (reader) {
         while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
+          const { done, value } = await reader.read()
+          if (done) break
 
-          const chunk = decoder.decode(value, { stream: true });
-          fullContent += chunk;
-          setStreamingContent(fullContent);
+          const chunk = decoder.decode(value, { stream: true })
+          fullContent += chunk
+          setStreamingContent(fullContent)
 
           // Actualizar el mensaje en tiempo real
           setMessages(prev => 
             prev.map(m => 
               m.id === assistantMessage.id 
                 ? { ...m, content: fullContent }
-                : m
-            )
-          );
+                : m,
+            ),
+          )
         }
       }
 
@@ -174,9 +174,9 @@ export function useChatAI(options: UseChatAIOptions = {}) {
         prev.map(m => 
           m.id === assistantMessage.id 
             ? { ...m, content: fullContent, isStreaming: false }
-            : m
-        )
-      );
+            : m,
+        ),
+      )
 
       // Persistir respuesta
       if (persistHistory && fullContent) {
@@ -185,42 +185,42 @@ export function useChatAI(options: UseChatAIOptions = {}) {
             role: 'assistant',
             content: fullContent,
             userId,
-          });
+          })
         } catch (e) {
-          console.warn('Error persistiendo respuesta:', e);
+          console.warn('Error persistiendo respuesta:', e)
         }
       }
 
     } catch (e) {
       if (e instanceof Error && e.name === 'AbortError') {
-        console.log('Solicitud cancelada');
+        console.log('Solicitud cancelada')
       } else {
-        setError(e instanceof Error ? e.message : 'Error desconocido');
+        setError(e instanceof Error ? e.message : 'Error desconocido')
       }
     } finally {
-      setIsLoading(false);
-      setStreamingContent('');
+      setIsLoading(false)
+      setStreamingContent('')
     }
-  }, [messages, isLoading, systemPrompt, userId, persistHistory, addConvexMessage]);
+  }, [messages, isLoading, systemPrompt, userId, persistHistory, addConvexMessage])
 
   // Cancelar streaming
   const cancel = useCallback(() => {
-    abortControllerRef.current?.abort();
-    setIsLoading(false);
-    setStreamingContent('');
-  }, []);
+    abortControllerRef.current?.abort()
+    setIsLoading(false)
+    setStreamingContent('')
+  }, [])
 
   // Limpiar historial
   const clearHistory = useCallback(async () => {
-    setMessages([]);
+    setMessages([])
     if (persistHistory) {
       try {
-        await clearConvexHistory({ userId });
+        await clearConvexHistory({ userId })
       } catch (e) {
-        console.warn('Error limpiando historial:', e);
+        console.warn('Error limpiando historial:', e)
       }
     }
-  }, [userId, persistHistory, clearConvexHistory]);
+  }, [userId, persistHistory, clearConvexHistory])
 
   // Estadísticas útiles
   const stats = useMemo(() => ({
@@ -230,7 +230,7 @@ export function useChatAI(options: UseChatAIOptions = {}) {
     lastActivity: messages.length > 0 
       ? messages[messages.length - 1].timestamp 
       : null,
-  }), [messages]);
+  }), [messages])
 
   return {
     messages,
@@ -241,7 +241,7 @@ export function useChatAI(options: UseChatAIOptions = {}) {
     cancel,
     clearHistory,
     stats,
-  };
+  }
 }
 
 // ===== SYSTEM PROMPT OPTIMIZADO PARA CHRONOS =====
@@ -289,6 +289,6 @@ Tú: "📝 **Confirmo los datos de la venta:**
 - Precio unitario: $10,000
 - Total: $100,000
 
-¿Procedo con el registro?"`;
+¿Procedo con el registro?"`
 
-export default useChatAI;
+export default useChatAI

@@ -13,10 +13,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { 
   collection, 
   getDocs, 
-  deleteDoc, 
   doc,
   writeBatch,
-  getFirestore
+  getFirestore,
 } from 'firebase/firestore'
 import { initializeApp, getApps } from 'firebase/app'
 import { logger } from '@/app/lib/utils/logger'
@@ -98,9 +97,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           error: 'Confirmación de seguridad requerida',
-          message: 'Envía { confirm: "ELIMINAR_TODO" } para confirmar la eliminación'
+          message: 'Envía { confirm: "ELIMINAR_TODO" } para confirmar la eliminación',
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
     
@@ -110,7 +109,7 @@ export async function POST(request: NextRequest) {
       // Permitir solo en preview deployments, no en producción
       logger.warn('[Clear Firestore] Intento de limpieza en posible producción bloqueado', {
         context: 'AdminAPI',
-        host
+        host,
       })
       // Para este caso, permitimos pero logueamos
     }
@@ -128,7 +127,7 @@ export async function POST(request: NextRequest) {
     
     logger.info('[Clear Firestore] Iniciando limpieza', {
       context: 'AdminAPI',
-      collectionsCount: collectionsToDelete.length
+      collectionsCount: collectionsToDelete.length,
     })
     
     const results: ClearResult[] = []
@@ -143,7 +142,7 @@ export async function POST(request: NextRequest) {
           results.push({
             collection: collectionName,
             documentsDeleted: 0,
-            success: true
+            success: true,
           })
           continue
         }
@@ -168,11 +167,11 @@ export async function POST(request: NextRequest) {
         results.push({
           collection: collectionName,
           documentsDeleted: deletedCount,
-          success: true
+          success: true,
         })
         
         logger.info(`[Clear Firestore] Colección ${collectionName} limpiada: ${deletedCount} docs`, {
-          context: 'AdminAPI'
+          context: 'AdminAPI',
         })
         
       } catch (error) {
@@ -181,10 +180,10 @@ export async function POST(request: NextRequest) {
           collection: collectionName,
           documentsDeleted: 0,
           success: false,
-          error: errorMessage
+          error: errorMessage,
         })
         logger.error(`[Clear Firestore] Error en ${collectionName}`, error, {
-          context: 'AdminAPI'
+          context: 'AdminAPI',
         })
       }
     }
@@ -198,7 +197,7 @@ export async function POST(request: NextRequest) {
       context: 'AdminAPI',
       totalDeleted,
       successCount,
-      failCount
+      failCount,
     })
     
     return NextResponse.json({
@@ -207,9 +206,9 @@ export async function POST(request: NextRequest) {
       summary: {
         totalDocumentsDeleted: totalDeleted,
         collectionsProcessed: successCount,
-        collectionsFailed: failCount
+        collectionsFailed: failCount,
       },
-      results
+      results,
     })
     
   } catch (error) {
@@ -217,9 +216,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { 
         error: 'Error al limpiar Firestore',
-        message: error instanceof Error ? error.message : 'Error desconocido'
+        message: error instanceof Error ? error.message : 'Error desconocido',
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
@@ -232,9 +231,9 @@ export async function GET() {
     description: 'Elimina todas las colecciones de Firestore',
     body: {
       collections: 'Array opcional de nombres de colecciones (si omite, limpia todas)',
-      confirm: 'Debe ser exactamente "ELIMINAR_TODO"'
+      confirm: 'Debe ser exactamente "ELIMINAR_TODO"',
     },
     availableCollections: ALL_COLLECTIONS,
-    warning: '⚠️ Esta operación es IRREVERSIBLE'
+    warning: '⚠️ Esta operación es IRREVERSIBLE',
   })
 }

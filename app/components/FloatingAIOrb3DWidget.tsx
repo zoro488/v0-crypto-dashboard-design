@@ -17,7 +17,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Mic, MicOff, Send, Maximize2, Sparkles, X, Bot, 
-  Brain, Zap, Activity, ChevronDown 
+  Brain, Zap, Activity, ChevronDown, 
 } from 'lucide-react'
 import { useState, useRef, useEffect, useCallback, Suspense } from 'react'
 import dynamic from 'next/dynamic'
@@ -133,7 +133,7 @@ function OrbScene({
 // Respuestas inteligentes basadas en contexto del store
 const getAIResponse = (
   message: string, 
-  store: ReturnType<typeof useAppStore.getState>
+  store: ReturnType<typeof useAppStore.getState>,
 ): { text: string; suggestions: string[] } => {
   const lowerMessage = message.toLowerCase()
   
@@ -249,7 +249,7 @@ function StatusIndicator({ status }: { status: OrbState }) {
         className={`w-2 h-2 rounded-full ${color}`}
         animate={status === 'idle' ? {} : { 
           scale: [1, 1.3, 1], 
-          opacity: [1, 0.7, 1] 
+          opacity: [1, 0.7, 1], 
         }}
         transition={{ duration: 1, repeat: status === 'idle' ? 0 : Infinity }}
       />

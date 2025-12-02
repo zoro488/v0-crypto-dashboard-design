@@ -1,6 +1,6 @@
-import { withBotId } from 'botid/next/config';
-import type { NextConfig } from 'next';
-import crypto from 'crypto';
+import { withBotId } from 'botid/next/config'
+import type { NextConfig } from 'next'
+import crypto from 'crypto'
 
 const baseConfig: NextConfig = {
   // Directorio de la app dentro de frontend
@@ -39,23 +39,23 @@ const baseConfig: NextConfig = {
   },
   reactStrictMode: true,
   compiler: {
-    removeConsole: process.env.NODE_ENV === "production" ? {
-      exclude: ["error", "warn"],
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
     } : false,
   },
   experimental: {
     optimizePackageImports: [
-      "lucide-react",
-      "framer-motion",
-      "@radix-ui/react-icons",
-      "@radix-ui/react-dialog",
-      "@radix-ui/react-dropdown-menu",
-      "recharts",
-      "three",
-      "@react-three/fiber",
-      "@react-three/drei",
-      "botid",
-      "@azure-rest/ai-inference",
+      'lucide-react',
+      'framer-motion',
+      '@radix-ui/react-icons',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      'recharts',
+      'three',
+      '@react-three/fiber',
+      '@react-three/drei',
+      'botid',
+      '@azure-rest/ai-inference',
     ],
     webpackMemoryOptimizations: true,
   },
@@ -68,7 +68,7 @@ const baseConfig: NextConfig = {
         ...config.resolve?.alias,
         three: require.resolve('three'),
       },
-    };
+    }
     
     // Ignorar warnings de exports deprecados de spline
     config.ignoreWarnings = [
@@ -77,7 +77,7 @@ const baseConfig: NextConfig = {
         module: /@splinetool/,
         message: /sRGBEncoding/,
       },
-    ];
+    ]
     
     // Optimizaciones de webpack
     config.optimization = {
@@ -98,12 +98,12 @@ const baseConfig: NextConfig = {
           },
           lib: {
             test(module: { size: () => number; identifier: () => string }) {
-              return module.size() > 160000 && /node_modules[/\\\\]/.test(module.identifier());
+              return module.size() > 160000 && /node_modules[/\\\\]/.test(module.identifier())
             },
             name(module: { identifier: () => string }) {
-              const hash = crypto.createHash('sha1');
-              hash.update(module.identifier());
-              return hash.digest('hex').substring(0, 8);
+              const hash = crypto.createHash('sha1')
+              hash.update(module.identifier())
+              return hash.digest('hex').substring(0, 8)
             },
             priority: 30,
             minChunks: 1,
@@ -121,7 +121,7 @@ const baseConfig: NextConfig = {
                   .createHash('sha1')
                   .update(chunks.reduce((acc: string, chunk: { name: string }) => acc + chunk.name, ''))
                   .digest('hex') + '_shared'
-              );
+              )
             },
             priority: 10,
             minChunks: 2,
@@ -129,14 +129,14 @@ const baseConfig: NextConfig = {
           },
         },
       },
-    };
+    }
 
     // Evitar problemas con módulos externos en el servidor
     if (isServer) {
-      config.externals = [...(config.externals || []), 'canvas', 'jsdom'];
+      config.externals = [...(config.externals || []), 'canvas', 'jsdom']
     }
 
-    return config;
+    return config
   },
   poweredByHeader: false,
   compress: true,
@@ -176,9 +176,9 @@ const baseConfig: NextConfig = {
           },
         ],
       },
-    ];
+    ]
   },
-};
+}
 
 // 🔒 Exportar con BotID habilitado para protección contra bots
-export default withBotId(baseConfig);
+export default withBotId(baseConfig)

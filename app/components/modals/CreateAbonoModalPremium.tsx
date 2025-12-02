@@ -58,8 +58,10 @@ import { useToast } from '@/app/hooks/use-toast'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
-import { registrarAbonoCliente } from '@/app/lib/services/business-logic.service'
+// ✅ USAR NUEVO SERVICIO DE BUSINESS OPERATIONS
+import { abonarCliente, type AbonarClienteInput } from '@/app/lib/services/business-operations.service'
 import { useClientes } from '@/app/lib/firebase/firestore-hooks.service'
+import { useVentasData } from '@/app/lib/firebase/firestore-hooks.service'
 
 // ============================================
 // SCHEMA ZOD
@@ -238,30 +240,41 @@ export function CreateAbonoModalPremium({
     }
   }, [open, preselectedCliente, setValue, reset])
 
-  // Submit
+  // Submit - Usa el nuevo servicio business-operations.service.ts
   const onSubmit = async (data: AbonoInput) => {
     setIsSubmitting(true)
 
     try {
-      const abonoData = {
+      // ✅ Usar el nuevo servicio de business operations
+      const abonoInput: AbonarClienteInput = {
         clienteId: data.clienteId,
         monto: data.monto,
-        metodo: data.metodoPago,
-        referencia: data.referencia,
-        notas: data.concepto,
+        metodoPago: data.metodoPago,
+        notas: data.concepto || data.referencia || '',
       }
 
-      logger.info('Registrando abono en Firestore', { 
-        data: abonoData,
+      logger.info('[CreateAbonoModalPremium] Registrando abono con business-operations', { 
+        data: abonoInput,
         context: 'CreateAbonoModalPremium',
       })
 
-      const result = await registrarAbonoCliente(abonoData)
+      // ✅ El servicio business-operations.service.ts maneja automáticamente:
+      // - Actualización del perfil del cliente (deuda, abonos, pendiente)
+      // - Distribución proporcional a los 3 bancos si hay venta asociada
+      // - Registro de movimiento de abono
+      const result = await abonarCliente(abonoInput)
 
       if (result) {
         toast({
           title: '✅ Abono Registrado',
-          description: `${formatearMonto(data.monto)} de ${data.clienteNombre}. Nuevo saldo: ${formatearMonto(nuevoSaldo)}`,
+          description: (
+            <div className="space-y-1">
+              <p>{formatearMonto(data.monto)} de {data.clienteNombre}</p>
+              <p className="text-xs text-gray-400">
+                Nuevo saldo: {formatearMonto(nuevoSaldo)} • Distribuido a bancos
+              </p>
+            </div>
+          ) as unknown as string,
         })
 
         onClose()
@@ -272,7 +285,7 @@ export function CreateAbonoModalPremium({
       }
 
     } catch (error) {
-      logger.error('Error al registrar abono', error)
+      logger.error('[CreateAbonoModalPremium] Error al registrar abono', error)
       toast({
         title: 'Error',
         description: error instanceof Error ? error.message : 'No se pudo registrar el abono',

@@ -56,7 +56,8 @@ import { useToast } from '@/app/hooks/use-toast'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
-import { crearVenta } from '@/app/lib/services/unified-data-service'
+// ✅ USAR NUEVO SERVICIO DE BUSINESS OPERATIONS
+import { crearVentaCompleta, type CrearVentaInput } from '@/app/lib/services/business-operations.service'
 import { useClientesData, useOrdenesCompraData } from '@/app/lib/firebase/firestore-hooks.service'
 
 // ============================================
@@ -343,59 +344,71 @@ export function CreateVentaModalPremium({
     setIsSubmitting(true)
 
     try {
-      // Crear una venta por cada item en el carrito
+      // Crear una venta por cada item en el carrito usando el nuevo servicio
       const ventasCreadas: string[] = []
       
       for (const item of carrito) {
-        // ✅ DISTRIBUCIÓN GYA CORRECTA según FORMULAS_CORRECTAS_VENTAS_Version2.md
-        // Bóveda Monte = Costo del producto (lo que pagamos al distribuidor)
-        const montoBovedaMonte = item.precioCompra * item.cantidad
-        // Fletes = Costo de transporte (si aplica)
-        const montoFletes = aplicaFlete ? item.precioFlete * item.cantidad : 0
-        // Utilidades = Ganancia neta (Precio Venta - Costo - Flete)
-        const montoUtilidades = (item.precioVenta - item.precioCompra - (aplicaFlete ? item.precioFlete : 0)) * item.cantidad
-        
-        const ventaData = {
+        // ✅ Usar el nuevo servicio de business operations con lógica GYA correcta
+        const ventaInput: CrearVentaInput = {
           cliente: clienteSeleccionado.nombre,
-          clienteId: clienteSeleccionado.id,
-          cantidad: item.cantidad,
-          precioVenta: item.precioVenta,
-          precioCompra: item.precioCompra, // ✅ CRÍTICO: Pasar precio de compra para cálculo GYA
-          precioTotalVenta: item.precioVenta * item.cantidad,
           producto: item.nombre,
           ocRelacionada: ocSeleccionada || undefined,
+          cantidad: item.cantidad,
+          precioVenta: item.precioVenta,
+          precioCompra: item.precioCompra,
           precioFlete: aplicaFlete ? item.precioFlete : 0,
-          fleteUtilidad: aplicaFlete ? item.precioFlete * item.cantidad : 0,
-          flete: aplicaFlete ? 'Aplica' as const : 'NoAplica' as const,
-          metodoPago,
           estadoPago,
           montoPagado: estadoPago === 'completo' 
             ? item.precioVenta * item.cantidad 
-            : Math.round((montoRealPagado / totales.totalIngreso) * item.precioVenta * item.cantidad),
+            : estadoPago === 'parcial'
+              ? Math.round((montoPagado / totales.totalIngreso) * item.precioVenta * item.cantidad)
+              : 0,
+          metodoPago,
           notas,
-          // Distribución GYA precalculada para validación
-          distribucionBancos: {
-            bovedaMonte: montoBovedaMonte,
-            fletes: montoFletes,
-            utilidades: montoUtilidades,
-          },
         }
 
-        logger.info('Creando venta en Firestore', { 
-          data: ventaData,
+        logger.info('[CreateVentaModalPremium] Creando venta con business-operations', { 
+          data: ventaInput,
           context: 'CreateVentaModalPremium',
         })
 
-        const result = await crearVenta(ventaData)
+        // ✅ El servicio business-operations.service.ts maneja automáticamente:
+        // - Distribución a 3 bancos (Bóveda Monte, Fletes, Utilidades)
+        // - Creación/actualización de perfil del cliente
+        // - Actualización de stock en almacén
+        // - Registro de movimientos en cada banco
+        // - Estado de pago (completo/parcial/pendiente)
+        const result = await crearVentaCompleta(ventaInput)
+        
         if (result) {
-          ventasCreadas.push(result)
+          ventasCreadas.push(result.ventaId)
+          logger.info('[CreateVentaModalPremium] Venta creada exitosamente', {
+            data: {
+              ventaId: result.ventaId,
+              distribucion: {
+                bovedaMonte: result.bovedaMonte,
+                fletes: result.fletes,
+                utilidades: result.utilidades,
+              },
+              deudaCliente: result.deudaCliente,
+            },
+            context: 'CreateVentaModalPremium',
+          })
         }
       }
 
       if (ventasCreadas.length > 0) {
         toast({
           title: '✅ Venta Registrada',
-          description: `${formatearMonto(totales.totalIngreso)} - ${clienteSeleccionado.nombre} (${ventasCreadas.length} item${ventasCreadas.length > 1 ? 's' : ''})`,
+          description: (
+            <div className="space-y-1">
+              <p>{formatearMonto(totales.totalIngreso)} - {clienteSeleccionado.nombre}</p>
+              <p className="text-xs text-gray-400">
+                ({ventasCreadas.length} item{ventasCreadas.length > 1 ? 's' : ''}) • 
+                Distribuido a Bóveda Monte, Fletes y Utilidades
+              </p>
+            </div>
+          ) as unknown as string,
         })
 
         onClose()
@@ -406,7 +419,7 @@ export function CreateVentaModalPremium({
       }
 
     } catch (error) {
-      logger.error('Error al registrar venta', error)
+      logger.error('[CreateVentaModalPremium] Error al registrar venta', error)
       toast({
         title: 'Error',
         description: error instanceof Error ? error.message : 'No se pudo registrar la venta',

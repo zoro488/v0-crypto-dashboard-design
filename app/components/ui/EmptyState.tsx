@@ -10,7 +10,7 @@ import {
   ShoppingCart, 
   Package, 
   TrendingUp,
-  type LucideIcon 
+  type LucideIcon, 
 } from 'lucide-react'
 
 interface EmptyStateProps {

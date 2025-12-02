@@ -1,0 +1,264 @@
+rules_version = '2';
+
+/**
+ * 🔒 REGLAS DE SEGURIDAD FIRESTORE - CHRONOS SYSTEM
+ * Versión: PRODUCCIÓN
+ * 
+ * ⚠️ IMPORTANTE: Para activar estas reglas:
+ * 1. Renombrar este archivo a firestore.rules
+ * 2. Ejecutar: firebase deploy --only firestore:rules
+ */
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===================================================================
+    // FUNCIONES DE AUTENTICACIÓN Y AUTORIZACIÓN
+    // ===================================================================
+    
+    // Verifica que el usuario esté autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Verifica que el usuario sea el propietario del documento
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Verifica que el documento tenga timestamps válidos
+    function hasValidTimestamps() {
+      return request.resource.data.keys().hasAny(['createdAt', 'updatedAt']);
+    }
+    
+    // Verifica escritura válida (autenticado + timestamps)
+    function isValidWrite() {
+      return isAuthenticated() && hasValidTimestamps();
+    }
+    
+    // Verifica que el usuario tenga rol de admin (requiere campo en /users/{uid})
+    function isAdmin() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Verifica que el monto no sea negativo
+    function isValidAmount() {
+      return !('monto' in request.resource.data) || 
+        request.resource.data.monto >= 0;
+    }
+
+    // ===================================================================
+    // USUARIOS - Solo el propietario puede modificar su perfil
+    // ===================================================================
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if false; // Usuarios no se eliminan
+    }
+
+    // ===================================================================
+    // BANCOS - Lectura autenticada, escritura solo por admin
+    // ===================================================================
+    match /bancos/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin();
+      allow update: if isAuthenticated() && isValidAmount();
+      allow delete: if false; // Bancos no se eliminan (auditoría)
+    }
+
+    // ===================================================================
+    // MOVIMIENTOS FINANCIEROS - Inmutables después de crear
+    // ===================================================================
+    match /movimientos/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite() && isValidAmount();
+      allow update, delete: if false; // Movimientos son inmutables
+    }
+    
+    match /transferencias/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite() && isValidAmount();
+      allow update, delete: if false;
+    }
+    
+    match /abonos/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite() && isValidAmount();
+      allow update, delete: if false;
+    }
+    
+    match /ingresos/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite() && isValidAmount();
+      allow update, delete: if false;
+    }
+    
+    match /gastos/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite() && isValidAmount();
+      allow update, delete: if false;
+    }
+
+    // ===================================================================
+    // VENTAS - Solo crear y leer, no eliminar
+    // ===================================================================
+    match /ventas/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update: if isAuthenticated(); // Permitir pagos parciales
+      allow delete: if isAdmin(); // Solo admin puede eliminar ventas
+    }
+
+    // ===================================================================
+    // CLIENTES - CRUD con validación
+    // ===================================================================
+    match /clientes/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isValidWrite();
+      allow delete: if isAdmin();
+    }
+
+    // ===================================================================
+    // DISTRIBUIDORES - CRUD con validación
+    // ===================================================================
+    match /distribuidores/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isValidWrite();
+      allow delete: if isAdmin();
+    }
+    
+    // ===================================================================
+    // ÓRDENES DE COMPRA
+    // ===================================================================
+    match /ordenes_compra/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update: if isAuthenticated();
+      allow delete: if isAdmin();
+    }
+
+    // ===================================================================
+    // ALMACÉN - Productos y movimientos
+    // ===================================================================
+    match /almacen/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isValidWrite();
+      allow delete: if isAdmin();
+    }
+    
+    match /almacen_productos/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isValidWrite();
+      allow delete: if isAdmin();
+    }
+    
+    match /almacen_entradas/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update, delete: if false; // Entradas inmutables
+    }
+    
+    match /almacen_salidas/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update, delete: if false; // Salidas inmutables
+    }
+
+    // ===================================================================
+    // DASHBOARD Y CONFIGURACIÓN
+    // ===================================================================
+    match /dashboard_totales/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+    
+    match /dashboard_paneles/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    match /configuracion/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin(); // Solo admin modifica config
+    }
+    
+    // ===================================================================
+    // LOGS DE AUDITORÍA - Solo lectura y creación
+    // ===================================================================
+    match /logs/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if false; // Logs son inmutables
+    }
+    
+    match /audit_logs/{docId} {
+      allow read: if isAdmin(); // Solo admin ve audit logs
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
+    }
+    
+    // ===================================================================
+    // CORTES BANCARIOS
+    // ===================================================================
+    match /cortes_bancarios/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update: if isAuthenticated();
+      allow delete: if false;
+    }
+    
+    match /productos/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isValidWrite();
+      allow delete: if isAdmin();
+    }
+    
+    match /dashboard_stats/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // ===================================================================
+    // TABLAS POR BANCO - Solo lectura y creación (inmutables)
+    // ===================================================================
+    
+    // Ingresos por banco
+    match /{banco}_ingresos/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update, delete: if false;
+    }
+
+    // Gastos por banco
+    match /{banco}_gastos/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update, delete: if false;
+    }
+
+    // Cortes por banco
+    match /{banco}_cortes/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update: if isAuthenticated();
+      allow delete: if false;
+    }
+
+    // Legacy
+    match /gastos_abonos/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isValidWrite();
+      allow update, delete: if false;
+    }
+
+    // ===================================================================
+    // REGLA POR DEFECTO - DENEGAR TODO LO DEMÁS
+    // ===================================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

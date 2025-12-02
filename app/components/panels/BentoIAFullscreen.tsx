@@ -48,7 +48,7 @@ interface Message {
 function AnimatedOrb({ 
   state, 
   audioLevel = 0,
-  size = 'large' 
+  size = 'large', 
 }: { 
   state: OrbState
   audioLevel?: number
@@ -89,7 +89,7 @@ function AnimatedOrb({
 
       {/* Anillo exterior */}
       <motion.div
-        className={`absolute inset-0 rounded-full border-2 border-white/20`}
+        className={'absolute inset-0 rounded-full border-2 border-white/20'}
         animate={state !== 'idle' ? {
           scale: [1, 1.5, 1],
           opacity: [0.5, 0, 0.5],
@@ -275,7 +275,7 @@ function MessageBubble({
         <p className="text-xs text-white/30 mt-2 text-right">
           {message.timestamp.toLocaleTimeString('es-MX', { 
             hour: '2-digit', 
-            minute: '2-digit' 
+            minute: '2-digit', 
           })}
         </p>
       </div>
@@ -455,7 +455,7 @@ export function BentoIAFullscreen() {
 
     if (lowerMessage.includes('nueva venta') || lowerMessage.includes('crear venta') || lowerMessage.includes('registrar venta')) {
       return {
-        content: `📝 **Nueva Venta**\n\nPuedo ayudarte a crear una venta. Para eso necesito:\n\n1. **Cliente**: ¿A quién va dirigida?\n2. **Distribuidor**: ¿Quién es el distribuidor?\n3. **Productos**: ¿Qué productos incluir?\n\nPuedo abrir el formulario de venta o guiarte paso a paso. ¿Qué prefieres?`,
+        content: '📝 **Nueva Venta**\n\nPuedo ayudarte a crear una venta. Para eso necesito:\n\n1. **Cliente**: ¿A quién va dirigida?\n2. **Distribuidor**: ¿Quién es el distribuidor?\n3. **Productos**: ¿Qué productos incluir?\n\nPuedo abrir el formulario de venta o guiarte paso a paso. ¿Qué prefieres?',
         suggestions: ['Abrir formulario', 'Guíame paso a paso', 'Ver últimas ventas'],
       }
     }
@@ -486,14 +486,14 @@ export function BentoIAFullscreen() {
 
     if (lowerMessage.includes('reporte') || lowerMessage.includes('exportar')) {
       return {
-        content: `📊 **Generación de Reportes**\n\nPuedo generar varios tipos de reportes:\n\n• **Ventas**: Diario, semanal, mensual\n• **Financiero**: Estado de bancos, flujo de caja\n• **Inventario**: Stock actual, movimientos\n• **Clientes**: Estado de cuenta, morosos\n\n¿Cuál necesitas?`,
+        content: '📊 **Generación de Reportes**\n\nPuedo generar varios tipos de reportes:\n\n• **Ventas**: Diario, semanal, mensual\n• **Financiero**: Estado de bancos, flujo de caja\n• **Inventario**: Stock actual, movimientos\n• **Clientes**: Estado de cuenta, morosos\n\n¿Cuál necesitas?',
         suggestions: ['Reporte de ventas', 'Estado financiero', 'Inventario', 'Clientes morosos'],
       }
     }
 
     if (lowerMessage.includes('hola') || lowerMessage.includes('hey') || lowerMessage.includes('buenos')) {
       const hora = new Date().getHours()
-      let saludo = hora < 12 ? '¡Buenos días!' : hora < 18 ? '¡Buenas tardes!' : '¡Buenas noches!'
+      const saludo = hora < 12 ? '¡Buenos días!' : hora < 18 ? '¡Buenas tardes!' : '¡Buenas noches!'
 
       return {
         content: `${saludo} 👋\n\nSoy **Chronos**, tu asistente de IA para el sistema de gestión empresarial.\n\n¿En qué puedo ayudarte hoy? Puedo:\n\n📊 Consultar datos de ventas, clientes, inventario\n📝 Crear ventas, órdenes y registros\n🏦 Gestionar bancos y transferencias\n📈 Generar reportes y análisis\n🧭 Navegar por el sistema`,
@@ -503,14 +503,14 @@ export function BentoIAFullscreen() {
 
     if (lowerMessage.includes('ayuda') || lowerMessage.includes('qué puedes') || lowerMessage.includes('comandos')) {
       return {
-        content: `🤖 **Capacidades de Chronos AI**\n\n**📊 Consultas:**\n• "Ver ventas de hoy"\n• "¿Cuánto hay en bancos?"\n• "Clientes con deuda"\n• "Stock crítico"\n\n**📝 Crear registros:**\n• "Nueva venta"\n• "Nuevo cliente"\n• "Crear orden de compra"\n\n**🧭 Navegación:**\n• "Ir al panel de clientes"\n• "Abrir almacén"\n\n**📈 Reportes:**\n• "Generar reporte de ventas"\n• "Exportar a Excel"\n\n💡 Puedes hablarme naturalmente, entiendo español y el contexto de tu negocio.`,
+        content: '🤖 **Capacidades de Chronos AI**\n\n**📊 Consultas:**\n• "Ver ventas de hoy"\n• "¿Cuánto hay en bancos?"\n• "Clientes con deuda"\n• "Stock crítico"\n\n**📝 Crear registros:**\n• "Nueva venta"\n• "Nuevo cliente"\n• "Crear orden de compra"\n\n**🧭 Navegación:**\n• "Ir al panel de clientes"\n• "Abrir almacén"\n\n**📈 Reportes:**\n• "Generar reporte de ventas"\n• "Exportar a Excel"\n\n💡 Puedes hablarme naturalmente, entiendo español y el contexto de tu negocio.',
         suggestions: ['Ver ventas', 'Estado bancos', 'Inventario', 'Nueva venta'],
       }
     }
 
     // Respuesta por defecto
     return {
-      content: `🤔 Entiendo tu consulta. Para darte información más precisa, puedes preguntarme sobre:\n\n• Ventas y facturación\n• Clientes y cobranza\n• Inventario y productos\n• Estado de bancos\n• Distribuidores y pagos\n\n¿Sobre qué tema te gustaría más información?`,
+      content: '🤔 Entiendo tu consulta. Para darte información más precisa, puedes preguntarme sobre:\n\n• Ventas y facturación\n• Clientes y cobranza\n• Inventario y productos\n• Estado de bancos\n• Distribuidores y pagos\n\n¿Sobre qué tema te gustaría más información?',
       suggestions: ['Ver opciones', 'Ventas de hoy', 'Estado general', 'Ayuda'],
     }
   }
@@ -658,7 +658,7 @@ export function BentoIAFullscreen() {
           animate={{ 
             x: [0, 60, 0], 
             y: [0, -40, 0], 
-            scale: [1, 1.2, 1] 
+            scale: [1, 1.2, 1], 
           }}
           transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
         />
@@ -667,7 +667,7 @@ export function BentoIAFullscreen() {
           animate={{ 
             x: [0, -60, 0], 
             y: [0, 40, 0], 
-            scale: [1, 1.3, 1] 
+            scale: [1, 1.3, 1], 
           }}
           transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
         />
@@ -727,7 +727,7 @@ export function BentoIAFullscreen() {
               }`}
               animate={orbState !== 'idle' ? { 
                 scale: [1, 1.4, 1], 
-                opacity: [1, 0.6, 1] 
+                opacity: [1, 0.6, 1], 
               } : {}}
               transition={{ duration: 0.8, repeat: Infinity }}
             />

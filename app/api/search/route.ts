@@ -3,9 +3,9 @@
  * Búsqueda inteligente con AI
  */
 
-import { checkBotId } from 'botid/server';
-import { NextRequest, NextResponse } from 'next/server';
-import { logger } from '@/app/lib/utils/logger';
+import { checkBotId } from 'botid/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { logger } from '@/app/lib/utils/logger'
 
 // Types for search operations
 interface SearchResult {
@@ -36,21 +36,21 @@ interface CodeSuggestionResult {
 
 export async function POST(request: NextRequest) {
   // 🔒 Verificación BotID
-  const verification = await checkBotId();
+  const verification = await checkBotId()
   
   if (verification.isBot) {
-    logger.warn('Bot detectado en /api/search', { context: 'SearchAPI' });
+    logger.warn('Bot detectado en /api/search', { context: 'SearchAPI' })
     return NextResponse.json(
       { error: 'Acceso denegado' },
-      { status: 403 }
-    );
+      { status: 403 },
+    )
   }
 
   try {
-    const body = await request.json();
-    const { type, query, code, language, error: errorMessage, stackTrace } = body;
+    const body = await request.json()
+    const { type, query, code, language, error: errorMessage, stackTrace } = body
 
-    let results: SearchResult[] | ErrorResolutionResult | CodeSuggestionResult;
+    let results: SearchResult[] | ErrorResolutionResult | CodeSuggestionResult
 
     switch (type) {
       case 'general':
@@ -60,15 +60,15 @@ export async function POST(request: NextRequest) {
           description: `Results for: ${query}`,
           type: 'answer',
           relevance: 85,
-        }];
-        break;
+        }]
+        break
       
       case 'code':
         if (!language) {
           return NextResponse.json(
             { error: 'Lenguaje requerido para búsqueda de código' },
-            { status: 400 }
-          );
+            { status: 400 },
+          )
         }
         results = [{
           title: `${language} code search`,
@@ -76,15 +76,15 @@ export async function POST(request: NextRequest) {
           type: 'code',
           relevance: 90,
           snippet: code || '',
-        }];
-        break;
+        }]
+        break
       
       case 'error':
         if (!errorMessage) {
           return NextResponse.json(
             { error: 'Mensaje de error requerido' },
-            { status: 400 }
-          );
+            { status: 400 },
+          )
         }
         results = {
           explanation: `Analysis of: ${errorMessage}`,
@@ -93,15 +93,15 @@ export async function POST(request: NextRequest) {
             description: 'Add null check before accessing property',
             confidence: 85,
           }],
-        };
-        break;
+        }
+        break
       
       case 'suggest':
         if (!code || !language) {
           return NextResponse.json(
             { error: 'Código y lenguaje requeridos' },
-            { status: 400 }
-          );
+            { status: 400 },
+          )
         }
         results = {
           completions: [{
@@ -109,22 +109,22 @@ export async function POST(request: NextRequest) {
             description: 'Auto-completion suggestion',
             confidence: 80,
           }],
-        };
-        break;
+        }
+        break
       
       default:
         return NextResponse.json(
           { error: 'Tipo de búsqueda no válido' },
-          { status: 400 }
-        );
+          { status: 400 },
+        )
     }
 
-    return NextResponse.json({ results });
+    return NextResponse.json({ results })
   } catch (error) {
-    logger.error('Error en /api/search', error as Error, { context: 'SearchAPI' });
+    logger.error('Error en /api/search', error as Error, { context: 'SearchAPI' })
     return NextResponse.json(
       { error: 'Error procesando búsqueda' },
-      { status: 500 }
-    );
+      { status: 500 },
+    )
   }
 }

@@ -5,8 +5,7 @@
  * Redirige a /login si no hay usuario autenticado
  */
 
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
 
 // Rutas públicas (no requieren auth)
 const PUBLIC_ROUTES = ['/login', '/api']

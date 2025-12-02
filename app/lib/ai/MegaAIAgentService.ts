@@ -258,7 +258,7 @@ Capacidades del sistema:
     const normalizedMessage = message.toLowerCase().trim()
     let bestMatch: { intent: IntentType; confidence: number } = { 
       intent: 'desconocido', 
-      confidence: 0 
+      confidence: 0, 
     }
 
     // Buscar coincidencias con patrones
@@ -286,7 +286,7 @@ Capacidades del sistema:
 
     logger.info('Intent analyzed', { 
       context: 'MegaAIAgentService', 
-      data: { message, intent: bestMatch.intent, confidence: bestMatch.confidence } 
+      data: { message, intent: bestMatch.intent, confidence: bestMatch.confidence }, 
     })
 
     return {
@@ -422,7 +422,7 @@ Capacidades del sistema:
    */
   async generateResponse(
     message: string, 
-    data?: Record<string, unknown>
+    data?: Record<string, unknown>,
   ): Promise<{ response: string; action: AIAction; suggestions: string[] }> {
     const analysis = this.analyzeIntent(message)
     

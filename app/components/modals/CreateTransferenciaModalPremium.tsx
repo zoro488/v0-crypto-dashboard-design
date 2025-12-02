@@ -50,7 +50,10 @@ import { useToast } from '@/app/hooks/use-toast'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
-import { crearTransferencia } from '@/app/lib/services/unified-data-service'
+// ✅ USAR NUEVO SERVICIO DE BUSINESS OPERATIONS
+import { realizarTransferencia, type TransferenciaInput as BizTransferenciaInput } from '@/app/lib/services/business-operations.service'
+import { useBancosData } from '@/app/lib/firebase/firestore-hooks.service'
+import type { BancoId as SystemBancoId } from '@/app/types'
 
 // ============================================
 // SCHEMA ZOD
@@ -289,28 +292,43 @@ export function CreateTransferenciaModalPremium({
     await new Promise(resolve => setTimeout(resolve, 2000))
 
     try {
-      logger.info('Creando transferencia en Firestore', { 
-        data: {
-          bancoOrigen: data.bancoOrigen,
-          bancoDestino: data.bancoDestino,
-          monto: data.monto,
-          concepto: data.concepto,
-        },
+      // ✅ Usar el nuevo servicio de business operations
+      const transferenciaInput: BizTransferenciaInput = {
+        bancoOrigen: data.bancoOrigen as SystemBancoId,
+        bancoDestino: data.bancoDestino as SystemBancoId,
+        monto: data.monto,
+        concepto: data.concepto || `Transferencia de ${origenData?.nombre} a ${destinoData?.nombre}`,
+        descripcion: data.referencia,
+      }
+
+      logger.info('[CreateTransferenciaModal] Creando transferencia con business-operations', { 
+        data: transferenciaInput,
         context: 'CreateTransferenciaModalPremium',
       })
 
-      // Llamar al servicio de Firestore
-      const result = await crearTransferencia(
-        data.bancoOrigen,
-        data.bancoDestino,
-        data.monto,
-        data.concepto || `Transferencia de ${origenData?.nombre} a ${destinoData?.nombre}`,
-      )
+      // ✅ El servicio business-operations.service.ts maneja automáticamente:
+      // - Descuento del banco origen
+      // - Suma al banco destino
+      // - Registro de movimientos en ambos bancos
+      // - Actualización de históricos
+      const result = await realizarTransferencia(transferenciaInput)
 
       if (result) {
+        logger.info('[CreateTransferenciaModal] Transferencia completada', {
+          data: { transferenciaId: result },
+          context: 'CreateTransferenciaModalPremium',
+        })
+
         toast({
           title: '✅ Transferencia Completada',
-          description: `${formatearMonto(data.monto)} de ${origenData?.nombre} a ${destinoData?.nombre}`,
+          description: (
+            <div className="space-y-1">
+              <p>{formatearMonto(data.monto)} transferido</p>
+              <p className="text-xs text-gray-400">
+                De {origenData?.nombre} → {destinoData?.nombre}
+              </p>
+            </div>
+          ) as unknown as string,
         })
 
         onClose()
@@ -321,7 +339,7 @@ export function CreateTransferenciaModalPremium({
       }
 
     } catch (error) {
-      logger.error('Error en transferencia', error)
+      logger.error('[CreateTransferenciaModal] Error en transferencia', error)
       toast({
         title: 'Error',
         description: error instanceof Error ? error.message : 'No se pudo completar la transferencia',

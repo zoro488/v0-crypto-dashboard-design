@@ -6,7 +6,33 @@
  */
 
 // ====================================================================
-// SERVICIO DE LÓGICA DE NEGOCIO (Funciones granulares)
+// SERVICIO DE OPERACIONES DE NEGOCIO COMPLETAS (RECOMENDADO)
+// ====================================================================
+export {
+  // Operaciones completas con batch transactions
+  crearOrdenCompraCompleta,
+  crearVentaCompleta,
+  abonarCliente,
+  pagarDistribuidor,
+  realizarTransferencia,
+  registrarGasto,
+  registrarIngreso,
+  businessOperationsService,
+  
+  // Tipos
+  type CrearOrdenCompraInput,
+  type OrdenCompraResult,
+  type CrearVentaInput,
+  type VentaResult,
+  type AbonarClienteInput,
+  type PagarDistribuidorInput,
+  type TransferenciaInput as BusinessTransferenciaInput,
+  type RegistrarGastoInput,
+  type RegistrarIngresoInput,
+} from './business-operations.service'
+
+// ====================================================================
+// SERVICIO DE LÓGICA DE NEGOCIO (Funciones granulares - LEGACY)
 // ====================================================================
 export {
   // Funciones de cálculo
