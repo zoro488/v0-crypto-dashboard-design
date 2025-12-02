@@ -70,43 +70,54 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          // Base: posición fija centrada perfectamente
-          'fixed left-1/2 top-1/2 z-[10001] -translate-x-1/2 -translate-y-1/2',
-          // Dimensiones responsivas con altura máxima para evitar scroll
-          'w-full max-w-[calc(100%-2rem)]',
-          // Altura máxima que permite ver completo sin scroll
-          'max-h-[85vh]',
-          // Overflow controlado
-          'overflow-hidden',
-          // Flex para layout interno correcto
-          'flex flex-col',
-          // Estilos visuales premium
-          'bg-background rounded-2xl border border-white/10 shadow-2xl backdrop-blur-xl',
-          // Sin padding por defecto, el contenido lo define
-          'p-0',
-          // Animaciones suaves de entrada/salida
-          'data-[state=open]:animate-in data-[state=closed]:animate-out',
-          'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-          'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-          'data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]',
-          'data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
-          'duration-200 ease-out',
-          // Tamaño específico
-          sizeClasses[size],
-          className,
+          // Base: posición fija centrada perfectamente con inset-0
+          'fixed inset-0 z-[10001]',
+          // Usar flexbox para centrar vertical y horizontalmente
+          'flex items-center justify-center',
+          // Padding para que no toque los bordes
+          'p-4 md:p-6',
+          // Puntero solo en el contenido interno
+          'pointer-events-none',
+          // El contenido interno sí recibe eventos
+          '[&>*]:pointer-events-auto',
         )}
         {...props}
       >
-        {children}
-        {showCloseButton && (
-          <DialogPrimitive.Close
-            data-slot="dialog-close"
-            className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 z-10 rounded-full p-2 opacity-70 transition-opacity hover:opacity-100 hover:bg-white/10 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
-          >
-            <XIcon />
-            <span className="sr-only">Close</span>
-          </DialogPrimitive.Close>
-        )}
+        <div
+          className={cn(
+            // Contenedor interno del modal
+            'relative w-full',
+            // Altura máxima que permite ver completo
+            'max-h-[90vh]',
+            // Overflow controlado con scroll interno
+            'overflow-hidden',
+            // Flex para layout interno correcto
+            'flex flex-col',
+            // Estilos visuales premium
+            'bg-background rounded-2xl border border-white/10 shadow-2xl backdrop-blur-xl',
+            // Sin padding por defecto, el contenido lo define
+            'p-0',
+            // Animaciones suaves de entrada/salida
+            'data-[state=open]:animate-in data-[state=closed]:animate-out',
+            'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+            'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+            'duration-200 ease-out',
+            // Tamaño específico
+            sizeClasses[size],
+            className,
+          )}
+        >
+          {children}
+          {showCloseButton && (
+            <DialogPrimitive.Close
+              data-slot="dialog-close"
+              className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 z-10 rounded-full p-2 opacity-70 transition-opacity hover:opacity-100 hover:bg-white/10 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+            >
+              <XIcon />
+              <span className="sr-only">Close</span>
+            </DialogPrimitive.Close>
+          )}
+        </div>
       </DialogPrimitive.Content>
     </DialogPortal>
   )

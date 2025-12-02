@@ -6,6 +6,7 @@ import { useState, useRef, useEffect, Suspense, useCallback, Component, type Rea
 import dynamic from 'next/dynamic'
 import type { Application } from '@splinetool/runtime'
 import { useAppStore } from '@/app/lib/store/useAppStore'
+import { useAIWidgetData, generateAIResponse } from '@/app/hooks/useAIWidgetData'
 
 // Carga dinámica de Spline con SSR desactivado para evitar errores de hidratación
 const Spline = dynamic(() => import('@splinetool/react-spline'), {
@@ -109,98 +110,6 @@ function ConditionalSpline({ onLoad, style }: { onLoad?: (app: Application) => v
   )
 }
 
-// Respuestas inteligentes basadas en contexto
-const getAIResponse = (message: string, store: ReturnType<typeof useAppStore.getState>): { text: string; suggestions: string[] } => {
-  const lowerMessage = message.toLowerCase()
-  
-  // Análisis de ventas
-  if (lowerMessage.includes('venta') || lowerMessage.includes('ventas')) {
-    const totalVentas = store.ventas.reduce((sum, v) => sum + v.precioTotalVenta, 0)
-    const ventasHoy = store.ventas.filter(v => {
-      const fecha = new Date(v.fecha)
-      const hoy = new Date()
-      return fecha.toDateString() === hoy.toDateString()
-    })
-    const totalHoy = ventasHoy.reduce((sum, v) => sum + v.precioTotalVenta, 0)
-    
-    return {
-      text: `📊 Resumen de ventas:\n\n• Total histórico: $${totalVentas.toLocaleString()}\n• Ventas hoy: ${ventasHoy.length} operaciones\n• Total hoy: $${totalHoy.toLocaleString()}\n• Ticket promedio: $${ventasHoy.length > 0 ? (totalHoy / ventasHoy.length).toLocaleString() : 0}`,
-      suggestions: ['Top clientes', 'Productos más vendidos', 'Comparar con ayer'],
-    }
-  }
-  
-  // Stock e inventario
-  if (lowerMessage.includes('stock') || lowerMessage.includes('inventario') || lowerMessage.includes('producto')) {
-    const productosStockBajo = store.productos.filter(p => p.stockActual < 10)
-    const valorTotal = store.productos.reduce((sum, p) => sum + (p.stockActual * p.valorUnitario), 0)
-    
-    return {
-      text: `📦 Estado del inventario:\n\n• Total productos: ${store.productos.length}\n• Valor total: $${valorTotal.toLocaleString()}\n• Productos con stock bajo (<10): ${productosStockBajo.length}\n${productosStockBajo.length > 0 ? `\n⚠️ Reabastecer: ${productosStockBajo.map(p => p.nombre).join(', ')}` : ''}`,
-      suggestions: ['Ver detalle productos', 'Crear orden de compra', 'Historial de movimientos'],
-    }
-  }
-  
-  // Bancos y finanzas
-  if (lowerMessage.includes('banco') || lowerMessage.includes('capital') || lowerMessage.includes('finanz') || lowerMessage.includes('saldo')) {
-    const totalCapital = store.bancos.reduce((sum, b) => sum + b.saldo, 0)
-    const bancosResumen = store.bancos.map(b => `• ${b.nombre}: $${b.saldo.toLocaleString()}`).join('\n')
-    
-    return {
-      text: `🏦 Estado financiero:\n\n${bancosResumen}\n\n💰 Capital total: $${totalCapital.toLocaleString()}`,
-      suggestions: ['Hacer transferencia', 'Ver movimientos', 'Registrar gasto'],
-    }
-  }
-  
-  // Clientes
-  if (lowerMessage.includes('cliente')) {
-    const totalClientes = store.clientes.length
-    const deudaTotal = store.clientes.reduce((sum, c) => sum + c.deudaTotal, 0)
-    const clientesConDeuda = store.clientes.filter(c => c.deudaTotal > 0)
-    
-    return {
-      text: `👥 Resumen de clientes:\n\n• Total clientes: ${totalClientes}\n• Clientes con deuda: ${clientesConDeuda.length}\n• Deuda total por cobrar: $${deudaTotal.toLocaleString()}`,
-      suggestions: ['Ver clientes morosos', 'Registrar abono', 'Nuevo cliente'],
-    }
-  }
-  
-  // Distribuidores
-  if (lowerMessage.includes('distribuidor') || lowerMessage.includes('proveedor')) {
-    const totalDist = store.distribuidores.length
-    const deudaTotal = store.distribuidores.reduce((sum, d) => sum + d.deudaTotal, 0)
-    
-    return {
-      text: `🚚 Resumen de distribuidores:\n\n• Total distribuidores: ${totalDist}\n• Deuda total a pagar: $${deudaTotal.toLocaleString()}`,
-      suggestions: ['Ver órdenes pendientes', 'Registrar pago', 'Nueva orden de compra'],
-    }
-  }
-  
-  // Saludo o inicio
-  if (lowerMessage.includes('hola') || lowerMessage.includes('inicio') || lowerMessage.includes('ayuda')) {
-    return {
-      text: '¡Hola! 👋 Soy Chronos, tu asistente de IA. Puedo ayudarte con:\n\n• 📊 Análisis de ventas\n• 📦 Estado del inventario\n• 🏦 Resumen financiero\n• 👥 Gestión de clientes\n• 🚚 Control de distribuidores\n\n¿Qué te gustaría consultar?',
-      suggestions: ['Resumen del día', 'Ventas de hoy', 'Estado de bancos'],
-    }
-  }
-  
-  // Resumen general
-  if (lowerMessage.includes('resumen') || lowerMessage.includes('general') || lowerMessage.includes('dashboard')) {
-    const totalCapital = store.bancos.reduce((sum, b) => sum + b.saldo, 0)
-    const totalVentas = store.ventas.reduce((sum, v) => sum + v.precioTotalVenta, 0)
-    const deudaClientes = store.clientes.reduce((sum, c) => sum + c.deudaTotal, 0)
-    
-    return {
-      text: `📈 Resumen General del Sistema:\n\n💰 Capital disponible: $${totalCapital.toLocaleString()}\n📊 Ventas totales: $${totalVentas.toLocaleString()}\n💳 Por cobrar: $${deudaClientes.toLocaleString()}\n📦 Productos en stock: ${store.productos.length}\n👥 Clientes activos: ${store.clientes.length}`,
-      suggestions: ['Ver detalles', 'Exportar reporte', 'Análisis profundo'],
-    }
-  }
-  
-  // Respuesta por defecto
-  return {
-    text: 'Entiendo tu consulta. Para darte información más precisa, puedes preguntarme sobre:\n\n• Ventas y facturación\n• Inventario y productos\n• Estado de bancos\n• Clientes y cobranza\n• Distribuidores y pagos',
-    suggestions: ['Ver ventas', 'Estado financiero', 'Revisar inventario'],
-  }
-}
-
 export function FloatingSplineAIWidget() {
   const [widgetState, setWidgetState] = useState<'minimized' | 'chat'>('minimized')
   const [messages, setMessages] = useState<DisplayMessage[]>([])
@@ -211,9 +120,11 @@ export function FloatingSplineAIWidget() {
   const [isListening, setIsListening] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   
-  // Store
-  const store = useAppStore()
-  const { setCurrentPanel, voiceAgentStatus, setVoiceAgentStatus } = store
+  // Store para UI y bancos
+  const { bancos, setCurrentPanel, voiceAgentStatus, setVoiceAgentStatus } = useAppStore()
+  
+  // Datos de Firestore para respuestas AI
+  const aiData = useAIWidgetData(bancos)
 
   // Scroll automático
   useEffect(() => {
@@ -250,7 +161,8 @@ export function FloatingSplineAIWidget() {
 
     // Simular delay de respuesta IA
     setTimeout(() => {
-      const response = getAIResponse(messageToSend, store)
+      // Usar datos de Firestore para generar respuesta
+      const response = generateAIResponse(messageToSend, aiData, bancos)
       
       const aiMessage: DisplayMessage = {
         id: (Date.now() + 1).toString(),
@@ -265,7 +177,7 @@ export function FloatingSplineAIWidget() {
       setVoiceAgentStatus('idle')
       setNotificationCount(0)
     }, 800)
-  }, [inputText, isTyping, store, setVoiceAgentStatus])
+  }, [inputText, isTyping, aiData, bancos, setVoiceAgentStatus])
 
   // Toggle micrófono (simulado)
   const toggleListening = () => {

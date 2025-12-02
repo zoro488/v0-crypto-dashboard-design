@@ -2,7 +2,7 @@
 
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import ChronosHeader from '@/app/components/layout/ChronosHeader'
-import { FloatingAIOrb3DWidget } from '@/app/components/FloatingAIOrb3DWidget'
+import { GrokAIOrb } from '@/app/components/widgets/GrokAIOrb'
 import { FirestoreSetupAlert } from '@/app/components/ui/FirestoreSetupAlert'
 import { CommandMenu } from '@/app/components/CommandMenu'
 import { SystemShowcase } from '@/app/components/ui/SystemShowcase'
@@ -30,8 +30,8 @@ const BentoReportesPremium = lazy(() => import('@/app/components/panels/BentoRep
 const BentoClientesPremium = lazy(() => import('@/app/components/panels/BentoClientesPremium'))
 const BentoDistribuidoresPremium = lazy(() => import('@/app/components/panels/BentoDistribuidoresPremium'))
 
-// Panel IA Inmersivo con Nexbot 3D
-const BentoIAImmersive = lazy(() => import('@/app/components/panels/BentoIAImmersive'))
+// Panel IA Inmersivo Premium con Robot 3D
+const ImmersiveAIPanel = lazy(() => import('@/app/components/3d/ImmersiveAIPanel'))
 
 // Panel GYA (Gastos y Abonos) - Gestión centralizada de egresos e ingresos
 const BentoGYA = lazy(() => import('@/app/components/panels/BentoGYA'))
@@ -206,7 +206,7 @@ export default function Chronos() {
       case 'reportes':
         return <BentoReportesPremium />
       case 'ia':
-        return <BentoIAImmersive />
+        return <ImmersiveAIPanel />
       default:
         return <ChronosDashboard />
     }
@@ -333,8 +333,8 @@ export default function Chronos() {
         </main>
       </div>
 
-      {/* 🔮 Widget Flotante IA con Orbe 3D GLTF */}
-      <FloatingAIOrb3DWidget />
+      {/* 🤖 Widget Flotante IA estilo Grok/Tesla - Siempre visible */}
+      <GrokAIOrb />
 
       {/* Command Menu - Cmd+K para búsqueda rápida */}
       <CommandMenu />

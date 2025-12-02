@@ -146,3 +146,43 @@ export {
   type PagoDistribuidorInput,
   type EstadoOrden,
 } from './ordenes-compra.schema'
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SCHEMAS DE ALMACÉN (NUEVO)
+// ═══════════════════════════════════════════════════════════════════════════
+export {
+  // Schemas base
+  StockSchema,
+  ValorMonetarioSchema,
+  CategoriaProductoSchema,
+  TipoMovimientoAlmacenSchema,
+  
+  // Schemas de producto
+  CrearProductoSchema,
+  ActualizarProductoSchema,
+  ProductoSchema,
+  
+  // Schemas de movimientos
+  EntradaAlmacenSchema,
+  SalidaAlmacenSchema,
+  AjusteInventarioSchema,
+  MovimientoAlmacenSchema,
+  
+  // Funciones de validación
+  validarCrearProducto,
+  validarEntradaAlmacen,
+  validarSalidaAlmacen,
+  validarAjusteInventario,
+  generarKeywordsProducto,
+  verificarStockSuficiente,
+  
+  // Tipos
+  type TipoMovimientoAlmacen,
+  type CrearProductoInput,
+  type ActualizarProductoInput,
+  type Producto as ProductoAlmacen,
+  type EntradaAlmacenInput,
+  type SalidaAlmacenInput,
+  type AjusteInventarioInput,
+  type MovimientoAlmacen,
+} from './almacen.schema'

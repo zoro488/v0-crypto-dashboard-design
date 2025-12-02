@@ -15,7 +15,6 @@ interface CreateEntradaAlmacenModalProps {
 
 export default function CreateEntradaAlmacenModal({ isOpen, onClose }: CreateEntradaAlmacenModalProps) {
   const { toast } = useToast()
-  const addEntradaAlmacen = useAppStore((state) => state.addEntradaAlmacen)
   const triggerDataRefresh = useAppStore((state) => state.triggerDataRefresh)
   const { data: productos = [] } = useAlmacenData()
 
@@ -42,18 +41,6 @@ export default function CreateEntradaAlmacenModal({ isOpen, onClose }: CreateEnt
         origen: formData.origen,
         costoUnitario: formData.costoUnitario,
         ordenCompraId: formData.ordenCompraRef || undefined,
-      })
-
-      // Actualizar store local para UI inmediata
-      addEntradaAlmacen({
-        tipo: 'entrada',
-        fecha: new Date().toISOString(),
-        cantidad: formData.cantidad,
-        origen: formData.origen,
-        productoNombre: formData.productoNombre,
-        costoUnitario: formData.costoUnitario,
-        valorTotal: formData.cantidad * formData.costoUnitario,
-        ordenCompraRef: formData.ordenCompraRef,
       })
 
       // 🔄 Trigger para actualizar hooks de datos

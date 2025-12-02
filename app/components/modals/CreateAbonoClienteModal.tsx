@@ -51,6 +51,7 @@ import {
 import { cn } from '@/app/lib/utils'
 import { useToast } from '@/app/hooks/use-toast'
 import { useAppStore } from '@/app/lib/store/useAppStore'
+import { useFirestoreCRUD } from '@/app/hooks/useFirestoreCRUD'
 import { logger } from '@/app/lib/utils/logger'
 import { useRegistrarAbonoCliente, useEstadoPago } from '@/app/hooks/useBusinessOperations'
 import type { Cliente } from '@/app/types'
@@ -91,7 +92,11 @@ export default function CreateAbonoClienteModal({
   clientePreseleccionado,
 }: CreateAbonoClienteModalProps) {
   const { toast } = useToast()
-  const clientes = useAppStore((state) => state.clientes)
+  
+  // Obtener clientes desde Firestore en lugar del store
+  const { data: clientesFirestore } = useFirestoreCRUD<Cliente>('clientes')
+  const clientes = clientesFirestore ?? []
+  
   const triggerDataRefresh = useAppStore((state) => state.triggerDataRefresh)
   
   // Hook de negocio para registrar abono

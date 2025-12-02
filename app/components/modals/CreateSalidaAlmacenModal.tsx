@@ -13,15 +13,24 @@ interface CreateSalidaAlmacenModalProps {
   onClose: () => void
 }
 
+interface ProductoAlmacen {
+  id: string
+  nombre: string
+  stockActual: number
+  [key: string]: unknown
+}
+
 export default function CreateSalidaAlmacenModal({ isOpen, onClose }: CreateSalidaAlmacenModalProps) {
   const { toast } = useToast()
-  const addSalidaAlmacen = useAppStore((state) => state.addSalidaAlmacen)
   const triggerDataRefresh = useAppStore((state) => state.triggerDataRefresh)
   const { data: productosFirestore = [] } = useAlmacenData()
-  const productosStore = useAppStore((state) => state.productos)
   
-  // Usar productos de Firestore si están disponibles, sino del store local
-  const productos = productosFirestore.length > 0 ? productosFirestore : productosStore
+  // Usar productos de Firestore
+  const productos: ProductoAlmacen[] = productosFirestore.map(p => ({
+    id: p.id || '',
+    nombre: (p as Record<string, unknown>).nombre as string || '',
+    stockActual: ((p as Record<string, unknown>).stock_actual as number) || ((p as Record<string, unknown>).stockActual as number) || 0,
+  }))
 
   const [formData, setFormData] = useState({
     productoId: '',
@@ -31,7 +40,7 @@ export default function CreateSalidaAlmacenModal({ isOpen, onClose }: CreateSali
     motivo: '',
   })
 
-  const productoSeleccionado = productos.find((p) => (p as Record<string, unknown>).id === formData.productoId) as Record<string, unknown> | undefined
+  const productoSeleccionado = productos.find((p) => p.id === formData.productoId)
 
   const handleSubmit = async () => {
     if (!formData.productoId || !formData.destino || formData.cantidad <= 0) {
@@ -39,7 +48,7 @@ export default function CreateSalidaAlmacenModal({ isOpen, onClose }: CreateSali
       return
     }
 
-    const stockActual = (productoSeleccionado?.stockActual as number) || 0
+    const stockActual = productoSeleccionado?.stockActual || 0
     if (formData.cantidad > stockActual) {
       toast({
         title: 'Stock Insuficiente',
@@ -59,23 +68,12 @@ export default function CreateSalidaAlmacenModal({ isOpen, onClose }: CreateSali
         motivo: formData.motivo || 'Salida manual',
       })
 
-      // Actualizar store local para UI inmediata
-      addSalidaAlmacen({
-        tipo: 'salida',
-        fecha: new Date().toISOString(),
-        cantidad: formData.cantidad,
-        destino: formData.destino,
-        productoId: formData.productoId,
-        productoNombre: (productoSeleccionado?.nombre as string) || '',
-        ventaRef: formData.ventaRef,
-      })
-
       // 🔄 Trigger para actualizar hooks de datos
       triggerDataRefresh()
 
       toast({
         title: '✅ Salida Registrada',
-        description: `${formData.cantidad} unidades de "${(productoSeleccionado?.nombre as string)}" retiradas del inventario`,
+        description: `${formData.cantidad} unidades de "${productoSeleccionado?.nombre || ''}" retiradas del inventario`,
       })
       
       // Resetear formulario

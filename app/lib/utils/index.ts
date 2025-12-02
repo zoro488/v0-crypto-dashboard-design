@@ -1,7 +1,35 @@
 /**
  * Utils - Exportaciones centralizadas
- * Sistema Chronos
+ * Sistema Chronos v2.1
  */
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// LOGGER (USAR SIEMPRE en lugar de console.log)
+// ═══════════════════════════════════════════════════════════════════════════════
+export { logger, type LogLevel, type LogOptions, type LogEntry } from './logger'
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RESULT PATTERN (Manejo de errores consistente)
+// ═══════════════════════════════════════════════════════════════════════════════
+export {
+  Result,
+  AppError,
+  ValidationError,
+  DatabaseError,
+  NotFoundError,
+  InsufficientStockError,
+  InsufficientFundsError,
+  BusinessRuleError,
+  DuplicateEntryError,
+  tryCatch,
+  tryCatchSync,
+  combineResults,
+  executeAll,
+  fromZodErrors,
+  fromFirebaseError,
+  fromUnknownError,
+  type ErrorCode,
+} from './result'
 
 // Cálculos de negocio
 export {

@@ -52,6 +52,7 @@ import {
 import { cn } from '@/app/lib/utils'
 import { useToast } from '@/app/hooks/use-toast'
 import { useAppStore } from '@/app/lib/store/useAppStore'
+import { useFirestoreCRUD } from '@/app/hooks/useFirestoreCRUD'
 import { logger } from '@/app/lib/utils/logger'
 import { usePagoDistribuidor } from '@/app/hooks/useBusinessOperations'
 import { useBancosData } from '@/app/lib/firebase/firestore-hooks.service'
@@ -88,7 +89,11 @@ export default function CreatePagoDistribuidorModal({
   distribuidorPreseleccionado,
 }: CreatePagoDistribuidorModalProps) {
   const { toast } = useToast()
-  const distribuidores = useAppStore((state) => state.distribuidores)
+  
+  // Obtener distribuidores desde Firestore
+  const { data: distribuidoresFirestore } = useFirestoreCRUD<Distribuidor>('distribuidores')
+  const distribuidores = distribuidoresFirestore ?? []
+  
   const triggerDataRefresh = useAppStore((state) => state.triggerDataRefresh)
   
   // Hook para obtener bancos con saldo
