@@ -1,0 +1,86 @@
+# webapp.io Configuration for CHRONOS
+# Full-stack environment snapshots for rapid development
+
+version: 1
+
+# Environment name
+name: chronos-staging
+
+# Build configuration
+build:
+  - name: frontend
+    dockerfile: Dockerfile
+    context: .
+    
+# Services configuration
+services:
+  # Main Next.js application
+  app:
+    build: frontend
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
+      - NEXT_PUBLIC_FIREBASE_API_KEY=${FIREBASE_API_KEY}
+      - NEXT_PUBLIC_MOCKEND_URL=https://mockend.com/api/${GITHUB_OWNER}/${GITHUB_REPO}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - XAI_API_KEY=${XAI_API_KEY}
+    healthcheck:
+      url: http://localhost:3000/api/health
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Firebase Emulator Suite
+  firebase:
+    image: node:20-alpine
+    command: npx firebase emulators:start --only firestore,auth
+    ports:
+      - 8080:8080   # Firestore
+      - 9099:9099   # Auth
+      - 4000:4000   # Emulator UI
+    volumes:
+      - ./firebase.json:/app/firebase.json
+      - ./firestore.rules:/app/firestore.rules
+
+# Snapshot configuration
+snapshots:
+  # Save snapshot after initial setup
+  - name: clean-start
+    trigger: after-build
+    description: Fresh environment with all services running
+    
+  # Save snapshot with seeded data
+  - name: with-demo-data
+    trigger: manual
+    description: Environment with demo data for testing
+    
+  # Save snapshot for specific features
+  - name: ai-features
+    trigger: manual
+    description: Environment with AI features configured
+
+# PR Preview configuration
+preview:
+  enabled: true
+  domains:
+    - pattern: pr-*.chronos.webapp.io
+    
+# Resource limits
+resources:
+  memory: 2Gi
+  cpu: 2
+
+# Hooks
+hooks:
+  # Run after environment starts
+  post-start:
+    - echo "CHRONOS environment ready"
+    - npm run migrate:verify || true
+    
+  # Run before snapshot
+  pre-snapshot:
+    - npm run lint
+    - npm run type-check

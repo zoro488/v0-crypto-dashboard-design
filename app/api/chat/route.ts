@@ -18,6 +18,7 @@
 import { streamText, tool } from 'ai'
 import { z } from 'zod'
 import { NextRequest } from 'next/server'
+import { checkBotId } from 'botid/server'
 import { logger } from '@/app/lib/utils/logger'
 
 // Configuración de Vercel AI Gateway
@@ -491,6 +492,16 @@ const tools = {
 // POST /api/chat - Endpoint principal del chat con IA
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 Verificación BotID - Protección contra bots
+    const verification = await checkBotId()
+    if (verification.isBot) {
+      logger.warn('Bot detectado en /api/chat', { context: 'ChatAPI' })
+      return new Response(
+        JSON.stringify({ error: 'Acceso denegado. Bot detectado.' }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
+
     const { messages } = await request.json()
     
     // Validar que hay mensajes
