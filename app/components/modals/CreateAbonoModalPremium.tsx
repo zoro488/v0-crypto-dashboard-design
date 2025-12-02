@@ -59,7 +59,7 @@ import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
 // ✅ USAR NUEVO SERVICIO DE BUSINESS OPERATIONS
-import { abonarCliente, type AbonarClienteInput } from '@/app/lib/services/business-operations.service'
+import { abonarCliente, type AbonarClienteInput, getStorageMode } from '@/app/lib/services/business-operations-unified.service'
 import { useClientes } from '@/app/lib/firebase/firestore-hooks.service'
 import { useVentasData } from '@/app/lib/firebase/firestore-hooks.service'
 

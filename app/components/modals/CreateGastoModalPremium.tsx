@@ -62,7 +62,7 @@ import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
 // ✅ USAR NUEVO SERVICIO DE BUSINESS OPERATIONS
-import { registrarGasto, type RegistrarGastoInput } from '@/app/lib/services/business-operations.service'
+import { registrarGasto, type RegistrarGastoInput, getStorageMode } from '@/app/lib/services/business-operations-unified.service'
 import { useBancosData } from '@/app/lib/firebase/firestore-hooks.service'
 import type { BancoId } from '@/app/types'
 
@@ -258,7 +258,7 @@ export function CreateGastoModalPremium({
         bancoOrigen: data.bancoOrigen as BancoId,
         monto: data.monto,
         concepto: data.concepto,
-        descripcion: data.notas,
+        notas: data.notas,
         categoria: data.categoria || 'General',
       }
 

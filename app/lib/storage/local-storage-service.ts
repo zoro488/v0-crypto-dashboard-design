@@ -152,6 +152,8 @@ const STORAGE_KEYS = {
   ABONOS: 'chronos_abonos',
   INGRESOS: 'chronos_ingresos',
   GASTOS: 'chronos_gastos',
+  ALMACEN_ENTRADAS: 'chronos_almacen_entradas',
+  ALMACEN_SALIDAS: 'chronos_almacen_salidas',
 } as const
 
 type StorageKey = typeof STORAGE_KEYS[keyof typeof STORAGE_KEYS]
@@ -571,14 +573,45 @@ export const localCrearVenta = (data: {
   saveToStorage(STORAGE_KEYS.VENTAS, ventas)
   saveToStorage(STORAGE_KEYS.CLIENTES, clientes)
   
-  // Actualizar almacén si hay producto
+  // Actualizar almacén si hay producto Y REGISTRAR SALIDA
   if (data.producto) {
     const prodIndex = productos.findIndex(p => p.nombre.toLowerCase() === data.producto!.toLowerCase())
     if (prodIndex !== -1) {
+      const productoId = productos[prodIndex].id
       productos[prodIndex].stockActual -= cantidad
       productos[prodIndex].totalSalidas = (productos[prodIndex].totalSalidas || 0) + cantidad
       productos[prodIndex].updatedAt = new Date().toISOString()
       saveToStorage(STORAGE_KEYS.PRODUCTOS, productos)
+      
+      // ✅ REGISTRAR SALIDA EN ALMACÉN
+      const salidas = getFromStorage<{
+        id: string
+        productoId: string
+        producto: string
+        cantidad: number
+        destino: string
+        ventaId: string
+        precioVenta: number
+        valorTotal: number
+        fecha: string
+        tipo: string
+        createdAt: string
+      }>(STORAGE_KEYS.ALMACEN_SALIDAS)
+      
+      salidas.push({
+        id: generateId('salida'),
+        productoId,
+        producto: data.producto,
+        cantidad,
+        destino: data.cliente,
+        ventaId,
+        precioVenta: precioVentaUnitario,
+        valorTotal: totalVenta,
+        fecha: data.fecha || new Date().toISOString(),
+        tipo: 'salida',
+        createdAt: new Date().toISOString(),
+      })
+      saveToStorage(STORAGE_KEYS.ALMACEN_SALIDAS, salidas)
     }
   }
   
@@ -773,17 +806,21 @@ export const localCrearOrdenCompra = (data: {
   saveToStorage(STORAGE_KEYS.ORDENES_COMPRA, ordenes)
   saveToStorage(STORAGE_KEYS.DISTRIBUIDORES, distribuidores)
   
-  // Actualizar almacén
+  // Actualizar almacén y REGISTRAR ENTRADA
   if (data.producto) {
     const prodIndex = productos.findIndex(p => p.nombre.toLowerCase() === data.producto!.toLowerCase())
+    let productoId = ''
+    
     if (prodIndex !== -1) {
+      productoId = productos[prodIndex].id
       productos[prodIndex].stockActual += data.cantidad
       productos[prodIndex].totalEntradas = (productos[prodIndex].totalEntradas || 0) + data.cantidad
       productos[prodIndex].updatedAt = new Date().toISOString()
     } else {
       // Crear producto
+      productoId = generateId('prod')
       const nuevoProducto: LocalProducto = {
-        id: generateId('prod'),
+        id: productoId,
         nombre: data.producto,
         stockActual: data.cantidad,
         stockMinimo: 0,
@@ -797,6 +834,36 @@ export const localCrearOrdenCompra = (data: {
       productos.push(nuevoProducto)
     }
     saveToStorage(STORAGE_KEYS.PRODUCTOS, productos)
+    
+    // ✅ REGISTRAR ENTRADA EN ALMACÉN
+    const entradas = getFromStorage<{
+      id: string
+      productoId: string
+      producto: string
+      cantidad: number
+      origen: string
+      ordenCompraId: string
+      costoUnitario: number
+      valorTotal: number
+      fecha: string
+      tipo: string
+      createdAt: string
+    }>(STORAGE_KEYS.ALMACEN_ENTRADAS)
+    
+    entradas.push({
+      id: generateId('entrada'),
+      productoId,
+      producto: data.producto,
+      cantidad: data.cantidad,
+      origen: data.distribuidor,
+      ordenCompraId: ordenId,
+      costoUnitario: costoPorUnidad,
+      valorTotal: costoTotal,
+      fecha: data.fecha || new Date().toISOString(),
+      tipo: 'entrada',
+      createdAt: new Date().toISOString(),
+    })
+    saveToStorage(STORAGE_KEYS.ALMACEN_ENTRADAS, entradas)
   }
   
   // Actualizar banco si hubo pago
@@ -811,9 +878,9 @@ export const localCrearOrdenCompra = (data: {
     }
   }
   
-  logger.info('Orden de compra creada localmente', {
+  logger.info('Orden de compra creada localmente con entrada en almacén', {
     context: 'LocalStorageService',
-    data: { ordenId, costoTotal, deuda },
+    data: { ordenId, costoTotal, deuda, producto: data.producto },
   })
   
   return ordenId
@@ -870,6 +937,46 @@ export const localCrearProducto = (data: {
 
 export const localSuscribirAlmacen = (callback: (productos: LocalProducto[]) => void): (() => void) => {
   return subscribe<LocalProducto>(STORAGE_KEYS.PRODUCTOS, callback)
+}
+
+// ============================================================
+// ENTRADAS Y SALIDAS DE ALMACÉN
+// ============================================================
+
+interface LocalEntradaAlmacen {
+  id: string
+  productoId: string
+  producto: string
+  cantidad: number
+  origen: string
+  ordenCompraId?: string
+  costoUnitario: number
+  valorTotal: number
+  fecha: string
+  tipo: string
+  createdAt: string
+}
+
+interface LocalSalidaAlmacen {
+  id: string
+  productoId: string
+  producto: string
+  cantidad: number
+  destino: string
+  ventaId?: string
+  precioVenta: number
+  valorTotal: number
+  fecha: string
+  tipo: string
+  createdAt: string
+}
+
+export const localSuscribirEntradasAlmacen = (callback: (entradas: LocalEntradaAlmacen[]) => void): (() => void) => {
+  return subscribe<LocalEntradaAlmacen>(STORAGE_KEYS.ALMACEN_ENTRADAS, callback)
+}
+
+export const localSuscribirSalidasAlmacen = (callback: (salidas: LocalSalidaAlmacen[]) => void): (() => void) => {
+  return subscribe<LocalSalidaAlmacen>(STORAGE_KEYS.ALMACEN_SALIDAS, callback)
 }
 
 // ============================================================

@@ -51,7 +51,7 @@ import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
 // ✅ USAR NUEVO SERVICIO DE BUSINESS OPERATIONS
-import { realizarTransferencia, type TransferenciaInput as BizTransferenciaInput } from '@/app/lib/services/business-operations.service'
+import { realizarTransferencia, type TransferenciaInput as BizTransferenciaInput, getStorageMode } from '@/app/lib/services/business-operations-unified.service'
 import { useBancosData } from '@/app/lib/firebase/firestore-hooks.service'
 import type { BancoId as SystemBancoId } from '@/app/types'
 

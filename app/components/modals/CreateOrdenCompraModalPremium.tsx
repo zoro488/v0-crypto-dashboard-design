@@ -62,8 +62,8 @@ import { useToast } from '@/app/hooks/use-toast'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
-// ✅ USAR NUEVO SERVICIO DE BUSINESS OPERATIONS
-import { crearOrdenCompraCompleta, type CrearOrdenCompraInput } from '@/app/lib/services/business-operations.service'
+// ✅ USAR SERVICIO UNIFICADO (Firebase + localStorage fallback)
+import { crearOrdenCompraCompleta, type CrearOrdenCompraInput, getStorageMode } from '@/app/lib/services/business-operations-unified.service'
 import { obtenerSiguienteIdOrdenCompra } from '@/app/lib/services/unified-data-service'
 import { BANCOS_LIST } from '@/app/hooks/useBusinessOperations'
 import type { BancoId } from '@/app/types'

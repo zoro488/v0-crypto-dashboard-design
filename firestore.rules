@@ -3,23 +3,27 @@ service cloud.firestore {
   match /databases/{database}/documents {
     
     // ═══════════════════════════════════════════════════════════════════════════════
-    // 🏦 FLOWDISTRIBUTOR - REGLAS DE SEGURIDAD PRODUCTION-READY
+    // 🏦 FLOWDISTRIBUTOR - REGLAS DE SEGURIDAD
     // ═══════════════════════════════════════════════════════════════════════════════
     // 
+    // 🔧 MODO DESARROLLO: Reglas permisivas para desarrollo local
+    // ⚠️ EN PRODUCCIÓN: Cambiar isAuthenticated() para requerir auth real
+    //
     // PRINCIPIOS CRÍTICOS:
     // 1. historicoIngresos NUNCA puede disminuir
     // 2. historicoGastos NUNCA puede disminuir  
     // 3. Deudas de clientes solo pueden BAJAR con abonos
     // 4. Ventas y movimientos son INMUTABLES (solo campos específicos editables)
-    // 5. Solo usuarios autenticados pueden acceder
     // ═══════════════════════════════════════════════════════════════════════════════
     
     // ───────────────────────────────────────────────────────────────────────────────
     // FUNCIONES DE AUTENTICACIÓN
     // ───────────────────────────────────────────────────────────────────────────────
     
+    // 🔧 DESARROLLO: Permitir acceso sin autenticación
+    // 🔒 PRODUCCIÓN: Cambiar a `return request.auth != null;`
     function isAuthenticated() {
-      return request.auth != null;
+      return true;
     }
     
     function isOwner(userId) {

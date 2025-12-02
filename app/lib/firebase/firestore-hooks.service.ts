@@ -473,17 +473,47 @@ export function useCorteBancario(bancoId: string): HookResult<DocumentData> {
 }
 
 export function useEntradasAlmacen(): HookResult<DocumentData> {
-  return useRealtimeQuery('almacen_entradas', {
-    orderByField: 'fecha',
-    orderDirection: 'desc',
-  })
+  const [data, setData] = useState<DocumentData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const dataRefreshTrigger = useAppStore((state) => state.dataRefreshTrigger)
+
+  const refresh = useCallback(async () => {
+    setLoading(true)
+  }, [])
+
+  useEffect(() => {
+    const unsubscribe = unifiedService.suscribirEntradasAlmacen((entradas) => {
+      setData(entradas as DocumentData[])
+      setLoading(false)
+      setError(null)
+    })
+    return () => unsubscribe()
+  }, [dataRefreshTrigger])
+
+  return { data, loading, error, refresh }
 }
 
 export function useSalidasAlmacen(): HookResult<DocumentData> {
-  return useRealtimeQuery('almacen_salidas', {
-    orderByField: 'fecha',
-    orderDirection: 'desc',
-  })
+  const [data, setData] = useState<DocumentData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const dataRefreshTrigger = useAppStore((state) => state.dataRefreshTrigger)
+
+  const refresh = useCallback(async () => {
+    setLoading(true)
+  }, [])
+
+  useEffect(() => {
+    const unsubscribe = unifiedService.suscribirSalidasAlmacen((salidas) => {
+      setData(salidas as DocumentData[])
+      setLoading(false)
+      setError(null)
+    })
+    return () => unsubscribe()
+  }, [dataRefreshTrigger])
+
+  return { data, loading, error, refresh }
 }
 
 // ===================================================================

@@ -56,8 +56,8 @@ import { useToast } from '@/app/hooks/use-toast'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
-// ✅ USAR NUEVO SERVICIO DE BUSINESS OPERATIONS
-import { crearVentaCompleta, type CrearVentaInput } from '@/app/lib/services/business-operations.service'
+// ✅ USAR SERVICIO UNIFICADO (Firebase + localStorage fallback)
+import { crearVentaCompleta, type CrearVentaInput, getStorageMode } from '@/app/lib/services/business-operations-unified.service'
 import { useClientesData, useOrdenesCompraData } from '@/app/lib/firebase/firestore-hooks.service'
 
 // ============================================

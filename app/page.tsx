@@ -30,8 +30,8 @@ const BentoReportesPremium = lazy(() => import('@/app/components/panels/BentoRep
 const BentoClientesPremium = lazy(() => import('@/app/components/panels/BentoClientesPremium'))
 const BentoDistribuidoresPremium = lazy(() => import('@/app/components/panels/BentoDistribuidoresPremium'))
 
-// Panel IA Inmersivo Premium con Robot 3D Nexbot y Spline
-const BentoIAImmersive = lazy(() => import('@/app/components/panels/BentoIAImmersive'))
+// Panel IA Elevado Premium con AIBrainVisualizer y Neural Engine
+const BentoIAElevated = lazy(() => import('@/app/components/panels/BentoIAElevated'))
 
 // Panel GYA (Gastos y Abonos) - Gestión centralizada de egresos e ingresos
 const BentoGYA = lazy(() => import('@/app/components/panels/BentoGYA'))
@@ -206,7 +206,7 @@ export default function Chronos() {
       case 'reportes':
         return <BentoReportesPremium />
       case 'ia':
-        return <BentoIAImmersive />
+        return <BentoIAElevated />
       default:
         return <ChronosDashboard />
     }

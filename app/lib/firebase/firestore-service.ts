@@ -1607,6 +1607,70 @@ export const suscribirAlmacen = (callback: (productos: Producto[]) => void) => {
 }
 
 /**
+ * Suscribirse a entradas de almacén
+ */
+export const suscribirEntradasAlmacen = (callback: (entradas: unknown[]) => void) => {
+  if (!isFirestoreAvailable()) {
+    callback([])
+    return () => {}
+  }
+  
+  try {
+    const q = query(collection(db!, 'almacen_entradas'), orderBy('fecha', 'desc'))
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        const entradas = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+        callback(entradas)
+      },
+      (error) => {
+        logger.error('Error fetching almacen_entradas', error, { context: 'FirestoreService' })
+        callback([])
+      },
+    )
+  } catch (error) {
+    logger.error('Error subscribing to almacen_entradas', error, { context: 'FirestoreService' })
+    callback([])
+    return () => {}
+  }
+}
+
+/**
+ * Suscribirse a salidas de almacén
+ */
+export const suscribirSalidasAlmacen = (callback: (salidas: unknown[]) => void) => {
+  if (!isFirestoreAvailable()) {
+    callback([])
+    return () => {}
+  }
+  
+  try {
+    const q = query(collection(db!, 'almacen_salidas'), orderBy('fecha', 'desc'))
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        const salidas = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+        callback(salidas)
+      },
+      (error) => {
+        logger.error('Error fetching almacen_salidas', error, { context: 'FirestoreService' })
+        callback([])
+      },
+    )
+  } catch (error) {
+    logger.error('Error subscribing to almacen_salidas', error, { context: 'FirestoreService' })
+    callback([])
+    return () => {}
+  }
+}
+
+/**
  * Crear un nuevo producto en el almacén
  */
 export const crearProducto = async (data: {
