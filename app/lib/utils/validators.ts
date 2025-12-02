@@ -43,7 +43,7 @@ export const idSchema = z.string()
 export const nombreSchema = z.string()
   .min(2, 'Nombre demasiado corto (mínimo 2 caracteres)')
   .max(100, 'Nombre demasiado largo (máximo 100 caracteres)')
-  .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-\.]+$/, 'Nombre contiene caracteres inválidos')
+  .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s.-]+$/, 'Nombre contiene caracteres inválidos')
 
 // ==========================================
 // ESQUEMAS DE VENTA

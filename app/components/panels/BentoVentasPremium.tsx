@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   TrendingUp, Plus, DollarSign, Users, Package, CheckCircle2, Clock, 
@@ -795,6 +796,3 @@ export default memo(function BentoVentasPremium() {
     </div>
   )
 })
-
-// Importación necesaria para React.createElement
-import React from 'react'

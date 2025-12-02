@@ -21,7 +21,7 @@ export type AnalyticsEvent =
   | 'error_occurred'
 
 // Track custom events
-export function trackEvent(event: AnalyticsEvent, properties?: Record<string, any>) {
+export function trackEvent(event: AnalyticsEvent, properties?: Record<string, unknown>) {
   if (typeof window === 'undefined') return
 
   // Vercel Analytics
@@ -36,6 +36,7 @@ export function trackEvent(event: AnalyticsEvent, properties?: Record<string, an
 
   // Development logging
   if (process.env.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
     console.log('📊 Analytics Event:', event, properties)
   }
 }
@@ -54,7 +55,7 @@ export function trackPageView(url: string) {
 }
 
 // Track errors
-export function trackError(error: Error, context?: Record<string, any>) {
+export function trackError(error: Error, context?: Record<string, unknown>) {
   trackEvent('error_occurred', {
     message: error.message,
     stack: error.stack,
@@ -63,7 +64,7 @@ export function trackError(error: Error, context?: Record<string, any>) {
 }
 
 // Track user actions
-export function trackUserAction(action: string, details?: Record<string, any>) {
+export function trackUserAction(action: string, details?: Record<string, unknown>) {
   trackEvent(action as AnalyticsEvent, {
     timestamp: new Date().toISOString(),
     ...details,
@@ -89,7 +90,7 @@ declare global {
     gtag?: (
       command: string,
       targetId: string,
-      config?: Record<string, any>
+      config?: Record<string, unknown>
     ) => void
   }
 }

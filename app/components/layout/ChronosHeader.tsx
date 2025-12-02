@@ -34,13 +34,21 @@ import {
   Eye,
   Command,
   Home,
+  Cpu,
   type LucideIcon,
 } from 'lucide-react'
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react'
 import { Button } from '@/app/components/ui/button'
 import { CreateOrdenCompraModalPremium } from '@/app/components/modals/CreateOrdenCompraModalPremium'
 import { CreateVentaModalPremium } from '@/app/components/modals/CreateVentaModalPremium'
 import { CreateTransferenciaModalPremium } from '@/app/components/modals/CreateTransferenciaModalPremium'
+import dynamic from 'next/dynamic'
+
+// 🎨 Importar componentes 3D dinámicamente para mejor performance
+const GlassNavIcon = dynamic(
+  () => import('@/app/components/3d/GlassNavIcons').then(mod => mod.GlassNavIcon),
+  { ssr: false, loading: () => <div className="w-10 h-10 bg-white/5 rounded-xl animate-pulse" /> },
+)
 
 // ============================================================
 // TIPOS
@@ -65,6 +73,50 @@ interface DropdownItem {
 // ============================================================
 // CONFIGURACIÓN DE PANELES
 // ============================================================
+
+// Mapeo de IDs de panel a iconos 3D GlassNavIcon
+type Glass3DIconName = 'dashboard' | 'analytics' | 'inventory' | 'orders' | 'clients' | 'distributors' | 'banks' | 'vault' | 'expenses' | 'profits' | 'settings' | 'notifications' | 'user' | 'search' | 'menu'
+
+const panelTo3DIcon: Record<string, Glass3DIconName> = {
+  dashboard: 'dashboard',
+  ventas: 'analytics',
+  ordenes: 'orders',
+  almacen: 'inventory',
+  banco: 'banks',
+  boveda_monte: 'vault',
+  boveda_usa: 'vault',
+  utilidades: 'profits',
+  flete_sur: 'orders',
+  azteca: 'banks',
+  leftie: 'vault',
+  profit: 'profits',
+  gya: 'expenses',
+  distribuidores: 'distributors',
+  clientes: 'clients',
+  reportes: 'analytics',
+  ia: 'search',
+}
+
+const panelTo3DColor: Record<string, 'blue' | 'purple' | 'cyan' | 'emerald' | 'amber' | 'rose'> = {
+  dashboard: 'blue',
+  ventas: 'emerald',
+  ordenes: 'purple',
+  almacen: 'amber',
+  banco: 'blue',
+  boveda_monte: 'cyan',
+  boveda_usa: 'rose',
+  utilidades: 'emerald',
+  flete_sur: 'amber',
+  azteca: 'purple',
+  leftie: 'amber',
+  profit: 'purple',
+  gya: 'emerald',
+  distribuidores: 'rose',
+  clientes: 'rose',
+  reportes: 'cyan',
+  ia: 'purple',
+}
+
 const mainPanels: PanelItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid, color: 'from-blue-500 to-cyan-500', description: 'Vista general del sistema' },
   { id: 'ventas', label: 'Ventas', icon: ShoppingCart, color: 'from-green-500 to-emerald-500', description: 'Gestión de ventas' },
@@ -84,23 +136,18 @@ const bancosItems: PanelItem[] = [
 ]
 
 const gestionItems: PanelItem[] = [
+  { id: 'gya', label: 'Gastos y Abonos', icon: Wallet, color: 'from-emerald-500 to-green-500', description: 'Gestión de egresos e ingresos' },
   { id: 'distribuidores', label: 'Distribuidores', icon: Users, color: 'from-orange-500 to-red-500', description: 'Proveedores' },
   { id: 'clientes', label: 'Clientes', icon: UserCheck, color: 'from-pink-500 to-rose-500', description: 'Cartera de clientes' },
   { id: 'reportes', label: 'Reportes', icon: BarChart3, color: 'from-teal-500 to-cyan-600', description: 'Análisis y reportes' },
   { id: 'ia', label: 'Asistente IA', icon: Sparkles, color: 'from-violet-500 to-purple-600', description: 'Inteligencia artificial' },
 ]
 
-const splineItems: DropdownItem[] = [
-  { id: '3d_dropdown', label: '3D Dropdown Menu', icon: Box, color: 'from-cyan-500 to-blue-500' },
-  { id: 'glass_buttons', label: 'Glass Buttons', icon: Layers, color: 'from-purple-500 to-pink-500' },
-  { id: 'ai_orb', label: 'AI Voice Orb', icon: Sparkles, color: 'from-violet-500 to-fuchsia-500' },
-  { id: 'fire_portal', label: 'Fire Portal', icon: Zap, color: 'from-orange-500 to-red-500' },
-  { id: 'nexbot', label: 'Nexbot Robot', icon: Activity, color: 'from-green-500 to-emerald-500' },
-  { id: 'particle_nebula', label: 'Particle Nebula', icon: Eye, color: 'from-indigo-500 to-purple-500' },
-]
+// Componentes 3D Spline ahora están integrados directamente en los paneles principales
+// Ver: BentoIA (AI Voice Orb), BentoDashboard (Glass Buttons), BentoVentas (Fire Portal), etc.
 
 // ============================================================
-// COMPONENTE: Dropdown Mega Menu
+// COMPONENTE: Dropdown Mega Menu con Iconos 3D
 // ============================================================
 interface MegaDropdownProps {
   title: string
@@ -112,6 +159,7 @@ interface MegaDropdownProps {
   onSelect: (id: string) => void
   currentPanel: string
   columns?: number
+  use3D?: boolean // Habilitar iconos 3D Spline
 }
 
 const MegaDropdown = ({ 
@@ -123,7 +171,8 @@ const MegaDropdown = ({
   onClose, 
   onSelect, 
   currentPanel,
-  columns = 2, 
+  columns = 2,
+  use3D = true, // Por defecto usar iconos 3D
 }: MegaDropdownProps) => {
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -167,22 +216,33 @@ const MegaDropdown = ({
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className="absolute top-full left-0 mt-2 z-50"
           >
-            <div className="bg-black/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden min-w-[280px]">
-              {/* Header del dropdown */}
-              <div className="px-4 py-3 border-b border-white/5 bg-white/5">
-                <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-500/20 to-purple-500/20">
-                    <Icon className="w-4 h-4 text-white" />
+            <div className="bg-black/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden min-w-[320px]">
+              {/* Header del dropdown con efecto 3D */}
+              <div className="px-4 py-3 border-b border-white/5 bg-gradient-to-r from-white/5 to-transparent">
+                <div className="flex items-center gap-3">
+                  {/* Orbe 3D decorativo en header */}
+                  <div className="relative">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500/30 to-purple-500/30 flex items-center justify-center overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 animate-pulse" />
+                      <Icon className="w-4 h-4 text-white relative z-10" />
+                    </div>
+                    <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl blur-md opacity-50" />
                   </div>
-                  <span className="text-sm font-semibold text-white">{title}</span>
+                  <div>
+                    <span className="text-sm font-semibold text-white">{title}</span>
+                    <p className="text-[10px] text-white/40">Spline 3D Enhanced</p>
+                  </div>
                 </div>
               </div>
 
-              {/* Items Grid */}
-              <div className={`p-2 grid gap-1 ${columns > 1 ? `grid-cols-${columns}` : ''}`} style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
+              {/* Items Grid con Iconos 3D */}
+              <div className={'p-3 grid gap-2'} style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
                 {items.map((item) => {
                   const ItemIcon = item.icon
                   const isActive = currentPanel === item.id
+                  const icon3D = panelTo3DIcon[item.id] || 'dashboard'
+                  const color3D = panelTo3DColor[item.id] || 'blue'
+                  
                   return (
                     <motion.button
                       key={item.id}
@@ -191,20 +251,44 @@ const MegaDropdown = ({
                         onClose()
                       }}
                       className={`
-                        flex items-center gap-3 p-3 rounded-xl text-left transition-all w-full
+                        group flex items-center gap-3 p-3 rounded-xl text-left transition-all w-full relative overflow-hidden
                         ${isActive 
                           ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30' 
-                          : 'hover:bg-white/5 border border-transparent'
+                          : 'hover:bg-white/5 border border-transparent hover:border-white/10'
                         }
                       `}
                       whileHover={{ scale: 1.02, x: 4 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      <div className={`p-2 rounded-lg bg-gradient-to-br ${item.color} shadow-lg`}>
-                        <ItemIcon className="w-4 h-4 text-white" />
+                      {/* Icono 3D Spline o Fallback */}
+                      <div className="relative flex-shrink-0">
+                        {use3D ? (
+                          <Suspense fallback={
+                            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${item.color} shadow-lg flex items-center justify-center`}>
+                              <ItemIcon className="w-4 h-4 text-white" />
+                            </div>
+                          }>
+                            <GlassNavIcon
+                              icon={icon3D}
+                              size="xs"
+                              colorScheme={color3D}
+                              isActive={isActive}
+                            />
+                          </Suspense>
+                        ) : (
+                          <div className={`p-2 rounded-lg bg-gradient-to-br ${item.color} shadow-lg`}>
+                            <ItemIcon className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                        
+                        {/* Glow effect para items activos */}
+                        {isActive && (
+                          <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/30 to-purple-500/30 rounded-xl blur-md opacity-60 -z-10" />
+                        )}
                       </div>
+                      
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-medium truncate ${isActive ? 'text-white' : 'text-white/80'}`}>
+                        <p className={`text-sm font-medium truncate ${isActive ? 'text-white' : 'text-white/80 group-hover:text-white'}`}>
                           {item.label}
                         </p>
                         {item.description && (
@@ -217,121 +301,6 @@ const MegaDropdown = ({
                     </motion.button>
                   )
                 })}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  )
-}
-
-// ============================================================
-// COMPONENTE: Spline Dropdown
-// ============================================================
-interface SplineDropdownProps {
-  isOpen: boolean
-  onToggle: () => void
-  onClose: () => void
-}
-
-const SplineDropdown = ({ isOpen, onToggle, onClose }: SplineDropdownProps) => {
-  const dropdownRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        onClose()
-      }
-    }
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [isOpen, onClose])
-
-  return (
-    <div ref={dropdownRef} className="relative">
-      <motion.button
-        onClick={onToggle}
-        className={`
-          flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all
-          bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20
-          ${isOpen ? 'text-white' : 'text-purple-300 hover:text-white'}
-        `}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-      >
-        <Box className="w-4 h-4" />
-        <span className="hidden md:inline">3D</span>
-        <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
-      </motion.button>
-
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="absolute top-full right-0 mt-2 z-50"
-          >
-            <div className="bg-black/90 backdrop-blur-2xl border border-purple-500/20 rounded-2xl shadow-2xl shadow-purple-500/10 overflow-hidden w-64">
-              {/* Header */}
-              <div className="px-4 py-3 border-b border-white/5 bg-gradient-to-r from-purple-500/10 to-pink-500/10">
-                <div className="flex items-center gap-2">
-                  <motion.div 
-                    className="p-1.5 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500"
-                    animate={{ rotate: [0, 360] }}
-                    transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                  >
-                    <Box className="w-4 h-4 text-white" />
-                  </motion.div>
-                  <span className="text-sm font-semibold text-white">Componentes 3D Spline</span>
-                </div>
-              </div>
-
-              {/* Items */}
-              <div className="p-2 space-y-1">
-                {splineItems.map((item, index) => {
-                  const ItemIcon = item.icon
-                  return (
-                    <motion.button
-                      key={item.id}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      onClick={() => {
-                        window.open(`/demo-3d?component=${item.id}`, '_blank')
-                        onClose()
-                      }}
-                      className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-white/5 transition-all group"
-                    >
-                      <div className={`p-2 rounded-lg bg-gradient-to-br ${item.color} shadow-lg group-hover:scale-110 transition-transform`}>
-                        <ItemIcon className="w-4 h-4 text-white" />
-                      </div>
-                      <span className="text-sm text-white/80 group-hover:text-white transition-colors">
-                        {item.label}
-                      </span>
-                    </motion.button>
-                  )
-                })}
-              </div>
-
-              {/* Footer */}
-              <div className="px-4 py-3 border-t border-white/5 bg-white/5">
-                <motion.button
-                  onClick={() => {
-                    window.open('/demo-3d', '_blank')
-                    onClose()
-                  }}
-                  className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-medium hover:opacity-90 transition-opacity"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Eye className="w-4 h-4" />
-                  Ver Galería Completa
-                </motion.button>
               </div>
             </div>
           </motion.div>
@@ -652,13 +621,6 @@ export default function ChronosHeader() {
               onSelect={setCurrentPanel}
               currentPanel={currentPanel}
               columns={1}
-            />
-
-            {/* Spline 3D Dropdown */}
-            <SplineDropdown
-              isOpen={activeDropdown === 'spline'}
-              onToggle={() => handleDropdownToggle('spline')}
-              onClose={() => setActiveDropdown(null)}
             />
           </nav>
 

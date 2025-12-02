@@ -80,7 +80,7 @@ export function initSentry() {
 }
 
 // Custom error capture with context
-export function captureError(error: Error, context?: Record<string, any>) {
+export function captureError(error: Error, context?: Record<string, unknown>) {
   if (context) {
     Sentry.setContext('custom', context)
   }
@@ -107,7 +107,7 @@ export function addBreadcrumb(
   message: string,
   category: string,
   level: Sentry.SeverityLevel = 'info',
-  data?: Record<string, any>,
+  data?: Record<string, unknown>,
 ) {
   Sentry.addBreadcrumb({
     message,

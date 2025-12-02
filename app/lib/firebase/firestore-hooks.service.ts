@@ -10,6 +10,7 @@
  * - Modo mock automático cuando Firestore falla
  * - Patrón getDocs (lectura única) para evitar ASSERTION FAILED
  * - 🔄 Auto-refresh cuando el store dispara triggerDataRefresh
+ * - 📦 Usa localStorage cuando Firebase no está disponible
  */
 
 import { useEffect, useState, useRef, useCallback } from 'react'
@@ -20,6 +21,7 @@ import {
 import { db, isFirebaseConfigured } from './config'
 import { logger } from '../utils/logger'
 import { useAppStore } from '../store/useAppStore'
+import * as unifiedService from '../services/unified-data-service'
 
 // ===================================================================
 // CONFIGURACIÓN
@@ -342,51 +344,136 @@ export function useBancoData(bancoId: string): HookResult<DocumentData> & { stat
 
 // Hook para obtener todos los bancos desde Firestore (TIEMPO REAL)
 export function useBancosData(): HookResult<DocumentData> {
-  return useRealtimeQuery('bancos', {
-    orderByField: 'nombre',
-    orderDirection: 'asc',
-    mockData: MOCK_BANCOS,
-  })
+  const [data, setData] = useState<DocumentData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const dataRefreshTrigger = useAppStore((state) => state.dataRefreshTrigger)
+
+  const refresh = useCallback(async () => {
+    setLoading(true)
+  }, [])
+
+  useEffect(() => {
+    // Usar servicio unificado que maneja Firebase o localStorage
+    const unsubscribe = unifiedService.suscribirBancos((bancos) => {
+      setData(bancos as DocumentData[])
+      setLoading(false)
+      setError(null)
+    })
+    return () => unsubscribe()
+  }, [dataRefreshTrigger])
+
+  return { data, loading, error, refresh }
 }
 
 export function useAlmacenData(): HookResult<DocumentData> {
-  return useRealtimeQuery('almacen_productos', {
-    orderByField: 'nombre',
-    orderDirection: 'asc',
-    mockData: MOCK_PRODUCTOS,
-  })
+  const [data, setData] = useState<DocumentData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const dataRefreshTrigger = useAppStore((state) => state.dataRefreshTrigger)
+
+  const refresh = useCallback(async () => {
+    setLoading(true)
+  }, [])
+
+  useEffect(() => {
+    const unsubscribe = unifiedService.suscribirAlmacen((productos) => {
+      setData(productos as DocumentData[])
+      setLoading(false)
+      setError(null)
+    })
+    return () => unsubscribe()
+  }, [dataRefreshTrigger])
+
+  return { data, loading, error, refresh }
 }
 
 export function useVentasData(): HookResult<DocumentData> {
-  return useRealtimeQuery('ventas', {
-    orderByField: 'fecha',
-    orderDirection: 'desc',
-    mockData: MOCK_VENTAS,
-  })
+  const [data, setData] = useState<DocumentData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const dataRefreshTrigger = useAppStore((state) => state.dataRefreshTrigger)
+
+  const refresh = useCallback(async () => {
+    setLoading(true)
+  }, [])
+
+  useEffect(() => {
+    const unsubscribe = unifiedService.suscribirVentas((ventas) => {
+      setData(ventas as DocumentData[])
+      setLoading(false)
+      setError(null)
+    })
+    return () => unsubscribe()
+  }, [dataRefreshTrigger])
+
+  return { data, loading, error, refresh }
 }
 
 export function useClientesData(): HookResult<DocumentData> {
-  return useRealtimeQuery('clientes', {
-    orderByField: 'nombre',
-    orderDirection: 'asc',
-    mockData: MOCK_CLIENTES,
-  })
+  const [data, setData] = useState<DocumentData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const dataRefreshTrigger = useAppStore((state) => state.dataRefreshTrigger)
+
+  const refresh = useCallback(async () => {
+    setLoading(true)
+  }, [])
+
+  useEffect(() => {
+    const unsubscribe = unifiedService.suscribirClientes((clientes) => {
+      setData(clientes as DocumentData[])
+      setLoading(false)
+      setError(null)
+    })
+    return () => unsubscribe()
+  }, [dataRefreshTrigger])
+
+  return { data, loading, error, refresh }
 }
 
 export function useDistribuidoresData(): HookResult<DocumentData> {
-  return useRealtimeQuery('distribuidores', {
-    orderByField: 'nombre',
-    orderDirection: 'asc',
-    mockData: MOCK_DISTRIBUIDORES,
-  })
+  const [data, setData] = useState<DocumentData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const dataRefreshTrigger = useAppStore((state) => state.dataRefreshTrigger)
+
+  const refresh = useCallback(async () => {
+    setLoading(true)
+  }, [])
+
+  useEffect(() => {
+    const unsubscribe = unifiedService.suscribirDistribuidores((distribuidores) => {
+      setData(distribuidores as DocumentData[])
+      setLoading(false)
+      setError(null)
+    })
+    return () => unsubscribe()
+  }, [dataRefreshTrigger])
+
+  return { data, loading, error, refresh }
 }
 
 export function useOrdenesCompraData(): HookResult<DocumentData> {
-  return useRealtimeQuery('ordenes_compra', {
-    orderByField: 'fecha',
-    orderDirection: 'desc',
-    mockData: MOCK_ORDENES_COMPRA,
-  })
+  const [data, setData] = useState<DocumentData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const dataRefreshTrigger = useAppStore((state) => state.dataRefreshTrigger)
+
+  const refresh = useCallback(async () => {
+    setLoading(true)
+  }, [])
+
+  useEffect(() => {
+    const unsubscribe = unifiedService.suscribirOrdenesCompra((ordenes) => {
+      setData(ordenes as DocumentData[])
+      setLoading(false)
+      setError(null)
+    })
+    return () => unsubscribe()
+  }, [dataRefreshTrigger])
+
+  return { data, loading, error, refresh }
 }
 
 export function useDashboardData(): HookResult<DocumentData> & { totales: Record<string, unknown> } {

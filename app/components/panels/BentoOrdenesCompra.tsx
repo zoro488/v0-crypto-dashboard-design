@@ -5,15 +5,17 @@ import {
   ShoppingCart, Plus, TrendingUp, AlertCircle, CheckCircle2, Clock, Package,
   Building2, DollarSign, Calendar, Search, Filter, Download, Eye, Edit,
   ArrowUpRight, ArrowDownRight, Truck, BarChart3, PieChart as PieChartIcon,
-  CreditCard, Receipt, RefreshCw, ChevronRight,
+  CreditCard, Receipt, RefreshCw, ChevronRight, Sparkles, Pencil, Trash2,
   type LucideIcon,
 } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 import { Badge } from '@/app/components/ui/badge'
 import { Input } from '@/app/components/ui/input'
 import { Skeleton } from '@/app/components/ui/skeleton'
-import { useState, useEffect, useMemo, useCallback } from 'react'
-import { suscribirOrdenesCompra } from '@/app/lib/firebase/firestore-service'
+import { useState, useEffect, useMemo, useCallback, Suspense } from 'react'
+import { suscribirOrdenesCompra, eliminarOrdenCompra } from '@/app/lib/services/unified-data-service'
+import { DeleteConfirmModal } from '@/app/components/modals/DeleteConfirmModal'
+import { useAppStore } from '@/app/lib/store/useAppStore'
 import type { OrdenCompra, FirestoreTimestamp } from '@/app/types'
 import { CreateOrdenCompraModalPremium } from '@/app/components/modals/CreateOrdenCompraModalPremium'
 import { useToast } from '@/app/hooks/use-toast'
@@ -22,6 +24,13 @@ import {
   AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, 
   Tooltip, PieChart, Pie, Cell, CartesianGrid, Legend, 
 } from 'recharts'
+import dynamic from 'next/dynamic'
+
+// 🎨 Componente 3D Premium cargado dinámicamente
+const PremiumSplineOrb = dynamic(
+  () => import('@/app/components/3d/PremiumSplineOrb').then(mod => mod.PremiumSplineOrb),
+  { ssr: false, loading: () => <div className="w-full h-full bg-gradient-to-br from-purple-500/10 to-violet-500/10 rounded-2xl animate-pulse" /> },
+)
 
 // ============================================================================
 // HELPERS
@@ -110,7 +119,12 @@ function StatCard({
 }
 
 // Tarjeta de Orden de Compra
-function OrdenCompraCard({ orden, onView }: { orden: OrdenCompra; onView: (oc: OrdenCompra) => void }) {
+function OrdenCompraCard({ orden, onView, onEdit, onDelete }: { 
+  orden: OrdenCompra
+  onView: (oc: OrdenCompra) => void
+  onEdit: (oc: OrdenCompra) => void
+  onDelete: (oc: OrdenCompra) => void
+}) {
   const getEstadoConfig = (estado: string) => {
     switch (estado) {
       case 'pagado':
@@ -188,8 +202,24 @@ function OrdenCompraCard({ orden, onView }: { orden: OrdenCompra; onView: (oc: O
         </div>
       </div>
 
-      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-        <ChevronRight size={20} className="text-white/40" />
+      {/* Botones de acción */}
+      <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={(e) => { e.stopPropagation(); onEdit(orden) }}
+          className="h-7 w-7 p-0 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
+        >
+          <Pencil size={14} />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={(e) => { e.stopPropagation(); onDelete(orden) }}
+          className="h-7 w-7 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+        >
+          <Trash2 size={14} />
+        </Button>
       </div>
     </motion.div>
   )
@@ -200,6 +230,7 @@ function OrdenCompraCard({ orden, onView }: { orden: OrdenCompra; onView: (oc: O
 // ============================================================================
 export default function BentoOrdenesCompra() {
   const { toast } = useToast()
+  const { triggerDataRefresh } = useAppStore()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [ordenesCompraData, setOrdenesCompraData] = useState<OrdenCompra[]>([])
   const [loading, setLoading] = useState(true)
@@ -207,14 +238,53 @@ export default function BentoOrdenesCompra() {
   const [filterEstado, setFilterEstado] = useState<string | null>(null)
   const [selectedOrden, setSelectedOrden] = useState<OrdenCompra | null>(null)
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
+  const [editingOrden, setEditingOrden] = useState<OrdenCompra | null>(null)
+  const [deletingOrden, setDeletingOrden] = useState<OrdenCompra | null>(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   useEffect(() => {
     const unsubscribe = suscribirOrdenesCompra((ordenes) => {
-      setOrdenesCompraData(ordenes)
+      setOrdenesCompraData(ordenes as OrdenCompra[])
       setLoading(false)
     })
 
     return () => unsubscribe()
+  }, [])
+
+  // Handlers para editar/eliminar
+  const handleEditOrden = useCallback((orden: OrdenCompra) => {
+    setEditingOrden(orden)
+    setIsModalOpen(true)
+  }, [])
+
+  const handleDeleteOrden = useCallback((orden: OrdenCompra) => {
+    setDeletingOrden(orden)
+    setShowDeleteModal(true)
+  }, [])
+
+  const confirmDeleteOrden = useCallback(async () => {
+    if (!deletingOrden?.id) return
+    
+    try {
+      await eliminarOrdenCompra(deletingOrden.id)
+      toast({
+        title: '✅ Orden eliminada',
+        description: `La orden ${deletingOrden.id} ha sido eliminada exitosamente`,
+      })
+      triggerDataRefresh()
+    } catch (error) {
+      logger.error('Error eliminando orden de compra', error)
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'No se pudo eliminar la orden',
+        variant: 'destructive',
+      })
+    }
+  }, [deletingOrden, toast, triggerDataRefresh])
+
+  const handleCloseModal = useCallback(() => {
+    setIsModalOpen(false)
+    setEditingOrden(null)
   }, [])
 
   // Handler para exportar datos
@@ -414,6 +484,71 @@ export default function BentoOrdenesCompra() {
           />
         </div>
 
+        {/* 3D Premium Orb + Resumen Visual */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          {/* Orb 3D de Órdenes */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3 }}
+            className="relative group"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-violet-500/10 rounded-2xl blur-xl" />
+            <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-4 hover:border-purple-500/30 transition-all h-[180px] flex flex-col items-center justify-center">
+              <Suspense fallback={<div className="w-20 h-20 bg-purple-500/10 rounded-full animate-pulse" />}>
+                <div className="w-full h-24 flex items-center justify-center">
+                  <PremiumSplineOrb 
+                    size={70}
+                    state={totalDeuda > 0 ? 'pulse' : 'success'}
+                    primaryColor="#8b5cf6"
+                    secondaryColor="#a78bfa"
+                    showParticles={true}
+                  />
+                </div>
+              </Suspense>
+              <div className="text-center mt-2">
+                <p className="text-xs text-zinc-400">Tasa de Pago</p>
+                <p className="text-lg font-bold text-purple-400">
+                  {Math.round((totalPagado / (totalCompras || 1)) * 100)}%
+                </p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Métricas Rápidas */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="lg:col-span-3 relative group"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-cyan-500/5 rounded-2xl blur-xl" />
+            <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-4 hover:border-blue-500/30 transition-all">
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles className="w-4 h-4 text-cyan-400" />
+                <h3 className="text-sm font-bold text-white">Estado de Órdenes</h3>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-center">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 mx-auto mb-1" />
+                  <p className="text-lg font-bold text-emerald-400">{ordenesPagadas}</p>
+                  <p className="text-[10px] text-emerald-400/60">Pagadas</p>
+                </div>
+                <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 text-center">
+                  <Clock className="w-5 h-5 text-amber-400 mx-auto mb-1" />
+                  <p className="text-lg font-bold text-amber-400">{ordenesParciales}</p>
+                  <p className="text-[10px] text-amber-400/60">Parciales</p>
+                </div>
+                <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-3 text-center">
+                  <AlertCircle className="w-5 h-5 text-rose-400 mx-auto mb-1" />
+                  <p className="text-lg font-bold text-rose-400">{ordenesPendientes}</p>
+                  <p className="text-[10px] text-rose-400/60">Pendientes</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
         {/* Gráficos */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Gráfico de tendencia */}
@@ -548,10 +683,13 @@ export default function BentoOrdenesCompra() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ delay: idx * 0.05 }}
+                    className="group"
                   >
                     <OrdenCompraCard 
                       orden={orden} 
                       onView={(oc) => setSelectedOrden(oc)}
+                      onEdit={handleEditOrden}
+                      onDelete={handleDeleteOrden}
                     />
                   </motion.div>
                 ))}
@@ -590,9 +728,23 @@ export default function BentoOrdenesCompra() {
       {isModalOpen && (
         <CreateOrdenCompraModalPremium
           open={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={handleCloseModal}
         />
       )}
+
+      {/* Modal de confirmación de eliminación */}
+      <DeleteConfirmModal
+        open={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false)
+          setDeletingOrden(null)
+        }}
+        onConfirm={confirmDeleteOrden}
+        title="¿Eliminar orden de compra?"
+        description="Esta acción eliminará permanentemente la orden de compra y todos sus datos asociados."
+        itemName={deletingOrden?.id || ''}
+        itemType="orden de compra"
+      />
     </div>
   )
 }

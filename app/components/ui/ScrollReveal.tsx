@@ -1,9 +1,7 @@
 'use client'
 
-import type React from 'react'
-
+import React, { useRef } from 'react'
 import { motion, useScroll, useTransform, useInView } from 'framer-motion'
-import { useRef } from 'react'
 
 interface ScrollRevealProps {
   children: React.ReactNode

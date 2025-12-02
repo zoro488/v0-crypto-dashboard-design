@@ -10,7 +10,7 @@
  * - Optimización automática según dispositivo
  */
 
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useFrame } from '@react-three/fiber'
 import { Suspense, useEffect, useState, useMemo, useRef } from 'react'
 import { 
   Float, 
@@ -29,7 +29,6 @@ import {
 } from '@react-three/postprocessing'
 import { BlendFunction } from 'postprocessing'
 import * as THREE from 'three'
-import { useFrame } from '@react-three/fiber'
 
 // ============================================================================
 // NEBULOSA PROCEDURAL - Nubes volumétricas de color

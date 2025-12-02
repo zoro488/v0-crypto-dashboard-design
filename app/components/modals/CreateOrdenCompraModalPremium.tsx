@@ -62,7 +62,7 @@ import { useToast } from '@/app/hooks/use-toast'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
-import { crearOrdenCompra } from '@/app/lib/firebase/firestore-service'
+import { crearOrdenCompra } from '@/app/lib/services/unified-data-service'
 
 // ============================================
 // SCHEMA ZOD - Basado en ordenes_compra.csv
@@ -262,7 +262,7 @@ export function CreateOrdenCompraModalPremium({
 
         toast({
           title: '⚠️ Modo Local',
-          description: `Orden registrada localmente (Firebase no disponible)`,
+          description: 'Orden registrada localmente (Firebase no disponible)',
         })
 
         onClose()
@@ -289,7 +289,7 @@ export function CreateOrdenCompraModalPremium({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          'max-w-4xl h-[90vh] p-0 overflow-hidden',
+          'max-w-4xl max-h-[85vh] p-0 overflow-hidden',
           'bg-black/60 backdrop-blur-2xl',
           'border border-white/10',
           'text-white',
@@ -317,7 +317,7 @@ export function CreateOrdenCompraModalPremium({
           />
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="relative flex flex-col h-full">
+        <form onSubmit={handleSubmit(onSubmit)} className="relative flex flex-col min-h-0 flex-1">
           {/* ===== HEADER ===== */}
           <div className="relative h-24 border-b border-white/10 bg-gradient-to-r from-emerald-500/10 via-transparent to-blue-500/10">
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />

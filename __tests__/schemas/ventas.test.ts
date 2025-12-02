@@ -227,7 +227,7 @@ describe('Ventas Schema - Validaciones', () => {
     it('✅ debe validar transferencia válida', () => {
       const transferencia = {
         bancoOrigenId: 'utilidades',
-        bancoDestinoId: 'boveda-monte',
+        bancoDestinoId: 'boveda_monte',
         monto: 50000,
         concepto: 'Transferencia de utilidades',
       }
@@ -253,7 +253,7 @@ describe('Ventas Schema - Validaciones', () => {
     it('❌ debe rechazar monto negativo', () => {
       const transferencia = {
         bancoOrigenId: 'utilidades',
-        bancoDestinoId: 'boveda-monte',
+        bancoDestinoId: 'boveda_monte',
         monto: -50000,
         concepto: 'Transferencia inválida',
       }
@@ -266,7 +266,7 @@ describe('Ventas Schema - Validaciones', () => {
     it('❌ debe rechazar concepto vacío', () => {
       const transferencia = {
         bancoOrigenId: 'utilidades',
-        bancoDestinoId: 'boveda-monte',
+        bancoDestinoId: 'boveda_monte',
         monto: 50000,
         concepto: '',
       }

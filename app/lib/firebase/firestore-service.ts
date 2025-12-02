@@ -24,11 +24,49 @@ import {
   Timestamp,
   writeBatch,
   increment,
+  setDoc,
   type Firestore,
 } from 'firebase/firestore'
 import { db } from './config'
 import type { Banco, OrdenCompra, Venta, Distribuidor, Cliente, Producto } from '@/app/types'
 import { logger } from '../utils/logger'
+
+// ============================================================
+// HELPER: Asegurar que un banco existe
+// ============================================================
+
+const BANCOS_DEFAULT: Record<string, Partial<Banco>> = {
+  boveda_monte: { nombre: 'Bóveda Monte', capitalActual: 0, historicoIngresos: 0, historicoGastos: 0 },
+  boveda_usa: { nombre: 'Bóveda USA', capitalActual: 0, historicoIngresos: 0, historicoGastos: 0 },
+  profit: { nombre: 'Profit', capitalActual: 0, historicoIngresos: 0, historicoGastos: 0 },
+  leftie: { nombre: 'Leftie', capitalActual: 0, historicoIngresos: 0, historicoGastos: 0 },
+  azteca: { nombre: 'Azteca', capitalActual: 0, historicoIngresos: 0, historicoGastos: 0 },
+  flete_sur: { nombre: 'Flete Sur', capitalActual: 0, historicoIngresos: 0, historicoGastos: 0 },
+  utilidades: { nombre: 'Utilidades', capitalActual: 0, historicoIngresos: 0, historicoGastos: 0 },
+}
+
+/**
+ * Asegura que un banco existe en Firestore, creándolo si es necesario
+ */
+const ensureBancoExists = async (bancoId: string): Promise<void> => {
+  if (!db) return
+  
+  const bancoRef = doc(db, COLLECTIONS.BANCOS, bancoId)
+  const bancoSnap = await getDoc(bancoRef)
+  
+  if (!bancoSnap.exists()) {
+    const defaultData = BANCOS_DEFAULT[bancoId] || { nombre: bancoId, capitalActual: 0, historicoIngresos: 0, historicoGastos: 0 }
+    await setDoc(bancoRef, {
+      id: bancoId,
+      ...defaultData,
+      historicoTransferencias: 0,
+      operaciones: [],
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    })
+    logger.info(`Banco ${bancoId} creado automáticamente`, { context: 'FirestoreService' })
+  }
+}
 
 // ============================================================
 // VERIFICACIÓN DE CONEXIÓN
@@ -292,6 +330,9 @@ export const crearOrdenCompra = async (data: CrearOrdenCompraInput) => {
 
     // Si hay pago, actualizar banco
     if ((ordenCompleta.pagoDistribuidor || 0) > 0 && ordenCompleta.bancoOrigen) {
+      // Asegurar que el banco existe
+      await ensureBancoExists(ordenCompleta.bancoOrigen)
+      
       const bancoRef = doc(db!, COLLECTIONS.BANCOS, ordenCompleta.bancoOrigen)
       batch.update(bancoRef, {
         capitalActual: increment(-(ordenCompleta.pagoDistribuidor || 0)),
@@ -353,10 +394,16 @@ type CrearVentaInput = Partial<Omit<Venta, 'id'>> & {
   cantidad: number
   precioTotalVenta?: number
   precioVenta?: number      // Precio unitario de venta
+  precioCompra?: number     // ✅ CRÍTICO: Precio de compra/costo para cálculo GYA
   producto?: string
   ocRelacionada?: string    // OC de donde viene el producto (para obtener costo)
   precioFlete?: number      // Flete por unidad
   fleteUtilidad?: number    // Flete total (alternativa)
+  distribucionBancos?: {    // Distribución precalculada (opcional, para validación)
+    bovedaMonte: number
+    fletes: number
+    utilidades: number
+  }
 }
 
 export const crearVenta = async (data: CrearVentaInput) => {
@@ -375,8 +422,13 @@ export const crearVenta = async (data: CrearVentaInput) => {
     let costoUnitarioBase = 0 // Costo por unidad (de la OC)
     let prodSnapshot: Awaited<ReturnType<typeof getDocs>> | null = null
     
-    // Intentar obtener costo desde la OC relacionada
-    if (data.ocRelacionada) {
+    // PRIORIDAD 1: Usar precioCompra pasado directamente desde el formulario
+    if (data.precioCompra && data.precioCompra > 0) {
+      costoUnitarioBase = data.precioCompra
+      logger.info(`Costo obtenido del formulario: $${costoUnitarioBase}`, { context: 'FirestoreService' })
+    }
+    // PRIORIDAD 2: Intentar obtener costo desde la OC relacionada
+    else if (data.ocRelacionada) {
       try {
         const ocDoc = await getDoc(doc(db!, COLLECTIONS.ORDENES_COMPRA, data.ocRelacionada))
         if (ocDoc.exists()) {
@@ -595,6 +647,13 @@ export const crearVenta = async (data: CrearVentaInput) => {
       const montoBovedaMonteReal = montoBovedaMonte * proporcionPagada
       const montoFleteReal = montoFlete * proporcionPagada
       const montoUtilidadReal = montoUtilidad * proporcionPagada
+      
+      // ⚡ ASEGURAR QUE LOS BANCOS EXISTEN ANTES DE ACTUALIZAR
+      await Promise.all([
+        montoBovedaMonteReal > 0 ? ensureBancoExists('boveda_monte') : Promise.resolve(),
+        montoFleteReal > 0 ? ensureBancoExists('flete_sur') : Promise.resolve(),
+        montoUtilidadReal > 0 ? ensureBancoExists('utilidades') : Promise.resolve(),
+      ])
       
       // 1. Ingreso a Bóveda Monte (recuperación de costo)
       if (montoBovedaMonteReal > 0) {
@@ -1004,27 +1063,367 @@ export const cobrarCliente = async (clienteId: string, ventaId: string, monto: n
     // Actualizar bancos (distribución proporcional)
     const proporcion = monto / ventaData.precioTotalVenta
 
-    const bovedaMonteRef = doc(db!, COLLECTIONS.BANCOS, 'bovedaMonte')
+    // Distribución a los 3 bancos (snake_case IDs)
+    const bovedaMonteRef = doc(db!, COLLECTIONS.BANCOS, 'boveda_monte')
     batch.update(bovedaMonteRef, {
       capitalActual: increment(ventaData.distribucionBancos.bovedaMonte * proporcion),
+      historicoIngresos: increment(ventaData.distribucionBancos.bovedaMonte * proporcion),
       updatedAt: Timestamp.now(),
     })
 
-    const fletesRef = doc(db!, COLLECTIONS.BANCOS, 'fletes')
+    const fletesRef = doc(db!, COLLECTIONS.BANCOS, 'flete_sur')
     batch.update(fletesRef, {
       capitalActual: increment(ventaData.distribucionBancos.fletes * proporcion),
+      historicoIngresos: increment(ventaData.distribucionBancos.fletes * proporcion),
       updatedAt: Timestamp.now(),
     })
 
     const utilidadesRef = doc(db!, COLLECTIONS.BANCOS, 'utilidades')
     batch.update(utilidadesRef, {
       capitalActual: increment(ventaData.distribucionBancos.utilidades * proporcion),
+      historicoIngresos: increment(ventaData.distribucionBancos.utilidades * proporcion), // ✅ FIX: Actualizar historicoIngresos
       updatedAt: Timestamp.now(),
     })
 
     await batch.commit()
   } catch (error) {
     logger.error('Error collecting cliente', error, { context: 'FirestoreService' })
+  }
+}
+
+/**
+ * Actualizar un cliente existente
+ */
+export const actualizarCliente = async (clienteId: string, data: Partial<{
+  nombre: string
+  empresa?: string
+  telefono?: string
+  email?: string
+  direccion?: string
+  deudaTotal?: number
+  totalVentas?: number
+  totalPagado?: number
+}>) => {
+  if (!isFirestoreAvailable()) {
+    logger.warn('actualizarCliente: Firestore no disponible', { context: 'FirestoreService' })
+    return null
+  }
+  
+  try {
+    const batch = writeBatch(db!)
+    const clienteRef = doc(db!, COLLECTIONS.CLIENTES, clienteId)
+    
+    batch.update(clienteRef, {
+      ...data,
+      updatedAt: Timestamp.now(),
+    })
+
+    await batch.commit()
+    logger.info('Cliente actualizado exitosamente', { data: { id: clienteId } })
+    return clienteId
+  } catch (error) {
+    logger.error('Error updating cliente', error, { context: 'FirestoreService' })
+    throw error
+  }
+}
+
+/**
+ * Eliminar un cliente
+ * ADVERTENCIA: Esto eliminará el cliente permanentemente
+ */
+export const eliminarCliente = async (clienteId: string) => {
+  if (!isFirestoreAvailable()) {
+    logger.warn('eliminarCliente: Firestore no disponible', { context: 'FirestoreService' })
+    return false
+  }
+  
+  try {
+    const batch = writeBatch(db!)
+    const clienteRef = doc(db!, COLLECTIONS.CLIENTES, clienteId)
+    
+    // Verificar si el cliente tiene ventas pendientes
+    const ventasQuery = query(
+      collection(db!, COLLECTIONS.VENTAS),
+      where('clienteId', '==', clienteId),
+      where('estadoPago', '!=', 'completo'),
+    )
+    const ventasPendientes = await getDocs(ventasQuery)
+    
+    if (!ventasPendientes.empty) {
+      throw new Error('No se puede eliminar un cliente con ventas pendientes')
+    }
+    
+    batch.delete(clienteRef)
+    await batch.commit()
+    
+    logger.info('Cliente eliminado exitosamente', { data: { id: clienteId } })
+    return true
+  } catch (error) {
+    logger.error('Error deleting cliente', error, { context: 'FirestoreService' })
+    throw error
+  }
+}
+
+/**
+ * Actualizar una venta existente
+ */
+export const actualizarVenta = async (ventaId: string, data: Partial<Venta>) => {
+  if (!isFirestoreAvailable()) {
+    logger.warn('actualizarVenta: Firestore no disponible', { context: 'FirestoreService' })
+    return null
+  }
+  
+  try {
+    const batch = writeBatch(db!)
+    const ventaRef = doc(db!, COLLECTIONS.VENTAS, ventaId)
+    
+    batch.update(ventaRef, {
+      ...data,
+      updatedAt: Timestamp.now(),
+    })
+
+    await batch.commit()
+    logger.info('Venta actualizada exitosamente', { data: { id: ventaId } })
+    return ventaId
+  } catch (error) {
+    logger.error('Error updating venta', error, { context: 'FirestoreService' })
+    throw error
+  }
+}
+
+/**
+ * Eliminar una venta
+ * ADVERTENCIA: Esto eliminará la venta y revertirá las distribuciones bancarias
+ */
+export const eliminarVenta = async (ventaId: string) => {
+  if (!isFirestoreAvailable()) {
+    logger.warn('eliminarVenta: Firestore no disponible', { context: 'FirestoreService' })
+    return false
+  }
+  
+  try {
+    const batch = writeBatch(db!)
+    const ventaRef = doc(db!, COLLECTIONS.VENTAS, ventaId)
+    
+    // Obtener venta para revertir distribución
+    const ventaSnap = await getDoc(ventaRef)
+    if (!ventaSnap.exists()) {
+      throw new Error('La venta no existe')
+    }
+    const ventaData = ventaSnap.data() as Venta
+    
+    // Solo revertir si la venta está pagada (completo o parcial)
+    if (ventaData.estadoPago !== 'pendiente') {
+      const proporcion = ventaData.montoPagado / ventaData.precioTotalVenta
+      
+      // Revertir distribución a los 3 bancos
+      if (ventaData.distribucionBancos) {
+        const bovedaMonteRef = doc(db!, COLLECTIONS.BANCOS, 'boveda_monte')
+        batch.update(bovedaMonteRef, {
+          capitalActual: increment(-ventaData.distribucionBancos.bovedaMonte * proporcion),
+          historicoIngresos: increment(-ventaData.distribucionBancos.bovedaMonte * proporcion),
+          updatedAt: Timestamp.now(),
+        })
+
+        const fletesRef = doc(db!, COLLECTIONS.BANCOS, 'flete_sur')
+        batch.update(fletesRef, {
+          capitalActual: increment(-ventaData.distribucionBancos.fletes * proporcion),
+          historicoIngresos: increment(-ventaData.distribucionBancos.fletes * proporcion),
+          updatedAt: Timestamp.now(),
+        })
+
+        const utilidadesRef = doc(db!, COLLECTIONS.BANCOS, 'utilidades')
+        batch.update(utilidadesRef, {
+          capitalActual: increment(-ventaData.distribucionBancos.utilidades * proporcion),
+          updatedAt: Timestamp.now(),
+        })
+      }
+      
+      // Actualizar cliente
+      if (ventaData.clienteId) {
+        const clienteRef = doc(db!, COLLECTIONS.CLIENTES, ventaData.clienteId)
+        batch.update(clienteRef, {
+          deudaTotal: increment(-ventaData.montoRestante),
+          totalVentas: increment(-ventaData.precioTotalVenta),
+          totalPagado: increment(-ventaData.montoPagado),
+          updatedAt: Timestamp.now(),
+        })
+      }
+    }
+    
+    batch.delete(ventaRef)
+    await batch.commit()
+    
+    logger.info('Venta eliminada exitosamente', { data: { id: ventaId } })
+    return true
+  } catch (error) {
+    logger.error('Error deleting venta', error, { context: 'FirestoreService' })
+    throw error
+  }
+}
+
+/**
+ * Actualizar una orden de compra existente
+ */
+export const actualizarOrdenCompra = async (ordenId: string, data: Partial<OrdenCompra>) => {
+  if (!isFirestoreAvailable()) {
+    logger.warn('actualizarOrdenCompra: Firestore no disponible', { context: 'FirestoreService' })
+    return null
+  }
+  
+  try {
+    const batch = writeBatch(db!)
+    const ordenRef = doc(db!, COLLECTIONS.ORDENES_COMPRA, ordenId)
+    
+    batch.update(ordenRef, {
+      ...data,
+      updatedAt: Timestamp.now(),
+    })
+
+    await batch.commit()
+    logger.info('Orden de compra actualizada exitosamente', { data: { id: ordenId } })
+    return ordenId
+  } catch (error) {
+    logger.error('Error updating orden de compra', error, { context: 'FirestoreService' })
+    throw error
+  }
+}
+
+/**
+ * Eliminar una orden de compra
+ */
+export const eliminarOrdenCompra = async (ordenId: string) => {
+  if (!isFirestoreAvailable()) {
+    logger.warn('eliminarOrdenCompra: Firestore no disponible', { context: 'FirestoreService' })
+    return false
+  }
+  
+  try {
+    const batch = writeBatch(db!)
+    const ordenRef = doc(db!, COLLECTIONS.ORDENES_COMPRA, ordenId)
+    
+    batch.delete(ordenRef)
+    await batch.commit()
+    
+    logger.info('Orden de compra eliminada exitosamente', { data: { id: ordenId } })
+    return true
+  } catch (error) {
+    logger.error('Error deleting orden de compra', error, { context: 'FirestoreService' })
+    throw error
+  }
+}
+
+/**
+ * Actualizar un producto del almacén
+ */
+export const actualizarProducto = async (productoId: string, data: Partial<Producto>) => {
+  if (!isFirestoreAvailable()) {
+    logger.warn('actualizarProducto: Firestore no disponible', { context: 'FirestoreService' })
+    return null
+  }
+  
+  try {
+    const batch = writeBatch(db!)
+    const productoRef = doc(db!, COLLECTIONS.ALMACEN, productoId)
+    
+    batch.update(productoRef, {
+      ...data,
+      updatedAt: Timestamp.now(),
+    })
+
+    await batch.commit()
+    logger.info('Producto actualizado exitosamente', { data: { id: productoId } })
+    return productoId
+  } catch (error) {
+    logger.error('Error updating producto', error, { context: 'FirestoreService' })
+    throw error
+  }
+}
+
+/**
+ * Eliminar un producto del almacén
+ */
+export const eliminarProducto = async (productoId: string) => {
+  if (!isFirestoreAvailable()) {
+    logger.warn('eliminarProducto: Firestore no disponible', { context: 'FirestoreService' })
+    return false
+  }
+  
+  try {
+    const batch = writeBatch(db!)
+    const productoRef = doc(db!, COLLECTIONS.ALMACEN, productoId)
+    
+    batch.delete(productoRef)
+    await batch.commit()
+    
+    logger.info('Producto eliminado exitosamente', { data: { id: productoId } })
+    return true
+  } catch (error) {
+    logger.error('Error deleting producto', error, { context: 'FirestoreService' })
+    throw error
+  }
+}
+
+/**
+ * Actualizar un distribuidor existente
+ */
+export const actualizarDistribuidor = async (distribuidorId: string, data: Partial<Distribuidor>) => {
+  if (!isFirestoreAvailable()) {
+    logger.warn('actualizarDistribuidor: Firestore no disponible', { context: 'FirestoreService' })
+    return null
+  }
+  
+  try {
+    const batch = writeBatch(db!)
+    const distribuidorRef = doc(db!, COLLECTIONS.DISTRIBUIDORES, distribuidorId)
+    
+    batch.update(distribuidorRef, {
+      ...data,
+      updatedAt: Timestamp.now(),
+    })
+
+    await batch.commit()
+    logger.info('Distribuidor actualizado exitosamente', { data: { id: distribuidorId } })
+    return distribuidorId
+  } catch (error) {
+    logger.error('Error updating distribuidor', error, { context: 'FirestoreService' })
+    throw error
+  }
+}
+
+/**
+ * Eliminar un distribuidor
+ */
+export const eliminarDistribuidor = async (distribuidorId: string) => {
+  if (!isFirestoreAvailable()) {
+    logger.warn('eliminarDistribuidor: Firestore no disponible', { context: 'FirestoreService' })
+    return false
+  }
+  
+  try {
+    const batch = writeBatch(db!)
+    const distribuidorRef = doc(db!, COLLECTIONS.DISTRIBUIDORES, distribuidorId)
+    
+    // Verificar si tiene órdenes pendientes
+    const ordenesQuery = query(
+      collection(db!, COLLECTIONS.ORDENES_COMPRA),
+      where('distribuidorId', '==', distribuidorId),
+      where('estado', '!=', 'entregado'),
+    )
+    const ordenesPendientes = await getDocs(ordenesQuery)
+    
+    if (!ordenesPendientes.empty) {
+      throw new Error('No se puede eliminar un distribuidor con órdenes pendientes')
+    }
+    
+    batch.delete(distribuidorRef)
+    await batch.commit()
+    
+    logger.info('Distribuidor eliminado exitosamente', { data: { id: distribuidorId } })
+    return true
+  } catch (error) {
+    logger.error('Error deleting distribuidor', error, { context: 'FirestoreService' })
+    throw error
   }
 }
 
@@ -1273,6 +1672,9 @@ export const crearIngreso = async (data: {
   }
   
   try {
+    // Asegurar que el banco existe
+    await ensureBancoExists(data.bancoDestino)
+    
     const batch = writeBatch(db!)
 
     // Crear documento de ingreso
@@ -1324,6 +1726,9 @@ export const crearGasto = async (data: {
   }
   
   try {
+    // Asegurar que el banco existe
+    await ensureBancoExists(data.bancoOrigen)
+    
     const batch = writeBatch(db!)
 
     // Crear documento de gasto
@@ -1378,6 +1783,12 @@ export const addTransferencia = async (data: TransferenciaData): Promise<string 
   }
   
   try {
+    // Asegurar que ambos bancos existen
+    await Promise.all([
+      ensureBancoExists(data.bancoOrigenId),
+      ensureBancoExists(data.bancoDestinoId),
+    ])
+    
     const batch = writeBatch(db!)
 
     // Crear documento en colección transferencias
@@ -1536,22 +1947,32 @@ export const firestoreService = {
   // Órdenes de Compra
   crearOrdenCompra,
   suscribirOrdenesCompra,
+  actualizarOrdenCompra,
+  eliminarOrdenCompra,
   // Ventas
   crearVenta,
   suscribirVentas,
+  actualizarVenta,
+  eliminarVenta,
   // Distribuidores
   crearDistribuidor,
   suscribirDistribuidores,
   pagarDistribuidor,
+  actualizarDistribuidor,
+  eliminarDistribuidor,
   // Clientes
   crearCliente,
   suscribirClientes,
   cobrarCliente,
+  actualizarCliente,
+  eliminarCliente,
   // Almacén
   suscribirAlmacen,
   crearProducto,
   crearEntradaAlmacen,
   crearSalidaAlmacen,
+  actualizarProducto,
+  eliminarProducto,
   // Ingresos y Gastos
   crearIngreso,
   crearGasto,

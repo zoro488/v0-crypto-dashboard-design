@@ -15,7 +15,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ReactNode, useState } from 'react'
+import { ReactNode } from 'react'
 import { logger } from '@/app/lib/utils/logger'
 
 // Configuración optimizada del Query Client

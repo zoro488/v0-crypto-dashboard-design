@@ -1,18 +1,30 @@
 'use client'
 
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion'
-import { TrendingUp, Plus, DollarSign, Users, Package, CheckCircle2, Clock, ArrowUpRight, ArrowDownRight, Sparkles, Target, Zap, BarChart3, PieChart as PieChartIcon } from 'lucide-react'
+import { TrendingUp, Plus, DollarSign, Users, Package, CheckCircle2, Clock, ArrowUpRight, ArrowDownRight, Sparkles, Target, Zap, BarChart3, PieChart as PieChartIcon, Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 import { Badge } from '@/app/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/components/ui/tabs'
-import { useState, useEffect, useMemo, useRef, memo } from 'react'
+import { useState, useEffect, useMemo, useRef, memo, Suspense } from 'react'
 import { useVentasData } from '@/app/lib/firebase/firestore-hooks.service'
 import { CreateVentaModalPremium } from '@/app/components/modals/CreateVentaModalPremium'
+import { DeleteConfirmModal } from '@/app/components/modals/DeleteConfirmModal'
 import { SalesFlowDiagram } from '@/app/components/visualizations/SalesFlowDiagram'
 import { 
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, 
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts'
+import dynamic from 'next/dynamic'
+import { eliminarVenta } from '@/app/lib/services/unified-data-service'
+import { useToast } from '@/app/hooks/use-toast'
+import { logger } from '@/app/lib/utils/logger'
+import { useAppStore } from '@/app/lib/store/useAppStore'
+
+// 🎨 Componente 3D Premium cargado dinámicamente
+const PremiumSplineOrb = dynamic(
+  () => import('@/app/components/3d/PremiumSplineOrb').then(mod => mod.PremiumSplineOrb),
+  { ssr: false, loading: () => <div className="w-full h-full bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-2xl animate-pulse" /> },
+)
 
 interface VentaData {
   id: string
@@ -153,9 +165,51 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
 export default memo(function BentoVentas() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedTimeRange, setSelectedTimeRange] = useState<'day' | 'week' | 'month'>('week')
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [editingVenta, setEditingVenta] = useState<VentaData | null>(null)
+  const [deletingVenta, setDeletingVenta] = useState<VentaData | null>(null)
+  
+  const { toast } = useToast()
+  const { triggerDataRefresh } = useAppStore()
 
   const { data: ventasDataRaw, loading, error } = useVentasData()
   const ventasData = ventasDataRaw as VentaData[]
+
+  // Handlers para editar/eliminar
+  const handleEditVenta = (venta: VentaData) => {
+    setEditingVenta(venta)
+    setIsModalOpen(true)
+  }
+
+  const handleDeleteVenta = (venta: VentaData) => {
+    setDeletingVenta(venta)
+    setShowDeleteModal(true)
+  }
+
+  const confirmDeleteVenta = async () => {
+    if (!deletingVenta?.id) return
+    
+    try {
+      await eliminarVenta(deletingVenta.id)
+      toast({
+        title: '✅ Venta eliminada',
+        description: 'La venta ha sido eliminada exitosamente',
+      })
+      triggerDataRefresh()
+    } catch (error) {
+      logger.error('Error eliminando venta', error)
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'No se pudo eliminar la venta',
+        variant: 'destructive',
+      })
+    }
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setEditingVenta(null)
+  }
 
   // ═══════════════════════════════════════════════════════════════════════════
   // CÁLCULOS OPTIMIZADOS CON useMemo - Solo se recalculan cuando cambian ventas
@@ -364,6 +418,74 @@ export default memo(function BentoVentas() {
             <Users className="w-8 h-8 text-cyan-400 mb-4" />
             <div className="text-3xl font-bold text-white mb-2">{metrics.ventasCompletas}</div>
             <p className="text-sm text-zinc-400">Completas</p>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* ════════════════════════════════════════════════════════════════════
+          ORB 3D PREMIUM - INDICADOR VISUAL DE RENDIMIENTO
+          ════════════════════════════════════════════════════════════════════ */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Orb 3D de Ventas */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3 }}
+          className="relative group"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl blur-xl" />
+          <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-4 hover:border-green-500/30 transition-all h-[200px] flex flex-col items-center justify-center">
+            <Suspense fallback={<div className="w-24 h-24 bg-green-500/10 rounded-full animate-pulse" />}>
+              <div className="w-full h-32 flex items-center justify-center">
+                <PremiumSplineOrb 
+                  size={80} 
+                  state={metrics.totalVentas > 1000000 ? 'active' : 'idle'}
+                  primaryColor="#22c55e"
+                  secondaryColor="#10b981"
+                  showParticles={true}
+                />
+              </div>
+            </Suspense>
+            <div className="text-center mt-2">
+              <p className="text-xs text-zinc-400">Performance Score</p>
+              <p className="text-lg font-bold text-green-400">
+                {Math.round((metrics.totalCobrado / (metrics.totalVentas || 1)) * 100)}%
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Distribución GYA Visual */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="lg:col-span-3 relative group"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-2xl blur-xl" />
+          <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 hover:border-blue-500/30 transition-all">
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="w-5 h-5 text-purple-400" />
+              <h3 className="text-lg font-bold text-white">Distribución GYA</h3>
+              <Badge variant="outline" className="ml-2 text-xs border-purple-500/30 text-purple-400">Sistema</Badge>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 text-center">
+                <p className="text-xs text-zinc-400 mb-1">Bóveda Monte</p>
+                <p className="text-xl font-bold text-blue-400">${(metrics.totalBovedaMonte / 1000).toFixed(0)}K</p>
+                <p className="text-[10px] text-blue-400/60">Costo (Compra × Cantidad)</p>
+              </div>
+              <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4 text-center">
+                <p className="text-xs text-zinc-400 mb-1">Fletes</p>
+                <p className="text-xl font-bold text-orange-400">${(metrics.totalFletes / 1000).toFixed(0)}K</p>
+                <p className="text-[10px] text-orange-400/60">Transporte</p>
+              </div>
+              <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4 text-center">
+                <p className="text-xs text-zinc-400 mb-1">Utilidades</p>
+                <p className="text-xl font-bold text-green-400">${(metrics.totalUtilidades / 1000).toFixed(0)}K</p>
+                <p className="text-[10px] text-green-400/60">Ganancia Neta</p>
+              </div>
+            </div>
           </div>
         </motion.div>
       </div>
@@ -695,6 +817,7 @@ export default memo(function BentoVentas() {
                       <th className="text-right py-4 px-4 text-sm font-medium text-emerald-400" title="Ganancia neta">Utilidad</th>
                       <th className="text-right py-4 px-4 text-sm font-medium text-yellow-400">Pendiente</th>
                       <th className="text-center py-4 px-4 text-sm font-medium text-zinc-400">Estado</th>
+                      <th className="text-center py-4 px-4 text-sm font-medium text-zinc-400">Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -765,6 +888,26 @@ export default memo(function BentoVentas() {
                               Pendiente
                             </Badge>
                           )}
+                        </td>
+                        <td className="py-4 px-4 text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditVenta(venta)}
+                              className="h-8 w-8 p-0 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteVenta(venta)}
+                              className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </td>
                       </motion.tr>
                     ))}

@@ -1,5 +1,5 @@
 export const mockIngresos = {
-  'boveda-monte': [
+  'boveda_monte': [
     {
       id: 'ING-001',
       fecha: '2025-11-20',
@@ -51,7 +51,7 @@ export const mockIngresos = {
       usuario: 'Admin',
     },
   ],
-  'boveda-usa': [
+  'boveda_usa': [
     {
       id: 'ING-006',
       fecha: '2025-11-20',
@@ -98,7 +98,7 @@ export const mockIngresos = {
 }
 
 export const mockGastos = {
-  'boveda-monte': [
+  'boveda_monte': [
     {
       id: 'GAS-001',
       fecha: '2025-11-20',
@@ -133,7 +133,7 @@ export const mockGastos = {
       categoria: 'Transferencia',
     },
   ],
-  fletes: [
+  flete_sur: [
     {
       id: 'GAS-004',
       fecha: '2025-11-20',
@@ -209,7 +209,7 @@ export const mockTransferencias = {
 }
 
 export const mockCortes = {
-  'boveda-monte': [
+  'boveda_monte': [
     {
       id: 'CORTE-001',
       fechaCorte: '2025-11-20',

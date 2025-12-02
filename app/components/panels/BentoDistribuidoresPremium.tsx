@@ -62,12 +62,18 @@ interface DistribuidorProfileModalProps {
 // ============================================
 
 function DistribuidorProfileModal({ distribuidor, isOpen, onClose, onEdit, ordenes }: DistribuidorProfileModalProps) {
-  if (!distribuidor) return null
+  // Hooks deben estar antes de cualquier return condicional
+  const distribuidorOrdenes = useMemo(() => {
+    if (!distribuidor) return []
+    return ordenes.filter(o => o.distribuidorId === distribuidor.id)
+  }, [distribuidor, ordenes])
 
-  const distribuidorOrdenes = ordenes.filter(o => o.distribuidorId === distribuidor.id)
-  const tasaPago = distribuidor.totalOrdenesCompra > 0 
-    ? Math.round((distribuidor.totalPagado / distribuidor.totalOrdenesCompra) * 100) 
-    : 0
+  const tasaPago = useMemo(() => {
+    if (!distribuidor) return 0
+    return distribuidor.totalOrdenesCompra > 0 
+      ? Math.round((distribuidor.totalPagado / distribuidor.totalOrdenesCompra) * 100) 
+      : 0
+  }, [distribuidor])
 
   // Datos para mini gráficos
   const ordenesPorMes = useMemo(() => {
@@ -87,6 +93,8 @@ function DistribuidorProfileModal({ distribuidor, isOpen, onClose, onEdit, orden
       inicial: o.stockInicial || o.cantidad || 0,
     }))
   }, [distribuidorOrdenes])
+
+  if (!distribuidor) return null
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>

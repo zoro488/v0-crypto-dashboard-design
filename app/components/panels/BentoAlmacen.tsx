@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Package, TrendingUp, TrendingDown, Archive, Scissors, Plus, Box, Activity, 
   BarChart3, Zap, RefreshCw, Search, Filter, Calendar, Download, Eye,
-  ArrowUpRight, ArrowDownRight, Layers, AlertTriangle, CheckCircle2,
+  ArrowUpRight, ArrowDownRight, Layers, AlertTriangle, CheckCircle2, Sparkles,
+  Pencil, Trash2,
   type LucideIcon,
 } from 'lucide-react'
 import { useState, useMemo, useCallback } from 'react'
@@ -15,12 +16,16 @@ import { Badge } from '@/app/components/ui/badge'
 import { Input } from '@/app/components/ui/input'
 import CreateEntradaAlmacenModal from '@/app/components/modals/CreateEntradaAlmacenModal'
 import CreateSalidaAlmacenModal from '@/app/components/modals/CreateSalidaAlmacenModal'
+import { DeleteConfirmModal } from '@/app/components/modals/DeleteConfirmModal'
+import { eliminarProducto } from '@/app/lib/services/unified-data-service'
+import { useAppStore } from '@/app/lib/store/useAppStore'
 import { useToast } from '@/app/hooks/use-toast'
 import { logger } from '@/app/lib/utils/logger'
 import { 
   AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, 
   Tooltip, PieChart, Pie, Cell, CartesianGrid, Legend, 
 } from 'recharts'
+import { Panel3DWrapper } from '@/app/components/3d/Panel3DWrapper'
 
 // ============================================================================
 // INTERFACES
@@ -158,12 +163,16 @@ function DataTable<T extends Record<string, unknown>>({
   loading,
   emptyMessage = 'No hay datos disponibles',
   onRowClick,
+  onEdit,
+  onDelete,
 }: { 
   data: T[]
   columns: { key: string; label: string; render?: (item: T) => React.ReactNode; width?: string }[]
   loading?: boolean
   emptyMessage?: string
   onRowClick?: (item: T) => void
+  onEdit?: (item: T) => void
+  onDelete?: (item: T) => void
 }) {
   if (loading) {
     return (
@@ -198,6 +207,11 @@ function DataTable<T extends Record<string, unknown>>({
                   {col.label}
                 </th>
               ))}
+              {(onEdit || onDelete) && (
+                <th className="px-4 py-3 text-center text-xs font-semibold text-white/60 uppercase tracking-wider w-24">
+                  Acciones
+                </th>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
@@ -215,6 +229,32 @@ function DataTable<T extends Record<string, unknown>>({
                     {col.render ? col.render(item) : String(item[col.key] ?? '-')}
                   </td>
                 ))}
+                {(onEdit || onDelete) && (
+                  <td className="px-4 py-3 text-center">
+                    <div className="flex items-center justify-center gap-1">
+                      {onEdit && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => { e.stopPropagation(); onEdit(item) }}
+                          className="h-7 w-7 p-0 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
+                        >
+                          <Pencil size={14} />
+                        </Button>
+                      )}
+                      {onDelete && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => { e.stopPropagation(); onDelete(item) }}
+                          className="h-7 w-7 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                        >
+                          <Trash2 size={14} />
+                        </Button>
+                      )}
+                    </div>
+                  </td>
+                )}
               </motion.tr>
             ))}
           </tbody>
@@ -229,10 +269,14 @@ function DataTable<T extends Record<string, unknown>>({
 // ============================================================================
 export default function BentoAlmacen() {
   const { toast } = useToast()
+  const { triggerDataRefresh } = useAppStore()
   const [activeTab, setActiveTab] = useState('entradas')
   const [searchQuery, setSearchQuery] = useState('')
   const [showEntradaModal, setShowEntradaModal] = useState(false)
   const [showSalidaModal, setShowSalidaModal] = useState(false)
+  const [editingProducto, setEditingProducto] = useState<ProductoAlmacen | null>(null)
+  const [deletingProducto, setDeletingProducto] = useState<ProductoAlmacen | null>(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   // Hooks de datos
   const { data: productosRaw = [], loading: loadingProductos } = useProductos()
@@ -243,6 +287,41 @@ export default function BentoAlmacen() {
   const productos = productosRaw as ProductoAlmacen[]
   const entradas = entradasRaw as MovimientoAlmacen[]
   const salidas = salidasRaw as MovimientoAlmacen[]
+
+  // Handlers para editar/eliminar productos
+  const handleEditProducto = useCallback((producto: ProductoAlmacen) => {
+    setEditingProducto(producto)
+    // TODO: Abrir modal de edición de producto
+    toast({
+      title: 'Editar producto',
+      description: `Editando: ${producto.nombre}`,
+    })
+  }, [toast])
+
+  const handleDeleteProducto = useCallback((producto: ProductoAlmacen) => {
+    setDeletingProducto(producto)
+    setShowDeleteModal(true)
+  }, [])
+
+  const confirmDeleteProducto = useCallback(async () => {
+    if (!deletingProducto?.id) return
+    
+    try {
+      await eliminarProducto(deletingProducto.id)
+      toast({
+        title: '✅ Producto eliminado',
+        description: `${deletingProducto.nombre} ha sido eliminado del almacén`,
+      })
+      triggerDataRefresh()
+    } catch (error) {
+      logger.error('Error eliminando producto', error)
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'No se pudo eliminar el producto',
+        variant: 'destructive',
+      })
+    }
+  }, [deletingProducto, toast, triggerDataRefresh])
 
   // Handler para exportar datos de almacén
   const handleExportAlmacen = useCallback(() => {
@@ -671,6 +750,8 @@ export default function BentoAlmacen() {
             },
           },
         ]}
+        onEdit={handleEditProducto}
+        onDelete={handleDeleteProducto}
       />
     </div>
   )
@@ -1018,6 +1099,29 @@ export default function BentoAlmacen() {
           />
         </div>
 
+        {/* Visualización 3D Premium */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="rounded-2xl border border-white/10 overflow-hidden bg-gradient-to-br from-cyan-500/5 to-purple-500/5"
+        >
+          <div className="p-4 border-b border-white/10 flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-cyan-400" />
+            <span className="text-white font-semibold">Visualización de Inventario</span>
+          </div>
+          <Panel3DWrapper
+            componentType="WorkflowVisualizer3D"
+            fallback={
+              <div className="h-[160px] bg-gradient-to-br from-cyan-500/5 to-blue-500/5 flex items-center justify-center">
+                <Package className="w-12 h-12 text-cyan-400/30" />
+              </div>
+            }
+            height="160px"
+            className="bg-black/40"
+          />
+        </motion.div>
+
         {/* Navegación de Tabs */}
         <div className="flex gap-2 p-1 rounded-xl bg-white/5 border border-white/10 overflow-x-auto">
           {TABS.map((tab) => (
@@ -1076,6 +1180,20 @@ export default function BentoAlmacen() {
           onClose={() => setShowSalidaModal(false)} 
         />
       )}
+
+      {/* Modal de confirmación de eliminación */}
+      <DeleteConfirmModal
+        open={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false)
+          setDeletingProducto(null)
+        }}
+        onConfirm={confirmDeleteProducto}
+        title="¿Eliminar producto?"
+        description="Esta acción eliminará permanentemente el producto del almacén."
+        itemName={deletingProducto?.nombre || deletingProducto?.sku || ''}
+        itemType="producto"
+      />
     </div>
   )
 }

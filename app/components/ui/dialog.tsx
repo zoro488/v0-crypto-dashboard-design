@@ -70,10 +70,10 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          // Base: posición fija centrada
-          'fixed left-[50%] top-[50%] z-[10001] translate-x-[-50%] translate-y-[-50%]',
+          // Base: posición fija centrada - AJUSTADO para mejor centrado vertical
+          'fixed left-1/2 top-1/2 z-[10001] -translate-x-1/2 -translate-y-1/2',
           // Dimensiones responsivas con altura máxima
-          'w-full max-w-[calc(100%-2rem)] max-h-[90vh]',
+          'w-full max-w-[calc(100%-2rem)]',
           // Flex para layout interno correcto
           'flex flex-col',
           // Estilos visuales

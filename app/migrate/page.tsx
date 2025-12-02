@@ -10,10 +10,10 @@
 import { useState } from 'react'
 import { Button } from '@/app/components/ui/button'
 import { Badge } from '@/app/components/ui/badge'
+import { logger } from '@/app/lib/utils/logger'
 import { 
   collection, 
   doc, 
-  setDoc, 
   getDocs,
   writeBatch,
 } from 'firebase/firestore'
@@ -235,7 +235,7 @@ export default function MigratePage() {
 
   const runMigration = async () => {
     if (!isFirebaseConfigured || !db) {
-      alert('Firebase no está configurado. Verifica las variables de entorno.')
+      logger.error('Firebase no está configurado. Verifica las variables de entorno.', undefined, { context: 'MigratePage' })
       return
     }
 
@@ -249,10 +249,9 @@ export default function MigratePage() {
       await migrateCollection('ventas', DATOS_INICIALES.ventas)
       await migrateCollection('ordenes_compra', DATOS_INICIALES.ordenes_compra)
       
-      alert('✅ Migración completada exitosamente!')
+      logger.info('Migración completada exitosamente!', { context: 'MigratePage' })
     } catch (error) {
-      console.error('Error en migración:', error)
-      alert(`❌ Error en migración: ${error instanceof Error ? error.message : 'Error desconocido'}`)
+      logger.error('Error en migración', error as Error, { context: 'MigratePage' })
     } finally {
       setIsRunning(false)
     }

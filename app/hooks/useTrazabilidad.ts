@@ -26,6 +26,7 @@ import {
   limit as firestoreLimit,
 } from 'firebase/firestore'
 import { db, isFirestoreAvailable } from '@/app/lib/firebase/config'
+import { logger } from '@/app/lib/utils/logger'
 import type { 
   Cliente, 
   Distribuidor, 
@@ -166,7 +167,7 @@ export function useTrazabilidadCliente(clienteId: string | null): TrazabilidadCl
         })) as GastoAbono[]
         setAbonos(abonosData)
       },
-      (err) => console.warn('Abonos query error:', err),
+      (err) => logger.warn('Abonos query error', { context: 'useTrazabilidadCliente', data: err }),
     )
 
     // Cargar datos del cliente
@@ -312,7 +313,7 @@ export function useTrazabilidadDistribuidor(distribuidorId: string | null): Traz
         })) as GastoAbono[]
         setPagos(pagosData)
       },
-      (err) => console.warn('Pagos query error:', err),
+      (err) => logger.warn('Pagos query error', { context: 'useTrazabilidadDistribuidor', data: err }),
     )
 
     // Cargar distribuidor

@@ -29,6 +29,9 @@ const BentoDistribuidoresPremium = lazy(() => import('@/app/components/panels/Be
 // Panel IA Inmersivo con Nexbot 3D
 const BentoIAImmersive = lazy(() => import('@/app/components/panels/BentoIAImmersive'))
 
+// Panel GYA (Gastos y Abonos) - Gestión centralizada de egresos e ingresos
+const BentoGYA = lazy(() => import('@/app/components/panels/BentoGYA'))
+
 const PanelLoader = () => (
   <div className="flex items-center justify-center min-h-[60vh]">
     <motion.div
@@ -124,6 +127,10 @@ export default function Chronos() {
         return <BentoBanco />
       case 'almacen':
         return <BentoAlmacen />
+      case 'gya':
+      case 'gastos':
+      case 'abonos':
+        return <BentoGYA />
       case 'reportes':
         return <BentoReportes />
       case 'ia':

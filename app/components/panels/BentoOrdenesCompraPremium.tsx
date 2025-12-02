@@ -25,7 +25,7 @@ import { Badge } from '@/app/components/ui/badge'
 import { Input } from '@/app/components/ui/input'
 import { Skeleton } from '@/app/components/ui/skeleton'
 import { useState, useEffect, useMemo } from 'react'
-import { suscribirOrdenesCompra } from '@/app/lib/firebase/firestore-service'
+import { suscribirOrdenesCompra } from '@/app/lib/services/unified-data-service'
 import type { OrdenCompra, FirestoreTimestamp } from '@/app/types'
 import { CreateOrdenCompraModalPremium } from '@/app/components/modals/CreateOrdenCompraModalPremium'
 import { 
@@ -338,7 +338,7 @@ export function BentoOrdenesCompraPremium() {
   // Suscripción en tiempo real
   useEffect(() => {
     const unsubscribe = suscribirOrdenesCompra((data) => {
-      setOrdenes(data)
+      setOrdenes(data as OrdenCompra[])
       setLoading(false)
     })
     return () => unsubscribe()

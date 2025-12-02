@@ -59,7 +59,7 @@ import { useToast } from '@/app/hooks/use-toast'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
-import { crearCliente } from '@/app/lib/firebase/firestore-service'
+import { crearCliente, actualizarCliente } from '@/app/lib/services/unified-data-service'
 
 // ============================================
 // SCHEMA ZOD - Basado en clientes.csv
@@ -208,14 +208,27 @@ export function CreateClienteModalPremium({
         telefono: data.telefono || undefined,
         email: data.email || undefined,
         direccion: data.direccion || undefined,
+        deudaTotal: data.deuda,
+        totalPagado: data.abonos,
       }
 
-      logger.info('Creando cliente en Firestore', { 
-        data: clienteData,
-        context: 'CreateClienteModalPremium',
-      })
+      let result: string | null = null
 
-      const result = await crearCliente(clienteData)
+      if (isEdit && editData?.id) {
+        // Modo edición - actualizar cliente existente
+        logger.info('Actualizando cliente en Firestore', { 
+          data: { clienteId: editData.id, clienteData },
+          context: 'CreateClienteModalPremium',
+        })
+        result = await actualizarCliente(editData.id, clienteData)
+      } else {
+        // Modo creación - crear nuevo cliente
+        logger.info('Creando cliente en Firestore', { 
+          data: clienteData,
+          context: 'CreateClienteModalPremium',
+        })
+        result = await crearCliente(clienteData)
+      }
 
       if (result) {
         toast({
@@ -227,7 +240,7 @@ export function CreateClienteModalPremium({
         onSuccess?.()
         useAppStore.getState().triggerDataRefresh()
       } else {
-        throw new Error('No se pudo crear el cliente')
+        throw new Error(isEdit ? 'No se pudo actualizar el cliente' : 'No se pudo crear el cliente')
       }
 
     } catch (error) {
@@ -247,7 +260,7 @@ export function CreateClienteModalPremium({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          'max-w-3xl h-[85vh] p-0 overflow-hidden',
+          'max-w-3xl max-h-[85vh] p-0 overflow-hidden',
           // 🎨 GLASSMORPHISM ULTRA PREMIUM
           'bg-black/60 backdrop-blur-2xl',
           'border border-white/10',
@@ -276,7 +289,7 @@ export function CreateClienteModalPremium({
           />
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="relative flex flex-col h-full">
+        <form onSubmit={handleSubmit(onSubmit)} className="relative flex flex-col min-h-0 flex-1">
           {/* ===== HEADER ===== */}
           <div className="relative h-24 border-b border-white/10 bg-gradient-to-r from-blue-500/10 via-transparent to-purple-500/10">
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />

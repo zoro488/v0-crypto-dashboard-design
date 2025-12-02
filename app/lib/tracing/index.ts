@@ -11,11 +11,10 @@
  */
 
 import { trace, SpanStatusCode, SpanKind, Span } from '@opentelemetry/api'
-import { WebTracerProvider } from '@opentelemetry/sdk-trace-web'
+import { WebTracerProvider, BatchSpanProcessor, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-web'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http'
 import { resourceFromAttributes } from '@opentelemetry/resources'
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions'
-import { BatchSpanProcessor, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-web'
 import { logger } from '../utils/logger'
 
 // ============================================================================
@@ -267,7 +266,7 @@ export async function traceBusinessLogic<T>(
  * Mide y traza el tiempo de renderizado de componentes
  */
 export function measureRenderTime(componentName: string): () => void {
-  if (!tracingEnabled) return () => {}
+  if (!tracingEnabled) return () => { /* noop */ }
 
   const startTime = performance.now()
   const tracer = getTracer('chronos-performance')

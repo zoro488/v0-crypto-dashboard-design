@@ -43,7 +43,7 @@ import { cn } from '@/app/lib/utils'
 import { useToast } from '@/app/hooks/use-toast'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
-import { crearDistribuidor } from '@/app/lib/firebase/firestore-service'
+import { crearDistribuidor } from '@/app/lib/services/unified-data-service'
 
 // ============================================
 // SCHEMA ZOD
@@ -216,7 +216,7 @@ export function CreateDistribuidorModalPremium({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          'max-w-3xl h-[85vh] p-0 overflow-hidden',
+          'max-w-3xl max-h-[85vh] p-0 overflow-hidden',
           'bg-black/60 backdrop-blur-2xl',
           'border border-white/10',
           'text-white',
@@ -282,7 +282,7 @@ export function CreateDistribuidorModalPremium({
             <motion.form
               key="form"
               onSubmit={handleSubmit(onSubmit)}
-              className="relative flex flex-col h-full"
+              className="relative flex flex-col min-h-0 flex-1"
               variants={containerVariants}
               initial="hidden"
               animate="visible"

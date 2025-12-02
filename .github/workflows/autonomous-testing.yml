@@ -185,7 +185,10 @@ jobs:
                   }
               )
               
-              if result.get('distribution_accuracy', 0) == 1.0:
+              # overall_accuracy es el indicador correcto (1.0 = todas las distribuciones correctas)
+              # distribution_accuracy es un diccionario con detalles por banco
+              overall = result.get('overall_accuracy', 0)
+              if overall == 1.0:
                   passed += 1
                   print(f'✅ Test passed: {tc}')
               else:

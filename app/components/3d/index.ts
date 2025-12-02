@@ -6,6 +6,19 @@
  */
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// PANEL 3D WRAPPER - INTEGRACIÓN UNIVERSAL
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export { 
+  Panel3DWrapper,
+  Dashboard3DPreset,
+  Analytics3DPreset,
+  Workflow3DPreset,
+  AI3DPreset,
+} from './Panel3DWrapper'
+export type { Component3DType } from './Panel3DWrapper'
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // ZERO FORCE - COMPONENTES 3D
 // ═══════════════════════════════════════════════════════════════════════════════
 

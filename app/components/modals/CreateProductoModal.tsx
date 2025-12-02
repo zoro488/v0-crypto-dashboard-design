@@ -1,11 +1,10 @@
 'use client'
 
-import type React from 'react'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Package, DollarSign, Tag } from 'lucide-react'
 import { useAppStore } from '@/app/lib/store/useAppStore'
-import { firestoreService } from '@/app/lib/firebase/firestore-service'
+import { crearProducto } from '@/app/lib/services/unified-data-service'
 import { useToast } from '@/app/hooks/use-toast'
 import { logger } from '@/app/lib/utils/logger'
 
@@ -53,8 +52,8 @@ export default function CreateProductoModal({ isOpen, onClose }: CreateProductoM
     if (!validateForm()) return
 
     try {
-      // Crear producto usando el servicio de Firestore
-      const productoId = await firestoreService.crearProducto({
+      // Crear producto usando el servicio unificado
+      const productoId = await crearProducto({
         nombre: formData.nombre,
         descripcion: formData.descripcion,
         valorUnitario: Number.parseFloat(formData.precioVenta),

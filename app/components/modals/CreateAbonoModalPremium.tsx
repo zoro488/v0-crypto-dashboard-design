@@ -59,6 +59,7 @@ import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
 import { registrarAbonoCliente } from '@/app/lib/services/business-logic.service'
+import { useClientes } from '@/app/lib/firebase/firestore-hooks.service'
 
 // ============================================
 // SCHEMA ZOD
@@ -94,16 +95,15 @@ interface CreateAbonoModalProps {
   }
 }
 
-// Mock de clientes con deuda (en producción viene de Firestore)
-const CLIENTES_CON_DEUDA = [
-  { id: '1', nombre: 'Robalo', deuda: 660000, abonos: 426000, pendiente: 234000 },
-  { id: '2', nombre: 'Valle', deuda: 880500, abonos: 845500, pendiente: 35000 },
-  { id: '3', nombre: 'Tio Tocayo', deuda: 315000, abonos: 0, pendiente: 315000 },
-  { id: '4', nombre: 'Lamas', deuda: 1057200, abonos: 941000, pendiente: 116200 },
-  { id: '5', nombre: 'Galvan', deuda: 14000, abonos: 0, pendiente: 14000 },
-  { id: '6', nombre: 'Negrito', deuda: 88300, abonos: 63000, pendiente: 25300 },
-  { id: '7', nombre: 'Primo', deuda: 0, abonos: 3000, pendiente: -3000 }, // Saldo a favor
-]
+// Interfaz para clientes de Firestore
+interface ClienteFirestore {
+  id: string
+  nombre: string
+  deudaTotal?: number
+  totalPagado?: number
+  totalVentas?: number
+  [key: string]: unknown
+}
 
 const BANCOS_DESTINO = [
   { id: 'boveda_monte', nombre: 'Bóveda Monte', icono: '🏦', color: 'blue' },
@@ -146,7 +146,25 @@ export function CreateAbonoModalPremium({
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState('')
   const [showClienteList, setShowClienteList] = React.useState(false)
-  const [selectedCliente, setSelectedCliente] = React.useState<typeof CLIENTES_CON_DEUDA[0] | null>(
+  
+  // 🔥 Cargar clientes reales de Firestore
+  const { data: clientesRaw, loading: loadingClientes } = useClientes()
+  
+  // Convertir clientes de Firestore al formato esperado
+  const clientesConDeuda = React.useMemo(() => {
+    if (!clientesRaw) return []
+    return (clientesRaw as ClienteFirestore[])
+      .map(c => ({
+        id: c.id,
+        nombre: c.nombre || 'Sin nombre',
+        deuda: c.deudaTotal ?? c.totalVentas ?? 0,
+        abonos: c.totalPagado ?? 0,
+        pendiente: (c.deudaTotal ?? c.totalVentas ?? 0) - (c.totalPagado ?? 0),
+      }))
+      .filter(c => c.pendiente > 0) // Solo clientes con deuda pendiente
+  }, [clientesRaw])
+  
+  const [selectedCliente, setSelectedCliente] = React.useState<typeof clientesConDeuda[0] | null>(
     preselectedCliente || null,
   )
 
@@ -184,14 +202,14 @@ export function CreateAbonoModalPremium({
 
   // Filtrar clientes
   const clientesFiltrados = React.useMemo(() => {
-    if (!searchQuery) return CLIENTES_CON_DEUDA.filter(c => c.pendiente > 0)
-    return CLIENTES_CON_DEUDA.filter(c => 
-      c.nombre.toLowerCase().includes(searchQuery.toLowerCase()) && c.pendiente > 0,
+    if (!searchQuery) return clientesConDeuda
+    return clientesConDeuda.filter(c => 
+      c.nombre.toLowerCase().includes(searchQuery.toLowerCase()),
     )
-  }, [searchQuery])
+  }, [searchQuery, clientesConDeuda])
 
   // Seleccionar cliente
-  const handleSelectCliente = (cliente: typeof CLIENTES_CON_DEUDA[0]) => {
+  const handleSelectCliente = (cliente: typeof clientesConDeuda[0]) => {
     setSelectedCliente(cliente)
     setValue('clienteId', cliente.id)
     setValue('clienteNombre', cliente.nombre)
@@ -270,7 +288,7 @@ export function CreateAbonoModalPremium({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          'max-w-2xl max-h-[90vh] p-0 overflow-hidden',
+          'max-w-2xl max-h-[85vh] p-0 overflow-hidden',
           'bg-black/60 backdrop-blur-2xl',
           'border border-white/10',
           'text-white',
@@ -296,7 +314,7 @@ export function CreateAbonoModalPremium({
           />
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="relative flex flex-col h-full">
+        <form onSubmit={handleSubmit(onSubmit)} className="relative flex flex-col min-h-0 flex-1">
           {/* ===== HEADER ===== */}
           <div className="relative h-24 border-b border-white/10 bg-gradient-to-r from-green-500/10 via-transparent to-emerald-500/10">
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />

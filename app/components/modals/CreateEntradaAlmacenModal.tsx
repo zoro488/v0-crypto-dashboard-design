@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { X, PackagePlus, ChevronRight } from 'lucide-react'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { useToast } from '@/app/hooks/use-toast'
-import { firestoreService } from '@/app/lib/firebase/firestore-service'
+import { crearEntradaAlmacen } from '@/app/lib/services/unified-data-service'
 import { useAlmacenData } from '@/app/lib/firebase/firestore-hooks.service'
 import { logger } from '@/app/lib/utils/logger'
 
@@ -35,8 +35,8 @@ export default function CreateEntradaAlmacenModal({ isOpen, onClose }: CreateEnt
     }
 
     try {
-      // Registrar entrada usando el servicio de Firestore
-      await firestoreService.crearEntradaAlmacen({
+      // Registrar entrada usando el servicio unificado
+      await crearEntradaAlmacen({
         productoId: formData.productoId,
         cantidad: formData.cantidad,
         origen: formData.origen,

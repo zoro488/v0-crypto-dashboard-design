@@ -4,6 +4,7 @@
  */
 
 import axios from 'axios'
+import { logger } from '@/app/lib/utils/logger'
 
 // Configuración Banxico
 const BANXICO_API_URL = 'https://www.banxico.org.mx/SieAPIRest/service/v1'
@@ -71,7 +72,7 @@ class CasaCambioService {
       const latestData = response.data.bmx.series[0].datos[0]
       return parseFloat(latestData.dato)
     } catch (error) {
-      console.error('Error fetching Banxico rate:', error)
+      logger.error('Error fetching Banxico rate', error, { context: 'CasaCambioService' })
       // Fallback a API alternativa
       return this.getFallbackRate()
     }
@@ -87,7 +88,7 @@ class CasaCambioService {
       )
       return response.data.rates.MXN
     } catch (error) {
-      console.error('Error fetching fallback rate:', error)
+      logger.error('Error fetching fallback rate', error, { context: 'CasaCambioService' })
       return 17.5 // Valor por defecto
     }
   }
@@ -118,7 +119,7 @@ class CasaCambioService {
         value: parseFloat(item.dato),
       })).reverse()
     } catch (error) {
-      console.error('Error fetching historical rates:', error)
+      logger.error('Error fetching historical rates', error, { context: 'CasaCambioService', data: { days } })
       // Generar datos mock si falla
       return this.generateMockHistoricalData(days)
     }
