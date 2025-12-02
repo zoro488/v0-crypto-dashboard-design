@@ -169,7 +169,7 @@ function EnergyRing({
 }: EnergyRingProps) {
   const ringRef = useRef<THREE.Mesh>(null)
   const materialRef = useRef<THREE.MeshBasicMaterial>(null)
-  const [scale, setScale] = useState(state === 'idle' ? 0 : 1)
+  const [_scale, setScale] = useState(state === 'idle' ? 0 : 1)
   
   useEffect(() => {
     if (state === 'opening') {

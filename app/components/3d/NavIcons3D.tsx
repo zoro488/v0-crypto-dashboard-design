@@ -1,7 +1,7 @@
 'use client'
 
-import { Suspense, useRef, useState, useCallback, useMemo, useEffect } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Suspense, useRef, useState, useCallback, useMemo } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
 import useSpline from '@splinetool/r3f-spline'
 import * as THREE from 'three'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -30,16 +30,9 @@ interface NavIcons3DProps {
   isActive?: boolean
   isHovered?: boolean
   onClick?: () => void
-  onHover?: (hovering: boolean) => void
+  onHover?: (_hovering: boolean) => void
   size?: number
   className?: string
-}
-
-// Interface para el estado del icono
-interface IconState {
-  scale: THREE.Vector3
-  rotation: THREE.Euler
-  position: THREE.Vector3
 }
 
 // Componente interno del icono 3D dentro del Canvas

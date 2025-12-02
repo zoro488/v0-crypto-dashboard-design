@@ -331,7 +331,7 @@ function StatusIndicator({ status }: { status: OrbState }) {
     error: { color: 'bg-red-500', label: 'Error', icon: X },
   }
   
-  const { color, label, icon: Icon } = config[status]
+  const { color, label } = config[status]
   
   return (
     <motion.div className="flex items-center gap-2" key={status} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>

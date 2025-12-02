@@ -8,6 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { Buffer } from 'node:buffer'
 import { logger } from '@/app/lib/utils/logger'
 
 // Configuración de proveedores TTS

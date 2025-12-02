@@ -14,7 +14,7 @@ import { logger } from '@/app/lib/utils/logger'
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID
 const TWILIO_API_KEY = process.env.TWILIO_API_KEY
 const TWILIO_API_SECRET = process.env.TWILIO_API_SECRET
-const TWILIO_TWIML_APP_SID = process.env.TWILIO_TWIML_APP_SID
+const _TWILIO_TWIML_APP_SID = process.env.TWILIO_TWIML_APP_SID // Reservado para uso futuro
 
 interface TokenRequest {
   identity: string

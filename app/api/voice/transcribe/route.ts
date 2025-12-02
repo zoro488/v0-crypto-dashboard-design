@@ -8,6 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { Buffer } from 'node:buffer'
 import { logger } from '@/app/lib/utils/logger'
 
 // Configuración de proveedores STT
@@ -73,8 +74,8 @@ async function transcribeAssemblyAI(
   audioBase64: string,
   language: string,
 ): Promise<TranscribeResponse> {
-  // 1. Subir audio
-  const audioBuffer = Uint8Array.from(atob(audioBase64), c => c.charCodeAt(0))
+  // 1. Subir audio - Convertir Buffer a Uint8Array para compatibilidad con fetch
+  const audioBuffer = new Uint8Array(Buffer.from(audioBase64, 'base64'))
   const uploadResponse = await fetch('https://api.assemblyai.com/v2/upload', {
     method: 'POST',
     headers: {
@@ -138,8 +139,8 @@ async function transcribeWhisper(
 ): Promise<TranscribeResponse> {
   const formData = new FormData()
   
-  // Convertir base64 a Blob
-  const audioBytes = Uint8Array.from(atob(audioBase64), c => c.charCodeAt(0))
+  // Convertir base64 a Blob usando Uint8Array para compatibilidad
+  const audioBytes = new Uint8Array(Buffer.from(audioBase64, 'base64'))
   const audioBlob = new Blob([audioBytes], { type: `audio/${format}` })
   formData.append('file', audioBlob, `audio.${format}`)
   formData.append('model', 'whisper-1')
@@ -176,7 +177,8 @@ async function transcribeDeepgram(
   audioBase64: string,
   language: string,
 ): Promise<TranscribeResponse> {
-  const audioBytes = Uint8Array.from(atob(audioBase64), c => c.charCodeAt(0))
+  // Usar Uint8Array para compatibilidad con fetch
+  const audioBuffer = new Uint8Array(Buffer.from(audioBase64, 'base64'))
   
   const response = await fetch(
     `https://api.deepgram.com/v1/listen?language=${language.split('-')[0]}&model=nova-2`,
@@ -186,7 +188,7 @@ async function transcribeDeepgram(
         'Authorization': `Token ${DEEPGRAM_API_KEY}`,
         'Content-Type': 'audio/wav',
       },
-      body: audioBytes,
+      body: audioBuffer,
     },
   )
   

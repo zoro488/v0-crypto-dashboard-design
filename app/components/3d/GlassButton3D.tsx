@@ -54,8 +54,8 @@ const COLOR_MAP = {
   cyan: '#06b6d4',
 }
 
-// Iconos SVG como paths (para usar en 3D)
-const ICON_PATHS: Record<string, string> = {
+// Iconos SVG como paths (para uso futuro en 3D)
+const _ICON_PATHS: Record<string, string> = {
   home: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
   chart: 'M3.5 18.5v-12h4v12zm6 0v-18h4v18zm6 0v-8h4v8z',
   wallet: 'M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z',
@@ -477,15 +477,15 @@ export function GlassButtonGroup({
 }) {
   return (
     <div className={`flex items-center gap-4 ${className}`}>
-      {buttons.map((button, index) => (
+      {buttons.map((button, idx) => (
         <GlassButton3D
-          key={index}
+          key={idx}
           icon={button.icon}
           label={button.label}
           color={button.color || 'blue'}
           size="sm"
-          isActive={activeIndex === index}
-          onClick={() => onSelect?.(index)}
+          isActive={activeIndex === idx}
+          onClick={() => onSelect?.(idx)}
         />
       ))}
     </div>

@@ -506,7 +506,7 @@ export async function POST(request: NextRequest) {
             { status: 403, headers: { 'Content-Type': 'application/json' } },
           )
         }
-      } catch (botError) {
+      } catch (_botError) {
         // Si BotID falla, continuar (fallback seguro en dev)
         logger.warn('BotID check failed, continuing...', { context: 'ChatAPI' })
       }

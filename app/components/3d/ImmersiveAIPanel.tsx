@@ -12,7 +12,7 @@
  * - HUD táctico
  */
 
-import { useState, useCallback, useRef, useEffect, Suspense } from 'react'
+import { useState, useRef, useEffect, Suspense } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { 
   Environment, 
@@ -31,10 +31,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import * as THREE from 'three'
 import { 
   Send, Mic, MicOff, X,
-  FileText, 
-  Package, Users, DollarSign, AlertTriangle,
-  CheckCircle, Clock, Database, Cpu, Activity,
-  ChevronRight, Plus, Edit3, Save, Trash2,
+  AlertTriangle,
+  CheckCircle, Database, Cpu, Activity,
+  Save,
 } from 'lucide-react'
 
 import { Button } from '@/app/components/ui/button'
@@ -97,7 +96,7 @@ interface RobotAvatarProps {
   onInteraction?: (part: string) => void;
 }
 
-function RobotAvatar({ state, audioLevel, onInteraction }: RobotAvatarProps) {
+function RobotAvatar({ state, audioLevel, onInteraction: _onInteraction }: RobotAvatarProps) {
   const groupRef = useRef<THREE.Group>(null)
   const headRef = useRef<THREE.Group>(null)
   const eyeLeftRef = useRef<THREE.Mesh>(null)
@@ -106,10 +105,10 @@ function RobotAvatar({ state, audioLevel, onInteraction }: RobotAvatarProps) {
   const screenRef = useRef<THREE.Mesh>(null)
   
   const colors = STATE_COLORS[state]
-  const { camera } = useThree()
+  useThree() // Para contexto de Three.js
   
   // Seguimiento del cursor/cámara
-  useFrame((frameState, delta) => {
+  useFrame((frameState, _delta) => {
     if (!groupRef.current || !headRef.current) return
     
     const time = frameState.clock.getElapsedTime()

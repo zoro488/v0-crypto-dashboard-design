@@ -371,7 +371,7 @@ function NavIconMesh({ icon, color, isHovered, isActive }: IconMeshProps) {
   const groupRef = useRef<THREE.Group>(null)
   const glassRef = useRef<THREE.Mesh>(null)
 
-  useFrame((state, delta) => {
+  useFrame((state, _delta) => {
     if (groupRef.current) {
       // Rotación suave en hover
       const targetRotY = isHovered ? Math.sin(state.clock.elapsedTime * 2) * 0.15 : 0
