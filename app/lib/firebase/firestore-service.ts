@@ -1081,6 +1081,7 @@ export const cobrarCliente = async (clienteId: string, ventaId: string, monto: n
     const utilidadesRef = doc(db!, COLLECTIONS.BANCOS, 'utilidades')
     batch.update(utilidadesRef, {
       capitalActual: increment(ventaData.distribucionBancos.utilidades * proporcion),
+      historicoIngresos: increment(ventaData.distribucionBancos.utilidades * proporcion), // ✅ FIX: Actualizar historicoIngresos
       updatedAt: Timestamp.now(),
     })
 

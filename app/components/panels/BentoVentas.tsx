@@ -15,7 +15,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts'
 import dynamic from 'next/dynamic'
-import { eliminarVenta } from '@/app/lib/firebase/firestore-service'
+import { eliminarVenta } from '@/app/lib/services/unified-data-service'
 import { useToast } from '@/app/hooks/use-toast'
 import { logger } from '@/app/lib/utils/logger'
 import { useAppStore } from '@/app/lib/store/useAppStore'

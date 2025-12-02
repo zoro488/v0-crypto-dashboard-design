@@ -13,7 +13,7 @@ import { Badge } from '@/app/components/ui/badge'
 import { Input } from '@/app/components/ui/input'
 import { Skeleton } from '@/app/components/ui/skeleton'
 import { useState, useEffect, useMemo, useCallback, Suspense } from 'react'
-import { suscribirOrdenesCompra, eliminarOrdenCompra } from '@/app/lib/firebase/firestore-service'
+import { suscribirOrdenesCompra, eliminarOrdenCompra } from '@/app/lib/services/unified-data-service'
 import { DeleteConfirmModal } from '@/app/components/modals/DeleteConfirmModal'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import type { OrdenCompra, FirestoreTimestamp } from '@/app/types'
@@ -244,7 +244,7 @@ export default function BentoOrdenesCompra() {
 
   useEffect(() => {
     const unsubscribe = suscribirOrdenesCompra((ordenes) => {
-      setOrdenesCompraData(ordenes)
+      setOrdenesCompraData(ordenes as OrdenCompra[])
       setLoading(false)
     })
 

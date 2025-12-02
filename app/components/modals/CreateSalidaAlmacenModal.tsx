@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { X, PackageMinus, ChevronRight } from 'lucide-react'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { useToast } from '@/app/hooks/use-toast'
-import { firestoreService } from '@/app/lib/firebase/firestore-service'
+import { crearSalidaAlmacen } from '@/app/lib/services/unified-data-service'
 import { useAlmacenData } from '@/app/lib/firebase/firestore-hooks.service'
 import { logger } from '@/app/lib/utils/logger'
 
@@ -50,8 +50,8 @@ export default function CreateSalidaAlmacenModal({ isOpen, onClose }: CreateSali
     }
 
     try {
-      // Registrar salida usando el servicio de Firestore
-      await firestoreService.crearSalidaAlmacen({
+      // Registrar salida usando el servicio unificado
+      await crearSalidaAlmacen({
         productoId: formData.productoId,
         cantidad: formData.cantidad,
         destino: formData.destino,

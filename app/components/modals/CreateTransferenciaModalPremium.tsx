@@ -50,7 +50,7 @@ import { useToast } from '@/app/hooks/use-toast'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
-import { crearTransferencia } from '@/app/lib/firebase/firestore-service'
+import { crearTransferencia } from '@/app/lib/services/unified-data-service'
 
 // ============================================
 // SCHEMA ZOD
