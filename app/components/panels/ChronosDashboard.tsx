@@ -1,6 +1,25 @@
 'use client'
 
-import { motion, AnimatePresence } from 'framer-motion'
+/**
+ * ============================================================================
+ * 🎯 CHRONOS DASHBOARD ULTRA-PREMIUM 2025
+ * ============================================================================
+ * 
+ * Diseño inspirado en:
+ * - Apple Vision Pro: Glassmorphism 24px blur, bordes ultra-sutiles
+ * - Tesla: Fondo negro puro #000, tipografía bold, animaciones spring
+ * - Grok.com 2025: KPIs gigantes con count-up, gradientes dinámicos
+ * 
+ * Optimizaciones 2025:
+ * - 🚀 Lazy loading de componentes 3D
+ * - 🎨 Animaciones spring optimizadas (stiffness 300, damping 30)
+ * - 📊 Charts con SafeChartContainer para prevenir errores
+ * - 🔄 Count-up animado en todos los valores numéricos
+ * - 🌌 Aurora background con orbes animados
+ * - 📱 Responsive completo (mobile-first)
+ */
+
+import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { 
   TrendingUp, 
@@ -27,6 +46,8 @@ import {
   Layers,
   Box,
   Target,
+  Cpu,
+  Gauge,
   type LucideIcon,
 } from 'lucide-react'
 import {
@@ -46,7 +67,7 @@ import {
   Line,
 } from 'recharts'
 import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/components/ui/SafeChartContainer'
-import { useState, useEffect, useMemo, Suspense, lazy } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef, Suspense, lazy } from 'react'
 import { useVentas, useOrdenesCompra, useProductos, useClientes } from '@/app/lib/firebase/firestore-hooks.service'
 import { Skeleton } from '@/app/components/ui/skeleton'
 import { CreateOrdenCompraModalPremium } from '@/app/components/modals/CreateOrdenCompraModalPremium'
@@ -59,6 +80,49 @@ import { PerformanceMetrics, MiniPerformanceWidget } from '@/app/components/ui/P
 const PremiumSplineOrb = lazy(() => 
   import('@/app/components/3d/PremiumSplineOrb').then(mod => ({ default: mod.PremiumSplineOrb })),
 )
+
+// ============================================================
+// CONSTANTES PREMIUM
+// ============================================================
+const SPRING_CONFIG = {
+  stiffness: 300,
+  damping: 30,
+  mass: 0.8,
+}
+
+const TRANSITION_PREMIUM = {
+  type: 'spring' as const,
+  ...SPRING_CONFIG,
+}
+
+// Hook para count-up animado estilo Grok
+function useCountUp(end: number, duration: number = 2000) {
+  const [count, setCount] = useState(0)
+  const countRef = useRef(count)
+  
+  useEffect(() => {
+    const startTime = Date.now()
+    const startValue = countRef.current
+    
+    const animate = () => {
+      const now = Date.now()
+      const progress = Math.min((now - startTime) / duration, 1)
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4)
+      const current = Math.floor(startValue + (end - startValue) * easeOutQuart)
+      
+      setCount(current)
+      countRef.current = current
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      }
+    }
+    
+    requestAnimationFrame(animate)
+  }, [end, duration])
+  
+  return count
+}
 
 // ============================================================
 // TIPOS E INTERFACES

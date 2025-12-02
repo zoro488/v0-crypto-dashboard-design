@@ -98,17 +98,31 @@ const BANCOS_CONFIG: Record<BancoId, { nombre: string; tipo: 'boveda' | 'operati
 
 const isFirestoreAvailable = (): boolean => {
   if (!isFirebaseConfigured || !db) {
-    logger.warn('[BusinessOps] Firestore no disponible')
+    logger.warn('[BusinessOps] Firestore no disponible - Firebase no está configurado')
     return false
   }
   return true
 }
 
 /**
+ * Verifica que Firestore esté disponible o lanza error
+ */
+const requireFirestore = (): void => {
+  if (!isFirebaseConfigured) {
+    throw new Error('Firebase no está configurado. Verifica las variables de entorno NEXT_PUBLIC_FIREBASE_*')
+  }
+  if (!db) {
+    throw new Error('Firestore no está inicializado. Recarga la página e intenta de nuevo.')
+  }
+}
+
+/**
  * Asegura que un banco existe, creándolo si es necesario
  */
 const ensureBancoExists = async (bancoId: BancoId): Promise<void> => {
-  if (!db) return
+  if (!db) {
+    throw new Error('Firestore no disponible para crear banco')
+  }
   
   const bancoRef = doc(db, COLLECTIONS.BANCOS, bancoId)
   const bancoSnap = await getDoc(bancoRef)
@@ -167,8 +181,9 @@ export interface OrdenCompraResult {
  */
 export async function crearOrdenCompraCompleta(
   input: CrearOrdenCompraInput,
-): Promise<OrdenCompraResult | null> {
-  if (!isFirestoreAvailable()) return null
+): Promise<OrdenCompraResult> {
+  // Verificar Firestore o lanzar error claro
+  requireFirestore()
   
   const batch = writeBatch(db!)
   
@@ -435,8 +450,9 @@ export interface VentaResult {
  */
 export async function crearVentaCompleta(
   input: CrearVentaInput,
-): Promise<VentaResult | null> {
-  if (!isFirestoreAvailable()) return null
+): Promise<VentaResult> {
+  // Verificar Firestore o lanzar error claro
+  requireFirestore()
   
   const batch = writeBatch(db!)
   
@@ -795,7 +811,7 @@ export interface AbonarClienteInput {
 }
 
 export async function abonarCliente(input: AbonarClienteInput): Promise<boolean> {
-  if (!isFirestoreAvailable()) return false
+  requireFirestore()
   
   const batch = writeBatch(db!)
   
@@ -941,7 +957,7 @@ export interface PagarDistribuidorInput {
 }
 
 export async function pagarDistribuidor(input: PagarDistribuidorInput): Promise<boolean> {
-  if (!isFirestoreAvailable()) return false
+  requireFirestore()
   
   const batch = writeBatch(db!)
   
@@ -1055,7 +1071,7 @@ export interface TransferenciaInput {
 }
 
 export async function realizarTransferencia(input: TransferenciaInput): Promise<string | null> {
-  if (!isFirestoreAvailable()) return null
+  requireFirestore()
   
   const batch = writeBatch(db!)
   
@@ -1155,7 +1171,7 @@ export interface RegistrarGastoInput {
 }
 
 export async function registrarGasto(input: RegistrarGastoInput): Promise<string | null> {
-  if (!isFirestoreAvailable()) return null
+  requireFirestore()
   
   const batch = writeBatch(db!)
   
@@ -1227,7 +1243,7 @@ export interface RegistrarIngresoInput {
 }
 
 export async function registrarIngreso(input: RegistrarIngresoInput): Promise<string | null> {
-  if (!isFirestoreAvailable()) return null
+  requireFirestore()
   
   const batch = writeBatch(db!)
   

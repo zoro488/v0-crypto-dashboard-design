@@ -1,25 +1,37 @@
 'use client'
 
 /**
- * 🏭 BENTO ALMACÉN PREMIUM - Panel de Almacén con Componentes 3D
+ * 🏭 BENTO ALMACÉN PREMIUM 2025 - Apple Vision Pro + Tesla + Grok Design
  * 
- * Características Premium:
- * - Orbes 3D para estadísticas principales
- * - GlassCards con efectos glassmorphism
- * - Animaciones fluidas con Framer Motion
- * - Gráficos Recharts con tema oscuro
- * - Partículas de fondo animadas
- * - 4 Tabs: Entradas, Stock, Salidas, RF Actual (Cortes)
+ * ============================================================================
+ * SISTEMA CHRONOS - PANEL ALMACÉN ULTRA PREMIUM
+ * ============================================================================
+ * 
+ * Diseño inspirado en:
+ * - Apple Vision Pro: Glassmorphism avanzado, blur 24px, bordes sutiles
+ * - Tesla: Fondo puro #000000, tipografía Inter bold, animaciones spring
+ * - Grok.com 2025: KPIs gigantes con count-up, gradientes cyan/purple
+ * 
+ * Características Premium 2025:
+ * - 🔮 Orbes 3D WebGL para estadísticas principales
+ * - 🪟 GlassCards con glassmorphism profundo (blur 24px)
+ * - ✨ Animaciones spring ultra-fluidas (stiffness 300, damping 30)
+ * - 📊 Gráficos Recharts con tema oscuro premium
+ * - 🌌 Partículas de fondo con efecto aurora
+ * - 📑 4 Tabs: Entradas, Stock, Salidas, RF Actual (Cortes)
+ * - 🎯 Count-up animado en todos los valores numéricos
+ * - 🌈 Gradientes dinámicos según el tab activo
  */
 
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion'
 import { 
   Package, TrendingUp, TrendingDown, Archive, Scissors, Plus, Box, Activity, 
   BarChart3, Zap, RefreshCw, Search, Filter, Calendar, Download, Eye,
   ArrowUpRight, ArrowDownRight, Layers, AlertTriangle, CheckCircle2,
-  Sparkles, ChevronRight, type LucideIcon,
+  Sparkles, ChevronRight, Warehouse, Truck, RotateCcw, ScanLine,
+  type LucideIcon,
 } from 'lucide-react'
-import { useState, useMemo, Suspense } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useProductos, useEntradasAlmacen, useSalidasAlmacen } from '@/app/lib/firebase/firestore-hooks.service'
 import { Skeleton } from '@/app/components/ui/skeleton'
 import { Button } from '@/app/components/ui/button'
@@ -37,6 +49,7 @@ import CreateSalidaAlmacenModal from '@/app/components/modals/CreateSalidaAlmace
 import { 
   AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, 
   Tooltip, PieChart, Pie, Cell, CartesianGrid, Legend, ComposedChart, Line,
+  RadialBarChart, RadialBar,
 } from 'recharts'
 
 // Componentes 3D Premium
@@ -49,6 +62,49 @@ import {
   GradientText,
   VARIANT_COLORS, 
 } from '@/app/components/3d/PremiumPanelComponents'
+
+// ============================================================================
+// ANIMACIONES SPRING ULTRA-PREMIUM (Apple/Tesla style)
+// ============================================================================
+const SPRING_CONFIG = {
+  stiffness: 300,
+  damping: 30,
+  mass: 0.8,
+}
+
+const TRANSITION_PREMIUM = {
+  type: 'spring' as const,
+  ...SPRING_CONFIG,
+}
+
+// Hook para count-up animado estilo Grok
+function useCountUp(end: number, duration: number = 2000) {
+  const [count, setCount] = useState(0)
+  const countRef = useRef(count)
+  
+  useEffect(() => {
+    const startTime = Date.now()
+    const startValue = countRef.current
+    
+    const animate = () => {
+      const now = Date.now()
+      const progress = Math.min((now - startTime) / duration, 1)
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4)
+      const current = Math.floor(startValue + (end - startValue) * easeOutQuart)
+      
+      setCount(current)
+      countRef.current = current
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      }
+    }
+    
+    requestAnimationFrame(animate)
+  }, [end, duration])
+  
+  return count
+}
 
 // ============================================================================
 // INTERFACES
@@ -89,13 +145,151 @@ interface ProductoAlmacen {
 // CONSTANTES
 // ============================================================================
 const TABS = [
-  { id: 'entradas', label: 'Entradas', icon: TrendingUp, color: 'text-emerald-400', variant: 'success' as const },
-  { id: 'stock', label: 'Stock Actual', icon: Archive, color: 'text-cyan-400', variant: 'info' as const },
-  { id: 'salidas', label: 'Salidas', icon: TrendingDown, color: 'text-rose-400', variant: 'danger' as const },
-  { id: 'rf', label: 'RF Actual (Cortes)', icon: Scissors, color: 'text-amber-400', variant: 'warning' as const },
+  { id: 'entradas', label: 'Entradas', icon: TrendingUp, color: 'text-emerald-400', variant: 'success' as const, gradient: 'from-emerald-500 to-green-400' },
+  { id: 'stock', label: 'Stock Actual', icon: Archive, color: 'text-cyan-400', variant: 'info' as const, gradient: 'from-cyan-500 to-blue-400' },
+  { id: 'salidas', label: 'Salidas', icon: TrendingDown, color: 'text-rose-400', variant: 'danger' as const, gradient: 'from-rose-500 to-pink-400' },
+  { id: 'rf', label: 'RF Actual (Cortes)', icon: Scissors, color: 'text-amber-400', variant: 'warning' as const, gradient: 'from-amber-500 to-orange-400' },
 ]
 
 const CHART_COLORS = ['#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444', '#3b82f6']
+
+// ============================================================================
+// COMPONENTE HERO KPI - ESTILO GROK 2025 (GIGANTE CON COUNT-UP)
+// ============================================================================
+function HeroKPI({ 
+  title, 
+  value, 
+  prefix = '',
+  suffix = '',
+  icon: Icon, 
+  gradient,
+  description,
+  sparklineData,
+}: { 
+  title: string
+  value: number
+  prefix?: string
+  suffix?: string
+  icon: LucideIcon
+  gradient: string
+  description?: string
+  sparklineData?: number[]
+}) {
+  const animatedValue = useCountUp(value, 1500)
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={TRANSITION_PREMIUM}
+      className="relative group"
+    >
+      {/* Glow effect */}
+      <div className={`absolute -inset-1 bg-gradient-to-r ${gradient} rounded-3xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500`} />
+      
+      {/* Card */}
+      <div className="relative bg-black/60 backdrop-blur-[24px] rounded-2xl border border-white/[0.08] p-6 overflow-hidden">
+        {/* Background pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
+            backgroundSize: '32px 32px',
+          }} />
+        </div>
+        
+        {/* Icon container */}
+        <motion.div 
+          className={`inline-flex p-3 rounded-2xl bg-gradient-to-br ${gradient} mb-4`}
+          whileHover={{ scale: 1.1, rotate: 5 }}
+          transition={TRANSITION_PREMIUM}
+        >
+          <Icon className="w-6 h-6 text-white" />
+        </motion.div>
+        
+        {/* Title */}
+        <p className="text-white/60 text-sm font-medium tracking-wide uppercase mb-2">{title}</p>
+        
+        {/* Value - GIGANTE estilo Grok */}
+        <div className="flex items-baseline gap-1">
+          {prefix && <span className="text-2xl text-white/70">{prefix}</span>}
+          <motion.span 
+            className="text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/80"
+            key={animatedValue}
+          >
+            {animatedValue.toLocaleString('es-MX')}
+          </motion.span>
+          {suffix && <span className="text-2xl text-white/70 ml-1">{suffix}</span>}
+        </div>
+        
+        {description && (
+          <p className="text-white/40 text-sm mt-2">{description}</p>
+        )}
+        
+        {/* Sparkline */}
+        {sparklineData && (
+          <div className="mt-4 h-12">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={sparklineData.map((v, i) => ({ value: v, idx: i }))}>
+                <defs>
+                  <linearGradient id={`sparkGradient-${title}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="white" stopOpacity={0.3} />
+                    <stop offset="100%" stopColor="white" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <Area 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke="rgba(255,255,255,0.5)" 
+                  fill={`url(#sparkGradient-${title})`}
+                  strokeWidth={2}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  )
+}
+
+// ============================================================================
+// GLASSMORPHISM CARD ULTRA PREMIUM (Apple Vision Pro style)
+// ============================================================================
+function GlassPanelUltra({ 
+  children, 
+  className = '',
+  glow = false,
+  glowColor = 'cyan',
+}: { 
+  children: React.ReactNode
+  className?: string
+  glow?: boolean
+  glowColor?: 'cyan' | 'emerald' | 'rose' | 'amber' | 'purple'
+}) {
+  const glowColors = {
+    cyan: 'from-cyan-500/20 to-blue-500/20',
+    emerald: 'from-emerald-500/20 to-green-500/20',
+    rose: 'from-rose-500/20 to-pink-500/20',
+    amber: 'from-amber-500/20 to-orange-500/20',
+    purple: 'from-purple-500/20 to-violet-500/20',
+  }
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={TRANSITION_PREMIUM}
+      className={`relative ${className}`}
+    >
+      {glow && (
+        <div className={`absolute -inset-px bg-gradient-to-r ${glowColors[glowColor]} rounded-2xl blur-xl opacity-50`} />
+      )}
+      <div className="relative bg-black/50 backdrop-blur-[24px] rounded-2xl border border-white/[0.08] p-6 overflow-hidden">
+        {children}
+      </div>
+    </motion.div>
+  )
+}
 
 // Datos de RF Cortes desde la documentación
 const RF_CORTES_DATA = [
@@ -882,114 +1076,307 @@ function TabRF() {
 }
 
 // ============================================================================
-// COMPONENTE PRINCIPAL
+// COMPONENTE PRINCIPAL - BENTO ALMACÉN PREMIUM 2025
 // ============================================================================
 export function BentoAlmacenPremium() {
   const [activeTab, setActiveTab] = useState('entradas')
   const [showEntradaModal, setShowEntradaModal] = useState(false)
   const [showSalidaModal, setShowSalidaModal] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   
   // Hooks de datos
   const { data: productos = [], loading: loadingProductos } = useProductos()
   const { data: entradas = [], loading: loadingEntradas } = useEntradasAlmacen()
   const { data: salidas = [], loading: loadingSalidas } = useSalidasAlmacen()
+  
+  // Métricas hero globales
+  const heroMetrics = useMemo(() => {
+    const totalStock = productos.reduce((sum, p) => sum + ((p as ProductoAlmacen).stock ?? (p as ProductoAlmacen).stockActual ?? 0), 0)
+    const totalEntradas = entradas.reduce((sum, e) => sum + ((e as MovimientoAlmacen).cantidad ?? 0), 0)
+    const totalSalidas = salidas.reduce((sum, s) => sum + ((s as MovimientoAlmacen).cantidad ?? 0), 0)
+    const valorInventario = productos.reduce((sum, p) => {
+      const stock = (p as ProductoAlmacen).stock ?? (p as ProductoAlmacen).stockActual ?? 0
+      const valor = (p as ProductoAlmacen).valorUnitario ?? (p as ProductoAlmacen).precio ?? 0
+      return sum + (stock * valor)
+    }, 0)
+    const rfTotal = RF_CORTES_DATA.reduce((sum, rf) => sum + (rf.corte ?? 0), 0)
+    
+    return { totalStock, totalEntradas, totalSalidas, valorInventario, rfTotal }
+  }, [productos, entradas, salidas])
+  
+  const handleRefresh = useCallback(() => {
+    setIsRefreshing(true)
+    haptic.medium()
+    setTimeout(() => setIsRefreshing(false), 1000)
+  }, [])
+  
+  const currentTab = TABS.find(t => t.id === activeTab) || TABS[0]
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="relative min-h-screen p-6"
+      transition={{ duration: 0.5 }}
+      className="relative min-h-screen"
     >
-      {/* Fondo de partículas */}
+      {/* ============================================
+          FONDO ULTRA-PREMIUM - Aurora Effect
+          ============================================ */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {/* Base negro puro (Tesla style) */}
+        <div className="absolute inset-0 bg-black" />
+        
+        {/* Aurora gradients */}
+        <motion.div 
+          className={`absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full blur-[180px] bg-gradient-to-r ${currentTab.gradient} opacity-10`}
+          animate={{
+            scale: [1, 1.2, 1],
+            x: [0, 100, 0],
+            y: [0, 50, 0],
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div 
+          className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full blur-[150px] bg-purple-500/10"
+          animate={{
+            scale: [1, 1.3, 1],
+            x: [0, -80, 0],
+            y: [0, -60, 0],
+          }}
+          transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut', delay: 5 }}
+        />
+        
+        {/* Grid pattern (Apple Vision Pro style) */}
+        <div 
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)
+            `,
+            backgroundSize: '60px 60px',
+          }}
+        />
+        
+        {/* Vignette */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/50" />
+      </div>
+      
+      {/* Partículas dinámicas */}
       <ParticleBackground 
-        variant={TABS.find(t => t.id === activeTab)?.variant || 'primary'} 
+        variant={currentTab.variant} 
         intensity="low" 
       />
       
-      {/* Header */}
-      <div className="relative z-10 mb-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <motion.div 
-              className="p-3 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-white/10"
-              whileHover={{ scale: 1.05, rotate: 5 }}
-            >
-              <Package className="w-8 h-8 text-cyan-400" />
-            </motion.div>
-            <div>
-              <h1 className="text-3xl font-bold">
-                <GradientText variant="info">Gestión de Almacén</GradientText>
-              </h1>
-              <p className="text-white/50 mt-1">Control integral de inventario y movimientos</p>
+      {/* ============================================
+          CONTENIDO PRINCIPAL
+          ============================================ */}
+      <div className="relative z-10 p-6 md:p-8">
+        
+        {/* ============================================
+            HEADER ULTRA-PREMIUM
+            ============================================ */}
+        <motion.header
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={TRANSITION_PREMIUM}
+          className="mb-8"
+        >
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            {/* Título con ícono animado */}
+            <div className="flex items-center gap-5">
+              <motion.div 
+                className="relative"
+                whileHover={{ scale: 1.05 }}
+                transition={TRANSITION_PREMIUM}
+              >
+                {/* Glow ring */}
+                <div className="absolute -inset-2 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-2xl blur-lg opacity-40" />
+                <div className="relative p-4 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-white/10 backdrop-blur-xl">
+                  <Warehouse className="w-8 h-8 text-cyan-400" />
+                </div>
+              </motion.div>
+              
+              <div>
+                <motion.h1 
+                  className="text-3xl md:text-4xl font-bold tracking-tight"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1, ...TRANSITION_PREMIUM }}
+                >
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/70">
+                    Gestión de Almacén
+                  </span>
+                </motion.h1>
+                <motion.p 
+                  className="text-white/50 mt-1 text-sm md:text-base"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  Control integral de inventario, movimientos y cortes RF
+                </motion.p>
+              </div>
+            </div>
+            
+            {/* Acciones */}
+            <div className="flex items-center gap-3">
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  onClick={() => { setShowEntradaModal(true); haptic.light() }}
+                  className="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white border-0 shadow-lg shadow-emerald-500/20"
+                >
+                  <Plus size={16} className="mr-2" />
+                  Nueva Entrada
+                </Button>
+              </motion.div>
+              
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  onClick={() => { setShowSalidaModal(true); haptic.light() }}
+                  variant="outline"
+                  className="border-rose-500/30 text-rose-400 hover:bg-rose-500/10 hover:border-rose-500/50"
+                >
+                  <Truck size={16} className="mr-2" />
+                  Registrar Salida
+                </Button>
+              </motion.div>
+              
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-white/60 hover:text-white hover:bg-white/5"
+                  onClick={handleRefresh}
+                >
+                  <RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} />
+                </Button>
+              </motion.div>
             </div>
           </div>
           
-          {/* Botones de acción */}
-          <div className="flex items-center gap-3">
-            <Button
-              onClick={() => setShowEntradaModal(true)}
-              className="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white border-0"
-            >
-              <Plus size={16} className="mr-2" />
-              Nueva Entrada
-            </Button>
-            <Button
-              onClick={() => setShowSalidaModal(true)}
-              variant="outline"
-              className="border-rose-500/30 text-rose-400 hover:bg-rose-500/10"
-            >
-              <TrendingDown size={16} className="mr-2" />
-              Registrar Salida
-            </Button>
-            <Button variant="ghost" size="icon" className="text-white/60 hover:text-white">
-              <RefreshCw size={18} />
-            </Button>
-          </div>
-        </div>
-        
-        {/* Tabs */}
-        <div className="flex gap-2 mt-6 p-1 bg-white/5 rounded-2xl border border-white/10 w-fit">
-          {TABS.map((tab) => {
-            const Icon = tab.icon
-            const isActive = activeTab === tab.id
-            return (
-              <motion.button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`
-                  flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all
-                  ${isActive 
-                    ? 'bg-white/10 text-white shadow-lg' 
-                    : 'text-white/50 hover:text-white/80 hover:bg-white/5'
-                  }
-                `}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Icon size={16} className={isActive ? tab.color : ''} />
-                {tab.label}
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTabIndicator"
-                    className="absolute inset-0 rounded-xl bg-white/5"
-                    style={{ zIndex: -1 }}
-                  />
-                )}
-              </motion.button>
-            )
-          })}
-        </div>
-      </div>
-      
-      {/* Contenido de tabs */}
-      <div className="relative z-10">
+          {/* ============================================
+              HERO KPIs - ESTILO GROK 2025
+              ============================================ */}
+          <motion.div 
+            className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, ...TRANSITION_PREMIUM }}
+          >
+            <HeroKPI
+              title="Stock Total"
+              value={heroMetrics.totalStock}
+              suffix="uds"
+              icon={Archive}
+              gradient="from-cyan-500 to-blue-500"
+              description="Unidades disponibles"
+              sparklineData={[45, 52, 49, 60, 55, 70, 65, 75]}
+            />
+            <HeroKPI
+              title="Entradas"
+              value={heroMetrics.totalEntradas}
+              suffix="uds"
+              icon={TrendingUp}
+              gradient="from-emerald-500 to-green-500"
+              description="Total ingresado"
+            />
+            <HeroKPI
+              title="Salidas"
+              value={heroMetrics.totalSalidas}
+              suffix="uds"
+              icon={TrendingDown}
+              gradient="from-rose-500 to-pink-500"
+              description="Total despachado"
+            />
+            <HeroKPI
+              title="Valor Inventario"
+              value={Math.round(heroMetrics.valorInventario / 1000)}
+              prefix="$"
+              suffix="k"
+              icon={Box}
+              gradient="from-purple-500 to-violet-500"
+              description="Valor estimado"
+            />
+            <HeroKPI
+              title="RF Cortes"
+              value={heroMetrics.rfTotal}
+              suffix="uds"
+              icon={Scissors}
+              gradient="from-amber-500 to-orange-500"
+              description="Total cortado"
+            />
+          </motion.div>
+          
+          {/* ============================================
+              TABS ULTRA-PREMIUM
+              ============================================ */}
+          <motion.div 
+            className="mt-8"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, ...TRANSITION_PREMIUM }}
+          >
+            <div className="flex gap-2 p-1.5 bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/[0.06] w-fit">
+              {TABS.map((tab, idx) => {
+                const Icon = tab.icon
+                const isActive = activeTab === tab.id
+                return (
+                  <motion.button
+                    key={tab.id}
+                    onClick={() => { setActiveTab(tab.id); haptic.light() }}
+                    className={`
+                      relative flex items-center gap-2.5 px-5 py-3 rounded-xl text-sm font-medium transition-all
+                      ${isActive 
+                        ? 'text-white' 
+                        : 'text-white/40 hover:text-white/70 hover:bg-white/[0.03]'
+                      }
+                    `}
+                    whileHover={{ scale: isActive ? 1 : 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 + idx * 0.05, ...TRANSITION_PREMIUM }}
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeTabBg"
+                        className={`absolute inset-0 bg-gradient-to-r ${tab.gradient} rounded-xl opacity-20`}
+                        transition={TRANSITION_PREMIUM}
+                      />
+                    )}
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeTabBorder"
+                        className="absolute inset-0 rounded-xl border border-white/20"
+                        transition={TRANSITION_PREMIUM}
+                      />
+                    )}
+                    <Icon size={16} className={isActive ? tab.color : ''} />
+                    <span className="relative z-10">{tab.label}</span>
+                    {isActive && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="w-1.5 h-1.5 rounded-full bg-white/80"
+                      />
+                    )}
+                  </motion.button>
+                )
+              })}
+            </div>
+          </motion.div>
+        </motion.header>
+        {/* ============================================
+            CONTENIDO DE TABS
+            ============================================ */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, y: -30, filter: 'blur(10px)' }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           >
             {activeTab === 'entradas' && (
               <TabEntradas entradas={entradas as MovimientoAlmacen[]} loading={loadingEntradas} />

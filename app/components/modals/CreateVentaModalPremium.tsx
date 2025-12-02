@@ -414,21 +414,20 @@ export function CreateVentaModalPremium({
         // - Estado de pago (completo/parcial/pendiente)
         const result = await crearVentaCompleta(ventaInput)
         
-        if (result) {
-          ventasCreadas.push(result.ventaId)
-          logger.info('[CreateVentaModalPremium] Venta creada exitosamente', {
-            data: {
-              ventaId: result.ventaId,
-              distribucion: {
-                bovedaMonte: result.bovedaMonte,
-                fletes: result.fletes,
-                utilidades: result.utilidades,
-              },
-              deudaCliente: result.deudaCliente,
+        // El servicio ahora lanza error si falla, así que si llegamos aquí es exitoso
+        ventasCreadas.push(result.ventaId)
+        logger.info('[CreateVentaModalPremium] Venta creada exitosamente', {
+          data: {
+            ventaId: result.ventaId,
+            distribucion: {
+              bovedaMonte: result.bovedaMonte,
+              fletes: result.fletes,
+              utilidades: result.utilidades,
             },
-            context: 'CreateVentaModalPremium',
-          })
-        }
+            deudaCliente: result.deudaCliente,
+          },
+          context: 'CreateVentaModalPremium',
+        })
       }
 
       if (ventasCreadas.length > 0) {
@@ -455,8 +454,8 @@ export function CreateVentaModalPremium({
     } catch (error) {
       logger.error('[CreateVentaModalPremium] Error al registrar venta', error)
       toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'No se pudo registrar la venta',
+        title: '❌ Error al Registrar',
+        description: error instanceof Error ? error.message : 'No se pudo registrar la venta. Verifica tu conexión.',
         variant: 'destructive',
       })
     } finally {

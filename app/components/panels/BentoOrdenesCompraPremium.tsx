@@ -1,23 +1,35 @@
 'use client'
 
 /**
- * 📦 BENTO ÓRDENES DE COMPRA PREMIUM - Panel de OC con Componentes 3D
+ * 📦 BENTO ÓRDENES DE COMPRA PREMIUM 2025 - Apple Vision Pro + Tesla + Grok Design
  * 
- * Características Premium:
- * - Orbes 3D para estadísticas principales
- * - Cards con glassmorphism y efectos 3D
- * - Timeline interactivo de órdenes
- * - Gráficos avanzados con Recharts
- * - Animaciones fluidas con Framer Motion
- * - Estados visuales dinámicos
+ * ============================================================================
+ * SISTEMA CHRONOS - PANEL ÓRDENES DE COMPRA ULTRA PREMIUM
+ * ============================================================================
+ * 
+ * Diseño inspirado en:
+ * - Apple Vision Pro: Glassmorphism avanzado, blur 24px, bordes sutiles
+ * - Tesla: Fondo puro #000000, tipografía Inter bold, animaciones spring
+ * - Grok.com 2025: KPIs gigantes con count-up, gradientes dinámicos
+ * 
+ * Características Premium 2025:
+ * - 🔮 Orbes 3D WebGL para estadísticas principales
+ * - 🪟 GlassCards con glassmorphism profundo (blur 24px)
+ * - ✨ Animaciones spring ultra-fluidas (stiffness 300, damping 30)
+ * - 📊 Gráficos Recharts con tema oscuro premium
+ * - 🌌 Partículas de fondo con efecto aurora
+ * - 🎯 Count-up animado en todos los valores numéricos
+ * - 💳 Cards de órdenes con progreso visual dinámico
+ * - 🔍 Búsqueda y filtrado en tiempo real
  */
 
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
 import { 
   ShoppingCart, Plus, TrendingUp, AlertCircle, CheckCircle2, Clock, Package,
   Building2, DollarSign, Calendar, Search, Filter, Download, Eye, Edit,
   ArrowUpRight, ArrowDownRight, Truck, BarChart3, PieChart as PieChartIcon,
   CreditCard, Receipt, RefreshCw, ChevronRight, Sparkles, Activity,
+  FileText, Boxes, Store, Wallet, Target,
   type LucideIcon,
 } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
@@ -31,13 +43,14 @@ import {
   SkeletonTable,
   haptic,
 } from '@/app/components/ui/microinteractions'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { suscribirOrdenesCompra } from '@/app/lib/services/unified-data-service'
 import type { OrdenCompra, FirestoreTimestamp } from '@/app/types'
 import { CreateOrdenCompraModalPremium } from '@/app/components/modals/CreateOrdenCompraModalPremium'
 import { 
   AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, 
   Tooltip, PieChart, Pie, Cell, CartesianGrid, Legend, ComposedChart, Line,
+  RadialBarChart, RadialBar,
 } from 'recharts'
 
 // Componentes 3D Premium
@@ -50,6 +63,49 @@ import {
   GradientText,
   VARIANT_COLORS, 
 } from '@/app/components/3d/PremiumPanelComponents'
+
+// ============================================================================
+// ANIMACIONES SPRING ULTRA-PREMIUM (Apple/Tesla style)
+// ============================================================================
+const SPRING_CONFIG = {
+  stiffness: 300,
+  damping: 30,
+  mass: 0.8,
+}
+
+const TRANSITION_PREMIUM = {
+  type: 'spring' as const,
+  ...SPRING_CONFIG,
+}
+
+// Hook para count-up animado estilo Grok
+function useCountUp(end: number, duration: number = 2000) {
+  const [count, setCount] = useState(0)
+  const countRef = useRef(count)
+  
+  useEffect(() => {
+    const startTime = Date.now()
+    const startValue = countRef.current
+    
+    const animate = () => {
+      const now = Date.now()
+      const progress = Math.min((now - startTime) / duration, 1)
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4)
+      const current = Math.floor(startValue + (end - startValue) * easeOutQuart)
+      
+      setCount(current)
+      countRef.current = current
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      }
+    }
+    
+    requestAnimationFrame(animate)
+  }, [end, duration])
+  
+  return count
+}
 
 // ============================================================================
 // HELPERS
@@ -123,6 +179,94 @@ const ESTADO_CONFIG: Record<string, {
 }
 
 const CHART_COLORS = ['#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#8b5cf6', '#3b82f6']
+
+// ============================================================================
+// COMPONENTE HERO KPI - ESTILO GROK 2025 (GIGANTE CON COUNT-UP)
+// ============================================================================
+function HeroKPI({ 
+  title, 
+  value, 
+  prefix = '',
+  suffix = '',
+  icon: Icon, 
+  gradient,
+  description,
+  trend,
+  trendValue,
+}: { 
+  title: string
+  value: number
+  prefix?: string
+  suffix?: string
+  icon: LucideIcon
+  gradient: string
+  description?: string
+  trend?: 'up' | 'down'
+  trendValue?: string
+}) {
+  const animatedValue = useCountUp(value, 1500)
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={TRANSITION_PREMIUM}
+      className="relative group"
+    >
+      {/* Glow effect */}
+      <div className={`absolute -inset-1 bg-gradient-to-r ${gradient} rounded-3xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500`} />
+      
+      {/* Card */}
+      <div className="relative bg-black/60 backdrop-blur-[24px] rounded-2xl border border-white/[0.08] p-6 overflow-hidden">
+        {/* Background pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
+            backgroundSize: '32px 32px',
+          }} />
+        </div>
+        
+        {/* Icon container */}
+        <motion.div 
+          className={`inline-flex p-3 rounded-2xl bg-gradient-to-br ${gradient} mb-4`}
+          whileHover={{ scale: 1.1, rotate: 5 }}
+          transition={TRANSITION_PREMIUM}
+        >
+          <Icon className="w-6 h-6 text-white" />
+        </motion.div>
+        
+        {/* Title */}
+        <p className="text-white/60 text-sm font-medium tracking-wide uppercase mb-2">{title}</p>
+        
+        {/* Value - GIGANTE estilo Grok */}
+        <div className="flex items-baseline gap-1">
+          {prefix && <span className="text-2xl text-white/70">{prefix}</span>}
+          <motion.span 
+            className="text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/80"
+            key={animatedValue}
+          >
+            {animatedValue.toLocaleString('es-MX')}
+          </motion.span>
+          {suffix && <span className="text-2xl text-white/70 ml-1">{suffix}</span>}
+        </div>
+        
+        {description && (
+          <p className="text-white/40 text-sm mt-2">{description}</p>
+        )}
+        
+        {/* Trend indicator */}
+        {trend && trendValue && (
+          <div className={`flex items-center gap-1 mt-3 text-sm ${
+            trend === 'up' ? 'text-emerald-400' : 'text-rose-400'
+          }`}>
+            {trend === 'up' ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
+            <span className="font-medium">{trendValue}</span>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  )
+}
 
 // ============================================================================
 // COMPONENTES AUXILIARES
@@ -332,7 +476,7 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
 }
 
 // ============================================================================
-// COMPONENTE PRINCIPAL
+// COMPONENTE PRINCIPAL - BENTO ÓRDENES COMPRA PREMIUM 2025
 // ============================================================================
 export function BentoOrdenesCompraPremium() {
   const [ordenes, setOrdenes] = useState<OrdenCompra[]>([])
@@ -341,6 +485,7 @@ export function BentoOrdenesCompraPremium() {
   const [selectedOrden, setSelectedOrden] = useState<OrdenCompra | null>(null)
   const [filtroEstado, setFiltroEstado] = useState<string>('todos')
   const [searchTerm, setSearchTerm] = useState('')
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   // Suscripción en tiempo real
   useEffect(() => {
@@ -366,8 +511,9 @@ export function BentoOrdenesCompraPremium() {
     }
     
     const distribuidores = new Set(ordenes.map(oc => oc.distribuidor)).size
+    const totalUnidades = ordenes.reduce((sum, oc) => sum + (oc.cantidad || 0), 0)
     
-    return { totalOrdenes, totalMonto, totalPagado, pendientePago, porEstado, distribuidores }
+    return { totalOrdenes, totalMonto, totalPagado, pendientePago, porEstado, distribuidores, totalUnidades }
   }, [ordenes])
 
   // Datos filtrados
@@ -410,224 +556,412 @@ export function BentoOrdenesCompraPremium() {
     return Object.entries(ultimasSemanas).map(([name, data]) => ({ name, ...data }))
   }, [ordenes])
 
-  const handleViewOrden = (oc: OrdenCompra) => {
+  const handleViewOrden = useCallback((oc: OrdenCompra) => {
     setSelectedOrden(oc)
-  }
+    haptic.light()
+  }, [])
+  
+  const handleRefresh = useCallback(() => {
+    setIsRefreshing(true)
+    haptic.medium()
+    setTimeout(() => setIsRefreshing(false), 1000)
+  }, [])
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="relative min-h-screen p-6"
+      transition={{ duration: 0.5 }}
+      className="relative min-h-screen"
     >
-      {/* Fondo de partículas */}
+      {/* ============================================
+          FONDO ULTRA-PREMIUM - Aurora Effect
+          ============================================ */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {/* Base negro puro (Tesla style) */}
+        <div className="absolute inset-0 bg-black" />
+        
+        {/* Aurora gradients */}
+        <motion.div 
+          className="absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full blur-[180px] bg-gradient-to-r from-blue-500/15 to-purple-500/15"
+          animate={{
+            scale: [1, 1.2, 1],
+            x: [0, 100, 0],
+            y: [0, 50, 0],
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div 
+          className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full blur-[150px] bg-gradient-to-r from-cyan-500/10 to-emerald-500/10"
+          animate={{
+            scale: [1, 1.3, 1],
+            x: [0, -80, 0],
+            y: [0, -60, 0],
+          }}
+          transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut', delay: 5 }}
+        />
+        
+        {/* Grid pattern (Apple Vision Pro style) */}
+        <div 
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)
+            `,
+            backgroundSize: '60px 60px',
+          }}
+        />
+        
+        {/* Vignette */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/50" />
+      </div>
+      
+      {/* Partículas */}
       <ParticleBackground variant="primary" intensity="low" />
       
-      {/* Header */}
-      <div className="relative z-10 mb-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <motion.div 
-              className="p-3 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-white/10"
-              whileHover={{ scale: 1.05, rotate: 5 }}
-            >
-              <ShoppingCart className="w-8 h-8 text-blue-400" />
-            </motion.div>
-            <div>
-              <h1 className="text-3xl font-bold">
-                <GradientText variant="primary">Órdenes de Compra</GradientText>
-              </h1>
-              <p className="text-white/50 mt-1">Gestión y seguimiento de compras a distribuidores</p>
+      {/* ============================================
+          CONTENIDO PRINCIPAL
+          ============================================ */}
+      <div className="relative z-10 p-6 md:p-8">
+        
+        {/* ============================================
+            HEADER ULTRA-PREMIUM
+            ============================================ */}
+        <motion.header
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={TRANSITION_PREMIUM}
+          className="mb-8"
+        >
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            {/* Título con ícono animado */}
+            <div className="flex items-center gap-5">
+              <motion.div 
+                className="relative"
+                whileHover={{ scale: 1.05 }}
+                transition={TRANSITION_PREMIUM}
+              >
+                {/* Glow ring */}
+                <div className="absolute -inset-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl blur-lg opacity-40" />
+                <div className="relative p-4 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-white/10 backdrop-blur-xl">
+                  <ShoppingCart className="w-8 h-8 text-blue-400" />
+                </div>
+              </motion.div>
+              
+              <div>
+                <motion.h1 
+                  className="text-3xl md:text-4xl font-bold tracking-tight"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1, ...TRANSITION_PREMIUM }}
+                >
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/70">
+                    Órdenes de Compra
+                  </span>
+                </motion.h1>
+                <motion.p 
+                  className="text-white/50 mt-1 text-sm md:text-base"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  Gestión y seguimiento de compras a distribuidores
+                </motion.p>
+              </div>
+            </div>
+            
+            {/* Acciones */}
+            <div className="flex items-center gap-3">
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  onClick={() => { setIsModalOpen(true); haptic.light() }}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white border-0 shadow-lg shadow-blue-500/20"
+                >
+                  <Plus size={16} className="mr-2" />
+                  Nueva Orden
+                </Button>
+              </motion.div>
+              
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  variant="outline"
+                  className="border-white/20 text-white/70 hover:bg-white/5 hover:border-white/30"
+                >
+                  <Download size={16} className="mr-2" />
+                  Exportar
+                </Button>
+              </motion.div>
+              
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-white/60 hover:text-white hover:bg-white/5"
+                  onClick={handleRefresh}
+                >
+                  <RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} />
+                </Button>
+              </motion.div>
             </div>
           </div>
           
-          <div className="flex items-center gap-3">
-            <Button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white border-0"
-            >
-              <Plus size={16} className="mr-2" />
-              Nueva Orden
-            </Button>
-            <Button variant="ghost" size="icon" className="text-white/60 hover:text-white">
-              <RefreshCw size={18} />
-            </Button>
-          </div>
-        </div>
-      </div>
+          {/* ============================================
+              HERO KPIs - ESTILO GROK 2025
+              ============================================ */}
+          <motion.div 
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, ...TRANSITION_PREMIUM }}
+          >
+            <HeroKPI
+              title="Total Órdenes"
+              value={metricas.totalOrdenes}
+              icon={FileText}
+              gradient="from-blue-500 to-indigo-500"
+              description="Órdenes registradas"
+            />
+            <HeroKPI
+              title="Monto Total"
+              value={Math.round(metricas.totalMonto / 1000)}
+              prefix="$"
+              suffix="k"
+              icon={DollarSign}
+              gradient="from-cyan-500 to-blue-500"
+              description="Valor de compras"
+              trend="up"
+              trendValue="+15.3%"
+            />
+            <HeroKPI
+              title="Total Pagado"
+              value={Math.round(metricas.totalPagado / 1000)}
+              prefix="$"
+              suffix="k"
+              icon={CreditCard}
+              gradient="from-emerald-500 to-green-500"
+              description="Inversión ejecutada"
+            />
+            <HeroKPI
+              title="Pendiente"
+              value={Math.round(metricas.pendientePago / 1000)}
+              prefix="$"
+              suffix="k"
+              icon={Receipt}
+              gradient={metricas.pendientePago > 0 ? 'from-amber-500 to-orange-500' : 'from-emerald-500 to-green-500'}
+              description="Por pagar"
+            />
+            <HeroKPI
+              title="Unidades"
+              value={metricas.totalUnidades}
+              suffix="uds"
+              icon={Boxes}
+              gradient="from-purple-500 to-violet-500"
+              description="Total ordenado"
+            />
+          </motion.div>
+        </motion.header>
       
-      {/* Stats Row */}
-      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCardPremium
-          title="Total Órdenes"
-          value={metricas.totalOrdenes}
-          subtitle="Órdenes registradas"
-          icon={ShoppingCart}
-          variant="primary"
-          miniChartData={[15, 22, 18, 28, 25, 32, 30]}
-        />
-        <StatCardPremium
-          title="Monto Total"
-          value={formatearMoneda(metricas.totalMonto)}
-          subtitle="Valor de compras"
-          icon={DollarSign}
-          variant="info"
-          trend="up"
-          trendValue="+15.3%"
-        />
-        <StatCardPremium
-          title="Total Pagado"
-          value={formatearMoneda(metricas.totalPagado)}
-          subtitle="Inversión ejecutada"
-          icon={CreditCard}
-          variant="success"
-        />
-        <StatCardPremium
-          title="Pendiente"
-          value={formatearMoneda(metricas.pendientePago)}
-          subtitle="Por pagar"
-          icon={Receipt}
-          variant={metricas.pendientePago > 0 ? 'warning' : 'success'}
-        />
-      </div>
-      
-      {/* Gráficos */}
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      {/* ============================================
+          GRÁFICOS PREMIUM
+          ============================================ */}
+      <motion.div 
+        className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, ...TRANSITION_PREMIUM }}
+      >
         {/* Distribución por estado */}
-        <GlassCard3D variant="primary" size="lg">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <PieChartIcon size={20} className="text-blue-400" />
-              <h3 className="text-lg font-semibold text-white">Distribución por Estado</h3>
+        <motion.div 
+          className="relative group"
+          whileHover={{ scale: 1.01 }}
+          transition={TRANSITION_PREMIUM}
+        >
+          <div className="absolute -inset-px bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl opacity-50 group-hover:opacity-70 transition-opacity" />
+          <div className="relative bg-black/50 backdrop-blur-[24px] rounded-2xl border border-white/[0.08] p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20">
+                  <PieChartIcon size={20} className="text-blue-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-white">Distribución por Estado</h3>
+              </div>
+              <PulseIndicator variant="primary" label="En vivo" />
             </div>
-            <PulseIndicator variant="primary" label="Actualizado" />
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={chartDataEstados}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={70}
+                    outerRadius={100}
+                    paddingAngle={4}
+                    dataKey="value"
+                  >
+                    {chartDataEstados.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} strokeWidth={0} />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend 
+                    verticalAlign="bottom" 
+                    height={36}
+                    formatter={(value) => <span className="text-white/70 text-xs">{value}</span>}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={chartDataEstados}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={90}
-                  paddingAngle={3}
-                  dataKey="value"
-                >
-                  {chartDataEstados.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.fill} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend 
-                  verticalAlign="bottom" 
-                  height={36}
-                  formatter={(value) => <span className="text-white/70 text-xs">{value}</span>}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </GlassCard3D>
+        </motion.div>
         
         {/* Tendencia de montos */}
-        <GlassCard3D variant="info" size="lg">
-          <div className="flex items-center gap-2 mb-4">
-            <BarChart3 size={20} className="text-cyan-400" />
-            <h3 className="text-lg font-semibold text-white">Tendencia de Montos</h3>
+        <motion.div 
+          className="relative group"
+          whileHover={{ scale: 1.01 }}
+          transition={TRANSITION_PREMIUM}
+        >
+          <div className="absolute -inset-px bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 rounded-2xl blur-xl opacity-50 group-hover:opacity-70 transition-opacity" />
+          <div className="relative bg-black/50 backdrop-blur-[24px] rounded-2xl border border-white/[0.08] p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-cyan-500/20 to-emerald-500/20">
+                <BarChart3 size={20} className="text-cyan-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-white">Tendencia de Montos</h3>
+            </div>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={chartDataTendencia}>
+                  <defs>
+                    <linearGradient id="gradientTotal" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.4} />
+                      <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                  <XAxis dataKey="name" stroke="rgba(255,255,255,0.4)" fontSize={12} />
+                  <YAxis stroke="rgba(255,255,255,0.4)" fontSize={12} tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Area type="monotone" dataKey="total" fill="url(#gradientTotal)" stroke="#3b82f6" strokeWidth={2} name="Total" />
+                  <Line type="monotone" dataKey="pagado" stroke="#10b981" strokeWidth={2} dot={{ fill: '#10b981', r: 4 }} name="Pagado" />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={chartDataTendencia}>
-                <defs>
-                  <linearGradient id="gradientTotal" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                <XAxis dataKey="name" stroke="rgba(255,255,255,0.5)" fontSize={12} />
-                <YAxis stroke="rgba(255,255,255,0.5)" fontSize={12} tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} />
-                <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="total" fill="url(#gradientTotal)" stroke="#3b82f6" strokeWidth={2} name="Total" />
-                <Line type="monotone" dataKey="pagado" stroke="#10b981" strokeWidth={2} dot={{ fill: '#10b981', r: 4 }} name="Pagado" />
-              </ComposedChart>
-            </ResponsiveContainer>
-          </div>
-        </GlassCard3D>
-      </div>
+        </motion.div>
+      </motion.div>
       
-      {/* Filtros y búsqueda */}
-      <div className="relative z-10 mb-6">
-        <GlassCard3D variant="secondary" size="sm">
+      {/* ============================================
+          FILTROS Y BÚSQUEDA PREMIUM
+          ============================================ */}
+      <motion.div 
+        className="mb-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, ...TRANSITION_PREMIUM }}
+      >
+        <div className="bg-black/30 backdrop-blur-[24px] rounded-2xl border border-white/[0.06] p-4">
           <div className="flex flex-wrap items-center justify-between gap-4">
+            {/* Filtros de estado */}
             <div className="flex items-center gap-2">
-              <span className="text-white/60 text-sm">Filtrar:</span>
-              {['todos', 'pendiente', 'parcial', 'pagado', 'entregado'].map((estado) => (
-                <Button
-                  key={estado}
-                  variant={filtroEstado === estado ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setFiltroEstado(estado)}
-                  className={`
-                    capitalize
-                    ${filtroEstado === estado 
-                      ? 'bg-white/10 text-white' 
-                      : 'text-white/50 hover:text-white hover:bg-white/5'
-                    }
-                  `}
-                >
-                  {estado === 'todos' ? 'Todos' : ESTADO_CONFIG[estado]?.label || estado}
-                  {estado !== 'todos' && (
-                    <Badge className="ml-2 bg-white/10 text-white/70" variant="outline">
-                      {metricas.porEstado[estado as keyof typeof metricas.porEstado] || 0}
-                    </Badge>
-                  )}
-                </Button>
-              ))}
+              <span className="text-white/50 text-sm font-medium">Estado:</span>
+              <div className="flex gap-1.5 p-1 bg-white/[0.03] rounded-xl">
+                {['todos', 'pendiente', 'parcial', 'pagado', 'entregado'].map((estado) => (
+                  <motion.button
+                    key={estado}
+                    onClick={() => { setFiltroEstado(estado); haptic.light() }}
+                    className={`
+                      px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize
+                      ${filtroEstado === estado 
+                        ? 'bg-white/10 text-white' 
+                        : 'text-white/40 hover:text-white/70 hover:bg-white/[0.03]'
+                      }
+                    `}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {estado === 'todos' ? 'Todos' : ESTADO_CONFIG[estado]?.label || estado}
+                    {estado !== 'todos' && (
+                      <span className="ml-2 px-1.5 py-0.5 text-xs bg-white/10 rounded-md">
+                        {metricas.porEstado[estado as keyof typeof metricas.porEstado] || 0}
+                      </span>
+                    )}
+                  </motion.button>
+                ))}
+              </div>
             </div>
             
+            {/* Búsqueda */}
             <div className="flex items-center gap-3">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
                 <Input
-                  placeholder="Buscar orden..."
+                  placeholder="Buscar orden o distribuidor..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-white/30 w-64"
+                  className="pl-10 w-72 bg-white/[0.03] border-white/[0.06] text-white placeholder:text-white/30 focus:border-blue-500/50 focus:ring-blue-500/20"
                 />
               </div>
-              <Button variant="outline" size="sm" className="border-white/20 text-white/70">
-                <Download size={14} className="mr-2" /> Exportar
-              </Button>
             </div>
           </div>
-        </GlassCard3D>
-      </div>
+        </div>
+      </motion.div>
       
-      {/* Grid de órdenes */}
-      <div className="relative z-10">
+      {/* ============================================
+          GRID DE ÓRDENES PREMIUM
+          ============================================ */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, ...TRANSITION_PREMIUM }}
+      >
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <Skeleton key={i} className="h-64 rounded-2xl bg-white/5" />
+              <motion.div
+                key={i}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <Skeleton className="h-72 rounded-2xl bg-white/[0.03]" />
+              </motion.div>
             ))}
           </div>
         ) : ordenesFiltradas.length === 0 ? (
-          <GlassCard3D variant="secondary" size="lg">
-            <div className="flex flex-col items-center justify-center py-12">
-              <div className="p-4 rounded-full bg-purple-500/10 mb-4">
-                <ShoppingCart size={48} className="text-purple-400 opacity-50" />
+          <motion.div 
+            className="relative group"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            <div className="absolute -inset-px bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-2xl blur-xl" />
+            <div className="relative bg-black/30 backdrop-blur-[24px] rounded-2xl border border-white/[0.06] p-16">
+              <div className="flex flex-col items-center justify-center text-center">
+                <motion.div 
+                  className="p-6 rounded-full bg-gradient-to-br from-purple-500/10 to-blue-500/10 mb-6"
+                  animate={{ 
+                    scale: [1, 1.1, 1],
+                    rotate: [0, 5, -5, 0],
+                  }}
+                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <ShoppingCart size={56} className="text-purple-400/50" />
+                </motion.div>
+                <p className="text-white/50 text-lg mb-2">No hay órdenes que mostrar</p>
+                <p className="text-white/30 text-sm mb-6">Crea tu primera orden de compra para comenzar</p>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button 
+                    onClick={() => { setIsModalOpen(true); haptic.light() }}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 shadow-lg shadow-blue-500/20"
+                  >
+                    <Plus size={16} className="mr-2" />
+                    Crear primera orden
+                  </Button>
+                </motion.div>
               </div>
-              <p className="text-white/40">No hay órdenes que mostrar</p>
-              <Button 
-                onClick={() => setIsModalOpen(true)}
-                className="mt-4 bg-gradient-to-r from-blue-600 to-purple-600"
-              >
-                <Plus size={16} className="mr-2" />
-                Crear primera orden
-              </Button>
             </div>
-          </GlassCard3D>
+          </motion.div>
         ) : (
           <motion.div 
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -637,7 +971,7 @@ export function BentoOrdenesCompraPremium() {
               hidden: { opacity: 0 },
               visible: { 
                 opacity: 1,
-                transition: { staggerChildren: 0.1 },
+                transition: { staggerChildren: 0.08 },
               },
             }}
           >
@@ -645,16 +979,17 @@ export function BentoOrdenesCompraPremium() {
               <motion.div
                 key={orden.id || index}
                 variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0 },
+                  hidden: { opacity: 0, y: 30, scale: 0.95 },
+                  visible: { opacity: 1, y: 0, scale: 1 },
                 }}
+                transition={TRANSITION_PREMIUM}
               >
                 <OrdenCompraCardPremium orden={orden} onView={handleViewOrden} />
               </motion.div>
             ))}
           </motion.div>
         )}
-      </div>
+      </motion.div>
       
       {/* Modal de creación */}
       {isModalOpen && (
@@ -664,70 +999,111 @@ export function BentoOrdenesCompraPremium() {
         />
       )}
       
-      {/* Panel de detalle de orden seleccionada */}
+      {/* ============================================
+          PANEL DE DETALLE SLIDE-OVER PREMIUM
+          ============================================ */}
       <AnimatePresence>
         {selectedOrden && (
-          <motion.div
-            initial={{ opacity: 0, x: 300 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 300 }}
-            className="fixed right-0 top-0 h-full w-96 bg-slate-900/95 backdrop-blur-xl border-l border-white/10 z-50 p-6 overflow-y-auto"
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-white">Detalle de Orden</h2>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => setSelectedOrden(null)}
-                className="text-white/60 hover:text-white"
-              >
-                ✕
-              </Button>
-            </div>
+          <>
+            {/* Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedOrden(null)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            />
             
-            <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                <p className="text-white/40 text-xs uppercase mb-1">Orden</p>
-                <p className="text-xl font-bold text-white">{selectedOrden.id}</p>
-              </div>
-              
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                <p className="text-white/40 text-xs uppercase mb-1">Distribuidor</p>
-                <p className="text-lg text-white">{selectedOrden.distribuidor}</p>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                  <p className="text-white/40 text-xs uppercase mb-1">Total</p>
-                  <p className="text-lg font-bold text-white">{formatearMoneda(selectedOrden.costoTotal)}</p>
+            {/* Panel */}
+            <motion.div
+              initial={{ opacity: 0, x: 400 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 400 }}
+              transition={TRANSITION_PREMIUM}
+              className="fixed right-0 top-0 h-full w-[420px] z-50"
+            >
+              <div className="h-full bg-black/90 backdrop-blur-[24px] border-l border-white/[0.08] p-6 overflow-y-auto">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h2 className="text-xl font-bold text-white">Detalle de Orden</h2>
+                    <p className="text-white/40 text-sm mt-1">Información completa</p>
+                  </div>
+                  <motion.button 
+                    onClick={() => setSelectedOrden(null)}
+                    className="p-2 rounded-xl bg-white/5 text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    ✕
+                  </motion.button>
                 </div>
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                  <p className="text-white/40 text-xs uppercase mb-1">Unidades</p>
-                  <p className="text-lg font-bold text-white">{formatNumber(selectedOrden.cantidad)}</p>
+                
+                {/* Contenido */}
+                <div className="space-y-4">
+                  {/* ID de Orden */}
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] border border-white/[0.06]">
+                    <p className="text-white/40 text-xs uppercase tracking-wider mb-2">Orden</p>
+                    <p className="text-2xl font-bold text-white font-mono">{selectedOrden.id}</p>
+                  </div>
+                  
+                  {/* Distribuidor */}
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] border border-white/[0.06]">
+                    <p className="text-white/40 text-xs uppercase tracking-wider mb-2">Distribuidor</p>
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-blue-500/10">
+                        <Building2 size={18} className="text-blue-400" />
+                      </div>
+                      <p className="text-lg text-white">{selectedOrden.distribuidor}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Montos */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 rounded-xl bg-gradient-to-br from-cyan-500/5 to-blue-500/5 border border-cyan-500/10">
+                      <p className="text-white/40 text-xs uppercase tracking-wider mb-2">Total</p>
+                      <p className="text-xl font-bold text-cyan-400">{formatearMoneda(selectedOrden.costoTotal)}</p>
+                    </div>
+                    <div className="p-4 rounded-xl bg-gradient-to-br from-purple-500/5 to-violet-500/5 border border-purple-500/10">
+                      <p className="text-white/40 text-xs uppercase tracking-wider mb-2">Unidades</p>
+                      <p className="text-xl font-bold text-purple-400">{formatNumber(selectedOrden.cantidad)}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Estado */}
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] border border-white/[0.06]">
+                    <p className="text-white/40 text-xs uppercase tracking-wider mb-3">Estado</p>
+                    <Badge 
+                      variant="outline" 
+                      className={`${ESTADO_CONFIG[selectedOrden.estado || 'pendiente']?.bgColor} ${ESTADO_CONFIG[selectedOrden.estado || 'pendiente']?.color} px-4 py-2`}
+                    >
+                      {ESTADO_CONFIG[selectedOrden.estado || 'pendiente']?.label}
+                    </Badge>
+                  </div>
+                  
+                  {/* Deuda pendiente */}
+                  {selectedOrden.deuda > 0 && (
+                    <div className="p-4 rounded-xl bg-gradient-to-br from-rose-500/5 to-pink-500/5 border border-rose-500/10">
+                      <p className="text-white/40 text-xs uppercase tracking-wider mb-2">Deuda Pendiente</p>
+                      <p className="text-2xl font-bold text-rose-400">{formatearMoneda(selectedOrden.deuda)}</p>
+                    </div>
+                  )}
+                  
+                  {/* Fecha */}
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] border border-white/[0.06]">
+                    <p className="text-white/40 text-xs uppercase tracking-wider mb-2">Fecha</p>
+                    <div className="flex items-center gap-2">
+                      <Calendar size={16} className="text-white/40" />
+                      <p className="text-white">{formatearFecha(selectedOrden.fecha)}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
-              
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                <p className="text-white/40 text-xs uppercase mb-2">Estado</p>
-                <Badge 
-                  variant="outline" 
-                  className={`${ESTADO_CONFIG[selectedOrden.estado || 'pendiente']?.bgColor} ${ESTADO_CONFIG[selectedOrden.estado || 'pendiente']?.color}`}
-                >
-                  {ESTADO_CONFIG[selectedOrden.estado || 'pendiente']?.label}
-                </Badge>
-              </div>
-              
-              {/* Info de deuda */}
-              {selectedOrden.deuda > 0 && (
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                  <p className="text-white/40 text-xs uppercase mb-2">Deuda Pendiente</p>
-                  <p className="text-rose-400 text-lg font-bold">{formatearMoneda(selectedOrden.deuda)}</p>
-                </div>
-              )}
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
+    </div>
     </motion.div>
   )
 }
