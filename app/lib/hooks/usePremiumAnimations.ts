@@ -60,9 +60,16 @@ export const useParallax = (config: ParallaxConfig = {}) => {
   
   const multiplier = direction === 'up' ? -speed : speed
   const rawY = useTransform(scrollY, (v) => v * multiplier)
-  const y = easing ? useSpring(rawY, { stiffness: 100, damping: 30 }) : rawY
   
-  return { y }
+  // useSpring SIEMPRE se llama (regla de hooks) - usamos config para desactivar easing
+  const springY = useSpring(rawY, { 
+    stiffness: easing ? 100 : 10000, 
+    damping: easing ? 30 : 10000,
+  })
+  
+  // Si easing está desactivado, springY seguirá el valor inmediatamente
+  // debido a la alta rigidez/amortiguación
+  return { y: springY }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
