@@ -236,3 +236,5 @@ security-audit.json
 !.env.example
 !.env.local.example
 !firebase-admin-key.example.json
+google-cloud-cli-linux-x86_64.tar.gz
+*.tar.gz
