@@ -165,7 +165,7 @@ const ActionButtonComponent = ({ action, onAction }: ActionButtonComponentProps)
       className={cn(
         'w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200',
         'text-sm font-medium',
-        variantStyles[action.variant || 'ghost']
+        variantStyles[action.variant || 'ghost'],
       )}
     >
       <Icon className="w-5 h-5 shrink-0" strokeWidth={1.5} />
@@ -194,7 +194,7 @@ const QuickStatCard = ({ stat }: { stat: QuickStat }) => {
         {stat.trend !== undefined && (
           <span className={cn(
             'text-xs font-medium',
-            stat.trend >= 0 ? 'text-green-400' : 'text-red-400'
+            stat.trend >= 0 ? 'text-green-400' : 'text-red-400',
           )}>
             {stat.trend >= 0 ? '+' : ''}{stat.trend}%
           </span>
@@ -250,7 +250,7 @@ const MiniAIWidget = () => {
             onClick={() => setIsListening(!isListening)}
             className={cn(
               'p-1.5 rounded-lg transition-colors',
-              isListening ? 'bg-[#E31911] text-white' : 'text-white/40 hover:text-white'
+              isListening ? 'bg-[#E31911] text-white' : 'text-white/40 hover:text-white',
             )}
           >
             <Mic className="w-4 h-4" />
@@ -325,7 +325,7 @@ export function PanelActionsSidebar({
               'border-l border-white/5',
               'flex flex-col',
               'shadow-2xl shadow-black/50',
-              className
+              className,
             )}
           >
             {/* Header */}

@@ -1,8 +1,8 @@
 'use client'
 
-import { useRef, useMemo, useEffect } from 'react'
+import { useRef, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { useSpring, animated, config } from '@react-spring/three'
+import { useSpring, config } from '@react-spring/three'
 import * as THREE from 'three'
 
 interface Character3DProps {
@@ -110,9 +110,8 @@ export function Character3D({
     <group>
       {/* Main character body */}
       <group 
-        // @ts-ignore - animated properties
-        scale={scale as any} 
-        rotation-y={rotation as any}
+        scale={scale.get()} 
+        rotation-y={rotation.get()}
       >
         {/* Head */}
         <mesh ref={headRef} position={[0, 1.5, 0]}>

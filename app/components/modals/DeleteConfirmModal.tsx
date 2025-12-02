@@ -66,9 +66,10 @@ export function DeleteConfirmModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
         showCloseButton={false}
+        size="sm"
         className={cn(
-          'max-w-md p-0 overflow-hidden',
-          'bg-black/80 backdrop-blur-2xl',
+          'p-0',
+          'bg-black/90 backdrop-blur-2xl',
           'border',
           isHighDanger ? 'border-red-500/30' : 'border-white/10',
           'text-white',

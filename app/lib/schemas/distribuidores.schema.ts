@@ -4,6 +4,10 @@
  */
 
 import { z } from 'zod'
+import { 
+  OptionalTimestampSchema, 
+  FirestoreTimestampSchema, 
+} from './timestamp.schema'
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ESQUEMAS DE DISTRIBUIDOR
@@ -65,12 +69,12 @@ export const DistribuidorSchema = CrearDistribuidorSchema.extend({
   
   // Métricas
   numeroOrdenes: z.number().int().nonnegative().default(0),
-  ultimaOrden: z.any().optional(),
+  ultimaOrden: OptionalTimestampSchema,
   
   // Referencias
   ordenesCompra: z.array(z.string()).default([]),
   historialPagos: z.array(z.object({
-    fecha: z.any(),
+    fecha: FirestoreTimestampSchema,
     monto: z.number(),
     bancoOrigen: z.string().optional(),
     ordenCompraId: z.string().optional(),
@@ -83,8 +87,8 @@ export const DistribuidorSchema = CrearDistribuidorSchema.extend({
   estado: z.enum(['activo', 'inactivo', 'suspendido']).default('activo'),
   
   // Timestamps
-  createdAt: z.any().optional(),
-  updatedAt: z.any().optional(),
+  createdAt: OptionalTimestampSchema,
+  updatedAt: OptionalTimestampSchema,
 })
 
 // ═══════════════════════════════════════════════════════════════════════════

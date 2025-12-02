@@ -70,21 +70,27 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          // Base: posición fija centrada - AJUSTADO para mejor centrado vertical
+          // Base: posición fija centrada perfectamente
           'fixed left-1/2 top-1/2 z-[10001] -translate-x-1/2 -translate-y-1/2',
-          // Dimensiones responsivas con altura máxima
+          // Dimensiones responsivas con altura máxima para evitar scroll
           'w-full max-w-[calc(100%-2rem)]',
+          // Altura máxima que permite ver completo sin scroll
+          'max-h-[85vh]',
+          // Overflow controlado
+          'overflow-hidden',
           // Flex para layout interno correcto
           'flex flex-col',
-          // Estilos visuales
-          'bg-background rounded-xl border shadow-2xl',
-          // Espaciado
+          // Estilos visuales premium
+          'bg-background rounded-2xl border border-white/10 shadow-2xl backdrop-blur-xl',
+          // Sin padding por defecto, el contenido lo define
           'p-0',
-          // Animaciones
+          // Animaciones suaves de entrada/salida
           'data-[state=open]:animate-in data-[state=closed]:animate-out',
           'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
           'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-          'duration-200',
+          'data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]',
+          'data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
+          'duration-200 ease-out',
           // Tamaño específico
           sizeClasses[size],
           className,

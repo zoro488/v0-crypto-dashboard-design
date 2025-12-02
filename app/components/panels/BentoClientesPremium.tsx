@@ -7,8 +7,19 @@ import {
   BarChart3, Activity, Zap, Phone, Mail, MapPin, Calendar, FileText,
   X, Edit2, Eye, History, CreditCard, User, ShoppingCart,
 } from 'lucide-react'
-import { Button } from '@/app/components/ui/button'
+// ═══════════════════════════════════════════════════════════════════════════
+// 🔴 TESLA 2025 DESIGN SYSTEM - Componentes Premium
+// ═══════════════════════════════════════════════════════════════════════════
+import { 
+  ButtonTesla,
+  CardTesla,
+  Badge as BadgeTesla,
+  SkeletonDashboard,
+  SkeletonTable,
+  DESIGN_TOKENS,
+} from '@/app/components/ui/tesla-index'
 import { Badge } from '@/app/components/ui/badge'
+import { Button } from '@/app/components/ui/button'
 import { useClientes, useVentas } from '@/app/lib/firebase/firestore-hooks.service'
 import { useFirestoreCRUD } from '@/app/hooks/useFirestoreCRUD'
 import { CreateClienteModalPremium } from '@/app/components/modals/CreateClienteModalPremium'
@@ -18,7 +29,6 @@ import {
   AnimatedCounter, 
   GlowButton, 
   Tilt3D, 
-  SkeletonTable, 
   Pulse, 
   ShineEffect,
   haptic,
@@ -538,20 +548,14 @@ export default function BentoClientesPremium() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] p-6 space-y-6">
-        <Skeleton className="h-20 w-full rounded-2xl" />
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-32 w-full rounded-2xl" />
-          ))}
-        </div>
-        <Skeleton className="h-96 w-full rounded-2xl" />
+      <div className="min-h-screen bg-black p-6 space-y-6">
+        <SkeletonDashboard />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-6 space-y-6">
+    <div className="min-h-screen bg-black p-6 space-y-6">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -571,21 +575,20 @@ export default function BentoClientesPremium() {
           </div>
         </div>
         <div className="flex gap-3">
-          <Button
+          <ButtonTesla
             onClick={() => setShowAbonoModal(true)}
-            variant="outline"
-            className="border-green-500/20 hover:bg-green-500/10 text-green-400"
+            variant="secondary"
           >
             <DollarSign className="w-4 h-4 mr-2" />
             Registrar Abono
-          </Button>
-          <Button
+          </ButtonTesla>
+          <ButtonTesla
             onClick={() => setShowCreateModal(true)}
-            className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
+            variant="primary"
           >
             <Plus className="w-4 h-4 mr-2" />
             Nuevo Cliente
-          </Button>
+          </ButtonTesla>
         </div>
       </motion.div>
 

@@ -59,7 +59,8 @@ const baseConfig: NextConfig = {
     ],
     webpackMemoryOptimizations: true,
   },
-  turbopack: {},
+  // Turbopack deshabilitado temporalmente por issues en Codespaces
+  // turbopack: {},
   webpack: (config, { isServer }) => {
     // Resolver THREE a una única instancia para evitar conflictos
     config.resolve = {

@@ -6,13 +6,14 @@
  * - Caching automático de respuestas
  * - Rate limiting inteligente
  * - Observabilidad con métricas
- * - Multi-provider (OpenAI, Anthropic, etc.)
+ * - Multi-provider (OpenAI, Anthropic, xAI, etc.)
  * - Costos optimizados
  */
 
-import { openai } from '@ai-sdk/openai'
+import { xai } from '@ai-sdk/xai'
 
 // Imports opcionales (instalar si se necesitan)
+// import { openai } from '@ai-sdk/openai'
 // import { anthropic } from '@ai-sdk/anthropic'
 // import { google } from '@ai-sdk/google'
 
@@ -34,12 +35,19 @@ import { openai } from '@ai-sdk/openai'
 // ===================================================================
 
 export const AI_MODELS = {
-  // OpenAI (recomendado para el sistema CHRONOS)
-  openai: {
-    gpt4Turbo: openai('gpt-4-turbo-2024-04-09'),
-    gpt4: openai('gpt-4'),
-    gpt35Turbo: openai('gpt-3.5-turbo'),
+  // xAI Grok (modelo principal del sistema CHRONOS)
+  xai: {
+    grok2: xai('grok-2-1212'),
+    grok2Latest: xai('grok-2-latest'),
+    grok3Mini: xai('grok-3-mini-beta'),
   },
+  
+  // OpenAI (fallback - instalar @ai-sdk/openai si se necesita)
+  // openai: {
+  //   gpt4Turbo: openai('gpt-4-turbo-2024-04-09'),
+  //   gpt4: openai('gpt-4'),
+  //   gpt35Turbo: openai('gpt-3.5-turbo'),
+  // },
   
   // Anthropic (instalar @ai-sdk/anthropic si se necesita)
   // anthropic: {
@@ -58,11 +66,11 @@ export const AI_MODELS = {
 // CONFIGURACIÓN POR DEFECTO
 // ===================================================================
 
-export const DEFAULT_MODEL = AI_MODELS.openai.gpt4Turbo
+export const DEFAULT_MODEL = AI_MODELS.xai.grok2Latest
 
 export const MODEL_CONFIG = {
   temperature: 0.7,
-  maxTokens: 2000,
+  maxTokens: 4000,
   topP: 1,
   frequencyPenalty: 0,
   presencePenalty: 0,
@@ -142,13 +150,13 @@ export const OBSERVABILITY_CONFIG = {
 export function getModelForTask(task: 'chat' | 'analysis' | 'code' | 'fast') {
   switch (task) {
     case 'chat':
-      return AI_MODELS.openai.gpt4Turbo
+      return AI_MODELS.xai.grok2Latest
     case 'analysis':
-      return AI_MODELS.openai.gpt4Turbo  // Usar GPT-4 Turbo para análisis
+      return AI_MODELS.xai.grok2  // Usar Grok-2 para análisis
     case 'code':
-      return AI_MODELS.openai.gpt4Turbo
+      return AI_MODELS.xai.grok2Latest
     case 'fast':
-      return AI_MODELS.openai.gpt35Turbo
+      return AI_MODELS.xai.grok3Mini // Grok-3 mini para respuestas rápidas
     default:
       return DEFAULT_MODEL
   }
@@ -159,6 +167,7 @@ export function getModelForTask(task: 'chat' | 'analysis' | 'code' | 'fast') {
  */
 export function checkApiKeys() {
   const keys = {
+    xai: !!process.env.XAI_API_KEY,
     openai: !!process.env.OPENAI_API_KEY,
     anthropic: !!process.env.ANTHROPIC_API_KEY,
     google: !!process.env.GOOGLE_API_KEY,

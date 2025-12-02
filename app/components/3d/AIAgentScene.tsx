@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useRef, useState, useEffect, useMemo, useCallback } from 'react'
+import { Suspense, useRef, useState, useEffect, useMemo } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import {
   EffectComposer,
@@ -22,7 +22,7 @@ interface AIAgentSceneProps {
   className?: string
   size?: 'sm' | 'md' | 'lg' | 'xl'
   showChat?: boolean
-  onMessageSend?: (message: string) => void
+  onMessageSend?: (_message: string) => void
   isProcessing?: boolean
   enableGlitch?: boolean
   enableFloating?: boolean
@@ -125,7 +125,7 @@ function SplineBot({
 // Componente del Bot 3D procedural (fallback) con shaders personalizados
 function ProceduralBot({
   isThinking,
-  isGlitching,
+  isGlitching: _isGlitching,
   enableFloating,
 }: {
   isThinking: boolean
@@ -326,7 +326,7 @@ function ErrorBoundary({
   children: React.ReactNode
   onError: () => void 
 }) {
-  const [hasError, setHasError] = useState(false)
+  const [hasError, _setHasError] = useState(false)
   
   useEffect(() => {
     if (hasError) {
@@ -535,7 +535,7 @@ function ChatInterface({
   isProcessing,
 }: {
   messages: ChatMessage[]
-  onSendMessage: (message: string) => void
+  onSendMessage: (_message: string) => void
   isProcessing: boolean
 }) {
   const [input, setInput] = useState('')

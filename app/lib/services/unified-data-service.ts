@@ -67,6 +67,8 @@ export const crearCliente = async (data: {
   telefono?: string
   email?: string
   direccion?: string
+  deudaTotal?: number
+  totalPagado?: number
 }): Promise<string | null> => {
   if (useLocalStorage) {
     try {
@@ -79,7 +81,15 @@ export const crearCliente = async (data: {
   return firestoreService.crearCliente(data)
 }
 
-export const actualizarCliente = async (clienteId: string, data: Partial<unknown>): Promise<string | null> => {
+export const actualizarCliente = async (clienteId: string, data: Partial<{
+  nombre: string
+  empresa?: string
+  telefono?: string
+  email?: string
+  direccion?: string
+  deudaTotal?: number
+  totalPagado?: number
+}>): Promise<string | null> => {
   if (useLocalStorage) {
     try {
       return localService.localActualizarCliente(clienteId, data)

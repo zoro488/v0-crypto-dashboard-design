@@ -288,6 +288,10 @@ export function CreateVentaModalPremium({
 
   // Agregar producto al carrito
   const agregarProducto = () => {
+    // Obtener stock disponible de la OC seleccionada
+    const ocData = ordenesCompra.find(oc => oc.id === ocSeleccionada)
+    const stockDisponible = ocData?.stockActual ?? ocData?.cantidad ?? 999
+
     const nuevoItem: CarritoItem = {
       id: `item-${Date.now()}`,
       productoId: `prod-${Date.now()}`,
@@ -296,22 +300,52 @@ export function CreateVentaModalPremium({
       precioVenta: PRECIO_VENTA_DEFAULT,
       precioCompra: PRECIO_COMPRA_DEFAULT,
       precioFlete: PRECIO_FLETE_DEFAULT,
-      stockDisponible: 999,
+      stockDisponible,
     }
     setCarrito(prev => [...prev, nuevoItem])
   }
 
-  // Actualizar item del carrito
+  // Actualizar item del carrito con validación de stock
   const actualizarItem = (id: string, campo: keyof CarritoItem, valor: number | string) => {
-    setCarrito(prev => prev.map(item => 
-      item.id === id ? { ...item, [campo]: valor } : item,
-    ))
+    setCarrito(prev => prev.map(item => {
+      if (item.id !== id) return item
+      
+      // Si estamos actualizando cantidad, validar contra stock
+      if (campo === 'cantidad') {
+        const nuevaCantidad = Number(valor)
+        if (nuevaCantidad > item.stockDisponible) {
+          // Mostrar advertencia pero permitir continuar
+          toast({
+            title: '⚠️ Advertencia de Stock',
+            description: `La cantidad (${nuevaCantidad}) excede el stock disponible (${item.stockDisponible}). La venta puede fallar.`,
+            variant: 'destructive',
+          })
+        }
+        return { ...item, cantidad: nuevaCantidad }
+      }
+      
+      return { ...item, [campo]: valor }
+    }))
   }
 
   // Eliminar del carrito
   const eliminarItem = (id: string) => {
     setCarrito(prev => prev.filter(item => item.id !== id))
   }
+
+  // Actualizar stock disponible cuando cambia la OC seleccionada
+  React.useEffect(() => {
+    if (ocSeleccionada) {
+      const ocData = ordenesCompra.find(oc => oc.id === ocSeleccionada)
+      const nuevoStock = ocData?.stockActual ?? ocData?.cantidad ?? 999
+      
+      // Actualizar stock en todos los items del carrito
+      setCarrito(prev => prev.map(item => ({
+        ...item,
+        stockDisponible: nuevoStock,
+      })))
+    }
+  }, [ocSeleccionada, ordenesCompra])
 
   // Reset form
   React.useEffect(() => {
@@ -434,13 +468,13 @@ export function CreateVentaModalPremium({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
         showCloseButton={false}
+        size="xl"
         className={cn(
-          'max-w-4xl max-h-[85vh] p-0 overflow-hidden',
-          'bg-black/60 backdrop-blur-2xl',
+          'p-0',
+          'bg-black/90 backdrop-blur-2xl',
           'border border-white/10',
           'text-white',
           'shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(16,185,129,0.15)]',
-          '!fixed !top-[50vh] !left-[50vw] !-translate-x-1/2 !-translate-y-1/2',
         )}
       >
         <DialogTitle className="sr-only">Nueva Venta</DialogTitle>
@@ -737,14 +771,33 @@ export function CreateVentaModalPremium({
                           {/* Fila 1: Cantidad y Precio Venta */}
                           <div className="grid grid-cols-12 gap-4 items-end">
                             <div className="col-span-2">
-                              <Label className="text-xs text-gray-400">Cantidad</Label>
+                              <Label className="text-xs text-gray-400 flex items-center justify-between">
+                                <span>Cantidad</span>
+                                <span className={cn(
+                                  'text-[10px]',
+                                  item.cantidad > item.stockDisponible 
+                                    ? 'text-red-400' 
+                                    : 'text-gray-500',
+                                )}>
+                                  Stock: {item.stockDisponible}
+                                </span>
+                              </Label>
                               <Input
                                 type="number"
                                 value={item.cantidad}
                                 onChange={(e) => actualizarItem(item.id, 'cantidad', Number(e.target.value))}
                                 min={1}
-                                className="h-12 text-center text-lg font-bold bg-white/5 border-white/10"
+                                max={item.stockDisponible}
+                                className={cn(
+                                  'h-12 text-center text-lg font-bold bg-white/5',
+                                  item.cantidad > item.stockDisponible
+                                    ? 'border-red-500/50 text-red-300'
+                                    : 'border-white/10',
+                                )}
                               />
+                              {item.cantidad > item.stockDisponible && (
+                                <p className="text-xs text-red-400 mt-1">⚠️ Excede stock</p>
+                              )}
                             </div>
                             <div className="col-span-3">
                               <Label className="text-xs text-green-400">💰 Precio Venta</Label>

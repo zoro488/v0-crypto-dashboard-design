@@ -6,8 +6,8 @@
  * Para uso en el Header de Chronos Dashboard
  */
 
-import { useRef, useState, useCallback, Suspense, memo, useMemo } from 'react'
-import { Canvas, useFrame, ThreeEvent } from '@react-three/fiber'
+import { useRef, useState, Suspense, memo } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
 import {
   MeshTransmissionMaterial,
   Environment,

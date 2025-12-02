@@ -1084,6 +1084,8 @@ export const crearCliente = async (data: {
   telefono?: string
   email?: string
   direccion?: string
+  deudaTotal?: number
+  totalPagado?: number
 }) => {
   if (!isFirestoreAvailable()) {
     logger.warn('crearCliente: Firestore no disponible', { context: 'FirestoreService' })
@@ -1107,10 +1109,14 @@ export const crearCliente = async (data: {
     // Crear nuevo cliente
     const clienteRef = doc(collection(db!, COLLECTIONS.CLIENTES))
     batch.set(clienteRef, {
-      ...data,
-      deudaTotal: 0,
+      nombre: data.nombre,
+      empresa: data.empresa,
+      telefono: data.telefono,
+      email: data.email,
+      direccion: data.direccion,
+      deudaTotal: data.deudaTotal || 0,
       totalVentas: 0,
-      totalPagado: 0,
+      totalPagado: data.totalPagado || 0,
       ventas: [],
       historialPagos: [],
       createdAt: Timestamp.now(),

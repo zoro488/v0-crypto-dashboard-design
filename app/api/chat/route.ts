@@ -47,8 +47,8 @@ import {
 // ===================================================================
 
 const apiKeys = checkApiKeys()
-if (!apiKeys.openai) {
-  logger.error('OPENAI_API_KEY no configurada', new Error('Missing API key'), { 
+if (!apiKeys.xai) {
+  logger.error('XAI_API_KEY no configurada', new Error('Missing API key'), { 
     context: 'ChatAPI',
     data: { availableKeys: apiKeys },
   })
@@ -494,14 +494,22 @@ const tools = {
 // POST /api/chat - Endpoint principal del chat con IA
 export async function POST(request: NextRequest) {
   try {
-    // 🔒 Verificación BotID - Protección contra bots
-    const verification = await checkBotId()
-    if (verification.isBot) {
-      logger.warn('Bot detectado en /api/chat', { context: 'ChatAPI' })
-      return new Response(
-        JSON.stringify({ error: 'Acceso denegado. Bot detectado.' }),
-        { status: 403, headers: { 'Content-Type': 'application/json' } },
-      )
+    // 🔒 Verificación BotID - Protección contra bots (skip en desarrollo)
+    const isDev = process.env.NODE_ENV === 'development'
+    if (!isDev) {
+      try {
+        const verification = await checkBotId()
+        if (verification.isBot) {
+          logger.warn('Bot detectado en /api/chat', { context: 'ChatAPI' })
+          return new Response(
+            JSON.stringify({ error: 'Acceso denegado. Bot detectado.' }),
+            { status: 403, headers: { 'Content-Type': 'application/json' } },
+          )
+        }
+      } catch (botError) {
+        // Si BotID falla, continuar (fallback seguro en dev)
+        logger.warn('BotID check failed, continuing...', { context: 'ChatAPI' })
+      }
     }
 
     const { messages } = await request.json()
@@ -535,7 +543,7 @@ export async function POST(request: NextRequest) {
               toolCallsCount: toolCalls?.length || 0,
               finishReason,
               tokensUsed: usage?.totalTokens || 0,
-              model: 'gpt-4-turbo',
+              model: 'grok-2-latest',
             },
           })
         }

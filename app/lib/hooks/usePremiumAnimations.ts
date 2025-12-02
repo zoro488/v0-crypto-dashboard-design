@@ -18,7 +18,7 @@ import {
   useTransform, 
   useInView,
   animate,
-  MotionValue
+  MotionValue,
 } from 'framer-motion'
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -96,7 +96,7 @@ export const useMousePosition = () => {
     smoothX, 
     smoothY,
     normalizedX,
-    normalizedY 
+    normalizedY, 
   }
 }
 
@@ -138,7 +138,7 @@ export const useElementMouseTracking = <T extends HTMLElement>() => {
     handlers: {
       onMouseMove: handleMouseMove,
       onMouseLeave: handleMouseLeave,
-    }
+    },
   }
 }
 
@@ -154,7 +154,7 @@ interface StaggerConfig {
 
 export const useStaggerAnimation = (
   itemCount: number, 
-  config: StaggerConfig = {}
+  config: StaggerConfig = {},
 ) => {
   const { stagger = 0.1, duration = 0.5, delay = 0 } = config
   
@@ -184,7 +184,7 @@ export const useStaggerAnimation = (
   return { 
     getItemVariants, 
     containerVariants,
-    itemCount 
+    itemCount, 
   }
 }
 
@@ -204,7 +204,7 @@ export const useRevealOnScroll = (config: RevealConfig = {}) => {
   const isInView = useInView(ref, { 
     once, 
     margin: rootMargin as `${number}px ${number}px ${number}px ${number}px` | `${number}px ${number}px ${number}px` | `${number}px ${number}px` | `${number}px`,
-    amount: threshold 
+    amount: threshold, 
   })
   
   const variants = {
@@ -215,7 +215,7 @@ export const useRevealOnScroll = (config: RevealConfig = {}) => {
       transition: {
         duration: 0.8,
         ease: [0.22, 1, 0.36, 1],
-      }
+      },
     },
   }
   
@@ -234,7 +234,7 @@ interface SpringConfig {
 
 export const useSpringValue = (
   value: number, 
-  config: SpringConfig = {}
+  config: SpringConfig = {},
 ) => {
   const { stiffness = 300, damping = 30, mass = 1 } = config
   const motionValue = useMotionValue(value)
@@ -259,7 +259,7 @@ interface CounterConfig {
 
 export const useAnimatedCounter = (
   targetValue: number,
-  config: CounterConfig = {}
+  config: CounterConfig = {},
 ) => {
   const { duration = 2, delay = 0, decimals = 0 } = config
   const [value, setValue] = useState(0)
@@ -340,7 +340,7 @@ export const useTilt = <T extends HTMLElement>(config: TiltConfig = {}) => {
     handlers: {
       onMouseMove: handleMouseMove,
       onMouseLeave: handleMouseLeave,
-    }
+    },
   }
 }
 
@@ -405,7 +405,7 @@ export const useMagnetic = <T extends HTMLElement>(config: MagneticConfig = {}) 
     style: {
       x: springX,
       y: springY,
-    }
+    },
   }
 }
 
@@ -420,7 +420,7 @@ export const useMorphTransition = (layoutId: string) => {
       type: 'spring',
       stiffness: 300,
       damping: 30,
-    }
+    },
   }
 }
 
@@ -463,7 +463,7 @@ export const animationPresets = {
     visible: { 
       opacity: 1, 
       y: 0, 
-      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } 
+      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }, 
     },
   },
   
@@ -472,7 +472,7 @@ export const animationPresets = {
     visible: { 
       opacity: 1, 
       y: 0, 
-      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } 
+      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }, 
     },
   },
   
@@ -481,7 +481,7 @@ export const animationPresets = {
     visible: { 
       opacity: 1, 
       x: 0, 
-      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } 
+      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }, 
     },
   },
   
@@ -490,7 +490,7 @@ export const animationPresets = {
     visible: { 
       opacity: 1, 
       x: 0, 
-      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } 
+      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }, 
     },
   },
   
@@ -500,7 +500,7 @@ export const animationPresets = {
     visible: { 
       opacity: 1, 
       scale: 1, 
-      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } 
+      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }, 
     },
   },
   
@@ -510,7 +510,7 @@ export const animationPresets = {
     visible: { 
       opacity: 1, 
       filter: 'blur(0px)', 
-      transition: { duration: 0.6 } 
+      transition: { duration: 0.6 }, 
     },
   },
   
@@ -523,8 +523,8 @@ export const animationPresets = {
       transition: { 
         type: 'spring', 
         stiffness: 300, 
-        damping: 20 
-      } 
+        damping: 20, 
+      }, 
     },
   },
   
@@ -535,7 +535,7 @@ export const animationPresets = {
       opacity: 1, 
       rotate: 0, 
       scale: 1,
-      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } 
+      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }, 
     },
   },
 } as const

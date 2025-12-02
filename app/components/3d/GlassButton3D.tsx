@@ -12,16 +12,13 @@
  */
 
 import { useRef, useState, Suspense, useMemo } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Canvas, useFrame } from '@react-three/fiber'
 import {
   MeshTransmissionMaterial,
   Environment,
   Float,
   RoundedBox,
-  Text,
-  useTexture,
   PerspectiveCamera,
-  OrbitControls,
 } from '@react-three/drei'
 import { EffectComposer, Bloom, ChromaticAberration, Vignette, Noise } from '@react-three/postprocessing'
 import { BlendFunction } from 'postprocessing'

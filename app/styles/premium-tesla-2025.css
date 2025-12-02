@@ -1,0 +1,806 @@
+/**
+ * 🚀 PREMIUM TESLA/APPLE/GROK 2025 DESIGN SYSTEM
+ * 
+ * Estándares de diseño ultra-premium:
+ * - Dark mode puro (#000000 / #050505)
+ * - Rojo Tesla #E31911 para acciones principales
+ * - Glassmorphism ultra-refinado (blur 24px, border 1px rgba(255,255,255,0.08))
+ * - Tipografía SF Pro con font-features 'cv11', 'ss01'
+ * - Spacing Apple 8px grid
+ * - Border radius 16px cards, 12px buttons, 24px modals
+ * - Spring physics (stiffness: 300, damping: 30)
+ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PALETA DE COLORES TESLA 2025
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Fondos Tesla */
+  --tesla-black: #000000;
+  --tesla-dark: #050505;
+  --tesla-surface: #0a0a0a;
+  --tesla-card: #111111;
+  --tesla-elevated: #1a1a1a;
+  
+  /* Textos */
+  --tesla-white: #FFFFFF;
+  --tesla-gray-100: #E5E5E5;
+  --tesla-gray-200: #98989D;
+  --tesla-gray-300: #87878C;
+  --tesla-gray-400: #666666;
+  --tesla-gray-500: #333333;
+  
+  /* Acento Tesla */
+  --tesla-red: #E31911;
+  --tesla-red-hover: #FF2D22;
+  --tesla-red-glow: rgba(227, 25, 17, 0.4);
+  
+  /* Estados */
+  --tesla-success: #10B981;
+  --tesla-warning: #F59E0B;
+  --tesla-error: #EF4444;
+  
+  /* Glassmorphism */
+  --glass-bg: rgba(10, 10, 10, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: 24px;
+  
+  /* Spacing Apple 8pt grid */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 40px;
+  --space-6: 48px;
+  
+  /* Radii */
+  --radius-button: 12px;
+  --radius-card: 16px;
+  --radius-modal: 24px;
+  --radius-pill: 999px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TIPOGRAFÍA PREMIUM
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Números tabulares perfectos */
+.tabular-nums,
+[class*="text-"] .number,
+.kpi-value,
+.price,
+.amount,
+input[type="number"] {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum', 'cv11', 'ss01';
+}
+
+/* Display gigante para KPIs */
+.text-display-tesla {
+  font-size: 64px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GLASSMORPHISM ULTRA-REFINADO
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.glass-tesla {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-tesla-subtle {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.glass-tesla-strong {
+  background: rgba(10, 10, 10, 0.9);
+  backdrop-filter: blur(40px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CARDS PREMIUM TESLA
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.card-tesla {
+  background: var(--tesla-card);
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-tesla:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 20px 40px -12px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Card con hover glow sutil */
+.card-tesla-glow:hover {
+  box-shadow: 
+    0 20px 40px -12px rgba(0, 0, 0, 0.5),
+    0 0 60px -20px var(--tesla-red-glow);
+}
+
+/* Top highlight line */
+.card-tesla::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BOTONES TESLA
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Ghost default */
+.btn-tesla-ghost {
+  background: transparent;
+  color: var(--tesla-gray-100);
+  border: none;
+  padding: 10px 24px;
+  border-radius: var(--radius-button);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  letter-spacing: -0.01em;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.btn-tesla-ghost:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--tesla-white);
+}
+
+.btn-tesla-ghost:active {
+  transform: scale(0.98);
+}
+
+/* Filled primario - Rojo Tesla */
+.btn-tesla-primary {
+  background: var(--tesla-red);
+  color: var(--tesla-white);
+  border: none;
+  padding: 10px 24px;
+  border-radius: var(--radius-button);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  letter-spacing: -0.01em;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  box-shadow: 0 4px 16px var(--tesla-red-glow);
+}
+
+.btn-tesla-primary:hover {
+  background: var(--tesla-red-hover);
+  box-shadow: 0 8px 28px var(--tesla-red-glow);
+  transform: translateY(-2px);
+}
+
+.btn-tesla-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px var(--tesla-red-glow);
+}
+
+.btn-tesla-primary:disabled {
+  background: var(--tesla-gray-500);
+  color: var(--tesla-gray-400);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Botón secundario - Outline */
+.btn-tesla-secondary {
+  background: transparent;
+  color: var(--tesla-white);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 24px;
+  border-radius: var(--radius-button);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.btn-tesla-secondary:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Botón destructivo */
+.btn-tesla-destructive {
+  background: transparent;
+  color: var(--tesla-red);
+  border: 1px solid var(--tesla-red);
+  padding: 10px 24px;
+  border-radius: var(--radius-button);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.btn-tesla-destructive:hover {
+  background: rgba(227, 25, 17, 0.1);
+}
+
+/* Icon button estilo Apple + */
+.btn-tesla-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  color: var(--tesla-white);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-tesla-icon:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: scale(1.05);
+}
+
+/* Loading spinner Apple style */
+@keyframes tesla-spinner {
+  0% { 
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 100, 200;
+    stroke-dashoffset: -15;
+  }
+  100% {
+    stroke-dasharray: 100, 200;
+    stroke-dashoffset: -125;
+  }
+}
+
+.spinner-tesla {
+  animation: tesla-spinner 1.4s ease-in-out infinite;
+  stroke: currentColor;
+  stroke-linecap: round;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   INPUTS TESLA - Border-bottom + Label flotante
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.input-group-tesla {
+  position: relative;
+  margin-bottom: var(--space-3);
+}
+
+.input-tesla {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: var(--space-2) 0;
+  font-size: 1rem;
+  color: var(--tesla-white);
+  transition: border-color 0.2s;
+}
+
+.input-tesla:focus {
+  outline: none;
+  border-bottom-color: var(--tesla-white);
+}
+
+.input-tesla:focus + .label-tesla,
+.input-tesla:not(:placeholder-shown) + .label-tesla {
+  transform: translateY(-24px) scale(0.85);
+  color: var(--tesla-gray-200);
+}
+
+.label-tesla {
+  position: absolute;
+  left: 0;
+  top: var(--space-2);
+  color: var(--tesla-gray-300);
+  font-size: 1rem;
+  pointer-events: none;
+  transform-origin: left;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TABLAS TESLA
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.table-tesla {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table-tesla thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.table-tesla thead th {
+  background: rgba(10, 10, 10, 0.9);
+  backdrop-filter: blur(20px);
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--tesla-gray-200);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.table-tesla tbody tr {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.table-tesla tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.table-tesla tbody tr:hover {
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateX(4px);
+  border-left: 2px solid var(--tesla-red);
+}
+
+.table-tesla td {
+  padding: var(--space-2) var(--space-3);
+  color: var(--tesla-gray-100);
+  font-size: 0.875rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SIDEBAR TESLA
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sidebar-tesla {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 280px;
+  background: var(--tesla-black);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  z-index: 50;
+  transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sidebar-tesla.collapsed {
+  width: 72px;
+}
+
+.sidebar-tesla-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  color: var(--tesla-gray-200);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+  border-radius: var(--radius-button);
+  margin: 4px 8px;
+}
+
+.sidebar-tesla-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--tesla-white);
+}
+
+.sidebar-tesla-item.active {
+  background: var(--tesla-red);
+  color: var(--tesla-white);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BOTTOM BAR MÓVIL - Estilo Tesla App
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.bottombar-tesla {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: var(--tesla-black);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  z-index: 50;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.bottombar-tesla-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--tesla-gray-300);
+  font-size: 10px;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 8px 16px;
+  transition: all 0.2s;
+}
+
+.bottombar-tesla-item.active {
+  color: var(--tesla-white);
+}
+
+.bottombar-tesla-item .icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOAST NOTIFICATIONS TESLA
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.toast-tesla {
+  position: fixed;
+  z-index: 100;
+  padding: var(--space-2) var(--space-3);
+  background: var(--tesla-black);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-button);
+  color: var(--tesla-white);
+  font-size: 0.875rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  animation: toast-slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Desktop: bottom-right */
+@media (min-width: 768px) {
+  .toast-tesla {
+    bottom: var(--space-4);
+    right: var(--space-4);
+  }
+}
+
+/* Mobile: bottom-center */
+@media (max-width: 767px) {
+  .toast-tesla {
+    bottom: calc(80px + env(safe-area-inset-bottom, 0) + var(--space-2));
+    left: var(--space-2);
+    right: var(--space-2);
+  }
+}
+
+.toast-tesla.error {
+  border-color: var(--tesla-red);
+}
+
+.toast-tesla.success {
+  border-color: var(--tesla-success);
+}
+
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODAL TESLA
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.modal-tesla {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-tesla-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+}
+
+.modal-tesla-content {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  background: var(--tesla-surface);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-modal);
+  overflow: hidden;
+  box-shadow: 
+    0 40px 80px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   AI ORB - Estilo Grok
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ai-orb-tesla {
+  position: fixed;
+  bottom: var(--space-3);
+  right: var(--space-3);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--tesla-red) 0%, var(--tesla-black) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 90;
+  box-shadow: 0 8px 32px var(--tesla-red-glow);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ai-orb-tesla:hover {
+  transform: scale(1.1);
+  box-shadow: 0 12px 40px var(--tesla-red-glow);
+}
+
+.ai-orb-tesla .icon {
+  color: var(--tesla-white);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* Pulse animation */
+@keyframes orb-pulse {
+  0%, 100% {
+    box-shadow: 0 8px 32px var(--tesla-red-glow);
+  }
+  50% {
+    box-shadow: 0 8px 48px var(--tesla-red-glow), 0 0 0 8px rgba(227, 25, 17, 0.1);
+  }
+}
+
+.ai-orb-tesla.pulsing {
+  animation: orb-pulse 2s ease-in-out infinite;
+}
+
+/* Mobile adjustment */
+@media (max-width: 767px) {
+  .ai-orb-tesla {
+    bottom: calc(80px + env(safe-area-inset-bottom, 0) + var(--space-2));
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MICRO-INTERACCIONES PREMIUM
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Hover scale + brightness estándar */
+.hover-premium {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-premium:hover {
+  transform: scale(1.02);
+  filter: brightness(1.1);
+}
+
+/* Spring transition */
+.spring-transition {
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Stagger children animation */
+@keyframes stagger-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stagger-children > * {
+  animation: stagger-fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.3s; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   KPI CARD TESLA PREMIUM
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.kpi-card-tesla {
+  position: relative;
+  background: var(--tesla-card);
+  border-radius: 20px;
+  padding: var(--space-4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.kpi-card-tesla::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+.kpi-card-tesla:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.5);
+}
+
+.kpi-card-tesla .icon {
+  width: 24px;
+  height: 24px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  color: var(--tesla-gray-300);
+}
+
+.kpi-card-tesla .value {
+  font-size: 64px;
+  font-weight: 700;
+  color: var(--tesla-white);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin: var(--space-3) 0 var(--space-1);
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi-card-tesla .label {
+  font-size: 0.875rem;
+  color: var(--tesla-gray-200);
+  font-weight: 500;
+}
+
+.kpi-card-tesla .trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.kpi-card-tesla .trend.positive {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10B981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.kpi-card-tesla .trend.negative {
+  background: rgba(239, 68, 68, 0.15);
+  color: #EF4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RADIAL MENU TESLA (para acciones de tabla)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.radial-menu-tesla {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radial-menu-tesla-item {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  background: var(--tesla-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tesla-gray-100);
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.radial-menu-tesla-item:hover {
+  background: var(--tesla-elevated);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.radial-menu-tesla-item.destructive {
+  color: var(--tesla-red);
+}
+
+.radial-menu-tesla-item.destructive:hover {
+  background: rgba(227, 25, 17, 0.2);
+}
+
+/* Posiciones radiales */
+.radial-menu-tesla-item:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
+.radial-menu-tesla-item:nth-child(2) { top: 25%; right: 0; }
+.radial-menu-tesla-item:nth-child(3) { bottom: 25%; right: 0; }
+.radial-menu-tesla-item:nth-child(4) { bottom: 0; left: 50%; transform: translateX(-50%); }
+.radial-menu-tesla-item:nth-child(5) { bottom: 25%; left: 0; }
+.radial-menu-tesla-item:nth-child(6) { top: 25%; left: 0; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODO CLARO (toggle opcional)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.light-mode {
+  --tesla-black: #FBFBFD;
+  --tesla-dark: #F5F5F7;
+  --tesla-surface: #FFFFFF;
+  --tesla-card: #FFFFFF;
+  --tesla-elevated: #F5F5F7;
+  
+  --tesla-white: #000000;
+  --tesla-gray-100: #1D1D1F;
+  --tesla-gray-200: #6E6E73;
+  --tesla-gray-300: #87878C;
+  --tesla-gray-400: #AEAEB2;
+  --tesla-gray-500: #D1D1D6;
+  
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(0, 0, 0, 0.06);
+}

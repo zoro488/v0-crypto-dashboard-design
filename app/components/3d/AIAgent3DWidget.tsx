@@ -10,15 +10,15 @@
  * - Estados visuales: idle, thinking, speaking
  */
 
-import { useRef, useState, useMemo, useEffect } from 'react'
+import { useRef, useState, useMemo } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Float, Html, Sphere, MeshDistortMaterial } from '@react-three/drei'
 import * as THREE from 'three'
 
 // ============================================================================
-// SHADER DE HOLOGRAMA
+// SHADER DE HOLOGRAMA (reservados para uso futuro)
 // ============================================================================
-const hologramVertexShader = /* glsl */ `
+const _hologramVertexShader = /* glsl */ `
   uniform float uTime;
   varying vec2 vUv;
   varying float vElevation;
@@ -38,7 +38,7 @@ const hologramVertexShader = /* glsl */ `
   }
 `
 
-const hologramFragmentShader = /* glsl */ `
+const _hologramFragmentShader = /* glsl */ `
   uniform float uTime;
   uniform vec3 uColor;
   uniform float uAlpha;

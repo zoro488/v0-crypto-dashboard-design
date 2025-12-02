@@ -120,7 +120,7 @@ export function AppleModal({
                 'w-full rounded-[24px] overflow-hidden',
                 'bg-[#0A0A0A] border border-white/10',
                 'shadow-2xl shadow-black/50',
-                sizes[size]
+                sizes[size],
               )}
             >
               {/* Header */}
@@ -223,7 +223,7 @@ export const AppleInput = forwardRef<HTMLInputElement, AppleInputProps>(
                   ? 'border-white' 
                   : 'border-white/20',
               disabled && 'opacity-50 cursor-not-allowed',
-              'placeholder-white/30'
+              'placeholder-white/30',
             )}
           />
 
@@ -248,7 +248,7 @@ export const AppleInput = forwardRef<HTMLInputElement, AppleInputProps>(
         </AnimatePresence>
       </div>
     )
-  }
+  },
 )
 
 AppleInput.displayName = 'AppleInput'
@@ -305,7 +305,7 @@ export const AppleSelect = forwardRef<HTMLSelectElement, AppleSelectProps>(
                 ? 'border-white' 
                 : 'border-white/20',
             disabled && 'opacity-50 cursor-not-allowed',
-            !hasValue && 'text-white/30'
+            !hasValue && 'text-white/30',
           )}
         >
           <option value="" disabled className="bg-[#0A0A0A] text-white/50">
@@ -351,7 +351,7 @@ export const AppleSelect = forwardRef<HTMLSelectElement, AppleSelectProps>(
         </AnimatePresence>
       </div>
     )
-  }
+  },
 )
 
 AppleSelect.displayName = 'AppleSelect'
@@ -375,18 +375,18 @@ export function AppleButton({
     primary: cn(
       'bg-[#E31911] hover:bg-[#CC1510] text-white',
       'shadow-lg shadow-red-500/20 hover:shadow-red-500/30',
-      'disabled:bg-[#E31911]/30 disabled:shadow-none'
+      'disabled:bg-[#E31911]/30 disabled:shadow-none',
     ),
     secondary: cn(
       'bg-transparent text-white border border-white/20',
-      'hover:bg-white/5 hover:border-white/30'
+      'hover:bg-white/5 hover:border-white/30',
     ),
     ghost: cn(
-      'bg-transparent text-white/70 hover:text-white hover:bg-white/5'
+      'bg-transparent text-white/70 hover:text-white hover:bg-white/5',
     ),
     danger: cn(
       'bg-red-500/10 text-red-400 border border-red-500/20',
-      'hover:bg-red-500/20'
+      'hover:bg-red-500/20',
     ),
   }
 
@@ -410,7 +410,7 @@ export function AppleButton({
         variants[variant],
         sizes[size],
         fullWidth && 'w-full',
-        className
+        className,
       )}
     >
       {loading ? (

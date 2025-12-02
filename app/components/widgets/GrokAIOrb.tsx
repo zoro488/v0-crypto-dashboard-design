@@ -96,7 +96,7 @@ const MessageBubble = ({ message }: { message: Message }) => {
       animate={{ opacity: 1, y: 0 }}
       className={cn(
         'flex gap-3 group',
-        isUser ? 'flex-row-reverse' : 'flex-row'
+        isUser ? 'flex-row-reverse' : 'flex-row',
       )}
     >
       {/* Avatar */}
@@ -104,7 +104,7 @@ const MessageBubble = ({ message }: { message: Message }) => {
         'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
         isUser 
           ? 'bg-white/10' 
-          : 'bg-gradient-to-br from-[#E31911] to-[#8B0000]'
+          : 'bg-gradient-to-br from-[#E31911] to-[#8B0000]',
       )}>
         {isUser ? (
           <User className="w-4 h-4 text-white/70" />
@@ -118,7 +118,7 @@ const MessageBubble = ({ message }: { message: Message }) => {
         'max-w-[80%] rounded-2xl px-4 py-3',
         isUser 
           ? 'bg-white/10 text-white' 
-          : 'bg-[#111] border border-white/5 text-white/90'
+          : 'bg-[#111] border border-white/5 text-white/90',
       )}>
         <p className="text-sm leading-relaxed whitespace-pre-wrap">
           {message.content}
@@ -234,8 +234,8 @@ export function GrokAIOrb({ className, onToolCall }: GrokAIOrbProps) {
         prev.map(msg => 
           msg.id === assistantMessage.id 
             ? { ...msg, content: response.slice(0, i) }
-            : msg
-        )
+            : msg,
+        ),
       )
     }
 
@@ -243,8 +243,8 @@ export function GrokAIOrb({ className, onToolCall }: GrokAIOrbProps) {
       prev.map(msg =>
         msg.id === assistantMessage.id
           ? { ...msg, isStreaming: false }
-          : msg
-      )
+          : msg,
+      ),
     )
 
     setIsLoading(false)
@@ -285,7 +285,7 @@ export function GrokAIOrb({ className, onToolCall }: GrokAIOrbProps) {
               'flex items-center justify-center',
               'shadow-2xl shadow-red-500/30',
               'cursor-pointer',
-              className
+              className,
             )}
             style={{ scale: springScale }}
           >
@@ -317,7 +317,7 @@ export function GrokAIOrb({ className, onToolCall }: GrokAIOrbProps) {
                 : 'bottom-6 right-6 w-96 h-[600px] max-h-[80vh]',
               'bg-[#050505] border border-white/10 rounded-2xl',
               'flex flex-col overflow-hidden',
-              'shadow-2xl shadow-black/50'
+              'shadow-2xl shadow-black/50',
             )}
           >
             {/* Header */}
@@ -409,7 +409,7 @@ export function GrokAIOrb({ className, onToolCall }: GrokAIOrbProps) {
                       'absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg transition-colors',
                       isListening 
                         ? 'bg-[#E31911] text-white' 
-                        : 'text-white/40 hover:text-white hover:bg-white/10'
+                        : 'text-white/40 hover:text-white hover:bg-white/10',
                     )}
                   >
                     {isListening ? (
@@ -430,7 +430,7 @@ export function GrokAIOrb({ className, onToolCall }: GrokAIOrbProps) {
                     'p-3 rounded-xl transition-all',
                     input.trim() && !isLoading
                       ? 'bg-[#E31911] text-white shadow-lg shadow-red-500/20'
-                      : 'bg-white/5 text-white/30'
+                      : 'bg-white/5 text-white/30',
                   )}
                 >
                   {isLoading ? (

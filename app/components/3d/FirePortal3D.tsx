@@ -12,11 +12,10 @@
  */
 
 import { useRef, useMemo, useState, useEffect, Suspense } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Canvas, useFrame } from '@react-three/fiber'
 import { 
   Points, 
   PointMaterial, 
-  shaderMaterial,
   Environment,
 } from '@react-three/drei'
 import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing'
@@ -67,7 +66,7 @@ function FireParticles({ count = 2000, radius = 2, speed = 1, color, state }: Fi
   const pointsRef = useRef<THREE.Points>(null)
   
   // Generar posiciones y velocidades iniciales
-  const { positions, velocities, lifetimes, sizes } = useMemo(() => {
+  const { positions, velocities, lifetimes, sizes: _sizes } = useMemo(() => {
     const pos = new Float32Array(count * 3)
     const vel = new Float32Array(count * 3)
     const life = new Float32Array(count)

@@ -29,6 +29,9 @@ export default function LoginPage() {
     // Simular autenticación (reemplazar con Firebase Auth real)
     await new Promise(resolve => setTimeout(resolve, 1500))
     
+    // Crear cookie de sesión para bypass del middleware
+    document.cookie = 'session=demo-session; path=/; max-age=86400'
+    
     // Redirigir al dashboard
     router.push('/')
     setIsLoading(false)

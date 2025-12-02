@@ -8,8 +8,19 @@ import {
   PieChart as PieChartIcon, Eye, Edit, Trash2, CreditCard, Wallet,
   ShoppingBag, Receipt, Calendar, Search, Filter, X,
 } from 'lucide-react'
-import { Button } from '@/app/components/ui/button'
-import { Badge } from '@/app/components/ui/badge'
+// ═══════════════════════════════════════════════════════════════════════════
+// 🔴 TESLA 2025 DESIGN SYSTEM - Componentes Premium
+// ═══════════════════════════════════════════════════════════════════════════
+import { 
+  ButtonTesla,
+  CardTesla, 
+  StatCard as StatCardTesla,
+  ModalTesla, 
+  Badge as BadgeTesla,
+  SkeletonDashboard,
+  DESIGN_TOKENS,
+  formatCurrency,
+} from '@/app/components/ui/tesla-index'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/components/ui/tabs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog'
 import { 
@@ -102,10 +113,10 @@ const VentaProfileModal = memo(function VentaProfileModal({
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-1">
                 <h2 className="text-2xl font-bold">{venta.id}</h2>
-                <Badge className={config.color}>
+                <BadgeTesla variant={estado === 'completo' ? 'success' : estado === 'parcial' ? 'warning' : 'error'}>
                   {React.createElement(config.icon, { className: 'w-3 h-3 mr-1' })}
                   {config.label}
-                </Badge>
+                </BadgeTesla>
               </div>
               <p className="text-white/60">Cliente: {venta.cliente || 'Sin asignar'}</p>
               <p className="text-white/40 text-sm mt-1">{venta.fecha || 'Sin fecha'}</p>
@@ -482,17 +493,14 @@ export default memo(function BentoVentasPremium() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
-        <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full border-4 border-white/10 border-t-green-500 animate-spin" />
-          <div className="text-white text-lg">Cargando ventas...</div>
-        </motion.div>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <SkeletonDashboard />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-6 space-y-6">
+    <div className="min-h-screen bg-black p-6 space-y-6">
       {error && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -521,13 +529,13 @@ export default memo(function BentoVentasPremium() {
             <p className="text-zinc-400 text-sm">Gestión avanzada de ventas y cobros</p>
           </div>
         </div>
-        <Button
-          className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
+        <ButtonTesla
+          variant="primary"
           onClick={() => setIsModalOpen(true)}
         >
           <Plus className="w-4 h-4 mr-2" />
           Nueva Venta
-        </Button>
+        </ButtonTesla>
       </motion.div>
 
       {/* KPI Widgets */}

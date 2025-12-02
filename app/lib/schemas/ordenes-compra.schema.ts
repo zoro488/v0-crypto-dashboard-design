@@ -4,6 +4,7 @@
  */
 
 import { z } from 'zod'
+import { OptionalTimestampSchema } from './timestamp.schema'
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ESQUEMAS BASE
@@ -173,8 +174,8 @@ export const OrdenCompraSchema = z.object({
   estado: EstadoOrdenSchema.default('pendiente'),
   notas: z.string().max(500).optional(),
   keywords: z.array(z.string()).default([]),
-  createdAt: z.any().optional(),
-  updatedAt: z.any().optional(),
+  createdAt: OptionalTimestampSchema,
+  updatedAt: OptionalTimestampSchema,
 })
 
 // ═══════════════════════════════════════════════════════════════════════════

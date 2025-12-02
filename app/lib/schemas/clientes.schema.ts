@@ -4,6 +4,11 @@
  */
 
 import { z } from 'zod'
+import { 
+  FirestoreTimestampSchema, 
+  OptionalTimestampSchema, 
+  HistorialPagoSchema, 
+} from './timestamp.schema'
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ESQUEMAS DE CLIENTE
@@ -61,14 +66,11 @@ export const ClienteSchema = CrearClienteSchema.extend({
   
   // Métricas
   numeroCompras: z.number().int().nonnegative().default(0),
-  ultimaCompra: z.any().optional(),
+  ultimaCompra: OptionalTimestampSchema,
   
   // Referencias
   ventas: z.array(z.string()).default([]),
-  historialPagos: z.array(z.object({
-    fecha: z.any(),
-    monto: z.number(),
-  })).default([]),
+  historialPagos: z.array(HistorialPagoSchema).default([]),
   
   // Keywords para búsqueda (auto-generadas)
   keywords: z.array(z.string()).default([]),
@@ -77,8 +79,8 @@ export const ClienteSchema = CrearClienteSchema.extend({
   estado: z.enum(['activo', 'inactivo']).default('activo'),
   
   // Timestamps
-  createdAt: z.any().optional(),
-  updatedAt: z.any().optional(),
+  createdAt: OptionalTimestampSchema,
+  updatedAt: OptionalTimestampSchema,
 })
 
 // ═══════════════════════════════════════════════════════════════════════════

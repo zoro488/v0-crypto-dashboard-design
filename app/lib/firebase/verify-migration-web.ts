@@ -7,8 +7,9 @@
  * @author CHRONOS Data Engineering Team
  */
 
-import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore'
+import { collection, getDocs, query } from 'firebase/firestore'
 import { db } from './config'
+import { logger } from '../utils/logger'
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPOS
@@ -268,77 +269,63 @@ export async function verifyUtilidadesIntegrity(): Promise<{
  * Generar reporte completo de verificación
  */
 export async function generateFullReport(): Promise<void> {
-  console.log('═'.repeat(70))
-  console.log('🔍 REPORTE DE VERIFICACIÓN DE DATOS EN FIRESTORE')
-  console.log('═'.repeat(70))
-  console.log(`📅 Fecha: ${new Date().toLocaleString('es-MX')}`)
-  console.log('')
+  logger.info('═'.repeat(70), { context: 'VerifyMigration' })
+  logger.info('🔍 REPORTE DE VERIFICACIÓN DE DATOS EN FIRESTORE', { context: 'VerifyMigration' })
+  logger.info('═'.repeat(70), { context: 'VerifyMigration' })
+  logger.info(`📅 Fecha: ${new Date().toLocaleString('es-MX')}`, { context: 'VerifyMigration' })
 
   // Verificar todas las colecciones
   const report = await verifyAllCollections()
 
-  console.log('📊 RESUMEN DE COLECCIONES:')
-  console.log('-'.repeat(70))
-  console.table(
-    report.collections.map(c => ({
+  logger.info('📊 RESUMEN DE COLECCIONES:', { 
+    context: 'VerifyMigration',
+    data: report.collections.map(c => ({
       Colección: c.name,
       Documentos: c.documentCount,
-      [`Total (${c.moneyField})`]: `$${c.totalMoney.toLocaleString()}`,
-      Estado: c.status === 'OK' ? '✅' : c.status === 'EMPTY' ? '⚠️ Vacía' : '❌ Error',
+      Total: `$${c.totalMoney.toLocaleString()}`,
+      Estado: c.status,
     })),
-  )
+  })
 
   // Verificar integridad de ventas
-  console.log('')
-  console.log('📋 INTEGRIDAD DE VENTAS:')
-  console.log('-'.repeat(70))
   const ventasIntegrity = await verifyVentasIntegrity()
-  console.log(`   Total ventas: ${ventasIntegrity.stats.total}`)
-  console.log(`   Pagadas: ${ventasIntegrity.stats.pagadas}`)
-  console.log(`   Pendientes: ${ventasIntegrity.stats.pendientes}`)
-  console.log(`   Parciales: ${ventasIntegrity.stats.parciales}`)
-  console.log(`   Suma total ingresos: $${ventasIntegrity.stats.sumaIngresos.toLocaleString()}`)
-  console.log(`   Integridad: ${ventasIntegrity.valid ? '✅ OK' : '❌ Problemas encontrados'}`)
-  
-  if (ventasIntegrity.issues.length > 0) {
-    console.log('   Problemas:')
-    ventasIntegrity.issues.slice(0, 5).forEach(issue => {
-      console.log(`      - ${issue}`)
-    })
-    if (ventasIntegrity.issues.length > 5) {
-      console.log(`      ... y ${ventasIntegrity.issues.length - 5} más`)
-    }
-  }
+  logger.info('📋 INTEGRIDAD DE VENTAS:', { 
+    context: 'VerifyMigration',
+    data: {
+      total: ventasIntegrity.stats.total,
+      pagadas: ventasIntegrity.stats.pagadas,
+      pendientes: ventasIntegrity.stats.pendientes,
+      parciales: ventasIntegrity.stats.parciales,
+      sumaIngresos: `$${ventasIntegrity.stats.sumaIngresos.toLocaleString()}`,
+      integridad: ventasIntegrity.valid ? '✅ OK' : '❌ Problemas encontrados',
+      problemas: ventasIntegrity.issues.slice(0, 5),
+    },
+  })
 
   // Verificar integridad de utilidades
-  console.log('')
-  console.log('📋 INTEGRIDAD DE UTILIDADES:')
-  console.log('-'.repeat(70))
   const utilIntegrity = await verifyUtilidadesIntegrity()
-  console.log(`   Total registros: ${utilIntegrity.stats.total}`)
-  console.log(`   Clientes únicos: ${utilIntegrity.stats.clientesUnicos}`)
-  console.log(`   Suma total ingresos: $${utilIntegrity.stats.sumaIngresos.toLocaleString()}`)
-  console.log(`   Integridad: ${utilIntegrity.valid ? '✅ OK' : '❌ Problemas encontrados'}`)
+  logger.info('📋 INTEGRIDAD DE UTILIDADES:', { 
+    context: 'VerifyMigration',
+    data: {
+      total: utilIntegrity.stats.total,
+      clientesUnicos: utilIntegrity.stats.clientesUnicos,
+      sumaIngresos: `$${utilIntegrity.stats.sumaIngresos.toLocaleString()}`,
+      integridad: utilIntegrity.valid ? '✅ OK' : '❌ Problemas encontrados',
+    },
+  })
 
   // Resumen final
-  console.log('')
-  console.log('═'.repeat(70))
-  console.log('📈 RESUMEN EJECUTIVO')
-  console.log('═'.repeat(70))
-  console.log(`   Total documentos en Firestore: ${report.totalDocuments.toLocaleString()}`)
-  console.log(`   Total dinero rastreado: $${report.totalMoney.toLocaleString()}`)
-  console.log(`   Errores encontrados: ${report.errors.length}`)
-  
-  if (report.errors.length === 0 && ventasIntegrity.valid && utilIntegrity.valid) {
-    console.log('')
-    console.log('✨ ESTADO: TODOS LOS DATOS VERIFICADOS CORRECTAMENTE')
-  } else {
-    console.log('')
-    console.log('⚠️ ESTADO: SE ENCONTRARON PROBLEMAS QUE REQUIEREN ATENCIÓN')
-  }
-
-  console.log('')
-  console.log('═'.repeat(70))
+  logger.info('📈 RESUMEN EJECUTIVO', {
+    context: 'VerifyMigration',
+    data: {
+      totalDocumentos: report.totalDocuments,
+      totalDinero: `$${report.totalMoney.toLocaleString()}`,
+      errores: report.errors.length,
+      estado: report.errors.length === 0 && ventasIntegrity.valid && utilIntegrity.valid
+        ? '✨ TODOS LOS DATOS VERIFICADOS CORRECTAMENTE'
+        : '⚠️ SE ENCONTRARON PROBLEMAS QUE REQUIEREN ATENCIÓN',
+    },
+  })
 }
 
 // Exportar para uso en componentes

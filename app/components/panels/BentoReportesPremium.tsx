@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * 📊 BENTO REPORTES PREMIUM - Centro de Reportes con Componentes 3D
+ * 📊 BENTO REPORTES PREMIUM - Centro de Reportes con Componentes 3D + Analytics
  * 
  * Características Premium:
  * - Dashboard estilo Spline con orbes 3D
@@ -10,6 +10,8 @@
  * - Sistema de favoritos con persistencia
  * - Exportación múltiple (Excel, PDF, Print, Share)
  * - Animaciones fluidas con Framer Motion
+ * - Analytics Avanzados con predicción y insights IA
+ * - Tesla 2025 Design System
  */
 
 import { motion, AnimatePresence } from 'framer-motion'
@@ -19,10 +21,10 @@ import {
   BarChart3, LineChart, Clock, CheckCircle2, AlertCircle, RefreshCw,
   FileSpreadsheet, FileType, Printer, Share2, Star, ArrowUpRight, ArrowDownRight,
   Wallet, Receipt, Truck, Scissors, Eye, ChevronRight, Sparkles, Zap,
-  Activity, Layers, Archive, CreditCard,
+  Activity, Layers, Archive, CreditCard, Brain,
   type LucideIcon,
 } from 'lucide-react'
-import { Button } from '@/app/components/ui/button'
+import { ButtonTesla, DESIGN_TOKENS } from '@/app/components/ui/tesla-index'
 import { Badge } from '@/app/components/ui/badge'
 import { Input } from '@/app/components/ui/input'
 import {
@@ -48,6 +50,12 @@ import {
   GradientText,
   VARIANT_COLORS, 
 } from '@/app/components/3d/PremiumPanelComponents'
+
+// Analytics Avanzados Tesla
+import { AdvancedAnalyticsTesla } from '@/app/components/analytics/AdvancedAnalyticsTesla'
+
+// Hooks de datos
+import { useVentas, useClientes, useOrdenesCompra } from '@/app/lib/firebase/firestore-hooks.service'
 
 // ============================================================================
 // TIPOS E INTERFACES
@@ -400,22 +408,22 @@ function ReporteCardPremium({
               </Badge>
               
               <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button 
+                <ButtonTesla 
                   size="sm" 
                   variant="ghost" 
-                  className="text-white/60 hover:text-white h-8 w-8 p-0"
-                  onClick={(e) => e.stopPropagation()}
+                  className="h-8 w-8 p-0"
+                  onClick={(e: React.MouseEvent) => e.stopPropagation()}
                 >
                   <FileType size={16} />
-                </Button>
-                <Button 
+                </ButtonTesla>
+                <ButtonTesla 
                   size="sm" 
                   variant="ghost" 
-                  className="text-white/60 hover:text-white h-8 w-8 p-0"
-                  onClick={(e) => e.stopPropagation()}
+                  className="h-8 w-8 p-0"
+                  onClick={(e: React.MouseEvent) => e.stopPropagation()}
                 >
                   <FileSpreadsheet size={16} />
-                </Button>
+                </ButtonTesla>
               </div>
             </div>
 
@@ -464,6 +472,16 @@ export function BentoReportesPremium() {
   const [searchTerm, setSearchTerm] = useState('')
   const [showExportModal, setShowExportModal] = useState(false)
   const [reporteSeleccionado, setReporteSeleccionado] = useState<ReporteConfig | null>(null)
+  const [vistaActiva, setVistaActiva] = useState<'reportes' | 'analytics'>('reportes')
+
+  // Datos de Firebase para Analytics
+  const ventasResult = useVentas()
+  const clientesResult = useClientes()
+  const ordenesResult = useOrdenesCompra()
+  
+  const ventas = ventasResult.data || []
+  const clientes = clientesResult.data || []
+  const ordenes = ordenesResult.data || []
 
   // Métricas
   const metricas = useMemo(() => ({
@@ -533,16 +551,39 @@ export function BentoReportesPremium() {
           </div>
           
           <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+            {/* Switch de Vista */}
+            <div 
+              className="flex p-1 rounded-xl"
+              style={{ backgroundColor: DESIGN_TOKENS.colors.surface }}
+            >
+              <ButtonTesla
+                variant={vistaActiva === 'reportes' ? 'primary' : 'ghost'}
+                size="sm"
+                onClick={() => setVistaActiva('reportes')}
+              >
+                <FileText size={14} className="mr-1" />
+                Reportes
+              </ButtonTesla>
+              <ButtonTesla
+                variant={vistaActiva === 'analytics' ? 'primary' : 'ghost'}
+                size="sm"
+                onClick={() => setVistaActiva('analytics')}
+              >
+                <Brain size={14} className="mr-1" />
+                Analytics IA
+              </ButtonTesla>
+            </div>
+            
+            <ButtonTesla
+              variant="secondary"
+              size="sm"
             >
               <Calendar size={16} className="mr-2" />
               Programar
-            </Button>
-            <Button variant="ghost" size="icon" className="text-white/60 hover:text-white">
+            </ButtonTesla>
+            <ButtonTesla variant="ghost" size="icon">
               <RefreshCw size={18} />
-            </Button>
+            </ButtonTesla>
           </div>
         </div>
       </div>
@@ -581,164 +622,172 @@ export function BentoReportesPremium() {
         />
       </div>
       
-      {/* Dashboard de métricas */}
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        {/* Tendencia general */}
-        <GlassCard3D variant="primary" size="lg" className="lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <LineChart size={20} className="text-blue-400" />
-              <h3 className="text-lg font-semibold text-white">Tendencia General</h3>
-            </div>
-            <PulseIndicator variant="primary" label="En tiempo real" />
-          </div>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={SAMPLE_DATA.tendencia}>
-                <defs>
-                  <linearGradient id="gradientVentas" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                <XAxis dataKey="name" stroke="rgba(255,255,255,0.5)" fontSize={12} />
-                <YAxis stroke="rgba(255,255,255,0.5)" fontSize={12} tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} />
-                <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="ventas" fill="url(#gradientVentas)" stroke="#10b981" strokeWidth={2} name="Ventas" />
-                <Line type="monotone" dataKey="gastos" stroke="#ef4444" strokeWidth={2} dot={{ fill: '#ef4444', r: 3 }} name="Gastos" />
-              </ComposedChart>
-            </ResponsiveContainer>
-          </div>
-        </GlassCard3D>
-        
-        {/* Distribución por categoría */}
-        <GlassCard3D variant="secondary" size="lg">
-          <div className="flex items-center gap-2 mb-4">
-            <PieChartIcon size={20} className="text-purple-400" />
-            <h3 className="text-lg font-semibold text-white">Por Categoría</h3>
-          </div>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={SAMPLE_DATA.categorias}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={80}
-                  paddingAngle={3}
-                  dataKey="value"
-                >
-                  {SAMPLE_DATA.categorias.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.fill} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend 
-                  verticalAlign="bottom" 
-                  height={36}
-                  formatter={(value) => <span className="text-white/70 text-xs">{value}</span>}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </GlassCard3D>
-      </div>
-      
-      {/* Filtros de categoría */}
-      <div className="relative z-10 mb-6">
-        <GlassCard3D variant="primary" size="sm">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-2 overflow-x-auto pb-2">
-              {CATEGORIAS.map((cat) => {
-                const Icon = cat.icon
-                const isActive = categoriaActiva === cat.id
-                const count = cat.id === 'todos' 
-                  ? reportes.length 
-                  : reportes.filter(r => r.categoria === cat.id).length
-                
-                return (
-                  <Button
-                    key={cat.id}
-                    variant={isActive ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setCategoriaActiva(cat.id)}
-                    className={`
-                      flex items-center gap-2 whitespace-nowrap
-                      ${isActive 
-                        ? 'bg-white/10 text-white' 
-                        : 'text-white/50 hover:text-white hover:bg-white/5'
-                      }
-                    `}
-                  >
-                    <Icon size={14} />
-                    {cat.label}
-                    <Badge className="ml-1 bg-white/10 text-white/70" variant="outline">
-                      {count}
-                    </Badge>
-                  </Button>
-                )
-              })}
-            </div>
+      {/* Contenido condicional según vista activa */}
+      {vistaActiva === 'analytics' ? (
+        /* Vista Analytics IA */
+        <div className="relative z-10">
+          <AdvancedAnalyticsTesla
+            ventas={ventas}
+            clientes={clientes}
+            ordenes={ordenes}
+          />
+        </div>
+      ) : (
+        /* Vista Reportes */
+        <>
+          {/* Dashboard de métricas */}
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            {/* Tendencia general */}
+            <GlassCard3D variant="primary" size="lg" className="lg:col-span-2">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <LineChart size={20} className="text-blue-400" />
+                  <h3 className="text-lg font-semibold text-white">Tendencia General</h3>
+                </div>
+                <PulseIndicator variant="primary" label="En tiempo real" />
+              </div>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart data={SAMPLE_DATA.tendencia}>
+                    <defs>
+                      <linearGradient id="gradientVentas" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10b981" stopOpacity={0.4} />
+                        <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                    <XAxis dataKey="name" stroke="rgba(255,255,255,0.5)" fontSize={12} />
+                    <YAxis stroke="rgba(255,255,255,0.5)" fontSize={12} tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Area type="monotone" dataKey="ventas" fill="url(#gradientVentas)" stroke="#10b981" strokeWidth={2} name="Ventas" />
+                    <Line type="monotone" dataKey="gastos" stroke="#ef4444" strokeWidth={2} dot={{ fill: '#ef4444', r: 3 }} name="Gastos" />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
+            </GlassCard3D>
             
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                <Input
-                  placeholder="Buscar reporte..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-white/30 w-64"
-                />
+            {/* Distribución por categoría */}
+            <GlassCard3D variant="secondary" size="lg">
+              <div className="flex items-center gap-2 mb-4">
+                <PieChartIcon size={20} className="text-purple-400" />
+                <h3 className="text-lg font-semibold text-white">Por Categoría</h3>
               </div>
-            </div>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={SAMPLE_DATA.categorias}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={50}
+                      outerRadius={80}
+                      paddingAngle={3}
+                      dataKey="value"
+                    >
+                      {SAMPLE_DATA.categorias.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend 
+                      verticalAlign="bottom" 
+                      height={36}
+                      formatter={(value) => <span className="text-white/70 text-xs">{value}</span>}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </GlassCard3D>
           </div>
-        </GlassCard3D>
-      </div>
-      
-      {/* Grid de reportes */}
-      <div className="relative z-10">
-        {reportesFiltrados.length === 0 ? (
-          <GlassCard3D variant="secondary" size="lg">
-            <div className="flex flex-col items-center justify-center py-12">
-              <div className="p-4 rounded-full bg-purple-500/10 mb-4">
-                <FileText size={48} className="text-purple-400 opacity-50" />
+          
+          {/* Filtros de categoría */}
+          <div className="relative z-10 mb-6">
+            <GlassCard3D variant="primary" size="sm">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-2 overflow-x-auto pb-2">
+                  {CATEGORIAS.map((cat) => {
+                    const Icon = cat.icon
+                    const isActive = categoriaActiva === cat.id
+                    const count = cat.id === 'todos' 
+                      ? reportes.length 
+                      : reportes.filter(r => r.categoria === cat.id).length
+                    
+                    return (
+                      <ButtonTesla
+                        key={cat.id}
+                        variant={isActive ? 'primary' : 'ghost'}
+                        size="sm"
+                        onClick={() => setCategoriaActiva(cat.id)}
+                      >
+                        <Icon size={14} className="mr-1" />
+                        {cat.label}
+                        <Badge className="ml-1 bg-white/10 text-white/70" variant="outline">
+                          {count}
+                        </Badge>
+                      </ButtonTesla>
+                    )
+                  })}
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                    <Input
+                      placeholder="Buscar reporte..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-white/30 w-64"
+                    />
+                  </div>
+                </div>
               </div>
-              <p className="text-white/40">No se encontraron reportes</p>
-            </div>
-          </GlassCard3D>
-        ) : (
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: { opacity: 0 },
-              visible: { 
-                opacity: 1,
-                transition: { staggerChildren: 0.05 },
-              },
-            }}
-          >
-            {reportesFiltrados.map((reporte) => (
-              <motion.div
-                key={reporte.id}
+            </GlassCard3D>
+          </div>
+      
+          {/* Grid de reportes */}
+          <div className="relative z-10">
+            {reportesFiltrados.length === 0 ? (
+              <GlassCard3D variant="secondary" size="lg">
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="p-4 rounded-full bg-purple-500/10 mb-4">
+                    <FileText size={48} className="text-purple-400 opacity-50" />
+                  </div>
+                  <p className="text-white/40">No se encontraron reportes</p>
+                </div>
+              </GlassCard3D>
+            ) : (
+              <motion.div 
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                initial="hidden"
+                animate="visible"
                 variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0 },
+                  hidden: { opacity: 0 },
+                  visible: { 
+                    opacity: 1,
+                    transition: { staggerChildren: 0.05 },
+                  },
                 }}
               >
-                <ReporteCardPremium
-                  reporte={reporte}
-                  onGenerar={() => handleGenerarReporte(reporte)}
-                  onToggleFavorito={() => handleToggleFavorito(reporte.id)}
-                />
+                {reportesFiltrados.map((reporte) => (
+                  <motion.div
+                    key={reporte.id}
+                    variants={{
+                      hidden: { opacity: 0, y: 20 },
+                      visible: { opacity: 1, y: 0 },
+                    }}
+                  >
+                    <ReporteCardPremium
+                      reporte={reporte}
+                      onGenerar={() => handleGenerarReporte(reporte)}
+                      onToggleFavorito={() => handleToggleFavorito(reporte.id)}
+                    />
+                  </motion.div>
+                ))}
               </motion.div>
-            ))}
-          </motion.div>
-        )}
-      </div>
+            )}
+          </div>
+        </>
+      )}
       
       {/* Modal de exportación */}
       <AnimatePresence>
@@ -768,50 +817,51 @@ export function BentoReportesPremium() {
               </div>
               
               <div className="grid grid-cols-2 gap-4 mb-6">
-                <Button 
-                  variant="outline" 
-                  className="border-white/20 text-white/70 hover:bg-white/10 h-auto py-4 flex-col"
+                <ButtonTesla 
+                  variant="secondary"
+                  className="h-auto py-4 flex-col"
                 >
                   <FileSpreadsheet size={24} className="mb-2 text-emerald-400" />
                   <span>Excel</span>
                   <span className="text-xs text-white/50">Todos los datos</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="border-white/20 text-white/70 hover:bg-white/10 h-auto py-4 flex-col"
+                </ButtonTesla>
+                <ButtonTesla 
+                  variant="secondary"
+                  className="h-auto py-4 flex-col"
                 >
                   <FileType size={24} className="mb-2 text-rose-400" />
                   <span>PDF</span>
                   <span className="text-xs text-white/50">Reporte ejecutivo</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="border-white/20 text-white/70 hover:bg-white/10 h-auto py-4 flex-col"
+                </ButtonTesla>
+                <ButtonTesla 
+                  variant="secondary"
+                  className="h-auto py-4 flex-col"
                 >
                   <Printer size={24} className="mb-2 text-blue-400" />
                   <span>Imprimir</span>
                   <span className="text-xs text-white/50">Enviar a impresora</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="border-white/20 text-white/70 hover:bg-white/10 h-auto py-4 flex-col"
+                </ButtonTesla>
+                <ButtonTesla 
+                  variant="secondary"
+                  className="h-auto py-4 flex-col"
                 >
                   <Share2 size={24} className="mb-2 text-purple-400" />
                   <span>Compartir</span>
                   <span className="text-xs text-white/50">Email o link</span>
-                </Button>
+                </ButtonTesla>
               </div>
               
               <div className="flex gap-3">
-                <Button 
+                <ButtonTesla 
                   variant="ghost" 
-                  className="flex-1 text-white/60"
+                  className="flex-1"
                   onClick={() => setShowExportModal(false)}
                 >
                   Cancelar
-                </Button>
-                <Button 
-                  className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600"
+                </ButtonTesla>
+                <ButtonTesla 
+                  variant="primary"
+                  className="flex-1"
                   onClick={() => {
                     // Aquí iría la lógica de generación
                     setShowExportModal(false)
@@ -819,7 +869,7 @@ export function BentoReportesPremium() {
                 >
                   <Sparkles size={16} className="mr-2" />
                   Generar Ahora
-                </Button>
+                </ButtonTesla>
               </div>
             </motion.div>
           </motion.div>

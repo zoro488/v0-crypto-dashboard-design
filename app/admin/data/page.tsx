@@ -11,6 +11,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from '@/app/components/ui/button'
 import { Badge } from '@/app/components/ui/badge'
+import { useConfirmation } from '@/app/components/ui/confirmation-dialog'
 import {
   Database,
   RefreshCw,
@@ -119,11 +120,20 @@ export default function AdminDataPage() {
     }
   }
 
+  // Hook de confirmación
+  const { confirm, ConfirmDialog } = useConfirmation()
+
   // Limpiar datos
   const handleClearData = async () => {
-    if (!window.confirm('⚠️ ¿Estás seguro? Esto eliminará TODOS los datos de Firestore.')) {
-      return
-    }
+    const confirmed = await confirm({
+      title: '⚠️ Eliminar Todos los Datos',
+      description: 'Esta acción eliminará TODOS los datos de Firestore. Esta operación no se puede deshacer.',
+      variant: 'danger',
+      confirmText: 'Sí, eliminar todo',
+      cancelText: 'Cancelar',
+    })
+
+    if (!confirmed) return
     
     setIsClearing(true)
     try {
@@ -404,6 +414,9 @@ export default function AdminDataPage() {
           </li>
         </ul>
       </motion.div>
+
+      {/* Modal de confirmación */}
+      {ConfirmDialog}
     </div>
   )
 }

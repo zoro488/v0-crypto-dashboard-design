@@ -7,6 +7,7 @@
  */
 
 import { z } from 'zod'
+import { OptionalTimestampSchema } from './timestamp.schema'
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ESQUEMAS BASE
@@ -128,8 +129,8 @@ export const CrearVentaSchema = VentaBaseSchema
 export const VentaSchema = VentaBaseSchema.extend({
   id: z.string().min(1),
   clienteId: z.string().min(1),
-  createdAt: z.any().optional(),
-  updatedAt: z.any().optional(),
+  createdAt: OptionalTimestampSchema,
+  updatedAt: OptionalTimestampSchema,
 })
 
 // ═══════════════════════════════════════════════════════════════════════════

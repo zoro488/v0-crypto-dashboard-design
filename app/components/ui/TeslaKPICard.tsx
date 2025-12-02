@@ -127,7 +127,7 @@ export function TeslaKPICard({
         'transition-all duration-300',
         'hover:border-white/[0.1] hover:shadow-2xl hover:shadow-black/50',
         onClick && 'cursor-pointer',
-        className
+        className,
       )}
     >
       {/* Hover glow effect */}
@@ -157,7 +157,7 @@ export function TeslaKPICard({
               'flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium',
               trend >= 0 
                 ? 'bg-green-500/10 text-green-400 border border-green-500/20' 
-                : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                : 'bg-red-500/10 text-red-400 border border-red-500/20',
             )}
           >
             {trend >= 0 ? (
@@ -222,7 +222,7 @@ export function KPIGrid({ children, columns = 4, className }: KPIGridProps) {
       className={cn(
         'grid gap-4 lg:gap-6',
         gridCols[columns],
-        className
+        className,
       )}
     >
       {children}
@@ -255,7 +255,7 @@ export function MiniKPICard({
       className={cn(
         'p-4 rounded-xl bg-white/[0.03] border border-white/[0.05]',
         'hover:bg-white/[0.05] transition-all duration-200',
-        className
+        className,
       )}
     >
       <div className="flex items-center justify-between mb-2">
@@ -263,7 +263,7 @@ export function MiniKPICard({
         {trend !== undefined && (
           <span className={cn(
             'text-xs font-medium',
-            trend >= 0 ? 'text-green-400' : 'text-red-400'
+            trend >= 0 ? 'text-green-400' : 'text-red-400',
           )}>
             {trend >= 0 ? '+' : ''}{trend}%
           </span>

@@ -15,6 +15,19 @@
  */
 
 // ═══════════════════════════════════════════════════════════════════════════
+// SCHEMAS DE TIMESTAMPS (NUEVO - Para tipado correcto de fechas Firestore)
+// ═══════════════════════════════════════════════════════════════════════════
+export {
+  FirestoreTimestampSchema,
+  OptionalTimestampSchema,
+  FlexibleDateSchema,
+  HistorialPagoSchema,
+  toDate,
+  toISOString,
+  type HistorialPago,
+} from './timestamp.schema'
+
+// ═══════════════════════════════════════════════════════════════════════════
 // SCHEMAS DE OPERACIONES DE NEGOCIO (NUEVOS - RECOMENDADOS)
 // ═══════════════════════════════════════════════════════════════════════════
 export {

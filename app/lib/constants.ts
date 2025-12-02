@@ -79,7 +79,23 @@ export const BANCOS_CONFIG: Array<{
 ]
 
 /**
- * @deprecated Use BANCOS_CONFIG y lee los datos reales desde Firestore
- * Array vacío - los datos con valores vienen de Firestore
+ * Bancos con configuración inicial - se sincroniza con Firestore
+ * Los valores reales se actualizan desde Firestore
  */
-export const BANCOS: Banco[] = []
+export const BANCOS: Banco[] = BANCOS_CONFIG.map(config => ({
+  id: config.id,
+  nombre: config.nombre,
+  icon: config.icon,
+  color: config.color,
+  tipo: config.tipo,
+  descripcion: config.descripcion,
+  moneda: config.moneda,
+  capitalActual: 0,
+  capitalInicial: 0,
+  historicoIngresos: 0,
+  historicoGastos: 0,
+  historicoTransferencias: 0,
+  estado: 'activo' as const,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+}))

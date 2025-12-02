@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { type, query, code, language, error: errorMessage, stackTrace } = body
+    const { type, query, code, language, error: errorMessage, stackTrace: _stackTrace } = body
 
     let results: SearchResult[] | ErrorResolutionResult | CodeSuggestionResult
 

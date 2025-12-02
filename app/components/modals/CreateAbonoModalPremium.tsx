@@ -300,9 +300,10 @@ export function CreateAbonoModalPremium({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
         showCloseButton={false}
+        size="lg"
         className={cn(
-          'max-w-2xl max-h-[85vh] p-0 overflow-hidden',
-          'bg-black/60 backdrop-blur-2xl',
+          'p-0',
+          'bg-black/90 backdrop-blur-2xl',
           'border border-white/10',
           'text-white',
           'shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(34,197,94,0.15)]',

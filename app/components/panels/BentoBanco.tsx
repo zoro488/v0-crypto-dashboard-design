@@ -28,6 +28,15 @@ import {
   Clock,
   RefreshCw,
 } from 'lucide-react'
+// ═══════════════════════════════════════════════════════════════════════════
+// 🔴 TESLA 2025 DESIGN SYSTEM - Componentes Premium
+// ═══════════════════════════════════════════════════════════════════════════
+import { 
+  ButtonTesla,
+  CardTesla,
+  SkeletonDashboard,
+  DESIGN_TOKENS,
+} from '@/app/components/ui/tesla-index'
 import { BANCOS } from '@/app/lib/constants'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import SimpleCurrencyWidget from '@/app/components/widgets/SimpleCurrencyWidget'
@@ -312,15 +321,14 @@ export default function BentoBanco() {
   // Loading state DESPUÉS de todos los hooks
   if (loading) {
     return (
-      <div className="p-6 space-y-6">
-        <Skeleton className="h-48 w-full rounded-2xl" />
-        <Skeleton className="h-96 w-full rounded-2xl" />
+      <div className="p-6 space-y-6 bg-black min-h-screen">
+        <SkeletonDashboard />
       </div>
     )
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 bg-black min-h-screen">
       {/* Header with Bank Selector */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -821,15 +829,13 @@ export default function BentoBanco() {
                   <h3 className="text-2xl font-bold text-white tracking-tight">Ingresos Históricos</h3>
                   <p className="text-white/40 text-sm mt-1">Registro detallado de entradas de capital</p>
                 </div>
-                <motion.button
-                  whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(16, 185, 129, 0.3)' }}
-                  whileTap={{ scale: 0.95 }}
-                  className="btn-premium bg-emerald-500 hover:bg-emerald-400 text-white border-none flex items-center gap-2 shadow-lg shadow-emerald-900/20"
+                <ButtonTesla
+                  variant="primary"
                   onClick={() => setShowIngresoModal(true)}
                 >
                   <Plus className="w-4 h-4" />
                   Nuevo Ingreso
-                </motion.button>
+                </ButtonTesla>
               </div>
 
               <div className="overflow-x-auto">
@@ -915,15 +921,13 @@ export default function BentoBanco() {
                   <h3 className="text-2xl font-bold text-white tracking-tight">Gastos Históricos</h3>
                   <p className="text-white/40 text-sm mt-1">Registro detallado de salidas de capital</p>
                 </div>
-                <motion.button
-                  whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(244, 63, 94, 0.3)' }}
-                  whileTap={{ scale: 0.95 }}
+                <ButtonTesla
+                  variant="destructive"
                   onClick={() => setShowGastoModal(true)}
-                  className="btn-premium bg-rose-500 hover:bg-rose-400 text-white border-none flex items-center gap-2 shadow-lg shadow-rose-900/20"
                 >
                   <Plus className="w-4 h-4" />
                   Registrar Gasto
-                </motion.button>
+                </ButtonTesla>
               </div>
 
               <div className="overflow-x-auto">
@@ -1078,15 +1082,13 @@ export default function BentoBanco() {
                   <h3 className="text-2xl font-bold text-white tracking-tight">Transferencias</h3>
                   <p className="text-white/40 text-sm mt-1">Movimientos de capital entre bancos</p>
                 </div>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                <ButtonTesla
+                  variant="secondary"
                   onClick={() => setShowTransferenciaModal(true)}
-                  className="btn-premium bg-purple-500 hover:bg-purple-400 text-white border-none flex items-center gap-2 shadow-lg shadow-purple-900/20"
                 >
                   <Send className="w-4 h-4" />
                   Nueva Transferencia
-                </motion.button>
+                </ButtonTesla>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">

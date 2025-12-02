@@ -1,7 +1,7 @@
 import type React from 'react'
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/react'
+import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import Script from 'next/script'
 import './globals.css'
@@ -15,6 +15,7 @@ import { QueryProvider } from '@/app/providers/QueryProvider'
 import { AuthProvider } from '@/app/providers/AuthProvider'
 import { ConvexClientProvider } from '@/app/lib/convex/ConvexProvider'
 import { RollbarProvider } from '@/app/lib/rollbar/RollbarProvider'
+import { FeatureFlagsDebugPanel } from '@/app/components/debug/FeatureFlagsDebugPanel'
 // FloatingAIWidget removido - usar FloatingSplineAIWidget desde page.tsx
 // para evitar widgets duplicados
 
@@ -126,6 +127,9 @@ export default function RootLayout({
                         </div>
                         
                         {/* 🤖 AGENTE IA FLOTANTE - Manejado en page.tsx con FloatingSplineAIWidget */}
+                        
+                        {/* 🎯 FEATURE FLAGS DEBUG PANEL - Solo en desarrollo */}
+                        <FeatureFlagsDebugPanel />
                         
                         <Toaster />
                       </SplashScreen>

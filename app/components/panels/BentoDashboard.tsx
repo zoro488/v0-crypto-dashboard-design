@@ -3,7 +3,17 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import { TrendingUp, DollarSign, Package, ShoppingCart, Zap, PieChart, Filter, Users, Activity, ArrowUpRight, ArrowDownRight, Sparkles, Clock, Bell } from 'lucide-react'
-// InteractiveMetricsOrb eliminado - causaba problemas de layout y scroll excesivo
+// ═══════════════════════════════════════════════════════════════════════════
+// 🔴 TESLA 2025 DESIGN SYSTEM - Componentes Premium
+// ═══════════════════════════════════════════════════════════════════════════
+import { 
+  ButtonTesla,
+  CardTesla, 
+  StatCard as StatCardTesla,
+  SkeletonDashboard,
+  DESIGN_TOKENS,
+} from '@/app/components/ui/tesla-index'
+import { Skeleton } from '@/app/components/ui/skeleton'
 import {
   AreaChart,
   Area,
@@ -25,7 +35,6 @@ import {
 import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/components/ui/SafeChartContainer'
 import { useState, useEffect, useMemo, useCallback, memo } from 'react'
 import { useVentas, useOrdenesCompra, useProductos, useClientes, useBancosData } from '@/app/lib/firebase/firestore-hooks.service'
-import { Skeleton } from '@/app/components/ui/skeleton'
 import {
   AnimatedCounter,
   GlowButton,
@@ -214,18 +223,14 @@ export default memo(function BentoDashboard() {
 
   if (loadingVentas || loadingOC || loadingProductos) {
     return (
-      <div className="bento-container min-h-screen">
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="col-span-12 sm:col-span-6 lg:col-span-3">
-            <Skeleton className="h-32 w-full rounded-3xl" />
-          </div>
-        ))}
+      <div className="bento-container min-h-screen bg-black">
+        <SkeletonDashboard />
       </div>
     )
   }
 
   return (
-    <div className="grid grid-cols-12 gap-6 p-6 relative min-h-screen">
+    <div className="grid grid-cols-12 gap-6 p-6 relative min-h-screen bg-black">
       <AnimatePresence mode="wait">
         {showChronos && (
           <motion.div
@@ -586,38 +591,30 @@ export default memo(function BentoDashboard() {
         </div>
 
         <div className="flex gap-3">
-          <motion.button
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.95 }}
+          <ButtonTesla
+            variant="primary"
             onClick={() => setIsOrdenModalOpen(true)}
-            className="px-6 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg transition-all bg-gradient-to-r from-blue-600 to-cyan-500 hover:shadow-blue-500/25"
           >
             Nueva Orden
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.95 }}
+          </ButtonTesla>
+          <ButtonTesla
+            variant="secondary"
             onClick={() => setIsVentaModalOpen(true)}
-            className="px-6 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg transition-all bg-white/5 hover:bg-white/10 border border-white/5"
           >
             Registrar Venta
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.95 }}
+          </ButtonTesla>
+          <ButtonTesla
+            variant="secondary"
             onClick={() => setIsTransferenciaModalOpen(true)}
-            className="px-6 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg transition-all bg-white/5 hover:bg-white/10 border border-white/5"
           >
             Transferencia
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.95 }}
+          </ButtonTesla>
+          <ButtonTesla
+            variant="ghost"
             onClick={() => useAppStore.getState().setCurrentPanel('reportes')}
-            className="px-6 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg transition-all bg-white/5 hover:bg-white/10 border border-white/5"
           >
             Reporte Rápido
-          </motion.button>
+          </ButtonTesla>
         </div>
       </motion.div>
 

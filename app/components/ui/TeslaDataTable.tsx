@@ -129,7 +129,7 @@ function ActionMenu<T>({ row, actions, isOpen, onToggle, onClose }: ActionMenuPr
                       'transition-colors text-left',
                       action.variant === 'danger'
                         ? 'text-red-400 hover:bg-red-500/10'
-                        : 'text-white/70 hover:bg-white/5 hover:text-white'
+                        : 'text-white/70 hover:bg-white/5 hover:text-white',
                     )}
                   >
                     <Icon className="w-4 h-4" />
@@ -209,7 +209,7 @@ function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) 
                   'w-8 h-8 rounded-lg text-sm font-medium transition-colors',
                   page === currentPage
                     ? 'bg-white text-black'
-                    : 'text-white/60 hover:bg-white/5'
+                    : 'text-white/60 hover:bg-white/5',
                 )}
               >
                 {page}
@@ -301,8 +301,8 @@ export function TeslaDataTable<T extends Record<string, unknown>>({
       const query = searchQuery.toLowerCase()
       result = result.filter((row) =>
         Object.values(row).some((value) =>
-          String(value).toLowerCase().includes(query)
-        )
+          String(value).toLowerCase().includes(query),
+        ),
       )
     }
 
@@ -377,7 +377,7 @@ export function TeslaDataTable<T extends Record<string, unknown>>({
                   className={cn(
                     'px-4 py-3 text-xs font-semibold text-white/50 uppercase tracking-wider',
                     'text-left',
-                    column.sortable && 'cursor-pointer hover:text-white/70 transition-colors select-none'
+                    column.sortable && 'cursor-pointer hover:text-white/70 transition-colors select-none',
                   )}
                   style={{ width: column.width }}
                   onClick={() => column.sortable && handleSort(String(column.key))}
@@ -385,7 +385,7 @@ export function TeslaDataTable<T extends Record<string, unknown>>({
                   <div className={cn(
                     'flex items-center gap-1',
                     column.align === 'center' && 'justify-center',
-                    column.align === 'right' && 'justify-end'
+                    column.align === 'right' && 'justify-end',
                   )}>
                     <span>{column.header}</span>
                     {column.sortable && sortConfig?.key === column.key && (
@@ -434,7 +434,7 @@ export function TeslaDataTable<T extends Record<string, unknown>>({
                     'border-b border-white/5',
                     'hover:bg-[#111111] transition-colors',
                     index % 2 === 0 ? 'bg-transparent' : 'bg-white/[0.01]',
-                    onRowClick && 'cursor-pointer'
+                    onRowClick && 'cursor-pointer',
                   )}
                 >
                   {columns.map((column) => {
@@ -445,7 +445,7 @@ export function TeslaDataTable<T extends Record<string, unknown>>({
                         className={cn(
                           'px-4 py-4 text-sm text-white/80',
                           column.align === 'center' && 'text-center',
-                          column.align === 'right' && 'text-right'
+                          column.align === 'right' && 'text-right',
                         )}
                       >
                         {column.render

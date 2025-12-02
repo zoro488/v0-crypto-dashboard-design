@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useEffect, lazy, Suspense } from 'react'
 import { useOptimizedPerformance } from '@/app/lib/hooks/useOptimizedPerformance'
 import { ScrollProgress, ScrollReveal } from '@/app/components/ui/ScrollReveal'
-import { PanelNavigator3D, QuickStats3D } from '@/app/components/ui/QuickStats3D'
+import { QuickStats3D } from '@/app/components/ui/QuickStats3D'
 import { useFirestoreCRUD } from '@/app/hooks/useFirestoreCRUD'
 import type { Venta, Cliente, OrdenCompra, Banco } from '@/app/types'
 import { 
@@ -21,16 +21,12 @@ import {
 // Nuevo Dashboard Premium con animación CHRONOS
 const ChronosDashboard = lazy(() => import('@/app/components/panels/ChronosDashboard'))
 
-// Paneles existentes
-const BentoOrdenesCompra = lazy(() => import('@/app/components/panels/BentoOrdenesCompra'))
+// Paneles Premium - TODOS los paneles usan versiones Premium con componentes 3D avanzados
+const BentoOrdenesCompraPremium = lazy(() => import('@/app/components/panels/BentoOrdenesCompraPremium'))
 const BentoBanco = lazy(() => import('@/app/components/panels/BentoBanco'))
-
-// Panel Ventas Premium con CRUD completo, perfiles y tabla avanzada
 const BentoVentasPremium = lazy(() => import('@/app/components/panels/BentoVentasPremium'))
-const BentoAlmacen = lazy(() => import('@/app/components/panels/BentoAlmacen'))
-const BentoReportes = lazy(() => import('@/app/components/panels/BentoReportes'))
-
-// Paneles Premium con CRUD completo, perfiles y tabla avanzada
+const BentoAlmacenPremium = lazy(() => import('@/app/components/panels/BentoAlmacenPremium'))
+const BentoReportesPremium = lazy(() => import('@/app/components/panels/BentoReportesPremium'))
 const BentoClientesPremium = lazy(() => import('@/app/components/panels/BentoClientesPremium'))
 const BentoDistribuidoresPremium = lazy(() => import('@/app/components/panels/BentoDistribuidoresPremium'))
 
@@ -185,7 +181,7 @@ export default function Chronos() {
       case 'dashboard':
         return <ChronosDashboard />
       case 'ordenes':
-        return <BentoOrdenesCompra />
+        return <BentoOrdenesCompraPremium />
       case 'ventas':
         return <BentoVentasPremium />
       case 'distribuidores':
@@ -202,13 +198,13 @@ export default function Chronos() {
       case 'profit':
         return <BentoBanco />
       case 'almacen':
-        return <BentoAlmacen />
+        return <BentoAlmacenPremium />
       case 'gya':
       case 'gastos':
       case 'abonos':
         return <BentoGYA />
       case 'reportes':
-        return <BentoReportes />
+        return <BentoReportesPremium />
       case 'ia':
         return <BentoIAImmersive />
       default:
@@ -304,18 +300,6 @@ export default function Chronos() {
         <ChronosHeader />
 
         <main className="pt-20 px-4 md:px-6 lg:px-8 pb-8 overflow-x-hidden max-w-full">
-          {/* Panel Navigator 3D */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6"
-          >
-            <PanelNavigator3D 
-              currentPanel={currentPanel}
-              onPanelChange={setCurrentPanel}
-            />
-          </motion.div>
-
           {/* Quick Stats 3D */}
           {_showStats && (
             <motion.div

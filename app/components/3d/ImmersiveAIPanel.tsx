@@ -12,29 +12,26 @@
  * - HUD táctico
  */
 
-import { useState, useCallback, useRef, useEffect, Suspense, useMemo } from 'react'
+import { useState, useCallback, useRef, useEffect, Suspense } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { 
   Environment, 
   Float, 
-  Text3D, 
-  Center, 
   RoundedBox,
   Html,
   PerspectiveCamera,
   OrbitControls,
   ContactShadows,
   MeshTransmissionMaterial,
-  useGLTF,
   Sparkles,
 } from '@react-three/drei'
-import { EffectComposer, Bloom, ChromaticAberration, Vignette, SSAO } from '@react-three/postprocessing'
+import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing'
 import { BlendFunction } from 'postprocessing'
 import { motion, AnimatePresence } from 'framer-motion'
 import * as THREE from 'three'
 import { 
-  Send, Mic, MicOff, X, Minimize2, Maximize2, 
-  BarChart3, PieChart, TrendingUp, FileText, 
+  Send, Mic, MicOff, X,
+  FileText, 
   Package, Users, DollarSign, AlertTriangle,
   CheckCircle, Clock, Database, Cpu, Activity,
   ChevronRight, Plus, Edit3, Save, Trash2,

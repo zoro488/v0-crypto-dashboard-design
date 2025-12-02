@@ -15,14 +15,14 @@
 
 import { useState, useCallback, useRef, useEffect, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { Environment, ContactShadows, PerspectiveCamera } from '@react-three/drei'
+import { Environment } from '@react-three/drei'
 import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing'
 import { BlendFunction } from 'postprocessing'
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion'
 import { 
   X, Send, Minimize2, Maximize2, Sparkles, Bot, User, 
-  Zap, Brain, Activity, MessageSquare, Mic, MicOff,
-  ChevronUp, BarChart3, FileText, Calculator, Package,
+  Zap, Brain, Activity, Mic, MicOff,
+  BarChart3, FileText, Calculator, Package,
 } from 'lucide-react'
 import * as THREE from 'three'
 

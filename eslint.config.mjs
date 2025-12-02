@@ -206,6 +206,9 @@ export default [
       'sentry.*.config.ts', // Configs de Sentry
       'evaluation/**', // Evaluación de AI
       'next-env.d.ts', // Autogenerado por Next.js - no editar
+      'functions/**', // Cloud Functions con su propio tsconfig
+      'generated/**', // Código generado automáticamente
+      'analysis_output/**', // Output de análisis
     ],
   },
   

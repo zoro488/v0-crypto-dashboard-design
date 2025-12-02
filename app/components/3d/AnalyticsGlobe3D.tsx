@@ -3,7 +3,6 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import { Card } from '@/app/components/ui/card'
 import { Badge } from '@/app/components/ui/badge'
-import { Button } from '@/app/components/ui/button'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Globe, 
@@ -17,7 +16,6 @@ import {
   ZoomOut,
   RotateCcw,
 } from 'lucide-react'
-import { logger } from '@/app/lib/utils/logger'
 
 // ============================================
 // INTERFACES Y TIPOS
@@ -38,7 +36,7 @@ export interface AnalyticsGlobe3DProps {
   data: DataPoint[];
   title?: string;
   height?: number;
-  onPointClick?: (point: DataPoint) => void;
+  onPointClick?: (_point: DataPoint) => void;
   autoRotate?: boolean;
   showLegend?: boolean;
 }

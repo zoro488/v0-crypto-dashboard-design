@@ -221,10 +221,11 @@ export default function CreatePagoDistribuidorModal({
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
+        size="lg"
         className={cn(
-          'max-w-2xl max-h-[85vh] p-0',
+          'p-0',
           'bg-black/95 border-white/10 backdrop-blur-2xl',
-          'text-white overflow-hidden flex flex-col',
+          'text-white flex flex-col',
           'shadow-2xl shadow-red-500/10',
         )}
       >

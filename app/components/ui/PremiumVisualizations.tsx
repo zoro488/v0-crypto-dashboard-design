@@ -69,7 +69,7 @@ export const Card3D = ({ children, className, depth = 10, glare = true }: Card3D
       className={cn(
         'relative rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10',
         'transition-shadow duration-300 hover:shadow-2xl hover:shadow-blue-500/10',
-        className
+        className,
       )}
     >
       {/* Glare effect */}
@@ -79,7 +79,7 @@ export const Card3D = ({ children, className, depth = 10, glare = true }: Card3D
           style={{
             background: useTransform(
               [glareX, glareY],
-              ([x, y]) => `radial-gradient(circle at ${x}% ${y}%, rgba(255,255,255,0.15) 0%, transparent 50%)`
+              ([x, y]) => `radial-gradient(circle at ${x}% ${y}%, rgba(255,255,255,0.15) 0%, transparent 50%)`,
             ),
           }}
         />
@@ -147,7 +147,7 @@ export const AnimatedBarChart = ({
               transition={{ 
                 delay: index * 0.1, 
                 duration: 0.8, 
-                ease: [0.22, 1, 0.36, 1] 
+                ease: [0.22, 1, 0.36, 1], 
               }}
               style={{ originY: 1 }}
             >
@@ -165,12 +165,12 @@ export const AnimatedBarChart = ({
               <motion.div
                 className={cn(
                   'w-full rounded-t-lg bg-gradient-to-t relative overflow-hidden',
-                  color
+                  color,
                 )}
                 style={{ height: `${percentage}%` }}
                 whileHover={{ 
                   scale: 1.05,
-                  transition: { duration: 0.2 }
+                  transition: { duration: 0.2 },
                 }}
               >
                 {/* Shimmer effect */}
@@ -181,7 +181,7 @@ export const AnimatedBarChart = ({
                     duration: 2, 
                     repeat: Infinity, 
                     repeatDelay: 3,
-                    delay: index * 0.2
+                    delay: index * 0.2,
                   }}
                 />
                 
@@ -271,7 +271,7 @@ export const AnimatedRingChart = ({
               transition={{ 
                 duration: 1.5, 
                 delay: index * 0.2,
-                ease: [0.22, 1, 0.36, 1]
+                ease: [0.22, 1, 0.36, 1],
               }}
               className="drop-shadow-lg"
               style={{
@@ -325,7 +325,7 @@ export const ParticleBackground = ({
       duration: 10 + Math.random() * 20,
       delay: Math.random() * 5,
     })),
-    [count, minSize, maxSize]
+    [count, minSize, maxSize],
   )
 
   return (
@@ -429,7 +429,7 @@ export const AnimatedStatCard = ({
         'relative p-6 rounded-2xl bg-gradient-to-br border backdrop-blur-xl',
         'transition-all duration-300 overflow-hidden group',
         colorStyles[color],
-        className
+        className,
       )}
     >
       {/* Background glow */}
@@ -459,7 +459,7 @@ export const AnimatedStatCard = ({
             transition={{ delay: 0.5 }}
             className={cn(
               'inline-flex items-center gap-1 text-sm font-medium',
-              trend >= 0 ? 'text-emerald-400' : 'text-rose-400'
+              trend >= 0 ? 'text-emerald-400' : 'text-rose-400',
             )}
           >
             <svg
@@ -506,9 +506,9 @@ export const WaveAnimation = ({
           fill={color}
           animate={{
             d: [
-              "M0,50 C360,100 720,0 1080,50 C1260,75 1380,25 1440,50 L1440,100 L0,100 Z",
-              "M0,50 C360,0 720,100 1080,50 C1260,25 1380,75 1440,50 L1440,100 L0,100 Z",
-              "M0,50 C360,100 720,0 1080,50 C1260,75 1380,25 1440,50 L1440,100 L0,100 Z",
+              'M0,50 C360,100 720,0 1080,50 C1260,75 1380,25 1440,50 L1440,100 L0,100 Z',
+              'M0,50 C360,0 720,100 1080,50 C1260,25 1380,75 1440,50 L1440,100 L0,100 Z',
+              'M0,50 C360,100 720,0 1080,50 C1260,75 1380,25 1440,50 L1440,100 L0,100 Z',
             ],
           }}
           transition={{
@@ -530,9 +530,9 @@ export const WaveAnimation = ({
           fill={color.replace('0.3', '0.2')}
           animate={{
             d: [
-              "M0,50 C360,0 720,100 1080,50 C1260,25 1380,75 1440,50 L1440,100 L0,100 Z",
-              "M0,50 C360,100 720,0 1080,50 C1260,75 1380,25 1440,50 L1440,100 L0,100 Z",
-              "M0,50 C360,0 720,100 1080,50 C1260,25 1380,75 1440,50 L1440,100 L0,100 Z",
+              'M0,50 C360,0 720,100 1080,50 C1260,25 1380,75 1440,50 L1440,100 L0,100 Z',
+              'M0,50 C360,100 720,0 1080,50 C1260,75 1380,25 1440,50 L1440,100 L0,100 Z',
+              'M0,50 C360,0 720,100 1080,50 C1260,25 1380,75 1440,50 L1440,100 L0,100 Z',
             ],
           }}
           transition={{
