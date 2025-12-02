@@ -3,14 +3,22 @@
  */
 import { initializeApp } from 'firebase/app'
 import { getFirestore, collection, getDocs, query, limit } from 'firebase/firestore'
+import 'dotenv/config'
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBwIBzl5LyWgKljRQJJLFzBf7u2eSO8Cvc",
-  authDomain: "premium-ecosystem-1760790572.firebaseapp.com",
-  projectId: "premium-ecosystem-1760790572",
-  storageBucket: "premium-ecosystem-1760790572.firebasestorage.app",
-  messagingSenderId: "781178880075",
-  appId: "1:781178880075:web:aa3b0f5badd5ebd94e1a2f"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+}
+
+// Validar configuración
+if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+  console.error('❌ Error: Variables de entorno de Firebase no configuradas')
+  console.error('   Copia .env.local.template a .env.local y configura las credenciales')
+  process.exit(1)
 }
 
 const app = initializeApp(firebaseConfig)

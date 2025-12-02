@@ -46,6 +46,7 @@
     "_deprecated",
     "app/lib/profit-engine/**",
     "app/lib/services/ai/**",
-    "app/lib/services/ventas-transaction.service.ts"
+    "app/lib/services/ventas-transaction.service.ts",
+    "functions/**"
   ]
 }

@@ -1,6 +1,8 @@
 /**
  * Migración a Firestore usando Firebase Web SDK
  * No requiere service account - usa credenciales web públicas
+ * 
+ * ⚠️ Requiere variables de entorno configuradas en .env.local
  */
 
 import { initializeApp } from 'firebase/app';
@@ -14,16 +16,24 @@ import {
 } from 'firebase/firestore';
 import * as fs from 'fs';
 import * as path from 'path';
+import 'dotenv/config';
 
-// Configuración Firebase Web
+// Configuración Firebase Web desde variables de entorno
 const firebaseConfig = {
-  apiKey: "AIzaSyCR7zKZJAzCEq-jBbfkLJxWaz98zuRCkX4",
-  authDomain: "premium-ecosystem-1760790572.firebaseapp.com",
-  projectId: "premium-ecosystem-1760790572",
-  storageBucket: "premium-ecosystem-1760790572.firebasestorage.app",
-  messagingSenderId: "100411784487",
-  appId: "1:100411784487:web:ac2713291717869bc83d02",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
+
+// Validar configuración
+if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+  console.error('❌ Error: Variables de entorno de Firebase no configuradas');
+  console.error('   Copia .env.local.template a .env.local y configura las credenciales');
+  process.exit(1);
+}
 
 // Inicializar Firebase
 const app = initializeApp(firebaseConfig);
