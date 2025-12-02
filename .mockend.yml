@@ -1,0 +1,119 @@
+# 📦 Mockend Configuration for CHRONOS System
+# API Mock para desarrollo y testing sin afectar Firestore
+# Docs: https://mockend.com/docs
+
+# Clave secreta para proteger el API mock
+key: ${MOCKEND_SECRET_KEY}
+
+models:
+  # 💰 Ventas - Transacciones de ventas
+  Venta:
+    belongsTo: [Cliente, Distribuidor]
+    hasMany: [Pago]
+    fake:
+      _count: 100
+      folio: { numerify: 'VTA-2024-####' }
+      precioVentaUnidad: { int: [8000, 15000] }
+      precioCompraUnidad: { int: [5000, 8000] }
+      precioFlete: { int: [300, 800] }
+      cantidad: { int: [1, 50] }
+      estadoPago: { oneOfString: ['completo', 'parcial', 'pendiente'] }
+      createdAt: { dateTime: [2024-01-01T00:00:00Z, 2024-12-31T23:59:59Z] }
+      updatedAt: dateTime
+
+  # 👤 Clientes
+  Cliente:
+    hasMany: [Venta]
+    fake:
+      _count: 50
+      nombre: name
+      email: email
+      telefono: phoneFormatted
+      direccion: street
+      ciudad: city
+      estado: state
+      rfc: { bothify: '????######???' }
+      activo: { bool: 95 }
+      createdAt: dateTime
+    data: [
+      { nombre: 'Cliente Demo 1', email: 'demo1@chronos.mx' },
+      { nombre: 'Cliente Demo 2', email: 'demo2@chronos.mx' },
+    ]
+
+  # 🚚 Distribuidores
+  Distribuidor:
+    hasMany: [Venta, OrdenCompra]
+    fake:
+      _count: 20
+      nombre: company
+      contacto: name
+      email: email
+      telefono: phoneFormatted
+      direccion: street
+      ciudad: city
+      estado: state
+      activo: { bool: 90 }
+      comisionPorcentaje: { float: [0.05, 0.15] }
+      createdAt: dateTime
+
+  # 📋 Órdenes de Compra
+  OrdenCompra:
+    belongsTo: [Distribuidor]
+    fake:
+      _count: 75
+      folio: { numerify: 'OC-2024-####' }
+      producto: { loremWords: [1, 3] }
+      cantidad: { int: [10, 200] }
+      precioUnitario: { int: [4000, 7000] }
+      estado: { oneOfString: ['pendiente', 'en_proceso', 'completada', 'cancelada'] }
+      fechaEntrega: { dateTime: [2024-06-01T00:00:00Z, 2025-06-01T23:59:59Z] }
+      createdAt: dateTime
+
+  # 💳 Pagos
+  Pago:
+    belongsTo: [Venta]
+    fake:
+      _count: 150
+      monto: { float: [1000, 50000] }
+      metodoPago: { oneOfString: ['efectivo', 'transferencia', 'tarjeta', 'cheque'] }
+      referencia: { hex32: '' }
+      fechaPago: dateTime
+      banco: { oneOfString: ['boveda_monte', 'boveda_usa', 'profit', 'leftie', 'azteca', 'flete_sur', 'utilidades'] }
+      createdAt: dateTime
+
+  # 💸 Movimientos Bancarios
+  Movimiento:
+    fake:
+      _count: 200
+      tipo: { oneOfString: ['ingreso', 'egreso', 'transferencia'] }
+      monto: { float: [500, 100000] }
+      concepto: { loremWords: [2, 5] }
+      bancoOrigen: { oneOfString: ['boveda_monte', 'boveda_usa', 'profit', 'leftie', 'azteca', 'flete_sur', 'utilidades'] }
+      bancoDestino: { oneOfString: ['boveda_monte', 'boveda_usa', 'profit', 'leftie', 'azteca', 'flete_sur', 'utilidades', null] }
+      referencia: { hex16: '' }
+      createdAt: { dateTime: [2024-01-01T00:00:00Z, 2024-12-31T23:59:59Z] }
+
+  # 📦 Almacén
+  ProductoAlmacen:
+    fake:
+      _count: 30
+      nombre: { loremWords: [1, 3] }
+      sku: { bothify: 'SKU-????-####' }
+      cantidad: { int: [0, 500] }
+      minimo: { int: [10, 50] }
+      ubicacion: { bothify: 'A##-B##' }
+      precioCompra: { float: [3000, 8000] }
+      precioVenta: { float: [8000, 15000] }
+      activo: { bool: 98 }
+      createdAt: dateTime
+
+  # 📊 Métricas Dashboard
+  MetricaDashboard:
+    fake:
+      _count: 365
+      fecha: { dateTime: [2024-01-01T00:00:00Z, 2024-12-31T23:59:59Z] }
+      ventasTotales: { float: [50000, 500000] }
+      gastosOperativos: { float: [10000, 100000] }
+      utilidadNeta: { float: [20000, 300000] }
+      numeroVentas: { int: [5, 50] }
+      ticketPromedio: { float: [8000, 20000] }
