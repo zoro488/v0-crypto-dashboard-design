@@ -57,6 +57,7 @@ import { useAppStore } from '@/app/lib/store/useAppStore'
 import { logger } from '@/app/lib/utils/logger'
 import { formatearMonto } from '@/app/lib/validations/smart-forms-schemas'
 import { crearVenta } from '@/app/lib/services/unified-data-service'
+import { useClientesData, useOrdenesCompraData } from '@/app/lib/firebase/firestore-hooks.service'
 
 // ============================================
 // SCHEMA ZOD
@@ -106,37 +107,6 @@ interface CarritoItem {
   stockDisponible: number
 }
 
-// Clientes del CSV
-const CLIENTES_MOCK = [
-  { id: 'bodega-mp', nombre: 'Bódega M-P', telefono: '555-0001', deuda: 945000 },
-  { id: 'valle', nombre: 'Valle', telefono: '555-0002', deuda: 378000 },
-  { id: 'ax', nombre: 'Ax', telefono: '555-0003', deuda: 0 },
-  { id: 'negrito', nombre: 'Negrito', telefono: '555-0004', deuda: 0 },
-  { id: 'wero-benavides', nombre: 'Wero Benavides', telefono: '555-0005', deuda: 126000 },
-  { id: 'lamas', nombre: 'Lamas', telefono: '555-0006', deuda: 485100 },
-  { id: 'tramite-chucho', nombre: 'Trámite Chucho', telefono: '555-0007', deuda: 302400 },
-  { id: 'galvan', nombre: 'Galvan', telefono: '555-0008', deuda: 0 },
-  { id: 'valle-local', nombre: 'Valle Local', telefono: '555-0009', deuda: 0 },
-  { id: 'tocayo', nombre: 'Tocayo', telefono: '555-0010', deuda: 0 },
-  { id: 'sierra47', nombre: 'Sierra47', telefono: '555-0011', deuda: 0 },
-  { id: 'chucho', nombre: 'Chucho', telefono: '555-0012', deuda: 0 },
-  { id: 'tio-tocayo', nombre: 'Tio Tocayo', telefono: '555-0013', deuda: 315000 },
-  { id: '470', nombre: '470', telefono: '555-0014', deuda: 0 },
-]
-
-// OCs relacionadas del CSV
-const OCS_DISPONIBLES = [
-  { id: 'OC0001', distribuidor: 'Q-MAYA', cantidad: 423, stockActual: 0 },
-  { id: 'OC0002', distribuidor: 'Q-MAYA', cantidad: 32, stockActual: 0 },
-  { id: 'OC0003', distribuidor: 'A/X🌶️🦀', cantidad: 33, stockActual: 0 },
-  { id: 'OC0004', distribuidor: 'PACMAN', cantidad: 487, stockActual: 150 },
-  { id: 'OC0005', distribuidor: 'Q-MAYA', cantidad: 513, stockActual: 200 },
-  { id: 'OC0006', distribuidor: 'CH-MONTE', cantidad: 100, stockActual: 50 },
-  { id: 'OC0007', distribuidor: 'VALLE-MONTE', cantidad: 20, stockActual: 20 },
-  { id: 'OC0008', distribuidor: 'PACMAN', cantidad: 488, stockActual: 300 },
-  { id: 'OC0009', distribuidor: 'Q-MAYA-MP', cantidad: 200, stockActual: 150 },
-]
-
 // Pasos del wizard
 const STEPS = [
   { id: 1, title: 'Cliente', icon: User, description: '¿Quién compra?' },
@@ -162,6 +132,25 @@ const itemVariants = {
 // COMPONENTE PRINCIPAL
 // ============================================
 
+// Tipo para cliente del hook
+interface ClienteData {
+  id: string
+  nombre: string
+  telefono?: string
+  deuda?: number
+  empresa?: string
+  email?: string
+}
+
+// Tipo para orden de compra del hook
+interface OrdenCompraData {
+  id: string
+  distribuidor?: string
+  cantidad?: number
+  stockActual?: number
+  status?: string
+}
+
 export function CreateVentaModalPremium({ 
   open, 
   onClose, 
@@ -172,8 +161,34 @@ export function CreateVentaModalPremium({
   const [step, setStep] = React.useState(1)
   const [direction, setDirection] = React.useState(1)
   
+  // 📦 Obtener datos desde localStorage/Firebase
+  const { data: clientesRaw, loading: loadingClientes } = useClientesData()
+  const { data: ordenesRaw, loading: loadingOrdenes } = useOrdenesCompraData()
+  
+  // Transformar datos a formato esperado
+  const clientes = React.useMemo<ClienteData[]>(() => {
+    return (clientesRaw || []).map((c: Record<string, unknown>) => ({
+      id: (c.id as string) || `cliente-${Date.now()}`,
+      nombre: (c.nombre as string) || 'Sin nombre',
+      telefono: (c.telefono as string) || '',
+      deuda: typeof c.deuda === 'number' ? c.deuda : 0,
+      empresa: c.empresa as string,
+      email: c.email as string,
+    }))
+  }, [clientesRaw])
+  
+  const ordenesCompra = React.useMemo<OrdenCompraData[]>(() => {
+    return (ordenesRaw || []).map((oc: Record<string, unknown>) => ({
+      id: (oc.id as string) || `oc-${Date.now()}`,
+      distribuidor: (oc.distribuidor as string) || 'Desconocido',
+      cantidad: typeof oc.cantidad === 'number' ? oc.cantidad : 0,
+      stockActual: typeof oc.stockActual === 'number' ? oc.stockActual : 0,
+      status: oc.status as string,
+    }))
+  }, [ordenesRaw])
+  
   // Estado del formulario
-  const [clienteSeleccionado, setClienteSeleccionado] = React.useState<typeof CLIENTES_MOCK[0] | null>(null)
+  const [clienteSeleccionado, setClienteSeleccionado] = React.useState<ClienteData | null>(null)
   const [clienteSearch, setClienteSearch] = React.useState('')
   const [carrito, setCarrito] = React.useState<CarritoItem[]>([])
   const [ocSeleccionada, setOcSeleccionada] = React.useState<string>('')
@@ -188,15 +203,15 @@ export function CreateVentaModalPremium({
   const PRECIO_FLETE_DEFAULT = 500   // Flete por unidad
   const PRECIO_VENTA_DEFAULT = 7000  // Precio venta sugerido
 
-  // Clientes filtrados
+  // Clientes filtrados desde datos reales
   const clientesFiltrados = React.useMemo(() => {
-    if (!clienteSearch) return CLIENTES_MOCK
+    if (!clienteSearch) return clientes
     const q = clienteSearch.toLowerCase()
-    return CLIENTES_MOCK.filter(c => 
+    return clientes.filter(c => 
       c.nombre.toLowerCase().includes(q) ||
-      c.telefono.includes(q),
+      (c.telefono && c.telefono.includes(q)),
     )
-  }, [clienteSearch])
+  }, [clienteSearch, clientes])
 
   // Cálculos del carrito con distribución GYA
   const totales = React.useMemo(() => {
@@ -531,47 +546,60 @@ export function CreateVentaModalPremium({
 
                   {/* Lista de clientes */}
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-[400px] overflow-y-auto">
-                    {clientesFiltrados.map((cliente) => (
-                      <motion.button
-                        key={cliente.id}
-                        type="button"
-                        onClick={() => setClienteSeleccionado(cliente)}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className={cn(
-                          'relative p-4 rounded-xl border text-left transition-all',
-                          clienteSeleccionado?.id === cliente.id
-                            ? 'bg-green-500/20 border-green-500 shadow-lg shadow-green-500/20'
-                            : 'bg-white/5 border-white/10 hover:bg-white/10',
-                        )}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className={cn(
-                            'w-10 h-10 rounded-full flex items-center justify-center',
+                    {loadingClientes ? (
+                      <div className="col-span-full text-center py-8 text-gray-500">
+                        <Loader2 className="w-8 h-8 mx-auto mb-2 animate-spin" />
+                        <p>Cargando clientes...</p>
+                      </div>
+                    ) : clientesFiltrados.length === 0 ? (
+                      <div className="col-span-full text-center py-8 text-gray-500">
+                        <User className="w-12 h-12 mx-auto mb-2 opacity-30" />
+                        <p>No hay clientes registrados.</p>
+                        <p className="text-sm">Crea uno desde el panel de Clientes.</p>
+                      </div>
+                    ) : (
+                      clientesFiltrados.map((cliente) => (
+                        <motion.button
+                          key={cliente.id}
+                          type="button"
+                          onClick={() => setClienteSeleccionado(cliente)}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className={cn(
+                            'relative p-4 rounded-xl border text-left transition-all',
                             clienteSeleccionado?.id === cliente.id
-                              ? 'bg-green-500 text-white'
-                              : 'bg-white/10 text-gray-400',
-                          )}>
-                            <User className="w-5 h-5" />
+                              ? 'bg-green-500/20 border-green-500 shadow-lg shadow-green-500/20'
+                              : 'bg-white/5 border-white/10 hover:bg-white/10',
+                          )}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={cn(
+                              'w-10 h-10 rounded-full flex items-center justify-center',
+                              clienteSeleccionado?.id === cliente.id
+                                ? 'bg-green-500 text-white'
+                                : 'bg-white/10 text-gray-400',
+                            )}>
+                              <User className="w-5 h-5" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-white truncate">{cliente.nombre}</p>
+                              <p className="text-xs text-gray-500">{cliente.telefono || 'Sin teléfono'}</p>
+                            </div>
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-white truncate">{cliente.nombre}</p>
-                            <p className="text-xs text-gray-500">{cliente.telefono}</p>
-                          </div>
-                        </div>
-                        {cliente.deuda > 0 && (
-                          <Badge 
-                            variant="outline" 
-                            className="absolute top-2 right-2 border-orange-500/50 text-orange-400 text-[10px]"
-                          >
-                            Deuda: {formatearMonto(cliente.deuda)}
-                          </Badge>
-                        )}
-                        {clienteSeleccionado?.id === cliente.id && (
-                          <CheckCircle2 className="absolute bottom-2 right-2 w-5 h-5 text-green-400" />
-                        )}
-                      </motion.button>
-                    ))}
+                          {(cliente.deuda ?? 0) > 0 && (
+                            <Badge 
+                              variant="outline" 
+                              className="absolute top-2 right-2 border-orange-500/50 text-orange-400 text-[10px]"
+                            >
+                              Deuda: {formatearMonto(cliente.deuda ?? 0)}
+                            </Badge>
+                          )}
+                          {clienteSeleccionado?.id === cliente.id && (
+                            <CheckCircle2 className="absolute bottom-2 right-2 w-5 h-5 text-green-400" />
+                          )}
+                        </motion.button>
+                      ))
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -603,23 +631,29 @@ export function CreateVentaModalPremium({
                   {/* OC Relacionada */}
                   <div className="p-4 rounded-xl bg-white/5 border border-white/10">
                     <Label className="text-sm text-gray-400 mb-2 block">OC Relacionada (opcional)</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {OCS_DISPONIBLES.filter(oc => oc.stockActual > 0).map((oc) => (
-                        <button
-                          key={oc.id}
-                          type="button"
-                          onClick={() => setOcSeleccionada(oc.id === ocSeleccionada ? '' : oc.id)}
-                          className={cn(
-                            'px-3 py-2 rounded-lg text-sm transition-all',
-                            ocSeleccionada === oc.id
-                              ? 'bg-blue-500/20 border border-blue-500 text-blue-400'
-                              : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10',
-                          )}
-                        >
-                          {oc.id} • {oc.distribuidor} • Stock: {oc.stockActual}
-                        </button>
-                      ))}
-                    </div>
+                    {loadingOrdenes ? (
+                      <p className="text-gray-500 text-sm">Cargando órdenes de compra...</p>
+                    ) : ordenesCompra.length === 0 ? (
+                      <p className="text-gray-500 text-sm">No hay órdenes de compra disponibles. Crea una primero.</p>
+                    ) : (
+                      <div className="flex flex-wrap gap-2">
+                        {ordenesCompra.filter(oc => (oc.stockActual ?? 0) > 0 || (oc.cantidad ?? 0) > 0).map((oc) => (
+                          <button
+                            key={oc.id}
+                            type="button"
+                            onClick={() => setOcSeleccionada(oc.id === ocSeleccionada ? '' : oc.id)}
+                            className={cn(
+                              'px-3 py-2 rounded-lg text-sm transition-all',
+                              ocSeleccionada === oc.id
+                                ? 'bg-blue-500/20 border border-blue-500 text-blue-400'
+                                : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10',
+                            )}
+                          >
+                            {oc.id} • {oc.distribuidor} • Stock: {oc.stockActual ?? oc.cantidad ?? 0}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* Lista de productos */}
