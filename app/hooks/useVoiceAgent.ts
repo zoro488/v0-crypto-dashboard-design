@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAppStore } from '@/app/lib/store/useAppStore'
+import type { PanelId } from '@/app/types'
 
 interface VoiceAgentConfig {
   apiKey?: string
@@ -35,11 +36,11 @@ export function useVoiceAgent(config: VoiceAgentConfig = {}) {
   const functionMap: Record<string, (args: FunctionArgs) => void | { success: boolean; message: string }> = {
     update_ui: (args) => {
       if (args.theme) setTheme(args.theme)
-      if (args.show_section) setCurrentPanel(args.show_section)
+      if (args.show_section) setCurrentPanel(args.show_section as PanelId)
       if (args.model_rotation !== undefined) setModelRotation(args.model_rotation)
     },
     navigate: (args) => {
-      if (args.panel) setCurrentPanel(args.panel)
+      if (args.panel) setCurrentPanel(args.panel as PanelId)
     },
     get_balance: (args) => {
       // Return balance info - would connect to actual data

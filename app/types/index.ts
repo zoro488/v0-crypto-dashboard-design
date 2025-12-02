@@ -587,6 +587,14 @@ export interface ReporteFinanciero {
 export type PanelId = 
   | 'dashboard'
   | 'bancos'
+  | 'banco'  // Alias para bancos
+  | 'boveda_monte'
+  | 'boveda_usa'
+  | 'utilidades'
+  | 'flete_sur'
+  | 'azteca'
+  | 'leftie'
+  | 'profit'
   | 'ventas'
   | 'ordenes'
   | 'clientes'
@@ -595,6 +603,9 @@ export type PanelId =
   | 'reportes'
   | 'ia'
   | 'configuracion'
+  | 'gya'  // Panel Gastos y Abonos
+  | 'gastos'
+  | 'abonos'
 
 export interface PanelConfig {
   id: PanelId

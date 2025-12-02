@@ -2,6 +2,7 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useAppStore } from '@/app/lib/store/useAppStore'
+import type { PanelId } from '@/app/types'
 import {
   LayoutGrid,
   ShoppingCart,
@@ -48,13 +49,13 @@ export default function BentoNav() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const allPanels = [
+  const allPanels: { id: PanelId; label: string; icon: any; color: string }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid, color: 'from-blue-500 to-cyan-500' },
     { id: 'ventas', label: 'Ventas', icon: ShoppingCart, color: 'from-green-500 to-emerald-500' },
     { id: 'ordenes', label: 'Órdenes', icon: Package, color: 'from-purple-500 to-violet-500' },
     { id: 'distribuidores', label: 'Distribuidores', icon: Users, color: 'from-orange-500 to-red-500' },
     { id: 'clientes', label: 'Clientes', icon: UserCheck, color: 'from-pink-500 to-rose-500' },
-    { id: 'banco', label: 'Bancos', icon: Building2, color: 'from-blue-600 to-indigo-600' },
+    { id: 'bancos', label: 'Bancos', icon: Building2, color: 'from-blue-600 to-indigo-600' },
     { id: 'almacen', label: 'Almacén', icon: Warehouse, color: 'from-amber-500 to-yellow-600' },
     { id: 'reportes', label: 'Reportes', icon: BarChart3, color: 'from-teal-500 to-cyan-600' },
     { id: 'ia', label: 'IA', icon: Sparkles, color: 'from-violet-500 to-purple-600' },

@@ -39,6 +39,15 @@ import {
   useTransferencias,
   useCorteBancario,
 } from '@/app/lib/firebase/firestore-hooks.service'
+import { 
+  AnimatedCounter, 
+  GlowButton, 
+  Tilt3D, 
+  SkeletonTable, 
+  Pulse, 
+  ShineEffect,
+  haptic,
+} from '@/app/components/ui/microinteractions'
 import { Skeleton } from '@/app/components/ui/skeleton'
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from 'recharts'
 import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/components/ui/SafeChartContainer'
@@ -133,9 +142,10 @@ export default function BentoBanco() {
   // Sincronizar banco seleccionado con el panel actual del store
   useEffect(() => {
     // Si el currentPanel es un ID de banco específico, seleccionarlo
-    const bancoFromPanel = BANCOS.find(b => b.id === currentPanel)
-    if (bancoFromPanel) {
-      setSelectedBanco(bancoFromPanel)
+    // Nota: currentPanel es PanelId, bancoId es BancoId - no son compatibles directamente
+    // Solo cambiamos si es 'bancos' (vista general)
+    if (currentPanel === 'bancos') {
+      // Mantener el banco actualmente seleccionado
     }
   }, [currentPanel])
 

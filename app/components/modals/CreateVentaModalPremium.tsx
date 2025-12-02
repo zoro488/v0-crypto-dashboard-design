@@ -221,8 +221,8 @@ export function CreateVentaModalPremium({
     const totalIngreso = carrito.reduce((acc, item) => 
       acc + (item.precioVenta * item.cantidad), 0)
     
-    // Distribución a 3 bancos según fórmulas correctas:
-    // Bóveda Monte = precioCompra × cantidad (COSTO)
+    // ✅ Distribución a 3 bancos según fórmulas correctas (FORMULAS_CORRECTAS_VENTAS_Version2.md):
+    // Bóveda Monte = precioCompra × cantidad (COSTO del distribuidor)
     const totalBovedaMonte = carrito.reduce((acc, item) => 
       acc + (item.precioCompra * item.cantidad), 0)
     
@@ -231,7 +231,8 @@ export function CreateVentaModalPremium({
       ? carrito.reduce((acc, item) => acc + (item.precioFlete * item.cantidad), 0)
       : 0
     
-    // Utilidades = (precioVenta - precioCompra - precioFlete) × cantidad (GANANCIA)
+    // ✅ Utilidades = (precioVenta - precioCompra - precioFlete) × cantidad (GANANCIA NETA)
+    // Esta es la ganancia después de restar COSTO y FLETE
     const totalUtilidades = carrito.reduce((acc, item) => {
       const fleteUnitario = aplicaFlete ? item.precioFlete : 0
       return acc + ((item.precioVenta - item.precioCompra - fleteUnitario) * item.cantidad)
@@ -346,9 +347,12 @@ export function CreateVentaModalPremium({
       const ventasCreadas: string[] = []
       
       for (const item of carrito) {
-        // Calcular distribución GYA correcta para este item
+        // ✅ DISTRIBUCIÓN GYA CORRECTA según FORMULAS_CORRECTAS_VENTAS_Version2.md
+        // Bóveda Monte = Costo del producto (lo que pagamos al distribuidor)
         const montoBovedaMonte = item.precioCompra * item.cantidad
+        // Fletes = Costo de transporte (si aplica)
         const montoFletes = aplicaFlete ? item.precioFlete * item.cantidad : 0
+        // Utilidades = Ganancia neta (Precio Venta - Costo - Flete)
         const montoUtilidades = (item.precioVenta - item.precioCompra - (aplicaFlete ? item.precioFlete : 0)) * item.cantidad
         
         const ventaData = {
@@ -423,6 +427,7 @@ export function CreateVentaModalPremium({
           'border border-white/10',
           'text-white',
           'shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_100px_rgba(16,185,129,0.15)]',
+          '!fixed !top-[50vh] !left-[50vw] !-translate-x-1/2 !-translate-y-1/2',
         )}
       >
         <DialogTitle className="sr-only">Nueva Venta</DialogTitle>
@@ -628,29 +633,73 @@ export function CreateVentaModalPremium({
                     </Button>
                   </div>
 
-                  {/* OC Relacionada */}
-                  <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                    <Label className="text-sm text-gray-400 mb-2 block">OC Relacionada (opcional)</Label>
+                  {/* OC Relacionada - MEJORADO PARA TRAZABILIDAD */}
+                  <div className="p-5 rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border-2 border-blue-500/30">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <Package className="w-5 h-5 text-blue-400" />
+                        <div>
+                          <Label className="text-base font-semibold text-blue-300">Orden de Compra Relacionada</Label>
+                          <p className="text-xs text-gray-400 mt-0.5">Selecciona la OC de donde proviene el producto (trazabilidad completa)</p>
+                        </div>
+                      </div>
+                      {ocSeleccionada && (
+                        <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/50">
+                          <CheckCircle2 className="w-3 h-3 mr-1" />
+                          Seleccionada
+                        </Badge>
+                      )}
+                    </div>
                     {loadingOrdenes ? (
-                      <p className="text-gray-500 text-sm">Cargando órdenes de compra...</p>
+                      <div className="text-center py-6 text-gray-500">
+                        <Loader2 className="w-6 h-6 mx-auto mb-2 animate-spin" />
+                        <p className="text-sm">Cargando órdenes de compra...</p>
+                      </div>
                     ) : ordenesCompra.length === 0 ? (
-                      <p className="text-gray-500 text-sm">No hay órdenes de compra disponibles. Crea una primero.</p>
+                      <div className="text-center py-6 rounded-xl bg-white/5 border border-white/10">
+                        <Package className="w-10 h-10 mx-auto mb-2 text-gray-600 opacity-40" />
+                        <p className="text-gray-500 text-sm">No hay órdenes de compra disponibles.</p>
+                        <p className="text-gray-600 text-xs mt-1">Crea una OC primero desde el panel de Órdenes.</p>
+                      </div>
                     ) : (
-                      <div className="flex flex-wrap gap-2">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
                         {ordenesCompra.filter(oc => (oc.stockActual ?? 0) > 0 || (oc.cantidad ?? 0) > 0).map((oc) => (
-                          <button
+                          <motion.button
                             key={oc.id}
                             type="button"
                             onClick={() => setOcSeleccionada(oc.id === ocSeleccionada ? '' : oc.id)}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
                             className={cn(
-                              'px-3 py-2 rounded-lg text-sm transition-all',
+                              'relative p-4 rounded-xl text-left transition-all group',
                               ocSeleccionada === oc.id
-                                ? 'bg-blue-500/20 border border-blue-500 text-blue-400'
-                                : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10',
+                                ? 'bg-blue-500/30 border-2 border-blue-400 shadow-lg shadow-blue-500/30'
+                                : 'bg-white/5 border-2 border-white/10 hover:bg-white/10 hover:border-blue-400/40',
                             )}
                           >
-                            {oc.id} • {oc.distribuidor} • Stock: {oc.stockActual ?? oc.cantidad ?? 0}
-                          </button>
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <div className={cn(
+                                'w-10 h-10 rounded-lg flex items-center justify-center transition-all',
+                                ocSeleccionada === oc.id
+                                  ? 'bg-blue-500 text-white'
+                                  : 'bg-blue-500/20 text-blue-400 group-hover:bg-blue-500/30',
+                              )}>
+                                <Building2 className="w-5 h-5" />
+                              </div>
+                              {ocSeleccionada === oc.id && (
+                                <CheckCircle2 className="w-5 h-5 text-blue-300 absolute top-2 right-2" />
+                              )}
+                            </div>
+                            <div className="space-y-1">
+                              <p className="font-bold text-white text-sm">{oc.id}</p>
+                              <p className="text-xs text-gray-400 truncate">{oc.distribuidor || 'Distribuidor'}</p>
+                              <div className="flex items-center gap-2 mt-2">
+                                <Badge variant="outline" className="text-[10px] border-green-500/50 text-green-400">
+                                  Stock: {oc.stockActual ?? oc.cantidad ?? 0}
+                                </Badge>
+                              </div>
+                            </div>
+                          </motion.button>
                         ))}
                       </div>
                     )}

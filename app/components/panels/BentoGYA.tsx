@@ -47,6 +47,13 @@ import {
 import { Button } from '@/app/components/ui/button'
 import { Badge } from '@/app/components/ui/badge'
 import { Input } from '@/app/components/ui/input'
+import {
+  AnimatedCounter,
+  GlowButton,
+  Tilt3D,
+  SkeletonTable,
+  haptic,
+} from '@/app/components/ui/microinteractions'
 import { 
   DropdownMenu,
   DropdownMenuContent,

@@ -24,6 +24,13 @@ import { Button } from '@/app/components/ui/button'
 import { Badge } from '@/app/components/ui/badge'
 import { Input } from '@/app/components/ui/input'
 import { Skeleton } from '@/app/components/ui/skeleton'
+import {
+  AnimatedCounter,
+  GlowButton,
+  Tilt3D,
+  SkeletonTable,
+  haptic,
+} from '@/app/components/ui/microinteractions'
 import { useState, useEffect, useMemo } from 'react'
 import { suscribirOrdenesCompra } from '@/app/lib/services/unified-data-service'
 import type { OrdenCompra, FirestoreTimestamp } from '@/app/types'

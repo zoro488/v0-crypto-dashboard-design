@@ -92,6 +92,15 @@ service cloud.firestore {
     match /cortes_bancarios/{docId} {
       allow read, write: if allowAccess();
     }
+    match /productos/{docId} {
+      allow read, write: if allowAccess();
+    }
+    match /dashboard_stats/{docId} {
+      allow read, write: if allowAccess();
+    }
+    match /audit_logs/{docId} {
+      allow read, write: if allowAccess();
+    }
 
     // Usuarios
     match /usuarios/{userId} {

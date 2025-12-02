@@ -220,15 +220,15 @@ function subscribe<T>(key: StorageKey, callback: Listener<T>): () => void {
 }
 
 // ============================================================
-// DATOS INICIALES - 7 BANCOS DEL SISTEMA
+// DATOS INICIALES - 7 BANCOS DEL SISTEMA (VALORES EN 0)
 // ============================================================
 
 const BANCOS_INICIALES: LocalBanco[] = [
   { 
     id: 'boveda_monte', 
     nombre: 'Bóveda Monte', 
-    capitalActual: 50000, 
-    historicoIngresos: 50000, 
+    capitalActual: 0, 
+    historicoIngresos: 0, 
     historicoGastos: 0,
     historicoTransferencias: 0,
     createdAt: new Date().toISOString(),
@@ -237,8 +237,8 @@ const BANCOS_INICIALES: LocalBanco[] = [
   { 
     id: 'boveda_usa', 
     nombre: 'Bóveda USA', 
-    capitalActual: 25000, 
-    historicoIngresos: 25000, 
+    capitalActual: 0, 
+    historicoIngresos: 0, 
     historicoGastos: 0,
     historicoTransferencias: 0,
     createdAt: new Date().toISOString(),
@@ -247,8 +247,8 @@ const BANCOS_INICIALES: LocalBanco[] = [
   { 
     id: 'utilidades', 
     nombre: 'Utilidades', 
-    capitalActual: 15000, 
-    historicoIngresos: 15000, 
+    capitalActual: 0, 
+    historicoIngresos: 0, 
     historicoGastos: 0,
     historicoTransferencias: 0,
     createdAt: new Date().toISOString(),
@@ -257,8 +257,8 @@ const BANCOS_INICIALES: LocalBanco[] = [
   { 
     id: 'flete_sur', 
     nombre: 'Flete Sur', 
-    capitalActual: 8000, 
-    historicoIngresos: 8000, 
+    capitalActual: 0, 
+    historicoIngresos: 0, 
     historicoGastos: 0,
     historicoTransferencias: 0,
     createdAt: new Date().toISOString(),
@@ -267,8 +267,8 @@ const BANCOS_INICIALES: LocalBanco[] = [
   { 
     id: 'azteca', 
     nombre: 'Azteca', 
-    capitalActual: 12000, 
-    historicoIngresos: 12000, 
+    capitalActual: 0, 
+    historicoIngresos: 0, 
     historicoGastos: 0,
     historicoTransferencias: 0,
     createdAt: new Date().toISOString(),
@@ -277,8 +277,8 @@ const BANCOS_INICIALES: LocalBanco[] = [
   { 
     id: 'leftie', 
     nombre: 'Leftie', 
-    capitalActual: 5000, 
-    historicoIngresos: 5000, 
+    capitalActual: 0, 
+    historicoIngresos: 0, 
     historicoGastos: 0,
     historicoTransferencias: 0,
     createdAt: new Date().toISOString(),
@@ -287,8 +287,8 @@ const BANCOS_INICIALES: LocalBanco[] = [
   { 
     id: 'profit', 
     nombre: 'Profit', 
-    capitalActual: 20000, 
-    historicoIngresos: 20000, 
+    capitalActual: 0, 
+    historicoIngresos: 0, 
     historicoGastos: 0,
     historicoTransferencias: 0,
     createdAt: new Date().toISOString(),
@@ -323,7 +323,7 @@ export const localObtenerBanco = (bancoId: string): LocalBanco | null => {
 export const localActualizarCapitalBanco = (
   bancoId: string,
   monto: number,
-  tipo: 'ingreso' | 'gasto' | 'transferencia'
+  tipo: 'ingreso' | 'gasto' | 'transferencia',
 ): void => {
   const bancos = getFromStorage<LocalBanco>(STORAGE_KEYS.BANCOS)
   const index = bancos.findIndex(b => b.id === bancoId)
@@ -405,7 +405,7 @@ export const localActualizarCliente = (clienteId: string, data: Partial<LocalCli
   clientes[index] = { 
     ...clientes[index], 
     ...data, 
-    updatedAt: new Date().toISOString() 
+    updatedAt: new Date().toISOString(), 
   }
   saveToStorage(STORAGE_KEYS.CLIENTES, clientes)
   
@@ -709,7 +709,7 @@ export const localCrearOrdenCompra = (data: {
   
   // Buscar o crear distribuidor
   let distIndex = distribuidores.findIndex(d => 
-    d.id === data.distribuidorId || d.nombre.toLowerCase() === data.distribuidor.toLowerCase()
+    d.id === data.distribuidorId || d.nombre.toLowerCase() === data.distribuidor.toLowerCase(),
   )
   
   if (distIndex === -1) {
@@ -1143,7 +1143,7 @@ export const localPagarDistribuidor = (
   distribuidorId: string,
   ordenCompraId: string,
   monto: number,
-  bancoOrigenId: string
+  bancoOrigenId: string,
 ): void => {
   const distribuidores = getFromStorage<LocalDistribuidor>(STORAGE_KEYS.DISTRIBUIDORES)
   const ordenes = getFromStorage<LocalOrdenCompra>(STORAGE_KEYS.ORDENES_COMPRA)

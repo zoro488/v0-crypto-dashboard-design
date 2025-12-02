@@ -12,6 +12,12 @@ import { AIBrainVisualizer } from '@/app/components/visualizations/AIBrainVisual
 import { QuickStatWidget } from '@/app/components/widgets/QuickStatWidget'
 import { MiniChartWidget } from '@/app/components/widgets/MiniChartWidget'
 import { ActivityFeedWidget, ActivityItem } from '@/app/components/widgets/ActivityFeedWidget'
+import {
+  AnimatedCounter,
+  GlowButton,
+  Tilt3D,
+  haptic,
+} from '@/app/components/ui/microinteractions'
 import { getMegaAIAgent, type AIResponse, type AIVisualization } from '@/app/lib/services/ai/MegaAIAgent.service'
 import { logger } from '@/app/lib/utils/logger'
 
@@ -827,28 +833,28 @@ export default function BentoIA() {
             title="Tiempo Respuesta"
             subtitle="0.8s"
             type="line"
-            data={[1.2, 1.1, 0.9, 0.95, 0.85, 0.82, 0.8].map((v, i) => ({ name: `T${i + 1}`, value: v * 100 }))}
+            data={[]}
             color="cyan"
           />
           <MiniChartWidget
             title="Uso GPU"
-            subtitle="67%"
+            subtitle="--"
             type="donut"
-            data={[{ name: 'Usado', value: 67 }, { name: 'Disponible', value: 33 }]}
+            data={[]}
             color="purple"
           />
           <MiniChartWidget
             title="Modelos Activos"
-            subtitle="5 modelos"
+            subtitle="--"
             type="bar"
-            data={[3, 4, 4, 5, 5, 5, 5].map((v, i) => ({ name: `D${i + 1}`, value: v }))}
+            data={[]}
             color="green"
           />
           <MiniChartWidget
             title="Accuracy"
-            subtitle="97.2%"
+            subtitle="--"
             type="area"
-            data={[92, 93, 94, 95, 96, 96.5, 97.2].map((v, i) => ({ name: `V${i + 1}`, value: v }))}
+            data={[]}
             color="orange"
           />
         </div>

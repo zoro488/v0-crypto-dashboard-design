@@ -12,6 +12,9 @@ import ImmersiveWrapper from '@/app/components/layout/ImmersiveWrapper'
 import { SplashScreen } from '@/app/components/splash'
 import { TracingProvider } from '@/app/lib/tracing/TracingProvider'
 import { QueryProvider } from '@/app/providers/QueryProvider'
+import { AuthProvider } from '@/app/providers/AuthProvider'
+import { ConvexClientProvider } from '@/app/lib/convex/ConvexProvider'
+import { RollbarProvider } from '@/app/lib/rollbar/RollbarProvider'
 // FloatingAIWidget removido - usar FloatingSplineAIWidget desde page.tsx
 // para evitar widgets duplicados
 
@@ -103,30 +106,36 @@ export default function RootLayout({
             `,
           }}
         />
-        <ErrorBoundary>
-          <TracingProvider enabled={process.env.NODE_ENV === 'development'}>
-            <QueryProvider>
-              <AppProvider>
-                {/* 🎬 SPLASH SCREEN - Partículas CHRONOS (deshabilitado temporalmente para testing) */}
-                <SplashScreen duration={5500} enabled={false}>
-                  {/* <PerformanceMonitor /> */}
-                  
-                  {/* 🌌 FONDO 3D GLOBAL - Siempre visible */}
-                  <ImmersiveWrapper />
-                  
-                  {/* 📦 CONTENIDO PRINCIPAL - Con z-index superior */}
-                  <div className="relative z-10 min-h-screen w-full overflow-auto">
-                    {children}
-                  </div>
-                  
-                  {/* 🤖 AGENTE IA FLOTANTE - Manejado en page.tsx con FloatingSplineAIWidget */}
-                  
-                  <Toaster />
-                </SplashScreen>
-              </AppProvider>
-            </QueryProvider>
-          </TracingProvider>
-        </ErrorBoundary>
+        <RollbarProvider>
+          <ConvexClientProvider>
+            <ErrorBoundary>
+              <TracingProvider enabled={process.env.NODE_ENV === 'development'}>
+                <QueryProvider>
+                  <AuthProvider>
+                    <AppProvider>
+                      {/* 🎬 SPLASH SCREEN - Partículas CHRONOS (deshabilitado temporalmente para testing) */}
+                      <SplashScreen duration={5500} enabled={false}>
+                        {/* <PerformanceMonitor /> */}
+                        
+                        {/* 🌌 FONDO 3D GLOBAL - Siempre visible */}
+                        <ImmersiveWrapper />
+                        
+                        {/* 📦 CONTENIDO PRINCIPAL - Con z-index superior */}
+                        <div className="relative z-10 min-h-screen w-full overflow-auto">
+                          {children}
+                        </div>
+                        
+                        {/* 🤖 AGENTE IA FLOTANTE - Manejado en page.tsx con FloatingSplineAIWidget */}
+                        
+                        <Toaster />
+                      </SplashScreen>
+                    </AppProvider>
+                  </AuthProvider>
+                </QueryProvider>
+              </TracingProvider>
+            </ErrorBoundary>
+          </ConvexClientProvider>
+        </RollbarProvider>
         <Analytics />
         <SpeedInsights />
       </body>

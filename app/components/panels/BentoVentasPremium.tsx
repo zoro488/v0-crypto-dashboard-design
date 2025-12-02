@@ -12,6 +12,15 @@ import { Button } from '@/app/components/ui/button'
 import { Badge } from '@/app/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/components/ui/tabs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog'
+import { 
+  AnimatedCounter, 
+  GlowButton, 
+  Tilt3D, 
+  SkeletonTable, 
+  Pulse, 
+  ShineEffect,
+  haptic,
+} from '@/app/components/ui/microinteractions'
 import { useState, useMemo, useCallback, memo } from 'react'
 import { useVentasData, useClientesData } from '@/app/lib/firebase/firestore-hooks.service'
 import { CreateVentaModalPremium } from '@/app/components/modals/CreateVentaModalPremium'

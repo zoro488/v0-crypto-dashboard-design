@@ -135,70 +135,11 @@ export function ScheduledReports() {
 
   const [nuevoDestinatario, setNuevoDestinatario] = useState('')
 
-  // Simular carga de reportes desde Firestore
+  // Cargar reportes desde Firestore (inicialmente vacío)
   useEffect(() => {
-    const mockReportes: ReporteProgramado[] = [
-      {
-        id: '1',
-        nombre: 'Reporte de Ventas Diario',
-        descripcion: 'Resumen de ventas del día anterior con desglose por distribuidor',
-        tipo: 'ventas-diario',
-        frecuencia: 'diaria',
-        hora: '07:00',
-        destinatarios: ['admin@chronos.com', 'gerencia@chronos.com'],
-        formato: 'pdf',
-        filtros: {},
-        activo: true,
-        ultimaEjecucion: new Date(Date.now() - 86400000),
-        proximaEjecucion: new Date(Date.now() + 86400000),
-        historial: [
-          { id: 'h1', fecha: new Date(Date.now() - 86400000), estado: 'exito', duracionMs: 2340 },
-          { id: 'h2', fecha: new Date(Date.now() - 172800000), estado: 'exito', duracionMs: 2150 },
-        ],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: '2',
-        nombre: 'Inventario Semanal',
-        descripcion: 'Estado completo del inventario con alertas de stock bajo',
-        tipo: 'inventario',
-        frecuencia: 'semanal',
-        diasSemana: [1], // Lunes
-        hora: '06:00',
-        destinatarios: ['almacen@chronos.com'],
-        formato: 'excel',
-        filtros: {},
-        activo: true,
-        ultimaEjecucion: new Date(Date.now() - 604800000),
-        proximaEjecucion: new Date(Date.now() + 172800000),
-        historial: [
-          { id: 'h3', fecha: new Date(Date.now() - 604800000), estado: 'exito', duracionMs: 4520 },
-        ],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: '3',
-        nombre: 'Utilidades Mensuales',
-        descripcion: 'Resumen de utilidades del mes con comparativo histórico',
-        tipo: 'utilidades',
-        frecuencia: 'mensual',
-        diaDelMes: 1,
-        hora: '05:00',
-        destinatarios: ['contabilidad@chronos.com', 'gerencia@chronos.com'],
-        formato: 'pdf',
-        filtros: {},
-        activo: false,
-        ultimaEjecucion: new Date(Date.now() - 2592000000),
-        historial: [
-          { id: 'h4', fecha: new Date(Date.now() - 2592000000), estado: 'error', mensaje: 'Timeout en generación' },
-        ],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ]
-    setReportes(mockReportes)
+    // Los reportes programados se cargarán desde Firestore cuando existan
+    // Por ahora, iniciar con array vacío para demostrar sistema limpio
+    setReportes([])
   }, [])
 
   // Handlers

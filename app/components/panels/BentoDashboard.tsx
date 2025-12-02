@@ -26,6 +26,13 @@ import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/
 import { useState, useEffect, useMemo, useCallback, memo } from 'react'
 import { useVentas, useOrdenesCompra, useProductos, useClientes, useBancosData } from '@/app/lib/firebase/firestore-hooks.service'
 import { Skeleton } from '@/app/components/ui/skeleton'
+import {
+  AnimatedCounter,
+  GlowButton,
+  Tilt3D,
+  SkeletonTable,
+  haptic,
+} from '@/app/components/ui/microinteractions'
 import { CreateOrdenCompraModalPremium } from '@/app/components/modals/CreateOrdenCompraModalPremium'
 import { CreateVentaModalPremium } from '@/app/components/modals/CreateVentaModalPremium'
 import { CreateTransferenciaModalPremium } from '@/app/components/modals/CreateTransferenciaModalPremium'
@@ -471,7 +478,7 @@ export default memo(function BentoDashboard() {
             >
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${banco.color} flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300`}
+                  className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${(banco as any).color || 'from-blue-500 to-blue-600'} flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300`}
                 >
                   <DollarSign className="w-5 h-5 text-white" />
                 </div>
@@ -619,6 +626,7 @@ export default memo(function BentoDashboard() {
       {/* ============================================================ */}
       
       {/* Fila de Mini Charts - 3 columnas */}
+      {/* Mini Charts - Datos reales de Firestore */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -627,18 +635,10 @@ export default memo(function BentoDashboard() {
       >
         <MiniChartWidget
           title="Tendencia Semanal"
-          subtitle="Últimos 7 días"
+          subtitle="Ventas recientes"
           type="area"
           color="blue"
-          data={[
-            { name: 'L', value: 45000 },
-            { name: 'M', value: 52000 },
-            { name: 'X', value: 48000 },
-            { name: 'J', value: 61000 },
-            { name: 'V', value: 58000 },
-            { name: 'S', value: 72000 },
-            { name: 'D', value: 65000 },
-          ]}
+          data={mockChartData.length > 0 ? mockChartData : []}
           height={140}
           delay={0.5}
         />
@@ -673,16 +673,11 @@ export default memo(function BentoDashboard() {
         className="col-span-12 lg:col-span-4"
       >
         <MiniChartWidget
-          title="Comparativa Mensual"
-          subtitle="Ventas vs Compras"
+          title="Comparativa"
+          subtitle="Ventas vs Profit"
           type="bar"
           color="green"
-          data={[
-            { name: 'Ene', value: 180000, value2: 120000 },
-            { name: 'Feb', value: 220000, value2: 150000 },
-            { name: 'Mar', value: 195000, value2: 140000 },
-            { name: 'Abr', value: 280000, value2: 180000 },
-          ]}
+          data={mockChartData.length > 0 ? mockChartData.map(d => ({ name: d.name, value: d.sales || 0, value2: d.profit || 0 })) : []}
           height={140}
           delay={0.7}
         />
@@ -722,12 +717,12 @@ export default memo(function BentoDashboard() {
           />
         </div>
         
-        {/* Indicadores de estado */}
+        {/* Indicadores de estado del sistema */}
         <div className="relative z-10 mt-6 flex flex-wrap justify-center gap-4">
           {[
-            { label: 'Precisión', value: '98.5%', color: 'text-emerald-400' },
-            { label: 'Consultas', value: '247', color: 'text-cyan-400' },
-            { label: 'Latencia', value: '42ms', color: 'text-purple-400' },
+            { label: 'Ventas', value: (ventas?.length || 0).toString(), color: 'text-emerald-400' },
+            { label: 'Clientes', value: (ventas ? new Set(ventas.map(v => v.cliente || v.clienteId)).size : 0).toString(), color: 'text-cyan-400' },
+            { label: 'Estado', value: 'Online', color: 'text-purple-400' },
           ].map((stat, i) => (
             <motion.div
               key={stat.label}
@@ -744,6 +739,7 @@ export default memo(function BentoDashboard() {
       </motion.div>
 
       {/* Activity Feed */}
+      {/* Activity Feed - Datos reales de ventas */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -753,18 +749,20 @@ export default memo(function BentoDashboard() {
         <ActivityFeedWidget
           title="Actividad en Tiempo Real"
           maxItems={6}
-          activities={[
-            { id: '1', type: 'venta', title: 'Venta #1234', description: 'Cliente: Bódega Valle', amount: 45000, timestamp: new Date(Date.now() - 5 * 60000), status: 'success' },
-            { id: '2', type: 'compra', title: 'OC-456 recibida', description: 'Proveedor: DistMex', amount: -23000, timestamp: new Date(Date.now() - 15 * 60000), status: 'success' },
-            { id: '3', type: 'transferencia', title: 'Transferencia Interna', description: 'Monte → Azteca', amount: 50000, timestamp: new Date(Date.now() - 60 * 60000), status: 'success' },
-            { id: '4', type: 'stock', title: 'Stock Actualizado', description: 'Producto Premium Box (+50 unidades)', timestamp: new Date(Date.now() - 2 * 60 * 60000), status: 'success' },
-            { id: '5', type: 'cliente', title: 'Nuevo Cliente', description: 'Super Express registrado', timestamp: new Date(Date.now() - 3 * 60 * 60000), status: 'success' },
-            { id: '6', type: 'alerta', title: 'Stock Bajo', description: 'Producto A por debajo del mínimo', timestamp: new Date(Date.now() - 4 * 60 * 60000), status: 'pending' },
-          ]}
+          activities={(ventas?.slice(0, 6) || []).map((v, i) => ({
+            id: v.id || String(i),
+            type: 'venta' as const,
+            title: `Venta ${v.id || ''}`,
+            description: `Cliente: ${(v as Record<string, unknown>).cliente || 'N/A'}`,
+            amount: ((v as Record<string, unknown>).montoTotal as number) || ((v as Record<string, unknown>).precioTotalVenta as number) || 0,
+            timestamp: v.fecha && typeof v.fecha === 'object' && 'seconds' in v.fecha ? new Date((v.fecha as {seconds: number}).seconds * 1000) : new Date(),
+            status: 'success' as const,
+          }))}
         />
       </motion.div>
 
       {/* Fila de Quick Stats Adicionales */}
+      {/* Quick Stats - Datos reales del sistema */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -774,11 +772,11 @@ export default memo(function BentoDashboard() {
         <QuickStatsGrid
           columns={5}
           stats={[
-            { title: 'Clientes Activos', value: 156, icon: Users, color: 'cyan', change: 12, changeLabel: 'vs mes anterior', sparklineData: [120, 135, 142, 138, 150, 156] },
-            { title: 'Ticket Promedio', value: 45200, prefix: '$', icon: DollarSign, color: 'green', change: 8.3, changeLabel: 'vs mes anterior', sparklineData: [38000, 40000, 42000, 44000, 45200] },
-            { title: 'Productos Activos', value: 847, icon: Package, color: 'purple', change: -2.1, changeLabel: '5 descontinuados', sparklineData: [860, 855, 850, 848, 847] },
-            { title: 'Días Sin Incidentes', value: 23, suffix: ' días', icon: Activity, color: 'orange', change: 15, sparklineData: [15, 17, 19, 21, 23] },
-            { title: 'Eficiencia', value: '94.5%', icon: Zap, color: 'pink', change: 3.2, changeLabel: 'mejora continua', sparklineData: [88, 90, 91, 93, 94.5] },
+            { title: 'Ventas Totales', value: ventas?.length || 0, icon: TrendingUp, color: 'cyan', change: 0, changeLabel: 'registros' },
+            { title: 'Capital Total', value: metrics.capitalTotal, prefix: '$', icon: DollarSign, color: 'green', change: 0, changeLabel: 'en bancos' },
+            { title: 'Stock Actual', value: metrics.stockActual, icon: Package, color: 'purple', change: 0, changeLabel: 'unidades' },
+            { title: 'Órdenes Activas', value: metrics.ordenesActivas, icon: ShoppingCart, color: 'orange', change: 0, changeLabel: 'pendientes' },
+            { title: 'Bancos', value: bancos?.length || 0, icon: Activity, color: 'pink', change: 0, changeLabel: 'activos' },
           ]}
         />
       </motion.div>

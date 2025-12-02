@@ -470,16 +470,18 @@ export const crearVenta = async (data: CrearVentaInput) => {
     const precioVentaUnitario = data.precioVenta || (data.precioTotalVenta ? data.precioTotalVenta / cantidad : 0)
     const totalVenta = data.precioTotalVenta || (precioVentaUnitario * cantidad)
     
-    // DISTRIBUCIÓN GYA:
-    // A. Bóveda Monte recupera la INVERSIÓN (Costo × Cantidad)
+    // ✅ DISTRIBUCIÓN GYA CORRECTA según FORMULAS_CORRECTAS_VENTAS_Version2.md:
+    // A. Bóveda Monte = Precio COMPRA × Cantidad (COSTO del distribuidor)
     const montoBovedaMonte = costoUnitarioBase * cantidad
     
-    // B. Flete Sur recibe el costo de flete
+    // B. Fletes = Flete × Cantidad (TRANSPORTE)
     const fleteAplica = data.flete === 'Aplica' || (data.precioFlete && data.precioFlete > 0) || (data.fleteUtilidad && data.fleteUtilidad > 0)
     const montoFlete = data.fleteUtilidad || ((data.precioFlete || 0) * cantidad) || 0
+    const fleteUnitario = cantidad > 0 ? montoFlete / cantidad : 0
     
-    // C. Utilidades = Ganancia Neta (Venta - Costo - Flete)
-    const montoUtilidad = totalVenta - montoBovedaMonte - montoFlete
+    // C. ✅ Utilidades = (Precio VENTA - Precio COMPRA - Flete) × Cantidad (GANANCIA NETA)
+    // Esta es la fórmula CORRECTA del documento FORMULAS_CORRECTAS_VENTAS_Version2.md
+    const montoUtilidad = (precioVentaUnitario - costoUnitarioBase - fleteUnitario) * cantidad
     
     // Log de cálculo para debugging
     logger.info('Cálculo GYA de venta:', {
@@ -638,8 +640,55 @@ export const crearVenta = async (data: CrearVentaInput) => {
     }
 
     // ═══════════════════════════════════════════════════════════════════════
+    // 6.5. ACTUALIZAR STOCK DE LA ORDEN DE COMPRA (TRAZABILIDAD COMPLETA)
+    // ═══════════════════════════════════════════════════════════════════════
+    
+    if (data.ocRelacionada) {
+      try {
+        const ocRef = doc(db!, COLLECTIONS.ORDENES_COMPRA, data.ocRelacionada)
+        const ocDoc = await getDoc(ocRef)
+        
+        if (ocDoc.exists()) {
+          const ocData = ocDoc.data() as OrdenCompra
+          const stockActualOC = ocData.stockActual || ocData.cantidad || 0
+          
+          // Validar que hay stock suficiente en la OC
+          if (stockActualOC >= cantidad) {
+            batch.update(ocRef, {
+              stockActual: increment(-cantidad),
+              updatedAt: Timestamp.now(),
+            })
+            
+            logger.info(`Stock de OC ${data.ocRelacionada} actualizado: -${cantidad}`, {
+              context: 'FirestoreService',
+              data: { stockAnterior: stockActualOC, stockNuevo: stockActualOC - cantidad },
+            })
+          } else {
+            logger.warn(`Stock insuficiente en OC ${data.ocRelacionada}`, {
+              context: 'FirestoreService',
+              data: { stockDisponible: stockActualOC, cantidadSolicitada: cantidad },
+            })
+          }
+        } else {
+          logger.warn(`OC ${data.ocRelacionada} no encontrada para actualizar stock`, {
+            context: 'FirestoreService',
+          })
+        }
+      } catch (error) {
+        logger.error(`Error actualizando stock de OC ${data.ocRelacionada}`, error, {
+          context: 'FirestoreService',
+        })
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
     // 7. GENERAR MOVIMIENTOS BANCARIOS (distribución GYA)
     // ═══════════════════════════════════════════════════════════════════════
+    
+    // ✅ LÓGICA CORRECTA según LOGICA_CORRECTA_SISTEMA_Version2.md:
+    // - PAGO COMPLETO: Actualiza capitalActual + historicoIngresos (100%)
+    // - PAGO PARCIAL: Actualiza capitalActual + historicoIngresos (PROPORCIONAL)
+    // - PAGO PENDIENTE: Solo actualiza historicoIngresos, NO capitalActual (0%)
     
     // Solo generamos movimientos si hay pago (completo o parcial)
     if (montoPagado > 0) {
@@ -732,6 +781,97 @@ export const crearVenta = async (data: CrearVentaInput) => {
           updatedAt: Timestamp.now(),
         })
       }
+    } else if (estadoPago === 'pendiente') {
+      // ✅ ESTADO PENDIENTE según LOGICA_CORRECTA_SISTEMA_Version2.md:
+      // Solo actualiza HISTÓRICOS (para referencia futura), NO capitalActual
+      
+      await Promise.all([
+        ensureBancoExists('boveda_monte'),
+        ensureBancoExists('flete_sur'),
+        ensureBancoExists('utilidades'),
+      ])
+      
+      // Actualizar SOLO historicoIngresos (sin tocar capitalActual)
+      if (montoBovedaMonte > 0) {
+        const bovedaMonteRef = doc(db!, COLLECTIONS.BANCOS, 'boveda_monte')
+        batch.update(bovedaMonteRef, {
+          historicoIngresos: increment(montoBovedaMonte),
+          updatedAt: Timestamp.now(),
+        })
+        
+        // Registrar movimiento PENDIENTE (sin afectar capital)
+        const movMonteRef = doc(collection(db!, COLLECTIONS.MOVIMIENTOS))
+        batch.set(movMonteRef, {
+          tipoMovimiento: 'ingreso',
+          tipo: 'ingreso_venta_pendiente',
+          bancoId: 'boveda_monte',
+          monto: montoBovedaMonte,
+          concepto: `Venta PENDIENTE ${ventaRef.id} - ${data.cliente}`,
+          referencia: 'Pendiente de cobro',
+          referenciaId: ventaRef.id,
+          referenciaTipo: 'venta',
+          cliente: data.cliente,
+          fecha: data.fecha || Timestamp.now(),
+          createdAt: Timestamp.now(),
+        })
+      }
+      
+      if (montoFlete > 0) {
+        const fletesRef = doc(db!, COLLECTIONS.BANCOS, 'flete_sur')
+        batch.update(fletesRef, {
+          historicoIngresos: increment(montoFlete),
+          updatedAt: Timestamp.now(),
+        })
+        
+        const movFleteRef = doc(collection(db!, COLLECTIONS.MOVIMIENTOS))
+        batch.set(movFleteRef, {
+          tipoMovimiento: 'ingreso',
+          tipo: 'ingreso_venta_pendiente',
+          bancoId: 'flete_sur',
+          monto: montoFlete,
+          concepto: `Flete PENDIENTE Venta ${ventaRef.id}`,
+          referencia: 'Pendiente de cobro',
+          referenciaId: ventaRef.id,
+          referenciaTipo: 'venta',
+          cliente: data.cliente,
+          fecha: data.fecha || Timestamp.now(),
+          createdAt: Timestamp.now(),
+        })
+      }
+      
+      if (montoUtilidad > 0) {
+        const utilidadesRef = doc(db!, COLLECTIONS.BANCOS, 'utilidades')
+        batch.update(utilidadesRef, {
+          historicoIngresos: increment(montoUtilidad),
+          updatedAt: Timestamp.now(),
+        })
+        
+        const movUtilRef = doc(collection(db!, COLLECTIONS.MOVIMIENTOS))
+        batch.set(movUtilRef, {
+          tipoMovimiento: 'ingreso',
+          tipo: 'ingreso_venta_pendiente',
+          bancoId: 'utilidades',
+          monto: montoUtilidad,
+          concepto: `Utilidad PENDIENTE Venta ${ventaRef.id}`,
+          referencia: 'Pendiente de cobro',
+          referenciaId: ventaRef.id,
+          referenciaTipo: 'venta',
+          cliente: data.cliente,
+          fecha: data.fecha || Timestamp.now(),
+          createdAt: Timestamp.now(),
+        })
+      }
+      
+      logger.info('Venta PENDIENTE registrada - Solo historicoIngresos actualizado', {
+        context: 'FirestoreService',
+        data: {
+          ventaId: ventaRef.id,
+          totalVenta,
+          distribucion: { bovedaMonte: montoBovedaMonte, fletes: montoFlete, utilidades: montoUtilidad },
+          estadoPago: 'pendiente',
+          nota: 'capitalActual NO modificado hasta que se cobre',
+        },
+      })
     }
 
     await batch.commit()
@@ -1937,6 +2077,74 @@ export const addAbono = async (data: AbonoData): Promise<string | null> => {
     logger.error('Error creating abono', error, { context: 'FirestoreService' })
     throw error
   }
+}
+
+// ============================================================================
+// FUNCIONES AUXILIARES PARA AI (wrappers síncronos-promesas)
+// ============================================================================
+
+/**
+ * Obtener todos los bancos como promesa (para uso en AI tools)
+ */
+export const obtenerBancos = (): Promise<Banco[]> => {
+  return new Promise((resolve, reject) => {
+    try {
+      const unsubscribe = suscribirBancos((bancos) => {
+        unsubscribe() // Desuscribirse inmediatamente
+        resolve(bancos)
+      })
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
+
+/**
+ * Obtener todas las ventas como promesa (para uso en AI tools)
+ */
+export const obtenerVentas = (): Promise<Venta[]> => {
+  return new Promise((resolve, reject) => {
+    try {
+      const unsubscribe = suscribirVentas((ventas) => {
+        unsubscribe() // Desuscribirse inmediatamente
+        resolve(ventas)
+      })
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
+
+/**
+ * Obtener todos los clientes como promesa (para uso en AI tools)
+ */
+export const obtenerClientes = (): Promise<Cliente[]> => {
+  return new Promise((resolve, reject) => {
+    try {
+      const unsubscribe = suscribirClientes((clientes) => {
+        unsubscribe() // Desuscribirse inmediatamente
+        resolve(clientes)
+      })
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
+
+/**
+ * Obtener todas las órdenes de compra como promesa (para uso en AI tools)
+ */
+export const obtenerOrdenesCompra = (): Promise<OrdenCompra[]> => {
+  return new Promise((resolve, reject) => {
+    try {
+      const unsubscribe = suscribirOrdenesCompra((ordenes) => {
+        unsubscribe() // Desuscribirse inmediatamente
+        resolve(ordenes)
+      })
+    } catch (error) {
+      reject(error)
+    }
+  })
 }
 
 export const firestoreService = {

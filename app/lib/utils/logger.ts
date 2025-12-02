@@ -11,6 +11,8 @@ interface LogOptions {
   timestamp?: boolean
   context?: string
   data?: unknown
+  // Permitir propiedades adicionales para datos de contexto
+  [key: string]: unknown
 }
 
 class Logger {

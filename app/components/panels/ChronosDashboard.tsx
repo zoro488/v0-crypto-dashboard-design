@@ -623,7 +623,7 @@ export default function ChronosDashboard() {
               <p className="text-xs md:text-sm text-white/40">Saldos actualizados</p>
             </div>
             <motion.button
-              onClick={() => setCurrentPanel('banco')}
+              onClick={() => setCurrentPanel('bancos')}
               className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 import { firestoreService } from '../firebase/firestore-service'
 import { logger } from '../utils/logger'
+import type { PanelId } from '@/app/types'
 
 // ============================================================
 // TIPOS LOCALES DEL STORE
@@ -105,7 +106,7 @@ interface BancoStore {
 
 interface AppState {
   // UI State
-  currentPanel: string
+  currentPanel: PanelId
   sidebarCollapsed: boolean
   theme: 'light' | 'dark' | 'cyber'
   
@@ -137,7 +138,7 @@ interface AppState {
   triggerDataRefresh: () => void
 
   // Actions
-  setCurrentPanel: (panel: string) => void
+  setCurrentPanel: (panel: PanelId) => void
   toggleSidebar: () => void
   setTheme: (theme: 'light' | 'dark' | 'cyber') => void
   setVoiceAgentActive: (active: boolean) => void

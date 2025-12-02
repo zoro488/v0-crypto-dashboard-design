@@ -51,6 +51,46 @@
 - **Spline 3D** para bot IA interactivo
 - **Framer Motion** para animaciones
 - **Tailwind CSS v4** para estilos
+- **🤖 Vercel AI Gateway** - Chat IA con 9 herramientas integradas
+- **Firebase Auth** - Autenticación segura
+
+---
+
+## 🤖 Sistema de IA Integrado
+
+### Vercel AI Gateway + OpenAI
+
+**9 Herramientas Disponibles:**
+- 📊 `obtenerVentas` - Consultar ventas con filtros de fecha
+- 🏦 `obtenerBancos` - Estado actual de los 7 bancos
+- 👥 `obtenerClientes` - Lista completa de clientes
+- 📦 `obtenerOrdenesCompra` - Órdenes por estado
+- 💡 `analizarVentas` - Análisis de período con insights
+- ➕ `registrarVenta` - Crear nueva venta con GYA
+- 📝 `crearOrdenCompra` - Nueva orden de compra
+- 👤 `crearCliente` - Registrar cliente nuevo
+- 🚚 `crearDistribuidor` - Registrar proveedor
+
+**Beneficios:**
+- ✅ Cache automático (ahorro 60% costos)
+- ✅ Rate limiting inteligente
+- ✅ Métricas en tiempo real
+- ✅ Multi-provider support
+
+### Configuración Rápida
+
+```bash
+# Método 1: Script automático (recomendado)
+./scripts/setup-vercel-ai.sh
+
+# Método 2: Manual
+vercel login
+vercel link
+vercel env add OPENAI_API_KEY
+vercel --prod
+```
+
+📖 **Guía completa:** [VERCEL_AI_GATEWAY_SETUP.md](./VERCEL_AI_GATEWAY_SETUP.md)
 
 ---
 

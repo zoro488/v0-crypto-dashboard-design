@@ -1,0 +1,948 @@
+{
+  "metadata": {
+    "fecha_analisis": "2025-12-02T10:56:03.049189",
+    "version": "1.0",
+    "archivos_procesados": [
+      "ventas",
+      "clientes",
+      "ordenes_compra",
+      "almacen",
+      "distribuidores",
+      "boveda_monte",
+      "boveda_usa",
+      "utilidades",
+      "gastos_abonos",
+      "bancos_profit",
+      "bancos_leftie",
+      "bancos_azteca",
+      "flete_sur"
+    ]
+  },
+  "ventas": {
+    "resumen_general": {
+      "total_registros": 96,
+      "periodo": "2025-08-23 00:00:00 a 2025-10-20 00:00:00",
+      "clientes_unicos": 26,
+      "ordenes_compra_relacionadas": 8
+    },
+    "metricas_financieras": {
+      "cantidad": {
+        "suma": 2279.0,
+        "promedio": 23.739583333333332,
+        "mediana": 15.5,
+        "desviacion": 33.270579635741925,
+        "minimo": 1.0,
+        "maximo": 230.0,
+        "percentil_25": 2.0,
+        "percentil_75": 30.0,
+        "coef_variacion": 1.4014811957135695
+      },
+      "bovedaMonte": {
+        "suma": 14371700.0,
+        "promedio": 149705.20833333334,
+        "mediana": 97650.0,
+        "desviacion": 209592.95758046012,
+        "minimo": 6300.0,
+        "maximo": 1449000.0,
+        "percentil_25": 12600.0,
+        "percentil_75": 189000.0,
+        "coef_variacion": 1.4000378471387638
+      },
+      "precioVenta": {
+        "suma": 506100.0,
+        "promedio": 5271.875,
+        "mediana": 7000.0,
+        "desviacion": 2984.581540800018,
+        "minimo": 0.0,
+        "maximo": 7400.0,
+        "percentil_25": 6300.0,
+        "percentil_75": 7000.0,
+        "coef_variacion": 0.5661328352436311
+      },
+      "ingreso": {
+        "suma": 8501600.0,
+        "promedio": 88558.33333333333,
+        "mediana": 17500.0,
+        "desviacion": 142579.1419503507,
+        "minimo": 0.0,
+        "maximo": 945000.0,
+        "percentil_25": 4875.0,
+        "percentil_75": 140000.0,
+        "coef_variacion": 1.6100025439015793
+      },
+      "fleteUtilidad": {
+        "suma": 555500.0,
+        "promedio": 5786.458333333333,
+        "mediana": 1000.0,
+        "desviacion": 10538.337228191538,
+        "minimo": 0.0,
+        "maximo": 75000.0,
+        "percentil_25": 0.0,
+        "percentil_75": 7625.0,
+        "coef_variacion": 1.821206793710869
+      },
+      "utilidad": {
+        "suma": -6095100.0,
+        "promedio": -63490.625,
+        "mediana": 400.0,
+        "desviacion": 190184.644395429,
+        "minimo": -1449000.0,
+        "maximo": 18000.0,
+        "percentil_25": -1250.0,
+        "percentil_75": 2100.0,
+        "coef_variacion": -2.9954760154814823
+      }
+    },
+    "distribucion_clientes": {
+      "470": {
+        "cantidad": 1,
+        "ingreso": 7000,
+        "utilidad": 200,
+        "transacciones": 1
+      },
+      "Ax": {
+        "cantidad": 177,
+        "ingreso": 853900,
+        "utilidad": -294700,
+        "transacciones": 10
+      },
+      "Bódega M-P": {
+        "cantidad": 480,
+        "ingreso": 945000,
+        "utilidad": -2079000,
+        "transacciones": 3
+      },
+      "Chucho": {
+        "cantidad": 62,
+        "ingreso": 434000,
+        "utilidad": 12400,
+        "transacciones": 4
+      },
+      "Don Rafa": {
+        "cantidad": 1,
+        "ingreso": 7400,
+        "utilidad": 600,
+        "transacciones": 1
+      },
+      "Galvan": {
+        "cantidad": 16,
+        "ingreso": 114800,
+        "utilidad": 6000,
+        "transacciones": 13
+      },
+      "Lamas": {
+        "cantidad": 150,
+        "ingreso": 1057200,
+        "utilidad": 37200,
+        "transacciones": 6
+      },
+      "Negrito": {
+        "cantidad": 50,
+        "ingreso": 350000,
+        "utilidad": 10000,
+        "transacciones": 4
+      },
+      "Robalo": {
+        "cantidad": 100,
+        "ingreso": 660000,
+        "utilidad": 30000,
+        "transacciones": 2
+      },
+      "Rojo": {
+        "cantidad": 3,
+        "ingreso": 21000,
+        "utilidad": 600,
+        "transacciones": 2
+      },
+      "Sierra47": {
+        "cantidad": 73,
+        "ingreso": 511000,
+        "utilidad": 10600,
+        "transacciones": 7
+      },
+      "Tavo": {
+        "cantidad": 100,
+        "ingreso": 0,
+        "utilidad": -630000,
+        "transacciones": 1
+      },
+      "Tio Tocayo": {
+        "cantidad": 124,
+        "ingreso": 315000,
+        "utilidad": -466200,
+        "transacciones": 2
+      },
+      "Tocayo": {
+        "cantidad": 140,
+        "ingreso": 599500,
+        "utilidad": -305500,
+        "transacciones": 6
+      },
+      "Trámite Chucho": {
+        "cantidad": 273,
+        "ingreso": 302400,
+        "utilidad": -1417500,
+        "transacciones": 10
+      },
+      "Trámite Güerito": {
+        "cantidad": 24,
+        "ingreso": 0,
+        "utilidad": -151200,
+        "transacciones": 1
+      },
+      "Trámite Playa Azul": {
+        "cantidad": 21,
+        "ingreso": 0,
+        "utilidad": -132300,
+        "transacciones": 2
+      },
+      "Valle": {
+        "cantidad": 245,
+        "ingreso": 880500,
+        "utilidad": -693000,
+        "transacciones": 5
+      },
+      "Valle Local": {
+        "cantidad": 39,
+        "ingreso": 273000,
+        "utilidad": 7800,
+        "transacciones": 4
+      },
+      "Wero Benavides": {
+        "cantidad": 40,
+        "ingreso": 142000,
+        "utilidad": 12000,
+        "transacciones": 2
+      },
+      "amigo playa azul": {
+        "cantidad": 50,
+        "ingreso": 355000,
+        "utilidad": 15000,
+        "transacciones": 1
+      },
+      "cabo": {
+        "cantidad": 1,
+        "ingreso": 7000,
+        "utilidad": 200,
+        "transacciones": 1
+      },
+      "compa": {
+        "cantidad": 2,
+        "ingreso": 13000,
+        "utilidad": 400,
+        "transacciones": 1
+      },
+      "flama": {
+        "cantidad": 50,
+        "ingreso": 335000,
+        "utilidad": -5000,
+        "transacciones": 1
+      },
+      "mg": {
+        "cantidad": 41,
+        "ingreso": 205900,
+        "utilidad": -66900,
+        "transacciones": 3
+      },
+      "tx8": {
+        "cantidad": 16,
+        "ingreso": 112000,
+        "utilidad": 3200,
+        "transacciones": 3
+      }
+    },
+    "analisis_temporal": {
+      "ventas_por_mes": {
+        "8": {
+          "cantidad": 742,
+          "ingreso": 4892900
+        },
+        "9": {
+          "cantidad": 846,
+          "ingreso": 2613900
+        },
+        "10": {
+          "cantidad": 691,
+          "ingreso": 994800
+        }
+      }
+    },
+    "estado_pagos": {
+      "Pagado": 50,
+      "Pendiente": 46
+    },
+    "analisis_flete": {
+      "con_flete": 65,
+      "sin_flete": 31,
+      "total_flete_utilidad": 555500.0
+    },
+    "anomalias_detectadas": [
+      {
+        "fecha": "2025-08-23 00:00:00",
+        "cliente": "Bódega M-P",
+        "ingreso": 945000.0,
+        "tipo": "ingreso_atipico"
+      },
+      {
+        "fecha": "2025-08-23 00:00:00",
+        "cliente": "Valle",
+        "ingreso": 408000.0,
+        "tipo": "ingreso_atipico"
+      },
+      {
+        "fecha": "2025-08-23 00:00:00",
+        "cliente": "Ax",
+        "ingreso": 350000.0,
+        "tipo": "ingreso_atipico"
+      },
+      {
+        "fecha": "2025-08-30 00:00:00",
+        "cliente": "Valle",
+        "ingreso": 472500.0,
+        "tipo": "ingreso_atipico"
+      },
+      {
+        "fecha": "2025-09-06 00:00:00",
+        "cliente": "Robalo",
+        "ingreso": 396000.0,
+        "tipo": "ingreso_atipico"
+      },
+      {
+        "fecha": "2025-09-13 00:00:00",
+        "cliente": "amigo playa azul",
+        "ingreso": 355000.0,
+        "tipo": "ingreso_atipico"
+      }
+    ],
+    "top_clientes": {
+      "Lamas": {
+        "cantidad": 150,
+        "ingreso": 1057200,
+        "utilidad": 37200,
+        "transacciones": 6
+      },
+      "Bódega M-P": {
+        "cantidad": 480,
+        "ingreso": 945000,
+        "utilidad": -2079000,
+        "transacciones": 3
+      },
+      "Valle": {
+        "cantidad": 245,
+        "ingreso": 880500,
+        "utilidad": -693000,
+        "transacciones": 5
+      },
+      "Ax": {
+        "cantidad": 177,
+        "ingreso": 853900,
+        "utilidad": -294700,
+        "transacciones": 10
+      },
+      "Robalo": {
+        "cantidad": 100,
+        "ingreso": 660000,
+        "utilidad": 30000,
+        "transacciones": 2
+      },
+      "Tocayo": {
+        "cantidad": 140,
+        "ingreso": 599500,
+        "utilidad": -305500,
+        "transacciones": 6
+      },
+      "Sierra47": {
+        "cantidad": 73,
+        "ingreso": 511000,
+        "utilidad": 10600,
+        "transacciones": 7
+      },
+      "Chucho": {
+        "cantidad": 62,
+        "ingreso": 434000,
+        "utilidad": 12400,
+        "transacciones": 4
+      },
+      "amigo playa azul": {
+        "cantidad": 50,
+        "ingreso": 355000,
+        "utilidad": 15000,
+        "transacciones": 1
+      },
+      "Negrito": {
+        "cantidad": 50,
+        "ingreso": 350000,
+        "utilidad": 10000,
+        "transacciones": 4
+      }
+    },
+    "metricas_utilidad": {
+      "utilidad_total": -6095100.0,
+      "utilidad_positiva": 178400.0,
+      "utilidad_negativa": -6273500.0,
+      "transacciones_con_perdida": 24,
+      "transacciones_con_ganancia": 63,
+      "transacciones_neutras": 9,
+      "margen_promedio": -63490.625
+    },
+    "deuda_pendiente": {
+      "total_registros_pendientes": 46,
+      "monto_boveda_monte_pendiente": 11976300.0,
+      "ingreso_pendiente": 5854600.0
+    }
+  },
+  "ordenes_compra": {
+    "resumen": {
+      "total_ordenes": 9,
+      "distribuidores_unicos": 6,
+      "unidades_totales": 2296
+    },
+    "costos": {
+      "costo_total_compras": 14478800.0,
+      "costo_promedio_unidad": 6377.777777777777,
+      "costo_transporte_total": 3214400.0
+    },
+    "distribuidores": {
+      "A/X🌶️🦀": {
+        "cantidad": 33,
+        "costoTotal": 207900,
+        "ordenes": 1
+      },
+      "CH-MONTE": {
+        "cantidad": 100,
+        "costoTotal": 630000,
+        "ordenes": 1
+      },
+      "PACMAN": {
+        "cantidad": 975,
+        "costoTotal": 6142500,
+        "ordenes": 2
+      },
+      "Q-MAYA": {
+        "cantidad": 968,
+        "costoTotal": 6098400,
+        "ordenes": 3
+      },
+      "Q-MAYA-MP": {
+        "cantidad": 200,
+        "costoTotal": 1260000,
+        "ordenes": 1
+      },
+      "VALLE-MONTE": {
+        "cantidad": 20,
+        "costoTotal": 140000,
+        "ordenes": 1
+      }
+    },
+    "pagos": {
+      "total_pagado": 953100.0,
+      "deuda_total": 13525700.0
+    }
+  },
+  "clientes": {
+    "resumen": {
+      "total_clientes": 31,
+      "con_deuda": 11,
+      "sin_deuda": 20,
+      "con_credito": 2
+    },
+    "cartera": {
+      "deuda_total_cartera": 5552200.0,
+      "abonos_totales": 2920280.0,
+      "pendiente_total": 2952300.0,
+      "credito_total": 320380.0
+    },
+    "segmentacion": {
+      "deuda_alta": 9,
+      "deuda_media": 2,
+      "deuda_baja": 0
+    },
+    "top_deudores": [
+      {
+        "cliente": "Bódega M-P",
+        "pendiente": 945000
+      },
+      {
+        "cliente": "amigo playa azul",
+        "pendiente": 355000
+      },
+      {
+        "cliente": "flama",
+        "pendiente": 335000
+      },
+      {
+        "cliente": "Tio Tocayo",
+        "pendiente": 315000
+      },
+      {
+        "cliente": "Tocayo",
+        "pendiente": 255200
+      },
+      {
+        "cliente": "Robalo",
+        "pendiente": 234000
+      },
+      {
+        "cliente": "mg",
+        "pendiente": 205900
+      },
+      {
+        "cliente": "Wero Benavides",
+        "pendiente": 142000
+      },
+      {
+        "cliente": "Lamas",
+        "pendiente": 116200
+      },
+      {
+        "cliente": "Valle",
+        "pendiente": 35000
+      }
+    ]
+  },
+  "bancos": {
+    "boveda_monte": {
+      "total_movimientos": 69,
+      "total_ingresos": 5722280.0,
+      "promedio_movimiento": 82931.59420289854,
+      "mayor_movimiento": 345100.0,
+      "menor_movimiento": 1880.0
+    },
+    "boveda_usa": {
+      "total_movimientos": 17,
+      "total_ingresos": 1888275.0,
+      "promedio_movimiento": 111075.0,
+      "mayor_movimiento": 650000.0,
+      "menor_movimiento": 1500.0
+    },
+    "utilidades": {
+      "total_movimientos": 51,
+      "total_ingresos": 280758.0,
+      "promedio_movimiento": 5505.058823529412,
+      "mayor_movimiento": 205658.0,
+      "menor_movimiento": 0.0
+    },
+    "bancos_profit": {
+      "total_movimientos": 55,
+      "total_ingresos": 12577748.0,
+      "promedio_movimiento": 228686.32727272727,
+      "mayor_movimiento": 1500000.0,
+      "menor_movimiento": 15000.0
+    },
+    "bancos_leftie": {
+      "total_movimientos": 11,
+      "total_ingresos": 1745100.0,
+      "promedio_movimiento": 158645.45454545456,
+      "mayor_movimiento": 280000.0,
+      "menor_movimiento": 31000.0
+    },
+    "bancos_azteca": {
+      "total_movimientos": 6,
+      "total_ingresos": 1880970.0,
+      "promedio_movimiento": 313495.0,
+      "mayor_movimiento": 1400000.0,
+      "menor_movimiento": 1400.0
+    }
+  },
+  "gastos_abonos": {
+    "resumen": {
+      "total_registros": 302,
+      "registros_gastos": 215,
+      "registros_abonos": 87
+    },
+    "gastos": {
+      "total": 10916768.68,
+      "promedio": 50775.66827906977
+    },
+    "abonos": {
+      "total": 13881913.0,
+      "promedio": 159562.2183908046
+    },
+    "tipo_cambio": {
+      "promedio": 18.080459770114953,
+      "rango": [
+        17.9,
+        19.0
+      ]
+    },
+    "por_destino": {
+      "Azteca": 1880970.0,
+      "Boveda Monte": 3326880.0,
+      "Bóveda USA": 1888275.0,
+      "Flete Sur": 245900.0,
+      "Leftie": 1252100.0,
+      "Profit": 12589924.0
+    }
+  },
+  "tendencias": {
+    "datos_semanales": {
+      "2025-08-18/2025-08-24": {
+        "cantidad": 335,
+        "ingreso": 2233000,
+        "utilidad": 30000,
+        "clientes_activos": 6,
+        "cambio_ingreso_pct": null,
+        "cambio_cantidad_pct": null,
+        "ingreso_ma3": null
+      },
+      "2025-08-25/2025-08-31": {
+        "cantidad": 407,
+        "ingreso": 2659900,
+        "utilidad": 29800,
+        "clientes_activos": 10,
+        "cambio_ingreso_pct": 19.117778772951176,
+        "cambio_cantidad_pct": 21.492537313432834,
+        "ingreso_ma3": null
+      },
+      "2025-09-01/2025-09-07": {
+        "cantidad": 394,
+        "ingreso": 837400,
+        "utilidad": -1676300,
+        "clientes_activos": 12,
+        "cambio_ingreso_pct": -68.51761344411445,
+        "cambio_cantidad_pct": -3.1941031941031928,
+        "ingreso_ma3": 1910100.0
+      },
+      "2025-09-08/2025-09-14": {
+        "cantidad": 291,
+        "ingreso": 1019400,
+        "utilidad": -887400,
+        "clientes_activos": 10,
+        "cambio_ingreso_pct": 21.733938380702167,
+        "cambio_cantidad_pct": -26.142131979695428,
+        "ingreso_ma3": 1505566.6666666667
+      },
+      "2025-09-15/2025-09-21": {
+        "cantidad": 139,
+        "ingreso": 610600,
+        "utilidad": -176100,
+        "clientes_activos": 11,
+        "cambio_ingreso_pct": -40.10202079654699,
+        "cambio_cantidad_pct": -52.23367697594501,
+        "ingreso_ma3": 822466.6666666666
+      },
+      "2025-09-22/2025-09-28": {
+        "cantidad": 2,
+        "ingreso": 6500,
+        "utilidad": -6100,
+        "clientes_activos": 2,
+        "cambio_ingreso_pct": -98.93547330494596,
+        "cambio_cantidad_pct": -98.56115107913669,
+        "ingreso_ma3": 545500.0
+      },
+      "2025-09-29/2025-10-05": {
+        "cantidad": 232,
+        "ingreso": 154000,
+        "utilidad": -1322600,
+        "clientes_activos": 4,
+        "cambio_ingreso_pct": 2269.2307692307695,
+        "cambio_cantidad_pct": 11500.0,
+        "ingreso_ma3": 257033.33333333334
+      },
+      "2025-10-06/2025-10-12": {
+        "cantidad": 396,
+        "ingreso": 734800,
+        "utilidad": -1793000,
+        "clientes_activos": 12,
+        "cambio_ingreso_pct": 377.1428571428571,
+        "cambio_cantidad_pct": 70.6896551724138,
+        "ingreso_ma3": 298433.3333333333
+      },
+      "2025-10-13/2025-10-19": {
+        "cantidad": 35,
+        "ingreso": 246000,
+        "utilidad": 9000,
+        "clientes_activos": 6,
+        "cambio_ingreso_pct": -66.52150244964616,
+        "cambio_cantidad_pct": -91.16161616161617,
+        "ingreso_ma3": 378266.6666666667
+      },
+      "2025-10-20/2025-10-26": {
+        "cantidad": 48,
+        "ingreso": 0,
+        "utilidad": -302400,
+        "clientes_activos": 1,
+        "cambio_ingreso_pct": -100.0,
+        "cambio_cantidad_pct": 37.142857142857146,
+        "ingreso_ma3": 326933.3333333333
+      }
+    },
+    "metricas_tendencia": {
+      "crecimiento_promedio_ingreso": 257.01652594800294,
+      "volatilidad_ingreso": 1.0788405666511567,
+      "semana_mayor_ingreso": "2025-08-25/2025-08-31",
+      "semana_menor_ingreso": "2025-10-20/2025-10-26"
+    }
+  },
+  "estacionalidad": {
+    "por_dia_semana": {
+      "Friday": {
+        "sum": 217800,
+        "mean": 27225.0,
+        "count": 8
+      },
+      "Monday": {
+        "sum": 1099600,
+        "mean": 52361.90476190476,
+        "count": 21
+      },
+      "Saturday": {
+        "sum": 5263900,
+        "mean": 219329.16666666666,
+        "count": 24
+      },
+      "Sunday": {
+        "sum": 310200,
+        "mean": 51700.0,
+        "count": 6
+      },
+      "Thursday": {
+        "sum": 629400,
+        "mean": 48415.38461538462,
+        "count": 13
+      },
+      "Tuesday": {
+        "sum": 854700,
+        "mean": 53418.75,
+        "count": 16
+      },
+      "Wednesday": {
+        "sum": 126000,
+        "mean": 15750.0,
+        "count": 8
+      }
+    },
+    "por_mes": {
+      "August": {
+        "sum": 4892900,
+        "mean": 244645.0,
+        "count": 20
+      },
+      "October": {
+        "sum": 994800,
+        "mean": 33160.0,
+        "count": 30
+      },
+      "September": {
+        "sum": 2613900,
+        "mean": 56823.913043478264,
+        "count": 46
+      }
+    }
+  },
+  "segmentacion_rfm": {
+    "distribucion_segmentos": {
+      "Potential Loyalists": 8,
+      "Lost": 6,
+      "Champions": 4,
+      "At Risk": 3,
+      "New Customers": 3,
+      "Loyal Customers": 2
+    },
+    "detalle_clientes": {
+      "470": {
+        "recency": 47,
+        "frequency": 1,
+        "monetary": 7000,
+        "segmento": "Lost"
+      },
+      "Ax": {
+        "recency": 11,
+        "frequency": 10,
+        "monetary": 853900,
+        "segmento": "Champions"
+      },
+      "Bódega M-P": {
+        "recency": 15,
+        "frequency": 3,
+        "monetary": 945000,
+        "segmento": "Loyal Customers"
+      },
+      "Chucho": {
+        "recency": 39,
+        "frequency": 4,
+        "monetary": 434000,
+        "segmento": "At Risk"
+      },
+      "Don Rafa": {
+        "recency": 31,
+        "frequency": 1,
+        "monetary": 7400,
+        "segmento": "Lost"
+      },
+      "Galvan": {
+        "recency": 3,
+        "frequency": 13,
+        "monetary": 114800,
+        "segmento": "Potential Loyalists"
+      },
+      "Lamas": {
+        "recency": 2,
+        "frequency": 6,
+        "monetary": 1057200,
+        "segmento": "Champions"
+      },
+      "Negrito": {
+        "recency": 31,
+        "frequency": 4,
+        "monetary": 350000,
+        "segmento": "At Risk"
+      },
+      "Robalo": {
+        "recency": 14,
+        "frequency": 2,
+        "monetary": 660000,
+        "segmento": "Potential Loyalists"
+      },
+      "Rojo": {
+        "recency": 5,
+        "frequency": 2,
+        "monetary": 21000,
+        "segmento": "New Customers"
+      },
+      "Sierra47": {
+        "recency": 3,
+        "frequency": 7,
+        "monetary": 511000,
+        "segmento": "Champions"
+      },
+      "Tavo": {
+        "recency": 42,
+        "frequency": 1,
+        "monetary": 0,
+        "segmento": "Lost"
+      },
+      "Tio Tocayo": {
+        "recency": 14,
+        "frequency": 2,
+        "monetary": 315000,
+        "segmento": "Potential Loyalists"
+      },
+      "Tocayo": {
+        "recency": 13,
+        "frequency": 6,
+        "monetary": 599500,
+        "segmento": "Champions"
+      },
+      "Trámite Chucho": {
+        "recency": 0,
+        "frequency": 10,
+        "monetary": 302400,
+        "segmento": "Potential Loyalists"
+      },
+      "Trámite Güerito": {
+        "recency": 48,
+        "frequency": 1,
+        "monetary": 0,
+        "segmento": "Lost"
+      },
+      "Trámite Playa Azul": {
+        "recency": 14,
+        "frequency": 2,
+        "monetary": 0,
+        "segmento": "Potential Loyalists"
+      },
+      "Valle": {
+        "recency": 15,
+        "frequency": 5,
+        "monetary": 880500,
+        "segmento": "Loyal Customers"
+      },
+      "Valle Local": {
+        "recency": 13,
+        "frequency": 4,
+        "monetary": 273000,
+        "segmento": "Potential Loyalists"
+      },
+      "Wero Benavides": {
+        "recency": 33,
+        "frequency": 2,
+        "monetary": 142000,
+        "segmento": "At Risk"
+      },
+      "amigo playa azul": {
+        "recency": 37,
+        "frequency": 1,
+        "monetary": 355000,
+        "segmento": "Lost"
+      },
+      "cabo": {
+        "recency": 11,
+        "frequency": 1,
+        "monetary": 7000,
+        "segmento": "New Customers"
+      },
+      "compa": {
+        "recency": 4,
+        "frequency": 1,
+        "monetary": 13000,
+        "segmento": "New Customers"
+      },
+      "flama": {
+        "recency": 37,
+        "frequency": 1,
+        "monetary": 335000,
+        "segmento": "Lost"
+      },
+      "mg": {
+        "recency": 11,
+        "frequency": 3,
+        "monetary": 205900,
+        "segmento": "Potential Loyalists"
+      },
+      "tx8": {
+        "recency": 6,
+        "frequency": 3,
+        "monetary": 112000,
+        "segmento": "Potential Loyalists"
+      }
+    },
+    "metricas_segmento": {
+      "('monetary', 'mean')": {
+        "At Risk": 308666.6666666667,
+        "Champions": 755400.0,
+        "Lost": 117400.0,
+        "Loyal Customers": 912750.0,
+        "New Customers": 13666.666666666666,
+        "Potential Loyalists": 247887.5
+      },
+      "('monetary', 'sum')": {
+        "At Risk": 926000,
+        "Champions": 3021600,
+        "Lost": 704400,
+        "Loyal Customers": 1825500,
+        "New Customers": 41000,
+        "Potential Loyalists": 1983100
+      },
+      "('frequency', 'mean')": {
+        "At Risk": 3.3333333333333335,
+        "Champions": 7.25,
+        "Lost": 1.0,
+        "Loyal Customers": 4.0,
+        "New Customers": 1.3333333333333333,
+        "Potential Loyalists": 4.875
+      }
+    }
+  },
+  "pareto": {
+    "clientes_top_80_pct": 10,
+    "total_clientes": 26,
+    "ratio_pareto": 38.46,
+    "detalle_top_10": {
+      "Lamas": 1057200,
+      "Bódega M-P": 945000,
+      "Valle": 880500,
+      "Ax": 853900,
+      "Robalo": 660000,
+      "Tocayo": 599500,
+      "Sierra47": 511000,
+      "Chucho": 434000,
+      "amigo playa azul": 355000,
+      "Negrito": 350000
+    },
+    "concentracion": {
+      "top_5_clientes_pct": 51.71497129952009,
+      "top_10_clientes_pct": 78.17469652771243
+    }
+  }
+}

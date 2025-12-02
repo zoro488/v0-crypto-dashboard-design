@@ -25,6 +25,12 @@ import {
 import { Button } from '@/app/components/ui/button'
 import { Badge } from '@/app/components/ui/badge'
 import { Input } from '@/app/components/ui/input'
+import {
+  AnimatedCounter,
+  GlowButton,
+  Tilt3D,
+  haptic,
+} from '@/app/components/ui/microinteractions'
 import { useState, useMemo } from 'react'
 import { 
   AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, 
@@ -236,30 +242,11 @@ const REPORTES_INICIALES: ReporteConfig[] = [
 
 const CHART_COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4']
 
-// Datos de muestra para gráficos
+// Datos vacíos - se llenan con datos reales de Firestore
 const SAMPLE_DATA = {
-  tendencia: [
-    { name: 'Ene', ventas: 45000, gastos: 32000 },
-    { name: 'Feb', ventas: 52000, gastos: 35000 },
-    { name: 'Mar', ventas: 48000, gastos: 30000 },
-    { name: 'Abr', ventas: 61000, gastos: 38000 },
-    { name: 'May', ventas: 55000, gastos: 33000 },
-    { name: 'Jun', ventas: 67000, gastos: 40000 },
-  ],
-  categorias: [
-    { name: 'Ventas', value: 35, fill: '#10b981' },
-    { name: 'Inventario', value: 25, fill: '#06b6d4' },
-    { name: 'Finanzas', value: 20, fill: '#3b82f6' },
-    { name: 'Operaciones', value: 12, fill: '#8b5cf6' },
-    { name: 'Clientes', value: 8, fill: '#ef4444' },
-  ],
-  radar: [
-    { subject: 'Ventas', A: 120, B: 110, fullMark: 150 },
-    { subject: 'Inventario', A: 98, B: 130, fullMark: 150 },
-    { subject: 'Finanzas', A: 86, B: 130, fullMark: 150 },
-    { subject: 'Operaciones', A: 99, B: 100, fullMark: 150 },
-    { subject: 'Clientes', A: 85, B: 90, fullMark: 150 },
-  ],
+  tendencia: [] as { name: string; ventas: number; gastos: number }[],
+  categorias: [] as { name: string; value: number; fill: string }[],
+  radar: [] as { subject: string; A: number; B: number; fullMark: number }[],
 }
 
 // ============================================================================

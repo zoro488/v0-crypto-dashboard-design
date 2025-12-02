@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { useAppStore } from '@/app/lib/store/useAppStore'
+import type { PanelId } from '@/app/types'
 import {
   LayoutGrid,
   ShoppingCart,
@@ -54,7 +55,7 @@ const GlassNavIcon = dynamic(
 // TIPOS
 // ============================================================
 interface PanelItem {
-  id: string
+  id: PanelId
   label: string
   icon: LucideIcon
   color: string
@@ -62,7 +63,7 @@ interface PanelItem {
 }
 
 interface DropdownItem {
-  id: string
+  id: PanelId
   label: string
   icon: LucideIcon
   onClick?: () => void
@@ -125,18 +126,18 @@ const mainPanels: PanelItem[] = [
 ]
 
 const bancosItems: PanelItem[] = [
-  { id: 'banco', label: 'Todos los Bancos', icon: Building2, color: 'from-blue-600 to-indigo-600', description: 'Vista consolidada' },
-  { id: 'boveda_monte', label: 'Bóveda Monte', icon: Wallet, color: 'from-blue-500 to-cyan-500', description: 'Capital principal MXN' },
-  { id: 'boveda_usa', label: 'Bóveda USA', icon: Globe, color: 'from-red-500 to-blue-500', description: 'Capital en USD' },
-  { id: 'utilidades', label: 'Utilidades', icon: TrendingUp, color: 'from-green-500 to-emerald-500', description: 'Ganancias netas' },
-  { id: 'flete_sur', label: 'Flete Sur', icon: Package, color: 'from-orange-500 to-amber-500', description: 'Transporte' },
-  { id: 'azteca', label: 'Azteca', icon: CreditCard, color: 'from-purple-500 to-pink-500', description: 'Cuenta externa' },
-  { id: 'leftie', label: 'Leftie', icon: PiggyBank, color: 'from-yellow-500 to-orange-500', description: 'Capital secundario' },
-  { id: 'profit', label: 'Profit', icon: DollarSign, color: 'from-indigo-500 to-purple-500', description: 'Banco operativo' },
+  { id: 'bancos', label: 'Todos los Bancos', icon: Building2, color: 'from-blue-600 to-indigo-600', description: 'Vista consolidada' },
+  { id: 'bancos', label: 'Bóveda Monte', icon: Wallet, color: 'from-blue-500 to-cyan-500', description: 'Capital principal MXN' },
+  { id: 'bancos', label: 'Bóveda USA', icon: Globe, color: 'from-red-500 to-blue-500', description: 'Capital en USD' },
+  { id: 'bancos', label: 'Utilidades', icon: TrendingUp, color: 'from-green-500 to-emerald-500', description: 'Ganancias netas' },
+  { id: 'bancos', label: 'Flete Sur', icon: Package, color: 'from-orange-500 to-amber-500', description: 'Transporte' },
+  { id: 'bancos', label: 'Azteca', icon: CreditCard, color: 'from-purple-500 to-pink-500', description: 'Cuenta externa' },
+  { id: 'bancos', label: 'Leftie', icon: PiggyBank, color: 'from-yellow-500 to-orange-500', description: 'Capital secundario' },
+  { id: 'bancos', label: 'Profit', icon: DollarSign, color: 'from-indigo-500 to-purple-500', description: 'Banco operativo' },
 ]
 
 const gestionItems: PanelItem[] = [
-  { id: 'gya', label: 'Gastos y Abonos', icon: Wallet, color: 'from-emerald-500 to-green-500', description: 'Gestión de egresos e ingresos' },
+  { id: 'reportes', label: 'Gastos y Abonos', icon: Wallet, color: 'from-emerald-500 to-green-500', description: 'Gestión de egresos e ingresos' },
   { id: 'distribuidores', label: 'Distribuidores', icon: Users, color: 'from-orange-500 to-red-500', description: 'Proveedores' },
   { id: 'clientes', label: 'Clientes', icon: UserCheck, color: 'from-pink-500 to-rose-500', description: 'Cartera de clientes' },
   { id: 'reportes', label: 'Reportes', icon: BarChart3, color: 'from-teal-500 to-cyan-600', description: 'Análisis y reportes' },
@@ -156,8 +157,8 @@ interface MegaDropdownProps {
   isOpen: boolean
   onToggle: () => void
   onClose: () => void
-  onSelect: (id: string) => void
-  currentPanel: string
+  onSelect: (id: PanelId) => void
+  currentPanel: PanelId
   columns?: number
   use3D?: boolean // Habilitar iconos 3D Spline
 }
@@ -316,8 +317,8 @@ const MegaDropdown = ({
 interface MobileMenuProps {
   isOpen: boolean
   onClose: () => void
-  currentPanel: string
-  onPanelSelect: (id: string) => void
+  currentPanel: PanelId
+  onPanelSelect: (id: PanelId) => void
   onAction: (action: string) => void
 }
 
@@ -438,7 +439,7 @@ const MobileMenu = ({ isOpen, onClose, currentPanel, onPanelSelect, onAction }: 
                     <motion.button
                       key={banco.id}
                       onClick={() => {
-                        onPanelSelect('banco')
+                        onPanelSelect('bancos')
                         onClose()
                       }}
                       className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all"

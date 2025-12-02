@@ -14,6 +14,15 @@ import { useFirestoreCRUD } from '@/app/hooks/useFirestoreCRUD'
 import { CreateClienteModalPremium } from '@/app/components/modals/CreateClienteModalPremium'
 import { CreateAbonoModalPremium } from '@/app/components/modals/CreateAbonoModalPremium'
 import { Skeleton } from '@/app/components/ui/skeleton'
+import { 
+  AnimatedCounter, 
+  GlowButton, 
+  Tilt3D, 
+  SkeletonTable, 
+  Pulse, 
+  ShineEffect,
+  haptic,
+} from '@/app/components/ui/microinteractions'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, BarChart, Bar } from 'recharts'
 import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/components/ui/SafeChartContainer'
 import { QuickStatWidget } from '@/app/components/widgets/QuickStatWidget'

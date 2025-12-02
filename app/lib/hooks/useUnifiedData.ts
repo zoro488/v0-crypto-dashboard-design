@@ -30,7 +30,7 @@ interface HookResult<T> {
 
 function useSubscription<T>(
   subscribeFn: (callback: (data: T[]) => void) => () => void,
-  initialData: T[] = []
+  initialData: T[] = [],
 ): HookResult<T> {
   const [data, setData] = useState<T[]>(initialData)
   const [loading, setLoading] = useState(true)
@@ -217,7 +217,7 @@ export function useBancosCRUD() {
     bancoOrigenId: string,
     bancoDestinoId: string,
     monto: number,
-    concepto: string
+    concepto: string,
   ) => {
     try {
       const id = await unifiedService.crearTransferencia(bancoOrigenId, bancoDestinoId, monto, concepto)

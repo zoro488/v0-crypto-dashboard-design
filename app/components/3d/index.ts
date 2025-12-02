@@ -90,6 +90,21 @@ export type {
 export { PremiumSplineOrb } from './PremiumSplineOrb'
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// AI VOICE ORB - WIDGET FLOTANTE 3D
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Orbe AI con modelo GLTF real
+export { AIVoiceOrbGLTF } from './models/AIVoiceOrbGLTF'
+export type { OrbState as AIVoiceOrbState } from './models/AIVoiceOrbGLTF'
+
+// Orbe AI procedural (fallback)
+export { AIVoiceOrb } from './models/AIVoiceOrb'
+export type { OrbState } from './models/AIVoiceOrb'
+
+// Widget flotante completo
+export { FloatingAIOrb } from './FloatingAIOrb'
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // SHADERS
 // ═══════════════════════════════════════════════════════════════════════════════
 

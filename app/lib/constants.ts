@@ -1,6 +1,18 @@
-import type { Banco } from '@/app/types'
+import type { Banco, BancoId } from '@/app/types'
 
-export const BANCOS: Banco[] = [
+/**
+ * Configuración base de los 7 bancos/bóvedas del sistema
+ * Esta es la estructura de configuración, NO datos - los valores reales vienen de Firestore
+ */
+export const BANCOS_CONFIG: Array<{
+  id: BancoId
+  nombre: string
+  icon: string
+  color: string
+  tipo: 'boveda' | 'utilidades' | 'gastos' | 'operativo'
+  descripcion: string
+  moneda: 'MXN' | 'USD'
+}> = [
   {
     id: 'boveda_monte',
     nombre: 'Bóveda Monte',
@@ -9,14 +21,6 @@ export const BANCOS: Banco[] = [
     tipo: 'boveda',
     descripcion: 'Capital principal de operaciones',
     moneda: 'MXN',
-    capitalActual: 2450000,
-    capitalInicial: 2000000,
-    historicoIngresos: 5000000,
-    historicoGastos: 2550000,
-    historicoTransferencias: 0,
-    estado: 'activo',
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     id: 'boveda_usa',
@@ -26,14 +30,6 @@ export const BANCOS: Banco[] = [
     tipo: 'boveda',
     descripcion: 'Capital en dólares/USA',
     moneda: 'USD',
-    capitalActual: 128005,
-    capitalInicial: 100000,
-    historicoIngresos: 200000,
-    historicoGastos: 71995,
-    historicoTransferencias: 0,
-    estado: 'activo',
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     id: 'utilidades',
@@ -43,14 +39,6 @@ export const BANCOS: Banco[] = [
     tipo: 'utilidades',
     descripcion: 'Ganancias netas del negocio',
     moneda: 'MXN',
-    capitalActual: 102658,
-    capitalInicial: 0,
-    historicoIngresos: 150000,
-    historicoGastos: 47342,
-    historicoTransferencias: 0,
-    estado: 'activo',
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     id: 'flete_sur',
@@ -60,14 +48,6 @@ export const BANCOS: Banco[] = [
     tipo: 'gastos',
     descripcion: 'Capital para gastos de transporte',
     moneda: 'MXN',
-    capitalActual: 185792,
-    capitalInicial: 200000,
-    historicoIngresos: 250000,
-    historicoGastos: 64208,
-    historicoTransferencias: 0,
-    estado: 'activo',
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     id: 'azteca',
@@ -77,14 +57,6 @@ export const BANCOS: Banco[] = [
     tipo: 'operativo',
     descripcion: 'Cuenta bancaria externa Azteca',
     moneda: 'MXN',
-    capitalActual: -178715,
-    capitalInicial: 50000,
-    historicoIngresos: 50000,
-    historicoGastos: 228715,
-    historicoTransferencias: 0,
-    estado: 'negativo',
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     id: 'leftie',
@@ -94,14 +66,6 @@ export const BANCOS: Banco[] = [
     tipo: 'operativo',
     descripcion: 'Capital de negocio secundario',
     moneda: 'MXN',
-    capitalActual: 45844,
-    capitalInicial: 50000,
-    historicoIngresos: 80000,
-    historicoGastos: 34156,
-    historicoTransferencias: 0,
-    estado: 'activo',
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     id: 'profit',
@@ -111,22 +75,11 @@ export const BANCOS: Banco[] = [
     tipo: 'operativo',
     descripcion: 'Utilidades distribuidas',
     moneda: 'MXN',
-    capitalActual: 12577748,
-    capitalInicial: 10000000,
-    historicoIngresos: 15000000,
-    historicoGastos: 2422252,
-    historicoTransferencias: 0,
-    estado: 'activo',
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
 ]
 
-export const MOCK_DATA = {
-  ventasHoy: 247500,
-  ventasAyer: 215000,
-  ordenesPendientes: 23,
-  stockCritico: 12,
-  capitalTotal: 18473020,
-  capitalMesAnterior: 17000000,
-}
+/**
+ * @deprecated Use BANCOS_CONFIG y lee los datos reales desde Firestore
+ * Array vacío - los datos con valores vienen de Firestore
+ */
+export const BANCOS: Banco[] = []

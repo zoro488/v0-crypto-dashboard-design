@@ -49,7 +49,7 @@ export const obtenerBanco = async (bancoId: string): Promise<any | null> => {
 export const actualizarCapitalBanco = async (
   bancoId: string,
   monto: number,
-  tipo: 'ingreso' | 'gasto' | 'transferencia'
+  tipo: 'ingreso' | 'gasto' | 'transferencia',
 ) => {
   if (useLocalStorage) {
     return localService.localActualizarCapitalBanco(bancoId, monto, tipo)
@@ -209,7 +209,7 @@ export const pagarDistribuidor = async (
   distribuidorId: string,
   ordenCompraId: string,
   monto: number,
-  bancoOrigenId: string
+  bancoOrigenId: string,
 ) => {
   if (useLocalStorage) {
     return localService.localPagarDistribuidor(distribuidorId, ordenCompraId, monto, bancoOrigenId)
@@ -396,7 +396,7 @@ export const crearTransferencia = async (
   bancoOrigenId: string,
   bancoDestinoId: string,
   monto: number,
-  concepto: string
+  concepto: string,
 ) => {
   return addTransferencia({ bancoOrigenId, bancoDestinoId, monto, concepto })
 }
