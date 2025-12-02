@@ -6,7 +6,7 @@ import { Building2, AlertCircle, CheckCircle2, Clock, DollarSign, Package, Plus,
 import { Button } from '@/app/components/ui/button'
 import { Badge } from '@/app/components/ui/badge'
 import { useDistribuidores, useOrdenesCompra } from '@/app/lib/firebase/firestore-hooks.service'
-import { eliminarDistribuidor } from '@/app/lib/firebase/firestore-service'
+import { eliminarDistribuidor } from '@/app/lib/services/unified-data-service'
 import { CreateDistribuidorModalPremium } from '@/app/components/modals/CreateDistribuidorModalPremium'
 import { CreatePagoDistribuidorModalPremium } from '@/app/components/modals/CreatePagoDistribuidorModalPremium'
 import { DeleteConfirmModal } from '@/app/components/modals/DeleteConfirmModal'
