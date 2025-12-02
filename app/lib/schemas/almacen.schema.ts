@@ -125,13 +125,13 @@ export const CrearProductoSchema = z.object({
   {
     message: 'El stock máximo debe ser mayor o igual al stock mínimo',
     path: ['stockMaximo'],
-  }
+  },
 ).refine(
   data => data.precioVenta >= data.precioCompra,
   {
     message: 'El precio de venta debe ser mayor o igual al precio de compra',
     path: ['precioVenta'],
-  }
+  },
 )
 
 export type CrearProductoInput = z.infer<typeof CrearProductoSchema>
@@ -444,7 +444,7 @@ export function validarAjusteInventario(data: unknown): {
 export function generarKeywordsProducto(
   nombre: string, 
   sku?: string, 
-  categoria?: string
+  categoria?: string,
 ): string[] {
   const keywords: string[] = []
   
@@ -481,7 +481,7 @@ export function generarKeywordsProducto(
  */
 export function verificarStockSuficiente(
   stockActual: number, 
-  cantidadSolicitada: number
+  cantidadSolicitada: number,
 ): { valido: boolean; mensaje?: string } {
   if (cantidadSolicitada <= 0) {
     return { valido: false, mensaje: 'La cantidad debe ser mayor a 0' }
@@ -490,7 +490,7 @@ export function verificarStockSuficiente(
   if (stockActual < cantidadSolicitada) {
     return { 
       valido: false, 
-      mensaje: `Stock insuficiente. Disponible: ${stockActual}, Solicitado: ${cantidadSolicitada}` 
+      mensaje: `Stock insuficiente. Disponible: ${stockActual}, Solicitado: ${cantidadSolicitada}`, 
     }
   }
   

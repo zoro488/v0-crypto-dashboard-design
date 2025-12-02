@@ -75,7 +75,7 @@ export class AppError extends Error {
     code: ErrorCode,
     message: string,
     context?: Record<string, unknown>,
-    originalError?: Error
+    originalError?: Error,
   ) {
     super(message)
     this.name = 'AppError'
@@ -115,7 +115,7 @@ export class ValidationError extends AppError {
     super(
       'VALIDATION_ERROR',
       `Datos inválidos: ${errors.join(', ')}`,
-      { ...context, errors }
+      { ...context, errors },
     )
     this.name = 'ValidationError'
     this.errors = errors
@@ -140,7 +140,7 @@ export class NotFoundError extends AppError {
     super(
       'NOT_FOUND',
       id ? `${resource} con ID "${id}" no encontrado` : `${resource} no encontrado`,
-      { resource, id }
+      { resource, id },
     )
     this.name = 'NotFoundError'
   }
@@ -153,12 +153,12 @@ export class InsufficientStockError extends AppError {
   constructor(
     productoId: string,
     stockDisponible: number,
-    cantidadSolicitada: number
+    cantidadSolicitada: number,
   ) {
     super(
       'INSUFFICIENT_STOCK',
       `Stock insuficiente. Disponible: ${stockDisponible}, Solicitado: ${cantidadSolicitada}`,
-      { productoId, stockDisponible, cantidadSolicitada }
+      { productoId, stockDisponible, cantidadSolicitada },
     )
     this.name = 'InsufficientStockError'
   }
@@ -171,12 +171,12 @@ export class InsufficientFundsError extends AppError {
   constructor(
     bancoId: string,
     saldoActual: number,
-    montoRequerido: number
+    montoRequerido: number,
   ) {
     super(
       'INSUFFICIENT_FUNDS',
       `Saldo insuficiente en ${bancoId}. Actual: $${saldoActual.toLocaleString()}, Requerido: $${montoRequerido.toLocaleString()}`,
-      { bancoId, saldoActual, montoRequerido }
+      { bancoId, saldoActual, montoRequerido },
     )
     this.name = 'InsufficientFundsError'
   }
@@ -200,7 +200,7 @@ export class DuplicateEntryError extends AppError {
     super(
       'DUPLICATE_ENTRY',
       `Ya existe un ${resource} con ${field}: "${value}"`,
-      { resource, field, value }
+      { resource, field, value },
     )
     this.name = 'DuplicateEntryError'
   }
@@ -287,14 +287,14 @@ export class Result<T, E extends AppError = AppError> {
   /**
    * Obtiene el valor o ejecuta una función que retorna el default
    */
-  getOrElse(fn: (error: E) => T): T {
+  getOrElse(fn: (_error: E) => T): T {
     return this._isOk ? (this._value as T) : fn(this._error as E)
   }
 
   /**
    * Transforma el valor si es exitoso
    */
-  map<U>(fn: (value: T) => U): Result<U, E> {
+  map<U>(fn: (_value: T) => U): Result<U, E> {
     if (this._isOk) {
       return Result.ok(fn(this._value as T))
     }
@@ -304,7 +304,7 @@ export class Result<T, E extends AppError = AppError> {
   /**
    * Transforma el error si es fallido
    */
-  mapError<F extends AppError>(fn: (error: E) => F): Result<T, F> {
+  mapError<F extends AppError>(fn: (_error: E) => F): Result<T, F> {
     if (this._isOk) {
       return Result.ok(this._value as T)
     }
@@ -314,7 +314,7 @@ export class Result<T, E extends AppError = AppError> {
   /**
    * Encadena operaciones que retornan Result
    */
-  flatMap<U>(fn: (value: T) => Result<U, E>): Result<U, E> {
+  flatMap<U>(fn: (_value: T) => Result<U, E>): Result<U, E> {
     if (this._isOk) {
       return fn(this._value as T)
     }
@@ -324,7 +324,7 @@ export class Result<T, E extends AppError = AppError> {
   /**
    * Ejecuta una función solo si es exitoso
    */
-  onOk(fn: (value: T) => void): Result<T, E> {
+  onOk(fn: (_value: T) => void): Result<T, E> {
     if (this._isOk) {
       fn(this._value as T)
     }
@@ -334,7 +334,7 @@ export class Result<T, E extends AppError = AppError> {
   /**
    * Ejecuta una función solo si es error
    */
-  onError(fn: (error: E) => void): Result<T, E> {
+  onError(fn: (_error: E) => void): Result<T, E> {
     if (!this._isOk) {
       fn(this._error as E)
     }
@@ -344,7 +344,7 @@ export class Result<T, E extends AppError = AppError> {
   /**
    * Match pattern - ejecuta una u otra función según el estado
    */
-  match<U>(handlers: { ok: (value: T) => U; error: (error: E) => U }): U {
+  match<U>(handlers: { ok: (_value: T) => U; error: (_error: E) => U }): U {
     if (this._isOk) {
       return handlers.ok(this._value as T)
     }
@@ -371,7 +371,7 @@ export class Result<T, E extends AppError = AppError> {
  */
 export async function tryCatch<T>(
   fn: () => Promise<T>,
-  errorHandler?: (error: unknown) => AppError
+  errorHandler?: (_error: unknown) => AppError,
 ): Promise<Result<T, AppError>> {
   try {
     const value = await fn()
@@ -385,7 +385,7 @@ export async function tryCatch<T>(
             'UNKNOWN_ERROR',
             error instanceof Error ? error.message : 'Error desconocido',
             {},
-            error instanceof Error ? error : undefined
+            error instanceof Error ? error : undefined,
           )
     return Result.fail(appError)
   }
@@ -396,7 +396,7 @@ export async function tryCatch<T>(
  */
 export function tryCatchSync<T>(
   fn: () => T,
-  errorHandler?: (error: unknown) => AppError
+  errorHandler?: (_error: unknown) => AppError,
 ): Result<T, AppError> {
   try {
     const value = fn()
@@ -410,7 +410,7 @@ export function tryCatchSync<T>(
             'UNKNOWN_ERROR',
             error instanceof Error ? error.message : 'Error desconocido',
             {},
-            error instanceof Error ? error : undefined
+            error instanceof Error ? error : undefined,
           )
     return Result.fail(appError)
   }
@@ -438,7 +438,7 @@ export function combineResults<T>(results: Result<T, AppError>[]): Result<T[], A
  * Ejecuta múltiples operaciones async y combina resultados
  */
 export async function executeAll<T>(
-  operations: (() => Promise<Result<T, AppError>>)[]
+  operations: (() => Promise<Result<T, AppError>>)[],
 ): Promise<Result<T[], AppError>> {
   const results = await Promise.all(operations.map(op => op()))
   return combineResults(results)
@@ -453,7 +453,7 @@ export async function executeAll<T>(
  */
 export function fromZodErrors(errors: { path: (string | number)[]; message: string }[]): ValidationError {
   return new ValidationError(
-    errors.map(e => `${e.path.join('.')}: ${e.message}`)
+    errors.map(e => `${e.path.join('.')}: ${e.message}`),
   )
 }
 
@@ -467,7 +467,7 @@ export function fromFirebaseError(error: unknown): DatabaseError {
   return new DatabaseError(
     message,
     error instanceof Error ? error : undefined,
-    { firebaseCode: code }
+    { firebaseCode: code },
   )
 }
 
@@ -484,8 +484,8 @@ export function fromUnknownError<T>(error: unknown, context?: string): Result<T,
       'UNKNOWN_ERROR',
       error instanceof Error ? error.message : 'Error desconocido',
       { context },
-      error instanceof Error ? error : undefined
-    )
+      error instanceof Error ? error : undefined,
+    ),
   )
 }
 

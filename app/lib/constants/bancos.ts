@@ -220,14 +220,14 @@ export const BANCOS_OPERATIVOS: BancoId[] = ['profit', 'leftie', 'azteca']
  * Bancos que pueden usarse para pagar a distribuidores
  */
 export const BANCOS_PAGO_PROVEEDORES: BancoId[] = BANCOS_IDS.filter(
-  id => BANCOS_CONFIG[id].pagoProveedores
+  id => BANCOS_CONFIG[id].pagoProveedores,
 )
 
 /**
  * Bancos activos en el sistema
  */
 export const BANCOS_ACTIVOS: BancoId[] = BANCOS_IDS.filter(
-  id => BANCOS_CONFIG[id].activo
+  id => BANCOS_CONFIG[id].activo,
 )
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -372,14 +372,14 @@ export const BANCOS_OPTIONS = BANCOS_ORDENADOS.map(banco => ({
  * Opciones de bancos que pueden recibir pagos de ventas
  */
 export const BANCOS_OPTIONS_VENTAS = BANCOS_OPTIONS.filter(
-  opt => BANCOS_DISTRIBUCION_GYA.includes(opt.value as BancoId)
+  opt => BANCOS_DISTRIBUCION_GYA.includes(opt.value as BancoId),
 )
 
 /**
  * Opciones de bancos para pagar a proveedores
  */
 export const BANCOS_OPTIONS_PROVEEDORES = BANCOS_OPTIONS.filter(
-  opt => BANCOS_PAGO_PROVEEDORES.includes(opt.value as BancoId)
+  opt => BANCOS_PAGO_PROVEEDORES.includes(opt.value as BancoId),
 )
 
 export default BANCOS_CONFIG

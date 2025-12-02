@@ -18,10 +18,10 @@ import { useFirestoreCRUD } from './useFirestoreCRUD'
 import type { 
   Venta, 
   Cliente, 
-  Distribuidor, 
-  BancoId 
+  Distribuidor,
 } from '@/app/types'
 import type { BancoUIState } from '@/app/lib/store/useAppStore'
+// BancoId se usa implícitamente a través de BancoUIState
 
 /**
  * Producto simplificado para el widget AI
@@ -66,8 +66,9 @@ export interface AIWidgetData {
 /**
  * Hook para obtener datos agregados de Firestore para widgets AI
  * Usa múltiples colecciones y calcula métricas en tiempo real
+ * @param _bancos - Bancos del UI state (reservado para futuro uso de capital)
  */
-export function useAIWidgetData(bancos: BancoUIState[]): AIWidgetData {
+export function useAIWidgetData(_bancos?: BancoUIState[]): AIWidgetData {
   // Obtener datos de Firestore
   const { data: ventasRaw, loading: loadingVentas } = useFirestoreCRUD<Venta>('ventas')
   const { data: clientesRaw, loading: loadingClientes } = useFirestoreCRUD<Cliente>('clientes')

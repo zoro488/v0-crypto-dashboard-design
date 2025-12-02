@@ -103,7 +103,7 @@ class Logger {
     level: LogLevel, 
     message: string, 
     options?: LogOptions, 
-    error?: Error | unknown
+    error?: Error | unknown,
   ): LogEntry {
     const entry: LogEntry = {
       level,
@@ -220,7 +220,7 @@ class Logger {
       const duration = performance.now() - startTime
       this.debug(`⏱️ Completado: ${operationName} (${duration.toFixed(2)}ms)`, { 
         context,
-        data: { duration: `${duration.toFixed(2)}ms` }
+        data: { duration: `${duration.toFixed(2)}ms` },
       })
     }
   }

@@ -59,19 +59,19 @@ interface AppState {
   triggerDataRefresh: () => void
 
   // ========== UI Actions ==========
-  setCurrentPanel: (panel: PanelId) => void
+  setCurrentPanel: (_panel: PanelId) => void
   toggleSidebar: () => void
-  setTheme: (theme: 'light' | 'dark' | 'cyber') => void
-  setVoiceAgentActive: (active: boolean) => void
-  setVoiceAgentStatus: (status: 'idle' | 'listening' | 'thinking' | 'speaking') => void
-  setAudioFrequencies: (frequencies: number[]) => void
-  setModelRotation: (rotation: number) => void
-  setActiveScene: (scene: string | null) => void
+  setTheme: (_theme: 'light' | 'dark' | 'cyber') => void
+  setVoiceAgentActive: (_active: boolean) => void
+  setVoiceAgentStatus: (_status: 'idle' | 'listening' | 'thinking' | 'speaking') => void
+  setAudioFrequencies: (_frequencies: number[]) => void
+  setModelRotation: (_rotation: number) => void
+  setActiveScene: (_scene: string | null) => void
   
   // ========== Financial UI Sync ==========
   // Solo para sincronizar cache de UI desde Firestore
-  updateBancoSaldo: (id: BancoId, saldo: number) => void
-  syncBancosFromFirestore: (bancos: Array<{ id: BancoId; saldo: number }>) => void
+  updateBancoSaldo: (_id: BancoId, _saldo: number) => void
+  syncBancosFromFirestore: (_bancos: Array<{ id: BancoId; saldo: number }>) => void
 }
 
 // ============================================================
@@ -87,7 +87,7 @@ const BANCOS_UI_INICIAL: BancoUIState[] = BANCOS_ORDENADOS.map((banco: BancoConf
 export const useAppStore = create<AppState>()(
   devtools(
     persist(
-      (set, get) => ({
+      (set, _get) => ({
         // ========== Initial UI State ==========
         currentPanel: 'dashboard',
         sidebarCollapsed: false,
@@ -110,13 +110,13 @@ export const useAppStore = create<AppState>()(
         // Data Refresh
         dataRefreshTrigger: 0,
         triggerDataRefresh: () => set((state) => ({ 
-          dataRefreshTrigger: state.dataRefreshTrigger + 1 
+          dataRefreshTrigger: state.dataRefreshTrigger + 1, 
         })),
 
         // ========== UI Actions ==========
         setCurrentPanel: (panel) => set({ currentPanel: panel }),
         toggleSidebar: () => set((state) => ({ 
-          sidebarCollapsed: !state.sidebarCollapsed 
+          sidebarCollapsed: !state.sidebarCollapsed, 
         })),
         setTheme: (theme) => set({ theme }),
         setVoiceAgentActive: (active) => set({ voiceAgentActive: active }),
@@ -129,12 +129,12 @@ export const useAppStore = create<AppState>()(
         updateBancoSaldo: (id, saldo) => {
           set((state) => {
             const newBancos = state.bancos.map((banco) => 
-              banco.id === id ? { ...banco, saldo } : banco
+              banco.id === id ? { ...banco, saldo } : banco,
             )
             const newTotalCapital = newBancos.reduce((acc, banco) => acc + banco.saldo, 0)
             return { 
               bancos: newBancos, 
-              totalCapital: newTotalCapital 
+              totalCapital: newTotalCapital, 
             }
           })
         },
@@ -151,12 +151,12 @@ export const useAppStore = create<AppState>()(
             
             logger.debug('Bancos sincronizados desde Firestore', {
               context: 'AppStore',
-              data: { totalCapital: newTotalCapital }
+              data: { totalCapital: newTotalCapital },
             })
             
             return { 
               bancos: newBancos, 
-              totalCapital: newTotalCapital 
+              totalCapital: newTotalCapital, 
             }
           })
         },
@@ -171,6 +171,6 @@ export const useAppStore = create<AppState>()(
         }),
       },
     ),
-    { name: 'ChronosStore' }
+    { name: 'ChronosStore' },
   ),
 )
