@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { 
   ShoppingCart, User, Truck, DollarSign, CreditCard, 
   CheckCircle2, Printer, Receipt, Sparkles, ArrowRight,
-  Package, X
+  Package, X,
 } from 'lucide-react'
 import { cn } from '@/app/lib/utils'
 import ObsidianDistributionSlider, { DistributionState } from './ObsidianDistributionSlider'
@@ -61,7 +61,7 @@ export default function SalesCockpit({
   onConfirm,
   products,
   clients,
-  defaultDistribution
+  defaultDistribution,
 }: SalesCockpitProps) {
   // Estado principal
   const [step, setStep] = useState<Step>('productos')
@@ -73,7 +73,7 @@ export default function SalesCockpit({
   const [fleteEnabled, setFleteEnabled] = useState(false)
   const [fleteAmount, setFleteAmount] = useState(500)
   const [distribucion, setDistribucion] = useState<DistributionState>(
-    defaultDistribution || { bovedaMonte: 63, fletes: 5, utilidades: 32 }
+    defaultDistribution || { bovedaMonte: 63, fletes: 5, utilidades: 32 },
   )
   const [notas, setNotas] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -83,7 +83,7 @@ export default function SalesCockpit({
   // Cálculos
   const subtotal = useMemo(() => 
     selectedProducts.reduce((acc, p) => acc + p.subtotal, 0), 
-    [selectedProducts]
+    [selectedProducts],
   )
   
   const fleteTotal = fleteEnabled ? fleteAmount * selectedProducts.reduce((acc, p) => acc + p.cantidad, 0) : 0
@@ -98,7 +98,7 @@ export default function SalesCockpit({
         return prev.map(p => 
           p.id === product.id 
             ? { ...p, cantidad: p.cantidad + cantidad, subtotal: (p.cantidad + cantidad) * p.precioVenta }
-            : p
+            : p,
         )
       }
       return [...prev, { ...product, cantidad, subtotal: cantidad * product.precioVenta }]
@@ -124,7 +124,7 @@ export default function SalesCockpit({
         distribucion,
         metodoPago,
         montoPagado,
-        notas
+        notas,
       }
 
       await onConfirm(saleData)
@@ -157,7 +157,7 @@ export default function SalesCockpit({
     const lower = clientSearch.toLowerCase()
     return clients.filter(c => 
       c.nombre.toLowerCase().includes(lower) ||
-      c.telefono?.includes(clientSearch)
+      c.telefono?.includes(clientSearch),
     ).slice(0, 8)
   }, [clients, clientSearch])
 
@@ -202,11 +202,11 @@ export default function SalesCockpit({
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             className={cn(
-              "fixed inset-4 md:inset-10 z-50",
-              "bg-[rgba(8,8,12,0.95)] backdrop-blur-2xl",
-              "rounded-3xl border border-white/10",
-              "shadow-2xl shadow-black/50",
-              "overflow-hidden flex flex-col"
+              'fixed inset-4 md:inset-10 z-50',
+              'bg-[rgba(8,8,12,0.95)] backdrop-blur-2xl',
+              'rounded-3xl border border-white/10',
+              'shadow-2xl shadow-black/50',
+              'overflow-hidden flex flex-col',
             )}
           >
             {/* Header */}
@@ -229,12 +229,12 @@ export default function SalesCockpit({
                       onClick={() => i <= currentStepIndex && setStep(s.id)}
                       disabled={i > currentStepIndex}
                       className={cn(
-                        "flex items-center gap-2 px-4 py-2 rounded-xl transition-all",
+                        'flex items-center gap-2 px-4 py-2 rounded-xl transition-all',
                         step === s.id 
-                          ? "bg-white/10 text-white" 
+                          ? 'bg-white/10 text-white' 
                           : i < currentStepIndex
-                            ? "text-white/60 hover:bg-white/5"
-                            : "text-white/20 cursor-not-allowed"
+                            ? 'text-white/60 hover:bg-white/5'
+                            : 'text-white/20 cursor-not-allowed',
                       )}
                       whileHover={i <= currentStepIndex ? { scale: 1.02 } : undefined}
                     >
@@ -291,8 +291,8 @@ export default function SalesCockpit({
                         <motion.button
                           onClick={() => setFleteEnabled(!fleteEnabled)}
                           className={cn(
-                            "relative w-14 h-8 rounded-full transition-colors",
-                            fleteEnabled ? "bg-orange-500" : "bg-white/10"
+                            'relative w-14 h-8 rounded-full transition-colors',
+                            fleteEnabled ? 'bg-orange-500' : 'bg-white/10',
                           )}
                           whileTap={{ scale: 0.95 }}
                         >
@@ -321,10 +321,10 @@ export default function SalesCockpit({
                         onChange={(e) => setClientSearch(e.target.value)}
                         placeholder="Buscar cliente..."
                         className={cn(
-                          "w-full h-14 px-5 rounded-2xl",
-                          "bg-black/40 backdrop-blur-xl border border-white/10",
-                          "text-white placeholder:text-white/30",
-                          "focus:outline-none focus:border-indigo-500/50"
+                          'w-full h-14 px-5 rounded-2xl',
+                          'bg-black/40 backdrop-blur-xl border border-white/10',
+                          'text-white placeholder:text-white/30',
+                          'focus:outline-none focus:border-indigo-500/50',
                         )}
                       />
                       
@@ -334,11 +334,11 @@ export default function SalesCockpit({
                             key={client.id}
                             onClick={() => setSelectedClient(client)}
                             className={cn(
-                              "w-full p-4 rounded-xl text-left transition-all",
-                              "border",
+                              'w-full p-4 rounded-xl text-left transition-all',
+                              'border',
                               selectedClient?.id === client.id
-                                ? "bg-indigo-500/20 border-indigo-500/50"
-                                : "bg-white/5 border-white/10 hover:bg-white/10"
+                                ? 'bg-indigo-500/20 border-indigo-500/50'
+                                : 'bg-white/5 border-white/10 hover:bg-white/10',
                             )}
                             whileHover={{ x: 4 }}
                           >
@@ -383,10 +383,10 @@ export default function SalesCockpit({
                               key={mp.id}
                               onClick={() => setMetodoPago(mp.id)}
                               className={cn(
-                                "p-4 rounded-xl border transition-all flex flex-col items-center gap-2",
+                                'p-4 rounded-xl border transition-all flex flex-col items-center gap-2',
                                 metodoPago === mp.id
-                                  ? "bg-indigo-500/20 border-indigo-500/50 text-white"
-                                  : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"
+                                  ? 'bg-indigo-500/20 border-indigo-500/50 text-white'
+                                  : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10',
                               )}
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
@@ -409,10 +409,10 @@ export default function SalesCockpit({
                             onChange={(e) => setMontoPagado(Number(e.target.value))}
                             placeholder="0.00"
                             className={cn(
-                              "w-full h-16 pl-10 pr-4 rounded-2xl text-2xl font-mono",
-                              "bg-black/40 backdrop-blur-xl border border-white/10",
-                              "text-white placeholder:text-white/20",
-                              "focus:outline-none focus:border-indigo-500/50"
+                              'w-full h-16 pl-10 pr-4 rounded-2xl text-2xl font-mono',
+                              'bg-black/40 backdrop-blur-xl border border-white/10',
+                              'text-white placeholder:text-white/20',
+                              'focus:outline-none focus:border-indigo-500/50',
                             )}
                           />
                         </div>
@@ -449,10 +449,10 @@ export default function SalesCockpit({
                           placeholder="Agregar notas a la venta..."
                           rows={3}
                           className={cn(
-                            "w-full p-4 rounded-2xl resize-none",
-                            "bg-black/40 backdrop-blur-xl border border-white/10",
-                            "text-white placeholder:text-white/30",
-                            "focus:outline-none focus:border-indigo-500/50"
+                            'w-full p-4 rounded-2xl resize-none',
+                            'bg-black/40 backdrop-blur-xl border border-white/10',
+                            'text-white placeholder:text-white/30',
+                            'focus:outline-none focus:border-indigo-500/50',
                           )}
                         />
                       </div>
@@ -529,10 +529,10 @@ export default function SalesCockpit({
                 }}
                 disabled={currentStepIndex === 0}
                 className={cn(
-                  "px-6 py-3 rounded-xl font-medium transition-all",
+                  'px-6 py-3 rounded-xl font-medium transition-all',
                   currentStepIndex === 0
-                    ? "text-white/20 cursor-not-allowed"
-                    : "text-white/60 hover:text-white hover:bg-white/5"
+                    ? 'text-white/20 cursor-not-allowed'
+                    : 'text-white/60 hover:text-white hover:bg-white/5',
                 )}
               >
                 Anterior
@@ -549,11 +549,11 @@ export default function SalesCockpit({
                 }}
                 disabled={!canProceed || isSubmitting}
                 className={cn(
-                  "px-8 py-3 rounded-xl font-semibold transition-all",
-                  "bg-gradient-to-r from-indigo-500 to-purple-600",
-                  "hover:from-indigo-400 hover:to-purple-500",
-                  "text-white shadow-lg shadow-indigo-500/25",
-                  (!canProceed || isSubmitting) && "opacity-50 cursor-not-allowed"
+                  'px-8 py-3 rounded-xl font-semibold transition-all',
+                  'bg-gradient-to-r from-indigo-500 to-purple-600',
+                  'hover:from-indigo-400 hover:to-purple-500',
+                  'text-white shadow-lg shadow-indigo-500/25',
+                  (!canProceed || isSubmitting) && 'opacity-50 cursor-not-allowed',
                 )}
                 whileHover={canProceed ? { scale: 1.02 } : undefined}
                 whileTap={canProceed ? { scale: 0.98 } : undefined}
@@ -563,7 +563,7 @@ export default function SalesCockpit({
                     <motion.div 
                       className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
                       animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                     />
                     Procesando...
                   </span>
@@ -612,7 +612,7 @@ function TicketPreview({
   montoPagado,
   metodoPago,
   isSealed,
-  folio
+  folio,
 }: TicketPreviewProps) {
   const cambio = montoPagado - total
   const now = new Date()
@@ -620,8 +620,8 @@ function TicketPreview({
   return (
     <motion.div
       className={cn(
-        "relative bg-[#fafafa] rounded-lg overflow-hidden",
-        "shadow-xl font-mono text-[11px] text-gray-800"
+        'relative bg-[#fafafa] rounded-lg overflow-hidden',
+        'shadow-xl font-mono text-[11px] text-gray-800',
       )}
       style={{
         backgroundImage: `repeating-linear-gradient(
@@ -630,7 +630,7 @@ function TicketPreview({
           transparent 1px,
           rgba(0,0,0,0.02) 1px,
           rgba(0,0,0,0.02) 2px
-        )`
+        )`,
       }}
       animate={{
         scale: isSealed ? [1, 1.02, 1] : 1,
@@ -639,8 +639,8 @@ function TicketPreview({
       {/* Efecto de papel perforado arriba */}
       <div className="h-3 bg-gradient-to-b from-gray-300/50 to-transparent" 
         style={{
-          backgroundImage: `radial-gradient(circle at 8px -4px, #1a1a1a 8px, transparent 8px)`,
-          backgroundSize: '16px 16px'
+          backgroundImage: 'radial-gradient(circle at 8px -4px, #1a1a1a 8px, transparent 8px)',
+          backgroundSize: '16px 16px',
         }}
       />
 
@@ -724,8 +724,8 @@ function TicketPreview({
       {/* Efecto de papel perforado abajo */}
       <div className="h-3 bg-gradient-to-t from-gray-300/50 to-transparent"
         style={{
-          backgroundImage: `radial-gradient(circle at 8px 12px, #1a1a1a 8px, transparent 8px)`,
-          backgroundSize: '16px 16px'
+          backgroundImage: 'radial-gradient(circle at 8px 12px, #1a1a1a 8px, transparent 8px)',
+          backgroundSize: '16px 16px',
         }}
       />
 

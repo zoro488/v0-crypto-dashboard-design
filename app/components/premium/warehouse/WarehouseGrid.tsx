@@ -5,7 +5,7 @@ import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motio
 import { 
   Package, Search, Grid3X3, List, Plus, Minus, AlertTriangle,
   TrendingUp, TrendingDown, Box, History, Edit3, X, Filter,
-  ArrowUpRight, ArrowDownLeft, RotateCcw, Eye
+  ArrowUpRight, ArrowDownLeft, RotateCcw, Eye,
 } from 'lucide-react'
 import { cn } from '@/app/lib/utils'
 import type { Producto, MovimientoAlmacen } from '@/app/types'
@@ -53,7 +53,7 @@ export default function WarehouseGrid({
   onProductEdit,
   onProductView,
   gridRows = 6,
-  gridCols = 8
+  gridCols = 8,
 }: WarehouseGridProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('heatmap')
   const [searchQuery, setSearchQuery] = useState('')
@@ -77,7 +77,7 @@ export default function WarehouseGrid({
       const lower = searchQuery.toLowerCase()
       result = result.filter(p => 
         p.nombre.toLowerCase().includes(lower) ||
-        p.sku?.toLowerCase().includes(lower)
+        p.sku?.toLowerCase().includes(lower),
       )
     }
     
@@ -110,37 +110,37 @@ export default function WarehouseGrid({
   const getStockStatus = useCallback((product: Producto): StockStatus => {
     const { stockActual, stockMinimo = 5, stockMaximo = stockMinimo * 5 } = product
     
-    if (stockActual <= 0) return { 
+    if (stockActual <= 0) {return { 
       color: 'bg-red-500', 
       glow: 'shadow-red-500/50',
       textColor: 'text-red-400',
       label: 'Sin stock', 
       level: 'critical' as const,
-      pulse: true 
-    }
-    if (stockActual <= stockMinimo) return { 
+      pulse: true, 
+    }}
+    if (stockActual <= stockMinimo) {return { 
       color: 'bg-red-500', 
       glow: 'shadow-red-500/50',
       textColor: 'text-red-400',
       label: 'Crítico', 
       level: 'critical' as const,
-      pulse: true 
-    }
-    if (stockActual > stockMaximo) return { 
+      pulse: true, 
+    }}
+    if (stockActual > stockMaximo) {return { 
       color: 'bg-blue-500', 
       glow: 'shadow-blue-500/50',
       textColor: 'text-blue-400',
       label: 'Exceso', 
       level: 'excess' as const,
-      pulse: false 
-    }
+      pulse: false, 
+    }}
     return { 
       color: 'bg-emerald-500', 
       glow: 'shadow-emerald-500/50',
       textColor: 'text-emerald-400',
       label: 'Óptimo', 
       level: 'optimal' as const,
-      pulse: false 
+      pulse: false, 
     }
   }, [])
 
@@ -191,10 +191,10 @@ export default function WarehouseGrid({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar producto..."
               className={cn(
-                "w-48 h-10 pl-10 pr-4 rounded-xl",
-                "bg-black/40 border border-white/10",
-                "text-white text-sm placeholder:text-white/30",
-                "focus:outline-none focus:border-white/20"
+                'w-48 h-10 pl-10 pr-4 rounded-xl',
+                'bg-black/40 border border-white/10',
+                'text-white text-sm placeholder:text-white/30',
+                'focus:outline-none focus:border-white/20',
               )}
             />
           </div>
@@ -206,10 +206,10 @@ export default function WarehouseGrid({
                 key={f}
                 onClick={() => setFilter(f)}
                 className={cn(
-                  "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                  'px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
                   filter === f 
-                    ? "bg-white/10 text-white" 
-                    : "text-white/40 hover:text-white/60"
+                    ? 'bg-white/10 text-white' 
+                    : 'text-white/40 hover:text-white/60',
                 )}
               >
                 {f === 'all' ? 'Todos' : f === 'critical' ? 'Crítico' : f === 'optimal' ? 'Óptimo' : 'Exceso'}
@@ -222,10 +222,10 @@ export default function WarehouseGrid({
             <button
               onClick={() => setViewMode('list')}
               className={cn(
-                "p-2 rounded-lg transition-all",
+                'p-2 rounded-lg transition-all',
                 viewMode === 'list' 
-                  ? "bg-white/10 text-white" 
-                  : "text-white/40 hover:text-white/60"
+                  ? 'bg-white/10 text-white' 
+                  : 'text-white/40 hover:text-white/60',
               )}
             >
               <List className="w-4 h-4" />
@@ -233,10 +233,10 @@ export default function WarehouseGrid({
             <button
               onClick={() => setViewMode('heatmap')}
               className={cn(
-                "p-2 rounded-lg transition-all",
+                'p-2 rounded-lg transition-all',
                 viewMode === 'heatmap' 
-                  ? "bg-white/10 text-white" 
-                  : "text-white/40 hover:text-white/60"
+                  ? 'bg-white/10 text-white' 
+                  : 'text-white/40 hover:text-white/60',
               )}
             >
               <Grid3X3 className="w-4 h-4" />
@@ -257,7 +257,7 @@ export default function WarehouseGrid({
               className="grid gap-2"
               style={{
                 gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`,
-                gridTemplateRows: `repeat(${Math.ceil(filteredProducts.length / gridCols)}, minmax(80px, auto))`
+                gridTemplateRows: `repeat(${Math.ceil(filteredProducts.length / gridCols)}, minmax(80px, auto))`,
               }}
             >
               {filteredProducts.map((product, index) => (
@@ -313,10 +313,10 @@ export default function WarehouseGrid({
         <motion.button
           onClick={() => setQuickActionModal('entry')}
           className={cn(
-            "w-14 h-14 rounded-2xl flex items-center justify-center",
-            "bg-gradient-to-br from-emerald-500 to-teal-600",
-            "shadow-lg shadow-emerald-500/30",
-            "hover:shadow-xl hover:shadow-emerald-500/40 transition-shadow"
+            'w-14 h-14 rounded-2xl flex items-center justify-center',
+            'bg-gradient-to-br from-emerald-500 to-teal-600',
+            'shadow-lg shadow-emerald-500/30',
+            'hover:shadow-xl hover:shadow-emerald-500/40 transition-shadow',
           )}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
@@ -327,10 +327,10 @@ export default function WarehouseGrid({
         <motion.button
           onClick={() => setQuickActionModal('exit')}
           className={cn(
-            "w-14 h-14 rounded-2xl flex items-center justify-center",
-            "bg-gradient-to-br from-red-500 to-rose-600",
-            "shadow-lg shadow-red-500/30",
-            "hover:shadow-xl hover:shadow-red-500/40 transition-shadow"
+            'w-14 h-14 rounded-2xl flex items-center justify-center',
+            'bg-gradient-to-br from-red-500 to-rose-600',
+            'shadow-lg shadow-red-500/30',
+            'hover:shadow-xl hover:shadow-red-500/40 transition-shadow',
           )}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
@@ -393,7 +393,7 @@ function StatsCard({
   label, 
   value, 
   color,
-  pulse 
+  pulse, 
 }: { 
   icon: typeof Box
   label: string
@@ -405,15 +405,15 @@ function StatsCard({
     white: 'text-white/80',
     red: 'text-red-400',
     emerald: 'text-emerald-400',
-    blue: 'text-blue-400'
+    blue: 'text-blue-400',
   }
 
   return (
     <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5">
-      <Icon className={cn("w-4 h-4", colorClasses[color], pulse && "animate-pulse")} />
+      <Icon className={cn('w-4 h-4', colorClasses[color], pulse && 'animate-pulse')} />
       <div>
         <div className="text-xs text-white/40">{label}</div>
-        <div className={cn("text-lg font-bold font-mono", colorClasses[color])}>{value}</div>
+        <div className={cn('text-lg font-bold font-mono', colorClasses[color])}>{value}</div>
       </div>
     </div>
   )
@@ -442,17 +442,17 @@ function HeatmapCell({ product, status, index, onClick, springX, springY }: Heat
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: index * 0.02 }}
       className={cn(
-        "relative p-3 rounded-xl overflow-hidden",
-        "bg-black/40 border border-white/10",
-        "hover:border-white/20 transition-all cursor-pointer",
-        "group"
+        'relative p-3 rounded-xl overflow-hidden',
+        'bg-black/40 border border-white/10',
+        'hover:border-white/20 transition-all cursor-pointer',
+        'group',
       )}
     >
       {/* Indicador de color de stock */}
       <motion.div
         className={cn(
-          "absolute inset-0 opacity-20",
-          status.color
+          'absolute inset-0 opacity-20',
+          status.color,
         )}
         animate={status.pulse ? { opacity: [0.1, 0.3, 0.1] } : undefined}
         transition={{ duration: 1.5, repeat: Infinity }}
@@ -463,10 +463,10 @@ function HeatmapCell({ product, status, index, onClick, springX, springY }: Heat
         <div className="flex items-start justify-between">
           <Package className="w-5 h-5 text-white/40 group-hover:text-white/60 transition-colors" />
           <motion.div 
-            className={cn("w-2 h-2 rounded-full", status.color)}
+            className={cn('w-2 h-2 rounded-full', status.color)}
             animate={status.pulse ? { scale: [1, 1.3, 1] } : undefined}
             transition={{ duration: 0.8, repeat: Infinity }}
-            style={{ boxShadow: isHovered ? `0 0 8px 2px currentColor` : 'none' }}
+            style={{ boxShadow: isHovered ? '0 0 8px 2px currentColor' : 'none' }}
           />
         </div>
         
@@ -474,7 +474,7 @@ function HeatmapCell({ product, status, index, onClick, springX, springY }: Heat
           <div className="text-xs text-white/80 truncate font-medium">
             {product.nombre}
           </div>
-          <div className={cn("text-lg font-bold font-mono", status.textColor)}>
+          <div className={cn('text-lg font-bold font-mono', status.textColor)}>
             {product.stockActual}
           </div>
         </div>
@@ -488,10 +488,10 @@ function HeatmapCell({ product, status, index, onClick, springX, springY }: Heat
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 5, scale: 0.95 }}
             className={cn(
-              "absolute z-50 left-1/2 -translate-x-1/2 bottom-full mb-2",
-              "p-3 rounded-xl",
-              "bg-black/90 backdrop-blur-xl border border-white/20",
-              "shadow-xl min-w-[180px]"
+              'absolute z-50 left-1/2 -translate-x-1/2 bottom-full mb-2',
+              'p-3 rounded-xl',
+              'bg-black/90 backdrop-blur-xl border border-white/20',
+              'shadow-xl min-w-[180px]',
             )}
           >
             {product.imagenUrl && (
@@ -507,7 +507,7 @@ function HeatmapCell({ product, status, index, onClick, springX, springY }: Heat
             )}
             <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/10">
               <span className="text-xs text-white/40">Stock</span>
-              <span className={cn("text-sm font-mono font-bold", status.textColor)}>
+              <span className={cn('text-sm font-mono font-bold', status.textColor)}>
                 {product.stockActual} / {product.stockMaximo || '∞'}
               </span>
             </div>
@@ -527,7 +527,7 @@ function ListRow({
   status, 
   index, 
   onClick,
-  onEdit
+  onEdit,
 }: { 
   product: Producto
   status: StockStatus
@@ -541,10 +541,10 @@ function ListRow({
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.03 }}
       className={cn(
-        "flex items-center gap-4 p-4 rounded-xl",
-        "bg-black/40 border border-white/10",
-        "hover:bg-white/5 hover:border-white/20 transition-all cursor-pointer",
-        "group"
+        'flex items-center gap-4 p-4 rounded-xl',
+        'bg-black/40 border border-white/10',
+        'hover:bg-white/5 hover:border-white/20 transition-all cursor-pointer',
+        'group',
       )}
       onClick={onClick}
     >
@@ -572,11 +572,11 @@ function ListRow({
       <div className="text-right">
         <div className="flex items-center gap-2">
           <motion.div 
-            className={cn("w-2 h-2 rounded-full", status.color)}
+            className={cn('w-2 h-2 rounded-full', status.color)}
             animate={status.pulse ? { scale: [1, 1.3, 1] } : undefined}
             transition={{ duration: 0.8, repeat: Infinity }}
           />
-          <span className={cn("text-xl font-bold font-mono", status.textColor)}>
+          <span className={cn('text-xl font-bold font-mono', status.textColor)}>
             {product.stockActual}
           </span>
         </div>
@@ -628,7 +628,7 @@ function ProductDrawer({
   onClose, 
   onEdit,
   onQuickEntry,
-  onQuickExit
+  onQuickExit,
 }: ProductDrawerProps) {
   return (
     <>
@@ -648,9 +648,9 @@ function ProductDrawer({
         exit={{ x: '100%' }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         className={cn(
-          "fixed right-0 top-0 bottom-0 z-50 w-full max-w-md",
-          "bg-[rgba(8,8,12,0.95)] backdrop-blur-2xl",
-          "border-l border-white/10 overflow-hidden flex flex-col"
+          'fixed right-0 top-0 bottom-0 z-50 w-full max-w-md',
+          'bg-[rgba(8,8,12,0.95)] backdrop-blur-2xl',
+          'border-l border-white/10 overflow-hidden flex flex-col',
         )}
       >
         {/* Header con Imagen */}
@@ -694,8 +694,8 @@ function ProductDrawer({
                 )}
               </div>
               <div className={cn(
-                "px-3 py-1 rounded-full text-xs font-medium",
-                status.color.replace('bg-', 'bg-opacity-20 text-').replace('-500', '-400')
+                'px-3 py-1 rounded-full text-xs font-medium',
+                status.color.replace('bg-', 'bg-opacity-20 text-').replace('-500', '-400'),
               )}>
                 {status.label}
               </div>
@@ -705,7 +705,7 @@ function ProductDrawer({
             <div className="mt-6 p-4 rounded-2xl bg-white/5 border border-white/10">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-white/40 text-sm">Stock Actual</span>
-                <span className={cn("text-3xl font-bold font-mono", status.textColor)}>
+                <span className={cn('text-3xl font-bold font-mono', status.textColor)}>
                   {product.stockActual}
                 </span>
               </div>
@@ -713,12 +713,12 @@ function ProductDrawer({
               {/* Barra de stock */}
               <div className="h-3 bg-white/10 rounded-full overflow-hidden">
                 <motion.div
-                  className={cn("h-full rounded-full", status.color)}
+                  className={cn('h-full rounded-full', status.color)}
                   initial={{ width: 0 }}
                   animate={{ 
-                    width: `${Math.min((product.stockActual / (product.stockMaximo || 100)) * 100, 100)}%` 
+                    width: `${Math.min((product.stockActual / (product.stockMaximo || 100)) * 100, 100)}%`, 
                   }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
+                  transition={{ duration: 0.8, ease: 'easeOut' }}
                 />
               </div>
               
@@ -733,9 +733,9 @@ function ProductDrawer({
               <button
                 onClick={onQuickEntry}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl",
-                  "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400",
-                  "border border-emerald-500/30 transition-colors"
+                  'flex-1 flex items-center justify-center gap-2 py-3 rounded-xl',
+                  'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400',
+                  'border border-emerald-500/30 transition-colors',
                 )}
               >
                 <ArrowDownLeft className="w-4 h-4" />
@@ -744,9 +744,9 @@ function ProductDrawer({
               <button
                 onClick={onQuickExit}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl",
-                  "bg-red-500/20 hover:bg-red-500/30 text-red-400",
-                  "border border-red-500/30 transition-colors"
+                  'flex-1 flex items-center justify-center gap-2 py-3 rounded-xl',
+                  'bg-red-500/20 hover:bg-red-500/30 text-red-400',
+                  'border border-red-500/30 transition-colors',
                 )}
               >
                 <ArrowUpRight className="w-4 h-4" />
@@ -786,8 +786,8 @@ function ProductDrawer({
                       >
                         {/* Dot */}
                         <div className={cn(
-                          "w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5",
-                          isEntry ? "bg-emerald-500" : mov.tipo === 'salida' ? "bg-red-500" : "bg-blue-500"
+                          'w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5',
+                          isEntry ? 'bg-emerald-500' : mov.tipo === 'salida' ? 'bg-red-500' : 'bg-blue-500',
                         )}>
                           {isEntry ? (
                             <ArrowDownLeft className="w-3 h-3 text-white" />
@@ -803,8 +803,8 @@ function ProductDrawer({
                           <div className="flex items-center justify-between">
                             <span className="text-white font-medium capitalize">{mov.tipo}</span>
                             <span className={cn(
-                              "font-mono font-bold",
-                              isEntry ? "text-emerald-400" : "text-red-400"
+                              'font-mono font-bold',
+                              isEntry ? 'text-emerald-400' : 'text-red-400',
                             )}>
                               {isEntry ? '+' : '-'}{Math.abs(mov.cantidad)}
                             </span>
@@ -837,10 +837,10 @@ function ProductDrawer({
           <button
             onClick={onEdit}
             className={cn(
-              "w-full py-3 rounded-xl font-medium",
-              "bg-gradient-to-r from-indigo-500 to-purple-600",
-              "hover:from-indigo-400 hover:to-purple-500",
-              "text-white transition-colors"
+              'w-full py-3 rounded-xl font-medium',
+              'bg-gradient-to-r from-indigo-500 to-purple-600',
+              'hover:from-indigo-400 hover:to-purple-500',
+              'text-white transition-colors',
             )}
           >
             Editar Producto
@@ -874,7 +874,7 @@ function QuickActionModal({ type, product, products, onClose, onConfirm }: Quick
     const lower = searchQuery.toLowerCase()
     return products.filter(p => 
       p.nombre.toLowerCase().includes(lower) ||
-      p.sku?.toLowerCase().includes(lower)
+      p.sku?.toLowerCase().includes(lower),
     ).slice(0, 10)
   }, [products, searchQuery])
 
@@ -895,24 +895,24 @@ function QuickActionModal({ type, product, products, onClose, onConfirm }: Quick
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 10 }}
         className={cn(
-          "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50",
-          "w-full max-w-md p-6",
-          "bg-[rgba(8,8,12,0.95)] backdrop-blur-2xl",
-          "rounded-3xl border border-white/10",
-          "shadow-2xl"
+          'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50',
+          'w-full max-w-md p-6',
+          'bg-[rgba(8,8,12,0.95)] backdrop-blur-2xl',
+          'rounded-3xl border border-white/10',
+          'shadow-2xl',
         )}
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className={cn(
-              "w-10 h-10 rounded-xl flex items-center justify-center",
-              isEntry ? "bg-emerald-500/20" : "bg-red-500/20"
+              'w-10 h-10 rounded-xl flex items-center justify-center',
+              isEntry ? 'bg-emerald-500/20' : 'bg-red-500/20',
             )}>
               {isEntry ? (
-                <ArrowDownLeft className={cn("w-5 h-5", `text-${color}-400`)} />
+                <ArrowDownLeft className={cn('w-5 h-5', `text-${color}-400`)} />
               ) : (
-                <ArrowUpRight className={cn("w-5 h-5", `text-${color}-400`)} />
+                <ArrowUpRight className={cn('w-5 h-5', `text-${color}-400`)} />
               )}
             </div>
             <h3 className="text-lg font-semibold text-white">{title}</h3>
@@ -931,10 +931,10 @@ function QuickActionModal({ type, product, products, onClose, onConfirm }: Quick
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar producto..."
               className={cn(
-                "w-full h-12 px-4 rounded-xl",
-                "bg-black/40 border border-white/10",
-                "text-white placeholder:text-white/30",
-                "focus:outline-none focus:border-white/20"
+                'w-full h-12 px-4 rounded-xl',
+                'bg-black/40 border border-white/10',
+                'text-white placeholder:text-white/30',
+                'focus:outline-none focus:border-white/20',
               )}
             />
             
@@ -945,9 +945,9 @@ function QuickActionModal({ type, product, products, onClose, onConfirm }: Quick
                     key={p.id}
                     onClick={() => setSelectedProductId(p.id)}
                     className={cn(
-                      "w-full p-3 rounded-xl text-left",
-                      "hover:bg-white/5 transition-colors",
-                      "flex items-center gap-3"
+                      'w-full p-3 rounded-xl text-left',
+                      'hover:bg-white/5 transition-colors',
+                      'flex items-center gap-3',
                     )}
                   >
                     <Package className="w-4 h-4 text-white/40" />
@@ -996,9 +996,9 @@ function QuickActionModal({ type, product, products, onClose, onConfirm }: Quick
               value={cantidad}
               onChange={(e) => setCantidad(Math.max(1, Number(e.target.value)))}
               className={cn(
-                "flex-1 h-12 text-center text-2xl font-mono font-bold",
-                "bg-black/40 border border-white/10 rounded-xl",
-                "text-white focus:outline-none focus:border-white/20"
+                'flex-1 h-12 text-center text-2xl font-mono font-bold',
+                'bg-black/40 border border-white/10 rounded-xl',
+                'text-white focus:outline-none focus:border-white/20',
               )}
             />
             <button
@@ -1014,7 +1014,7 @@ function QuickActionModal({ type, product, products, onClose, onConfirm }: Quick
         {selectedProduct && (
           <div className="mb-6 p-4 rounded-xl bg-white/5 text-center">
             <div className="text-white/40 text-sm mb-1">Nuevo Stock</div>
-            <div className={cn("text-3xl font-bold font-mono", `text-${color}-400`)}>
+            <div className={cn('text-3xl font-bold font-mono', `text-${color}-400`)}>
               {isEntry 
                 ? selectedProduct.stockActual + cantidad
                 : Math.max(0, selectedProduct.stockActual - cantidad)
@@ -1039,11 +1039,11 @@ function QuickActionModal({ type, product, products, onClose, onConfirm }: Quick
             }}
             disabled={!selectedProductId}
             className={cn(
-              "flex-1 py-3 rounded-xl font-medium transition-colors",
+              'flex-1 py-3 rounded-xl font-medium transition-colors',
               isEntry 
-                ? "bg-emerald-500 hover:bg-emerald-600 text-white"
-                : "bg-red-500 hover:bg-red-600 text-white",
-              !selectedProductId && "opacity-50 cursor-not-allowed"
+                ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                : 'bg-red-500 hover:bg-red-600 text-white',
+              !selectedProductId && 'opacity-50 cursor-not-allowed',
             )}
           >
             Confirmar

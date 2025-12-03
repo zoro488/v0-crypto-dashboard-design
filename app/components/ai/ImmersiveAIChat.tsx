@@ -99,7 +99,7 @@ function VoiceWave({ isActive, audioLevel }: VoiceWaveProps) {
         barsRef.current[i] = THREE.MathUtils.lerp(
           barsRef.current[i],
           targetHeight,
-          0.15
+          0.15,
         )
 
         const barHeight = barsRef.current[i]
@@ -490,7 +490,7 @@ export default function ImmersiveAIChat() {
 
     // Marcar como completado
     setMessages((prev) =>
-      prev.map((m) => (m.id === aiMessageId ? { ...m, isStreaming: false } : m))
+      prev.map((m) => (m.id === aiMessageId ? { ...m, isStreaming: false } : m)),
     )
   }, [query])
 

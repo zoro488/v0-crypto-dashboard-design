@@ -23,7 +23,7 @@ interface SparklineBackgroundProps {
 export const SparklineBackground = memo(function SparklineBackground({
   data,
   className = '',
-  variant = 'sapphire'
+  variant = 'sapphire',
 }: SparklineBackgroundProps) {
   
   const colorMap = {
@@ -32,7 +32,7 @@ export const SparklineBackground = memo(function SparklineBackground({
     amethyst: '#8b5cf6',
     cyan: '#06b6d4',
     gold: '#f59e0b',
-    ruby: '#ef4444'
+    ruby: '#ef4444',
   }
   
   const color = data?.color || colorMap[variant]

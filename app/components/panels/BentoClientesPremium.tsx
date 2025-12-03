@@ -49,6 +49,7 @@ import { logger } from '@/app/lib/utils/logger'
 // 🌑 OBSIDIAN GLASS PREMIUM COMPONENTS
 // ═══════════════════════════════════════════════════════════════════════════
 import EntityRelationshipManager from '@/app/components/premium/crm/EntityRelationshipManager'
+import { ClientNetworkGraph } from '@/app/components/visualizations/ClientNetworkGraph'
 import { toast } from 'sonner'
 
 // ============================================
@@ -613,7 +614,7 @@ export default function BentoClientesPremium() {
           {/* Toggle CRM View */}
           <ButtonTesla
             onClick={() => setShowCRMView(!showCRMView)}
-            variant={showCRMView ? "primary" : "secondary"}
+            variant={showCRMView ? 'primary' : 'secondary'}
           >
             <Users className="w-4 h-4 mr-2" />
             {showCRMView ? 'Vista Clásica' : 'CRM Premium'}
@@ -798,6 +799,36 @@ export default function BentoClientesPremium() {
           </div>
         </motion.div>
       </div>
+
+      {/* Client Network Visualization */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7 }}
+        className="relative group"
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-2xl blur-xl" />
+        <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-blue-500/20">
+                <Users className="w-5 h-5 text-blue-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white">Red de Clientes</h3>
+                <p className="text-xs text-zinc-400">Conexiones y relaciones</p>
+              </div>
+            </div>
+          </div>
+          <div className="h-[400px] rounded-xl overflow-hidden bg-black/40">
+            <ClientNetworkGraph 
+              width={900}
+              height={400}
+              className="w-full h-full"
+            />
+          </div>
+        </div>
+      </motion.div>
 
       {/* Activity & Mini Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

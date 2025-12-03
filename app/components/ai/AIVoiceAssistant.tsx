@@ -150,7 +150,7 @@ function useSpeechRecognition() {
 const AudioWaveform = memo(function AudioWaveform({ 
   level, 
   isActive,
-  color = '#ef4444'
+  color = '#ef4444',
 }: { 
   level: number
   isActive: boolean
@@ -187,7 +187,7 @@ const AudioWaveform = memo(function AudioWaveform({
 
 // Burbuja de mensaje
 const ChatBubble = memo(function ChatBubble({ 
-  message 
+  message, 
 }: { 
   message: Message 
 }) {
@@ -391,7 +391,7 @@ export const AIVoiceAssistant = memo(function AIVoiceAssistant({
       role: 'assistant',
       content: '¡Hola! Soy tu asistente de Chronos. Puedo ayudarte a registrar ventas, consultar balances y más. ¿En qué puedo ayudarte?',
       timestamp: new Date(),
-    }
+    },
   ])
   const [inputText, setInputText] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
@@ -453,7 +453,7 @@ export const AIVoiceAssistant = memo(function AIVoiceAssistant({
             role: 'system',
             content: 'Venta registrada: $5,000.00 ✓',
             timestamp: new Date(),
-            toolResult: { type: 'crearVenta', success: true, data: { monto: 5000 } }
+            toolResult: { type: 'crearVenta', success: true, data: { monto: 5000 } },
           }])
         } else if (lowerInput.includes('balance') || lowerInput.includes('capital')) {
           response = 'Tu capital total actual es de $125,840.00 distribuido en 6 bancos. El banco con mayor saldo es Bóveda Monte con $45,200.00.'

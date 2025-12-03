@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import dynamic from 'next/dynamic'
 import { 
   Search, 
   Bell, 
@@ -21,6 +22,13 @@ import {
   CreditCard,
   HelpCircle,
 } from 'lucide-react'
+
+// Logo 3D Chrome dinámico (solo cliente)
+const ChromeParticleLogo = dynamic(
+  () => import('@/app/components/3d/ChromeParticleLogo'),
+  { ssr: false },
+)
+import { ChronosLogo } from '@/app/components/ui/ChronosLogo'
 import { Button } from '@/app/components/ui/button'
 import { Input } from '@/app/components/ui/input'
 import { Badge } from '@/app/components/ui/badge'
@@ -83,25 +91,23 @@ export default function Header({ currentPanel, onToggleSidebar }: HeaderProps) {
             </Button>
           </motion.div>
 
-          {/* Logo */}
+          {/* Logo CHRONOS Premium */}
           <motion.div
             className="flex items-center gap-3 cursor-pointer group"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
+            {/* Nuevo Logo CHRONOS */}
             <div className="relative">
-              <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-2xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:shadow-purple-500/50 transition-shadow">
-                <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-              </div>
-              {/* Pulse effect */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 animate-ping opacity-20" />
+              <ChronosLogo size="sm" animated={false} glow />
             </div>
             <div className="hidden sm:block">
               <div className="flex items-center gap-2">
-                <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
+                {/* Título CHRONOS con efecto Mirror Chrome */}
+                <h1 className="text-mirror-chrome text-lg sm:text-xl font-bold tracking-wider">
                   CHRONOS
                 </h1>
-                <Badge className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 border-blue-500/30 text-[10px] px-1.5 py-0">
+                <Badge className="badge-mirror-chrome text-gray-800 text-[10px] px-1.5 py-0">
                   <Sparkles className="h-2.5 w-2.5 mr-0.5" />
                   PRO
                 </Badge>

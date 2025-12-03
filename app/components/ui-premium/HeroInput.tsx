@@ -35,9 +35,9 @@ export const HeroInput = memo(forwardRef<HTMLInputElement, HeroInputProps>(
       variant = 'emerald',
       type = 'currency',
       autoFocus = false,
-      className = ''
+      className = '',
     },
-    ref
+    ref,
   ) {
     const [isFocused, setIsFocused] = useState(false)
     const inputRef = useRef<HTMLInputElement>(null)
@@ -46,38 +46,38 @@ export const HeroInput = memo(forwardRef<HTMLInputElement, HeroInputProps>(
       emerald: {
         text: '#10b981',
         glow: 'rgba(16, 185, 129, 0.4)',
-        caret: '#34d399'
+        caret: '#34d399',
       },
       sapphire: {
         text: '#3b82f6',
         glow: 'rgba(59, 130, 246, 0.4)',
-        caret: '#60a5fa'
+        caret: '#60a5fa',
       },
       amethyst: {
         text: '#8b5cf6',
         glow: 'rgba(139, 92, 246, 0.4)',
-        caret: '#a78bfa'
+        caret: '#a78bfa',
       },
       ruby: {
         text: '#ef4444',
         glow: 'rgba(239, 68, 68, 0.4)',
-        caret: '#f87171'
+        caret: '#f87171',
       },
       gold: {
         text: '#f59e0b',
         glow: 'rgba(245, 158, 11, 0.4)',
-        caret: '#fbbf24'
+        caret: '#fbbf24',
       },
       cyan: {
         text: '#06b6d4',
         glow: 'rgba(6, 182, 212, 0.4)',
-        caret: '#22d3ee'
+        caret: '#22d3ee',
       },
       white: {
         text: '#ffffff',
         glow: 'rgba(255, 255, 255, 0.3)',
-        caret: '#ffffff'
-      }
+        caret: '#ffffff',
+      },
     }
     
     const colors = colorMap[variant]
@@ -109,7 +109,7 @@ export const HeroInput = memo(forwardRef<HTMLInputElement, HeroInputProps>(
     const displayValue = type === 'currency' && value
       ? parseFloat(value).toLocaleString('en-US', { 
           minimumFractionDigits: 0,
-          maximumFractionDigits: 2 
+          maximumFractionDigits: 2, 
         })
       : value
     
@@ -139,21 +139,21 @@ export const HeroInput = memo(forwardRef<HTMLInputElement, HeroInputProps>(
               : `
                 inset 0 2px 4px rgba(0, 0, 0, 0.2),
                 inset 0 0 0 1px rgba(255, 255, 255, 0.05)
-              `
+              `,
           }}
           style={{
             background: 'rgba(20, 20, 28, 0.6)',
-            backdropFilter: 'blur(16px)'
+            backdropFilter: 'blur(16px)',
           }}
         >
           {/* Resplandor de fondo cuando enfocado */}
           <motion.div
             className="absolute inset-0 pointer-events-none"
             animate={{
-              opacity: isFocused ? 0.15 : 0
+              opacity: isFocused ? 0.15 : 0,
             }}
             style={{
-              background: `radial-gradient(ellipse at center, ${colors.glow} 0%, transparent 70%)`
+              background: `radial-gradient(ellipse at center, ${colors.glow} 0%, transparent 70%)`,
             }}
           />
           
@@ -164,10 +164,10 @@ export const HeroInput = memo(forwardRef<HTMLInputElement, HeroInputProps>(
                 className="text-4xl md:text-5xl font-semibold mr-2"
                 style={{
                   fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
-                  color: isFocused ? colors.text : 'rgba(255, 255, 255, 0.4)'
+                  color: isFocused ? colors.text : 'rgba(255, 255, 255, 0.4)',
                 }}
                 animate={{
-                  textShadow: isFocused ? `0 0 30px ${colors.glow}` : 'none'
+                  textShadow: isFocused ? `0 0 30px ${colors.glow}` : 'none',
                 }}
               >
                 {prefix}
@@ -208,12 +208,12 @@ export const HeroInput = memo(forwardRef<HTMLInputElement, HeroInputProps>(
                 fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
                 fontFeatureSettings: "'tnum' 1",
                 letterSpacing: '-0.02em',
-                color: value ? (isFocused ? colors.text : '#ffffff') : 'rgba(255, 255, 255, 0.2)'
+                color: value ? (isFocused ? colors.text : '#ffffff') : 'rgba(255, 255, 255, 0.2)',
               }}
               animate={{
                 textShadow: isFocused && value 
                   ? `0 0 40px ${colors.glow}` 
-                  : 'none'
+                  : 'none',
               }}
             >
               {value || placeholder}
@@ -226,18 +226,18 @@ export const HeroInput = memo(forwardRef<HTMLInputElement, HeroInputProps>(
                 initial={{ opacity: 0, scaleY: 0 }}
                 animate={{ 
                   opacity: [1, 0.3, 1],
-                  scaleY: 1
+                  scaleY: 1,
                 }}
                 transition={{
                   opacity: { duration: 1, repeat: Infinity, ease: 'easeInOut' },
-                  scaleY: { duration: 0.2 }
+                  scaleY: { duration: 0.2 },
                 }}
                 style={{
                   width: '4px',
                   height: '50px',
                   borderRadius: '2px',
                   background: colors.caret,
-                  boxShadow: `0 0 20px ${colors.glow}`
+                  boxShadow: `0 0 20px ${colors.glow}`,
                 }}
               />
             )}
@@ -247,7 +247,7 @@ export const HeroInput = memo(forwardRef<HTMLInputElement, HeroInputProps>(
               <motion.span
                 className="text-xl font-medium ml-3"
                 style={{
-                  color: 'rgba(255, 255, 255, 0.4)'
+                  color: 'rgba(255, 255, 255, 0.4)',
                 }}
               >
                 {suffix}
@@ -261,16 +261,16 @@ export const HeroInput = memo(forwardRef<HTMLInputElement, HeroInputProps>(
           className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-[2px] rounded-full"
           animate={{
             width: isFocused ? '60%' : '0%',
-            opacity: isFocused ? 1 : 0
+            opacity: isFocused ? 1 : 0,
           }}
           style={{
-            background: `linear-gradient(90deg, transparent, ${colors.text}, transparent)`
+            background: `linear-gradient(90deg, transparent, ${colors.text}, transparent)`,
           }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
         />
       </motion.div>
     )
-  }
+  },
 ))
 
 export default HeroInput

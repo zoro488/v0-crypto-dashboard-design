@@ -62,11 +62,13 @@ import {
   useRealtimeVentas, 
   useRealtimeOrdenesCompra, 
   useRealtimeAlmacen, 
-  useRealtimeBancos 
+  useRealtimeBancos, 
 } from '@/app/hooks/useRealtimeCollection'
 import { CreateOrdenCompraModalPremium } from '@/app/components/modals/CreateOrdenCompraModalPremium'
 import { CreateVentaModalPremium } from '@/app/components/modals/CreateVentaModalPremium'
 import { CreateTransferenciaModalPremium } from '@/app/components/modals/CreateTransferenciaModalPremium'
+import RevenueWidget from '@/app/components/widgets/RevenueWidget'
+import TopProductsWidget from '@/app/components/widgets/TopProductsWidget'
 import { cn } from '@/app/lib/utils'
 
 // Spring animation Chronos 2025
@@ -190,8 +192,23 @@ export default memo(function BentoDashboard() {
     const ventasMes = ventas?.reduce((acc, v) => acc + (v?.montoTotal ?? 0), 0) ?? 0
     const stockActual = productos?.reduce((acc, p) => acc + (p?.stock ?? 0), 0) ?? 0
     const ordenesActivas = ordenesCompra?.filter((oc) => oc?.estado === 'pendiente')?.length ?? 0
+    // Ventas del día actual
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const ventasDelDia = ventas?.filter(v => {
+      if (!v?.fecha) return false
+      let fecha: Date
+      if (typeof v.fecha === 'object' && 'seconds' in v.fecha) {
+        fecha = new Date(v.fecha.seconds * 1000)
+      } else if (v.fecha instanceof Date) {
+        fecha = v.fecha
+      } else {
+        fecha = new Date(v.fecha)
+      }
+      return fecha >= today
+    }).reduce((acc, v) => acc + (v?.montoTotal ?? 0), 0) ?? 0
     
-    return { capitalTotal, ventasMes, stockActual, ordenesActivas }
+    return { capitalTotal, ventasMes, stockActual, ordenesActivas, ventasDelDia }
   }, [bancos, ventas, productos, ordenesCompra])
 
   // Helper para formatear fecha de Firestore
@@ -614,8 +631,8 @@ export default memo(function BentoDashboard() {
               title="Sin actividad reciente"
               description="Las transacciones aparecerán aquí"
               action={{
-                label: "Registrar primera venta",
-                onClick: () => setIsVentaModalOpen(true)
+                label: 'Registrar primera venta',
+                onClick: () => setIsVentaModalOpen(true),
               }}
             />
           )}
@@ -649,6 +666,30 @@ export default memo(function BentoDashboard() {
           ))}
         </div>
       </motion.div>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          WIDGETS PREMIUM - Revenue & Top Products
+       ═══════════════════════════════════════════════════════════════════════ */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <RevenueWidget 
+          value={metrics.ventasDelDia}
+          change={12.5}
+          data={mockChartData.slice(-7).map((d) => ({ 
+            time: d.name, 
+            value: d.value, 
+          }))}
+          sparkle
+        />
+        <TopProductsWidget 
+          products={productos?.slice(0, 5).map((p, i) => ({
+            id: (p as Record<string, unknown>).id as string || String(i),
+            name: (p as Record<string, unknown>).nombre as string || (p as Record<string, unknown>).sku as string || `Producto ${i + 1}`,
+            sales: (p as Record<string, unknown>).stock as number || 0,
+            revenue: ((p as Record<string, unknown>).stock as number || 0) * ((p as Record<string, unknown>).precioVenta as number || 100),
+            trend: Math.random() * 20 - 10,
+          })) || []}
+        />
+      </div>
 
       <CreateOrdenCompraModalPremium open={isOrdenModalOpen} onClose={() => setIsOrdenModalOpen(false)} />
       <CreateVentaModalPremium open={isVentaModalOpen} onClose={() => setIsVentaModalOpen(false)} />

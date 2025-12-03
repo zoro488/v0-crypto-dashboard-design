@@ -86,7 +86,7 @@ export default function Sidebar({
         // Glassmorphism sutil Chronos 2025
         'bg-[rgba(0,0,0,0.8)] backdrop-blur-[24px]',
         'border-r border-[rgba(255,255,255,0.05)]',
-        'shadow-[0_0_40px_rgba(0,0,0,0.5)]'
+        'shadow-[0_0_40px_rgba(0,0,0,0.5)]',
       )}
     >
       {/* Toggle Button - Estilo Linear/Vercel */}
@@ -99,7 +99,7 @@ export default function Sidebar({
             'bg-[#0066FF] border-2 border-black',
             'flex items-center justify-center',
             'shadow-[0_0_20px_rgba(0,102,255,0.4)]',
-            'hover:bg-[#0052CC] transition-colors'
+            'hover:bg-[#0052CC] transition-colors',
           )}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
@@ -153,7 +153,7 @@ export default function Sidebar({
                 variant="ghost"
                 className={cn(
                   'w-full text-[#A0A0A0] hover:text-white hover:bg-[rgba(255,255,255,0.03)]',
-                  collapsed ? 'justify-center px-2' : 'justify-between px-3'
+                  collapsed ? 'justify-center px-2' : 'justify-between px-3',
                 )}
               >
                 {!collapsed ? (
@@ -161,7 +161,7 @@ export default function Sidebar({
                     <span className="text-[11px] font-semibold uppercase tracking-[0.1em]">Bancos</span>
                     <ChevronDown className={cn(
                       'h-4 w-4 transition-transform text-[#6B6B6B]',
-                      bancosOpen && 'rotate-180'
+                      bancosOpen && 'rotate-180',
                     )} />
                   </>
                 ) : (
@@ -246,7 +246,7 @@ function SidebarItem({ label, icon: Icon, badge, collapsed, active, onClick }: S
           collapsed ? 'justify-center px-2' : 'justify-start px-3',
           active
             ? 'bg-[#0066FF] text-white shadow-[0_0_20px_rgba(0,102,255,0.3)]'
-            : 'text-[#A0A0A0] hover:text-white hover:bg-[rgba(255,255,255,0.03)]'
+            : 'text-[#A0A0A0] hover:text-white hover:bg-[rgba(255,255,255,0.03)]',
         )}
         onClick={onClick}
       >
@@ -254,7 +254,7 @@ function SidebarItem({ label, icon: Icon, badge, collapsed, active, onClick }: S
         <Icon 
           className={cn(
             'h-5 w-5 flex-shrink-0',
-            active && 'drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]'
+            active && 'drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]',
           )} 
           strokeWidth={1.8}
         />
@@ -327,7 +327,7 @@ function BancoSelector({ collapsed, selectedBanco, onBancoChange, onViewBanco }:
             collapsed ? 'px-2' : 'px-3',
             selectedBanco.id === banco.id
               ? 'bg-[rgba(0,102,255,0.1)] border border-[rgba(0,102,255,0.3)]'
-              : 'hover:bg-[rgba(255,255,255,0.03)]'
+              : 'hover:bg-[rgba(255,255,255,0.03)]',
           )}
           onClick={() => {
             onBancoChange(banco)
@@ -340,7 +340,7 @@ function BancoSelector({ collapsed, selectedBanco, onBancoChange, onViewBanco }:
               className={cn(
                 'h-8 w-8 rounded-[10px] flex items-center justify-center flex-shrink-0',
                 'bg-gradient-to-br',
-                banco.color
+                banco.color,
               )}
             >
               {banco.icon === 'building' && <Building2 className="h-4 w-4 text-white" strokeWidth={1.8} />}
@@ -358,7 +358,7 @@ function BancoSelector({ collapsed, selectedBanco, onBancoChange, onViewBanco }:
                   <p className="text-[13px] font-medium text-white truncate">{banco.nombre}</p>
                   <p className={cn(
                     'text-[12px] font-mono',
-                    banco.capitalActual < 0 ? 'text-[#FF0033]' : 'text-[#00FF57]'
+                    banco.capitalActual < 0 ? 'text-[#FF0033]' : 'text-[#00FF57]',
                   )}>
                     {banco.moneda === 'USD' ? '$' : '$'}
                     {banco.capitalActual.toLocaleString('es-MX')}
@@ -371,7 +371,7 @@ function BancoSelector({ collapsed, selectedBanco, onBancoChange, onViewBanco }:
                   'h-2 w-2 rounded-full flex-shrink-0',
                   banco.estado === 'activo' 
                     ? 'bg-[#00FF57] shadow-[0_0_6px_#00FF57]' 
-                    : 'bg-[#FF0033] shadow-[0_0_6px_#FF0033]'
+                    : 'bg-[#FF0033] shadow-[0_0_6px_#FF0033]',
                 )} />
               </>
             )}

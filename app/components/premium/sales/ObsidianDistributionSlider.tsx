@@ -40,13 +40,13 @@ export default function ObsidianDistributionSlider({
   totalAmount, 
   initialValues = DEFAULT_VALUES,
   onChange,
-  disabled = false
+  disabled = false,
 }: ObsidianDistributionSliderProps) {
   const [values, setValues] = useState<DistributionState>(initialValues)
   const [locked, setLocked] = useState<Record<keyof DistributionState, boolean>>({
     bovedaMonte: false,
     fletes: false,
-    utilidades: false
+    utilidades: false,
   })
   const [activeSlider, setActiveSlider] = useState<keyof DistributionState | null>(null)
 
@@ -54,7 +54,7 @@ export default function ObsidianDistributionSlider({
   const amounts = {
     bovedaMonte: totalAmount * (values.bovedaMonte / 100),
     fletes: totalAmount * (values.fletes / 100),
-    utilidades: totalAmount * (values.utilidades / 100)
+    utilidades: totalAmount * (values.utilidades / 100),
   }
 
   const totalPercent = Object.values(values).reduce((a, b) => a + b, 0)
@@ -119,7 +119,7 @@ export default function ObsidianDistributionSlider({
         animate={{
           background: isValid 
             ? 'radial-gradient(ellipse at center, rgba(16, 185, 129, 0.05) 0%, transparent 70%)'
-            : 'radial-gradient(ellipse at center, rgba(239, 68, 68, 0.05) 0%, transparent 70%)'
+            : 'radial-gradient(ellipse at center, rgba(239, 68, 68, 0.05) 0%, transparent 70%)',
         }}
         transition={{ duration: 0.5 }}
       />
@@ -143,10 +143,10 @@ export default function ObsidianDistributionSlider({
           
           <motion.div 
             className={cn(
-              "px-3 py-1.5 rounded-full text-xs font-mono border transition-all flex items-center gap-2",
+              'px-3 py-1.5 rounded-full text-xs font-mono border transition-all flex items-center gap-2',
               isValid 
-                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" 
-                : "border-red-500/30 bg-red-500/10 text-red-400"
+                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400' 
+                : 'border-red-500/30 bg-red-500/10 text-red-400',
             )}
             animate={{ scale: isValid ? 1 : [1, 1.05, 1] }}
             transition={{ duration: 0.3 }}
@@ -237,40 +237,40 @@ function BankSlider({
   disabled,
   onToggleLock, 
   onChange,
-  onEnd
+  onEnd,
 }: BankSliderProps) {
   const gradients: Record<string, string> = {
-    blue: "from-blue-600 via-indigo-600 to-blue-500",
-    orange: "from-orange-500 via-amber-500 to-orange-400",
-    green: "from-emerald-500 via-teal-500 to-emerald-400"
+    blue: 'from-blue-600 via-indigo-600 to-blue-500',
+    orange: 'from-orange-500 via-amber-500 to-orange-400',
+    green: 'from-emerald-500 via-teal-500 to-emerald-400',
   }
 
   const glowColors: Record<string, string> = {
-    blue: "rgba(59, 130, 246, 0.5)",
-    orange: "rgba(249, 115, 22, 0.5)",
-    green: "rgba(16, 185, 129, 0.5)"
+    blue: 'rgba(59, 130, 246, 0.5)',
+    orange: 'rgba(249, 115, 22, 0.5)',
+    green: 'rgba(16, 185, 129, 0.5)',
   }
 
   const textColors: Record<string, string> = {
-    blue: "text-blue-400",
-    orange: "text-orange-400",
-    green: "text-emerald-400"
+    blue: 'text-blue-400',
+    orange: 'text-orange-400',
+    green: 'text-emerald-400',
   }
 
   const dotColors: Record<string, string> = {
-    blue: "bg-blue-500",
-    orange: "bg-orange-500",
-    green: "bg-emerald-500"
+    blue: 'bg-blue-500',
+    orange: 'bg-orange-500',
+    green: 'bg-emerald-500',
   }
 
   return (
     <motion.div 
       className={cn(
-        "space-y-3 group transition-opacity",
-        disabled && "opacity-50 pointer-events-none"
+        'space-y-3 group transition-opacity',
+        disabled && 'opacity-50 pointer-events-none',
       )}
       animate={{ scale: isActive ? 1.01 : 1 }}
-      transition={{ type: "spring", stiffness: 400 }}
+      transition={{ type: 'spring', stiffness: 400 }}
     >
       {/* Header del slider */}
       <div className="flex justify-between items-end">
@@ -278,10 +278,10 @@ function BankSlider({
           <motion.button 
             onClick={onToggleLock} 
             className={cn(
-              "p-1.5 rounded-lg transition-all",
+              'p-1.5 rounded-lg transition-all',
               isLocked 
-                ? "bg-white/10 text-white/60" 
-                : "text-white/20 hover:text-white/50 hover:bg-white/5"
+                ? 'bg-white/10 text-white/60' 
+                : 'text-white/20 hover:text-white/50 hover:bg-white/5',
             )}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
@@ -291,8 +291,8 @@ function BankSlider({
           
           <div>
             <div className="flex items-center gap-2">
-              <span className={cn("w-1.5 h-1.5 rounded-full", dotColors[color])} />
-              <span className={cn("text-sm font-medium", textColors[color])}>{label}</span>
+              <span className={cn('w-1.5 h-1.5 rounded-full', dotColors[color])} />
+              <span className={cn('text-sm font-medium', textColors[color])}>{label}</span>
             </div>
             <span className="text-[10px] text-white/30 uppercase tracking-wider">{sublabel}</span>
           </div>
@@ -321,11 +321,11 @@ function BankSlider({
       {/* Barra de Energía */}
       <div 
         className={cn(
-          "relative h-5 bg-white/5 rounded-full overflow-hidden",
-          isLocked && "opacity-60"
+          'relative h-5 bg-white/5 rounded-full overflow-hidden',
+          isLocked && 'opacity-60',
         )}
         style={{
-          boxShadow: isActive ? `0 0 20px ${glowColors[color]}` : 'none'
+          boxShadow: isActive ? `0 0 20px ${glowColors[color]}` : 'none',
         }}
       >
         <input 
@@ -343,10 +343,10 @@ function BankSlider({
         
         {/* Barra animada */}
         <motion.div 
-          className={cn("h-full absolute left-0 top-0 bg-gradient-to-r z-10 rounded-full", gradients[color])}
+          className={cn('h-full absolute left-0 top-0 bg-gradient-to-r z-10 rounded-full', gradients[color])}
           initial={false}
           animate={{ width: `${percent}%` }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         >
           {/* Brillo interno */}
           <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent rounded-full" />
@@ -428,7 +428,7 @@ function DonutPreview({ values, amounts }: DonutPreviewProps) {
                   strokeDasharray: dashArray,
                   strokeDashoffset: -currentOffset,
                 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
                 style={{ filter: `drop-shadow(0 0 3px ${seg.color})` }}
               />
             )

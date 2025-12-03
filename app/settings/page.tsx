@@ -50,7 +50,7 @@ interface Session {
 function Toggle({ 
   checked, 
   onChange, 
-  disabled = false 
+  disabled = false, 
 }: { 
   checked: boolean
   onChange: (checked: boolean) => void
@@ -107,7 +107,7 @@ function SaveToast({ show }: { show: boolean }) {
 function SettingsCard({ 
   title, 
   description, 
-  children 
+  children, 
 }: { 
   title: string
   description?: string
@@ -133,7 +133,7 @@ function SettingsCard({
 // Theme Selector
 function ThemeSelector({ 
   value, 
-  onChange 
+  onChange, 
 }: { 
   value: 'dark' | 'light' | 'system'
   onChange: (theme: 'dark' | 'light' | 'system') => void
@@ -189,7 +189,7 @@ function ThemeSelector({
 // Avatar Upload
 function AvatarUpload({ 
   currentAvatar, 
-  onUpload 
+  onUpload, 
 }: { 
   currentAvatar?: string
   onUpload: (file: File) => void 

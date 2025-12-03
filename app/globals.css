@@ -1335,3 +1335,310 @@ body {
   color: #98989D;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * 🪞 MIRROR CHROME EFFECT - Apple Logo Style
+ * ═══════════════════════════════════════════════════════════════════════════
+ * Efecto espejo cromado como el logo de Apple en iPhones
+ * Simula reflexión de horizonte (cielo arriba, tierra abajo)
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Chrome Text - Para tipografía CHRONOS */
+.text-mirror-chrome {
+  background-image: linear-gradient(
+    180deg, 
+    #FFFFFF 0%,
+    #F5F5F5 15%,
+    #E8E8E8 30%,
+    #D0D0D0 45%,
+    #888888 50%,   /* Línea del horizonte */
+    #A8A8A8 55%,
+    #C0C0C0 70%,
+    #E0E0E0 85%,
+    #FFFFFF 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 
+    0 1px 0 rgba(255,255,255,0.4),
+    0 -1px 0 rgba(0,0,0,0.2);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+/* Chrome Text Animado - Con reflejo dinámico */
+.text-mirror-chrome-animated {
+  background-image: linear-gradient(
+    180deg, 
+    #FFFFFF 0%,
+    #E0E0E0 25%,
+    #A0A0A0 48%,
+    #707070 50%,
+    #909090 52%,
+    #D0D0D0 75%,
+    #FFFFFF 100%
+  );
+  background-size: 100% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: chrome-shimmer 3s ease-in-out infinite;
+}
+
+@keyframes chrome-shimmer {
+  0%, 100% { background-position: 0% 0%; }
+  50% { background-position: 0% 100%; }
+}
+
+/* Botón Chrome - Efecto espejo 3D */
+.btn-mirror-chrome {
+  background: linear-gradient(
+    180deg, 
+    #F8F8F8 0%,
+    #E8E8E8 20%,
+    #D0D0D0 45%,
+    #888888 50%,
+    #A0A0A0 55%,
+    #C8C8C8 80%,
+    #F0F0F0 100%
+  );
+  color: #1a1a1a;
+  font-weight: 600;
+  box-shadow: 
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    inset 0 -1px 0 rgba(0,0,0,0.3),
+    0 4px 15px rgba(0,0,0,0.5),
+    0 1px 3px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+}
+
+.btn-mirror-chrome:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 
+    inset 0 1px 0 rgba(255,255,255,1),
+    inset 0 -1px 0 rgba(0,0,0,0.2),
+    0 8px 25px rgba(0,0,0,0.4),
+    0 0 30px rgba(255, 255, 255, 0.15);
+}
+
+.btn-mirror-chrome:active {
+  transform: translateY(0) scale(0.98);
+  filter: brightness(0.95);
+}
+
+/* Chrome Badge - Para etiquetas pequeñas */
+.badge-mirror-chrome {
+  background: linear-gradient(
+    180deg,
+    #F0F0F0 0%,
+    #C0C0C0 50%,
+    #E0E0E0 100%
+  );
+  color: #1a1a1a;
+  font-weight: 500;
+  box-shadow: 
+    inset 0 1px 0 rgba(255,255,255,0.8),
+    0 1px 3px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Chrome Surface - Para paneles/cards */
+.surface-mirror-chrome {
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.15) 0%,
+    rgba(200,200,200,0.1) 25%,
+    rgba(100,100,100,0.05) 50%,
+    rgba(150,150,150,0.1) 75%,
+    rgba(255,255,255,0.12) 100%
+  );
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 
+    inset 0 1px 0 rgba(255,255,255,0.2),
+    0 4px 30px rgba(0,0,0,0.3);
+}
+
+/* Chrome Icon Container */
+.icon-mirror-chrome {
+  background: linear-gradient(
+    145deg,
+    #E8E8E8 0%,
+    #B0B0B0 50%,
+    #D8D8D8 100%
+  );
+  box-shadow: 
+    inset 0 2px 4px rgba(255,255,255,0.8),
+    inset 0 -2px 4px rgba(0,0,0,0.2),
+    0 4px 12px rgba(0,0,0,0.3);
+  border-radius: 50%;
+}
+
+/* Chrome Divider Line */
+.divider-mirror-chrome {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.4) 20%,
+    rgba(255,255,255,0.6) 50%,
+    rgba(255,255,255,0.4) 80%,
+    transparent 100%
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * 🔮 PREMIUM GLASS EFFECTS - Ultra Glassmorphism
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Glass Panel Premium */
+.glass-premium {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Obsidian Glass - Dark Premium */
+.glass-obsidian {
+  background: linear-gradient(
+    145deg,
+    rgba(20, 20, 25, 0.95) 0%,
+    rgba(10, 10, 15, 0.98) 100%
+  );
+  backdrop-filter: blur(60px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 
+    0 25px 80px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ⚡ GPU ACCELERATION & PERFORMANCE
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.smooth-transform {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * 🌈 GRADIENT ANIMATIONS
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+.gradient-animate {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
+    filter: brightness(1);
+  }
+  50% { 
+    box-shadow: 0 0 40px rgba(34, 211, 238, 0.6);
+    filter: brightness(1.1);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * 🎭 PREMIUM HOVER EFFECTS
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.hover-glow:hover {
+  box-shadow: 
+    0 0 20px rgba(34, 211, 238, 0.3),
+    0 0 40px rgba(34, 211, 238, 0.1);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * 🔊 AUDIO REACTIVE STYLES
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+.audio-reactive {
+  --audio-level: 0;
+  transition: transform 0.1s ease-out, filter 0.1s ease-out;
+}
+
+.audio-reactive.active {
+  transform: scale(calc(1 + var(--audio-level) * 0.2));
+  filter: brightness(calc(1 + var(--audio-level) * 0.3));
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * 📱 RESPONSIVE UTILITIES
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 640px) {
+  .text-mirror-chrome {
+    background-size: 100% 150%;
+  }
+  
+  .glass-premium {
+    backdrop-filter: blur(20px);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * 🌙 DARK MODE OPTIMIZATIONS
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-color-scheme: dark) {
+  .auto-dark-glass {
+    background: rgba(0, 0, 0, 0.6);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * 🎬 REDUCED MOTION
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .gradient-animate,
+  .glow-pulse,
+  .text-mirror-chrome-animated {
+    animation: none;
+  }
+  
+  .hover-lift:hover {
+    transform: none;
+  }
+}

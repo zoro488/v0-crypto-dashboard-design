@@ -79,7 +79,7 @@ const formatValue = (
   value: number,
   format: KPICardProps['format'],
   prefix?: string,
-  suffix?: string
+  suffix?: string,
 ): string => {
   let formatted: string
 
@@ -231,7 +231,7 @@ const TrendBadge = memo(({ trend }: { trend: number }) => {
         'flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold border',
         style.bg,
         style.text,
-        style.border
+        style.border,
       )}
       style={{ boxShadow: style.glow }}
       initial={{ scale: 0.8, opacity: 0 }}
@@ -347,7 +347,7 @@ export const KPICard = memo(({
               'font-bold tracking-tight',
               styles.value,
               // Gradient text con glow
-              'bg-gradient-to-b from-white to-white/70 bg-clip-text text-transparent'
+              'bg-gradient-to-b from-white to-white/70 bg-clip-text text-transparent',
             )}
             style={{
               textShadow: '0 0 40px rgba(255, 255, 255, 0.15)',

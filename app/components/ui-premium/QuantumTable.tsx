@@ -134,7 +134,7 @@ function QuantumRow<T extends Record<string, unknown>>({
             className="font-mono"
             style={{ 
               fontVariantNumeric: 'tabular-nums',
-              color: numVal >= 0 ? '#10b981' : '#ef4444'
+              color: numVal >= 0 ? '#10b981' : '#ef4444',
             }}
           >
             ${Math.abs(numVal).toLocaleString('en-US', { minimumFractionDigits: 2 })}
@@ -324,7 +324,7 @@ export function QuantumTable<T extends Record<string, unknown>>({
         style={{ 
           background: 'rgba(0, 0, 0, 0.4)', 
           backdropFilter: 'blur(40px)',
-          border: '1px solid rgba(255, 255, 255, 0.05)'
+          border: '1px solid rgba(255, 255, 255, 0.05)',
         }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -340,7 +340,7 @@ export function QuantumTable<T extends Record<string, unknown>>({
       style={{ 
         background: 'rgba(0, 0, 0, 0.4)', 
         backdropFilter: 'blur(40px)',
-        border: '1px solid rgba(255, 255, 255, 0.05)'
+        border: '1px solid rgba(255, 255, 255, 0.05)',
       }}
     >
       {/* Headers - Sticky Frosted Glass */}

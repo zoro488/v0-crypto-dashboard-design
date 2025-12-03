@@ -1,41 +1,75 @@
 import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
+import { motion } from 'framer-motion'
+import { Loader2 } from 'lucide-react'
 
 import { cn } from '@/app/lib/utils'
 
+/**
+ * 🎨 BUTTON OBSIDIAN - Sistema Premium Unificado
+ * 
+ * Migrado a Obsidian Glass Design System con:
+ * - Glassmorphism avanzado
+ * - Animaciones Apple-style
+ * - Variantes premium actualizadas
+ * - Compatibilidad hacia atrás con API legacy
+ */
+
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-all duration-300 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-[0.98] will-change-transform",
+  // Base: Obsidian Glass Foundation
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-semibold transition-all duration-300 disabled:pointer-events-none disabled:opacity-40 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none will-change-transform apple-font-smoothing",
   {
     variants: {
       variant: {
+        // 🔵 Primary - Apple Blue con glow
         default: 
-          'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl hover:shadow-blue-500/25 focus-visible:ring-blue-500/50',
+          'bg-[#0A84FF] text-white hover:bg-[#0A84FF]/90 shadow-[0_4px_20px_-4px_rgba(10,132,255,0.5)] hover:shadow-[0_8px_30px_-4px_rgba(10,132,255,0.6)] focus-visible:ring-2 focus-visible:ring-[#0A84FF]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-xl active:scale-[0.98]',
+        
+        // 🟣 Premium - Gradient con animación
         premium:
-          'bg-gradient-to-r from-purple-500 via-pink-500 to-purple-600 hover:from-purple-600 hover:via-pink-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl hover:shadow-purple-500/30 focus-visible:ring-purple-500/50 animate-gradient',
+          'bg-gradient-to-r from-purple-500 via-pink-500 to-purple-600 hover:from-purple-600 hover:via-pink-600 hover:to-purple-700 text-white shadow-[0_4px_20px_-4px_rgba(168,85,247,0.5)] hover:shadow-[0_8px_30px_-4px_rgba(168,85,247,0.6)] rounded-xl active:scale-[0.98]',
+        
+        // 🔮 Glass - Obsidian Glassmorphism
         glass:
-          'bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/20 text-white shadow-lg hover:shadow-xl focus-visible:ring-white/30',
+          'bg-[rgba(10,10,15,0.6)] backdrop-blur-2xl border border-white/[0.08] hover:border-white/[0.15] hover:bg-[rgba(20,20,30,0.7)] text-white shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.05)] rounded-xl active:scale-[0.98]',
+        
+        // 🔴 Destructive - Error state
         destructive:
-          'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl hover:shadow-red-500/25 focus-visible:ring-red-500/50',
+          'bg-[#FF453A] text-white hover:bg-[#FF453A]/90 shadow-[0_4px_20px_-4px_rgba(255,69,58,0.5)] hover:shadow-[0_8px_30px_-4px_rgba(255,69,58,0.6)] focus-visible:ring-2 focus-visible:ring-[#FF453A]/50 rounded-xl active:scale-[0.98]',
+        
+        // ⬜ Outline - Border with glow on hover
         outline:
-          'border-2 border-white/20 hover:border-white/40 bg-transparent hover:bg-white/5 text-white shadow-sm hover:shadow-lg focus-visible:ring-white/30',
+          'border border-white/[0.15] hover:border-white/[0.25] bg-transparent hover:bg-white/[0.05] text-white/90 hover:text-white shadow-[0_0_0_0_rgba(255,255,255,0)] hover:shadow-[0_4px_20px_-8px_rgba(255,255,255,0.15)] rounded-xl active:scale-[0.98]',
+        
+        // ⚫ Secondary - Subtle background
         secondary:
-          'bg-white/10 hover:bg-white/15 text-white backdrop-blur-sm border border-white/10 hover:border-white/20 focus-visible:ring-white/30',
+          'bg-white/[0.08] hover:bg-white/[0.12] text-white/90 backdrop-blur-xl border border-white/[0.06] hover:border-white/[0.1] rounded-xl active:scale-[0.98]',
+        
+        // 👻 Ghost - Invisible until hover
         ghost:
-          'hover:bg-white/10 text-white/80 hover:text-white focus-visible:ring-white/20',
+          'hover:bg-white/[0.08] text-white/70 hover:text-white rounded-xl active:scale-[0.98]',
+        
+        // 🔗 Link - Text only
         link: 
-          'text-blue-400 hover:text-blue-300 underline-offset-4 hover:underline',
+          'text-[#0A84FF] hover:text-[#0A84FF]/80 underline-offset-4 hover:underline',
+        
+        // ✅ Success - Green accent
         success:
-          'bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-lg hover:shadow-xl hover:shadow-emerald-500/25 focus-visible:ring-emerald-500/50',
+          'bg-[#30D158] text-white hover:bg-[#30D158]/90 shadow-[0_4px_20px_-4px_rgba(48,209,88,0.5)] hover:shadow-[0_8px_30px_-4px_rgba(48,209,88,0.6)] rounded-xl active:scale-[0.98]',
+        
+        // 🟠 Warning - Amber accent
+        warning:
+          'bg-[#FF9F0A] text-black hover:bg-[#FF9F0A]/90 shadow-[0_4px_20px_-4px_rgba(255,159,10,0.5)] hover:shadow-[0_8px_30px_-4px_rgba(255,159,10,0.6)] rounded-xl active:scale-[0.98]',
       },
       size: {
-        default: 'h-10 px-5 py-2.5 has-[>svg]:px-4',
-        sm: 'h-9 rounded-lg gap-1.5 px-3.5 text-xs has-[>svg]:px-3',
-        lg: 'h-12 rounded-xl px-7 text-base has-[>svg]:px-5',
-        xl: 'h-14 rounded-2xl px-8 text-lg has-[>svg]:px-6',
-        icon: 'size-10 rounded-xl',
-        'icon-sm': 'size-9 rounded-lg',
-        'icon-lg': 'size-12 rounded-xl',
+        default: 'h-11 px-6 py-2.5 has-[>svg]:px-5', // 44px Apple standard
+        sm: 'h-9 rounded-lg gap-1.5 px-4 text-xs has-[>svg]:px-3',
+        lg: 'h-13 rounded-2xl px-8 text-base has-[>svg]:px-6',
+        xl: 'h-15 rounded-2xl px-10 text-lg has-[>svg]:px-8',
+        icon: 'size-11 rounded-xl p-0',
+        'icon-sm': 'size-9 rounded-lg p-0',
+        'icon-lg': 'size-13 rounded-xl p-0',
       },
     },
     defaultVariants: {
@@ -45,24 +79,57 @@ const buttonVariants = cva(
   },
 )
 
+export interface ButtonProps
+  extends React.ComponentProps<'button'>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
+  loading?: boolean
+  isLoading?: boolean
+  leftIcon?: React.ReactNode
+  rightIcon?: React.ReactNode
+}
+
 function Button({
   className,
   variant,
   size,
   asChild = false,
+  loading,
+  isLoading,
+  leftIcon,
+  rightIcon,
+  children,
+  disabled,
   ...props
-}: React.ComponentProps<'button'> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
-  }) {
+}: ButtonProps) {
   const Comp = asChild ? Slot : 'button'
+  const actualLoading = loading ?? isLoading
 
   return (
     <Comp
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
+      disabled={disabled || actualLoading}
       {...props}
-    />
+    >
+      {/* Loading spinner */}
+      {actualLoading && (
+        <Loader2 className="w-4 h-4 animate-spin" />
+      )}
+      
+      {/* Left icon */}
+      {!actualLoading && leftIcon && (
+        <span className="flex-shrink-0">{leftIcon}</span>
+      )}
+      
+      {/* Content */}
+      {children}
+      
+      {/* Right icon */}
+      {!actualLoading && rightIcon && (
+        <span className="flex-shrink-0">{rightIcon}</span>
+      )}
+    </Comp>
   )
 }
 

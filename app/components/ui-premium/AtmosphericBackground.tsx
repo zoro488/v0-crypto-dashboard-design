@@ -173,7 +173,7 @@ const FloatingParticles = memo(() => {
       duration: Math.random() * 20 + 20,
       delay: Math.random() * 10,
     })),
-    []
+    [],
   )
 
   return (

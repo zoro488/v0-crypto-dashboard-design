@@ -26,6 +26,7 @@ import * as THREE from 'three'
 import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing'
 import { BlendFunction } from 'postprocessing'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ChronosLogo } from '@/app/components/ui/ChronosLogo'
 
 // ═══════════════════════════════════════════════════════════════════════════════════════
 // 1. SHADER DE HIPERESPACIO AVANZADO (GLSL)
@@ -188,7 +189,7 @@ const HyperspaceShader = {
       
       gl_FragColor = vec4(finalColor, finalAlpha);
     }
-  `
+  `,
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════════════
@@ -519,22 +520,27 @@ export default function WarpSingularity({
             exit={{ opacity: 0, scale: 1.5, filter: 'blur(20px)' }}
             transition={{ duration: 0.5 }}
           >
-            {/* Logo CHRONOS */}
-            <motion.h1
-              className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter"
-              style={{
-                fontFamily: 'Geist Mono, SF Mono, monospace',
-                background: 'linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(150,180,255,0.8) 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                textShadow: '0 0 80px rgba(100, 150, 255, 0.5)',
-              }}
+            {/* Logo CHRONOS con símbolo */}
+            <motion.div
+              className="flex flex-col items-center gap-4"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.8 }}
             >
-              CHRONOS
-            </motion.h1>
+              <ChronosLogo size="2xl" animated glow />
+              <motion.h1
+                className="text-5xl md:text-7xl lg:text-8xl font-black tracking-[0.15em]"
+                style={{
+                  fontFamily: 'Geist Mono, SF Mono, monospace',
+                  background: 'linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(150,180,255,0.8) 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  textShadow: '0 0 80px rgba(100, 150, 255, 0.5)',
+                }}
+              >
+                CHRONOS
+              </motion.h1>
+            </motion.div>
             
             {/* Subtítulo */}
             <motion.p

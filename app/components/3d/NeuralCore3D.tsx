@@ -208,7 +208,7 @@ export default function NeuralCore3D({
     material.uniforms.uProcessingIntensity.value = THREE.MathUtils.lerp(
       material.uniforms.uProcessingIntensity.value,
       processingIntensity,
-      0.08
+      0.08,
     )
     
     // Actualizar posición del mouse con suavizado
@@ -217,12 +217,12 @@ export default function NeuralCore3D({
     material.uniforms.uMouse.value.x = THREE.MathUtils.lerp(
       material.uniforms.uMouse.value.x,
       targetX,
-      0.1
+      0.1,
     )
     material.uniforms.uMouse.value.y = THREE.MathUtils.lerp(
       material.uniforms.uMouse.value.y,
       targetY,
-      0.1
+      0.1,
     )
     
     // Rotación lenta del sistema

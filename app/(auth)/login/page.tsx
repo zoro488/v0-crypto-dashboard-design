@@ -8,6 +8,23 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import * as THREE from 'three'
 import React from 'react'
+import dynamic from 'next/dynamic'
+import { ChronosLogo } from '@/app/components/ui/ChronosLogo'
+
+// Logo 3D con partículas de diamante/cromo (carga dinámica para SSR)
+const DiamondChromeLogo = dynamic(
+  () => import('@/app/components/3d/DiamondChromeLogo'),
+  { ssr: false, loading: () => <LogoPlaceholder /> },
+)
+
+// Placeholder mientras carga el logo 3D
+function LogoPlaceholder() {
+  return (
+    <div className="h-32 w-full flex items-center justify-center">
+      <ChronosLogo size="xl" animated glow />
+    </div>
+  )
+}
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
@@ -151,7 +168,7 @@ function LiquidChromeParticles({ count = 12000 }: { count?: number }) {
     mouseHistory.current.push({ 
       x: smoothMouse.current.x, 
       y: smoothMouse.current.y, 
-      time 
+      time, 
     })
     if (mouseHistory.current.length > 20) mouseHistory.current.shift()
     
@@ -245,7 +262,7 @@ function LiquidChromeParticles({ count = 12000 }: { count?: number }) {
         const particleVel = Math.sqrt(
           particleData.velocities[i3] ** 2 + 
           particleData.velocities[i3 + 1] ** 2 + 
-          particleData.velocities[i3 + 2] ** 2
+          particleData.velocities[i3 + 2] ** 2,
         )
         
         // Efecto chrome: brillo aumenta cerca del cursor
@@ -489,7 +506,7 @@ function GlowInput({
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SUBMIT BUTTON - Botón con transformación
+// SUBMIT BUTTON - Botón Chrome Espejo estilo Apple
 // ═══════════════════════════════════════════════════════════════════════════
 
 function SubmitButton({ isLoading, isSuccess }: { isLoading: boolean; isSuccess: boolean }) {
@@ -497,26 +514,30 @@ function SubmitButton({ isLoading, isSuccess }: { isLoading: boolean; isSuccess:
     <motion.button
       type="submit"
       disabled={isLoading || isSuccess}
-      className="relative w-full h-14 rounded-xl font-semibold text-white overflow-hidden"
+      className="relative w-full h-14 rounded-xl font-semibold overflow-hidden"
       animate={{
         width: isLoading || isSuccess ? 56 : '100%',
         borderRadius: isLoading || isSuccess ? 28 : 12,
       }}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       style={{
+        // Gradiente de espejo cromado tipo Apple
         background: isSuccess 
           ? '#10b981' 
-          : 'linear-gradient(135deg, #2A2A2A 0%, #4A4A4A 25%, #6A6A6A 50%, #4A4A4A 75%, #2A2A2A 100%)',
+          : 'linear-gradient(180deg, #F8F8F8 0%, #E8E8E8 20%, #D0D0D0 45%, #888888 50%, #A0A0A0 55%, #C8C8C8 80%, #F0F0F0 100%)',
+        color: isSuccess ? '#ffffff' : '#1a1a1a',
         boxShadow: isSuccess
           ? '0 0 40px rgba(16, 185, 129, 0.4)'
-          : '0 4px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 0 rgba(0,0,0,0.3)',
-        border: isSuccess ? 'none' : '1px solid rgba(255,255,255,0.1)',
+          : 'inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(0,0,0,0.3), 0 4px 20px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0,0,0,0.3)',
+        border: isSuccess ? 'none' : '1px solid rgba(255,255,255,0.3)',
+        textShadow: isSuccess ? 'none' : '0 1px 0 rgba(255,255,255,0.5)',
       }}
       whileHover={!isLoading && !isSuccess ? { 
-        background: 'linear-gradient(135deg, #3A3A3A 0%, #5A5A5A 25%, #8A8A8A 50%, #5A5A5A 75%, #3A3A3A 100%)',
-        boxShadow: '0 6px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.4), inset 0 -1px 0 rgba(0,0,0,0.2)',
+        filter: 'brightness(1.15)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 40px rgba(255, 255, 255, 0.15)',
+        y: -2,
       } : undefined}
-      whileTap={!isLoading && !isSuccess ? { scale: 0.98 } : undefined}
+      whileTap={!isLoading && !isSuccess ? { scale: 0.98, filter: 'brightness(0.95)' } : undefined}
     >
       <AnimatePresence mode="wait">
         {isSuccess ? (
@@ -524,7 +545,7 @@ function SubmitButton({ isLoading, isSuccess }: { isLoading: boolean; isSuccess:
             key="success"
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="flex items-center justify-center"
+            className="flex items-center justify-center text-white"
           >
             <Check className="w-6 h-6" />
           </motion.div>
@@ -536,7 +557,7 @@ function SubmitButton({ isLoading, isSuccess }: { isLoading: boolean; isSuccess:
             className="flex items-center justify-center"
           >
             <motion.div
-              className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+              className="w-5 h-5 border-2 border-gray-400/30 border-t-gray-600 rounded-full"
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
             />
@@ -547,7 +568,7 @@ function SubmitButton({ isLoading, isSuccess }: { isLoading: boolean; isSuccess:
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="flex items-center justify-center gap-2"
+            className="flex items-center justify-center gap-2 text-gray-800 font-bold"
           >
             <span>Ingresar</span>
             <ArrowRight className="w-5 h-5" />
@@ -695,8 +716,9 @@ export default function LoginPage() {
           transition={{ delay: 0.5, duration: 0.8 }}
           className="relative z-10 text-center space-y-6 pointer-events-none select-none"
         >
+          <ChronosLogo size="2xl" animated glow />
           <motion.h1 
-            className="text-8xl font-bold tracking-tighter"
+            className="text-7xl font-bold tracking-[0.15em]"
             style={{
               background: 'linear-gradient(to bottom, #FFFFFF 0%, #808080 50%, #404040 100%)',
               WebkitBackgroundClip: 'text',
@@ -768,25 +790,13 @@ export default function LoginPage() {
               boxShadow: '0 25px 80px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.05), inset 0 -1px 0 rgba(0,0,0,0.2)',
             }}
           >
-            {/* Header */}
-            <div className="text-center mb-10">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', delay: 0.2 }}
-                className="w-16 h-16 mx-auto mb-6 rounded-2xl flex items-center justify-center"
-                style={{
-                  background: 'linear-gradient(145deg, #3A3A3A 0%, #1A1A1A 100%)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
-                }}
-              >
-                <Sparkles className="w-8 h-8" style={{ color: '#FFFFFF' }} />
-              </motion.div>
+            {/* Header con Logo DiamondChrome */}
+            <div className="text-center mb-8">
+              {/* Logo 3D de partículas cromadas */}
+              <div className="relative -mx-8 -mt-4 mb-4">
+                <DiamondChromeLogo height="h-40" />
+              </div>
               
-              <h1 className="text-2xl font-bold text-white mb-2">
-                Bienvenido a CHRONOS
-              </h1>
               <p className="text-white/40 text-sm">
                 Ingresa a tu panel de control financiero
               </p>

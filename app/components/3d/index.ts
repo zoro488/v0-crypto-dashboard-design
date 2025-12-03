@@ -129,3 +129,19 @@ export { default as SingularityParticles } from './SingularityParticles'
 
 // Shaders GLSL avanzados
 export * from './shaders/NeuralCoreShaders'
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// AUDIO REACTIVE ORB - ORBE CON REACCIÓN A VOZ
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Orbe que reacciona al audio del micrófono en tiempo real
+export { default as AudioReactiveOrb } from './AudioReactiveOrb'
+export type { AudioReactiveOrbProps } from './AudioReactiveOrb'
+
+// Logo CHRONOS con partículas cromadas estilo Apple
+export { default as ChromeParticleLogo, ChromeLogoCSS } from './ChromeParticleLogo'
+export type { ChromeParticleLogoProps } from './ChromeParticleLogo'
+
+// Logo CHRONOS con micro-lingotes de diamante/cromo - Arena Metálica Magnetizada
+export { default as DiamondChromeLogo, DiamondChromeLogoCompact } from './DiamondChromeLogo'
+export type { DiamondChromeLogoProps } from './DiamondChromeLogo'

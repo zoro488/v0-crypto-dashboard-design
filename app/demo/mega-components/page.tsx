@@ -6,14 +6,14 @@ import {
   PremiumStatCard,
   QuantumTable,
   HolographicAreaChart,
-  type ColumnDef
+  type ColumnDef,
 } from '@/app/components/ui-premium'
 import { AIVoiceAssistant } from '@/app/components/ai'
 import { 
   Wallet, 
   TrendingUp, 
   CreditCard,
-  BarChart3
+  BarChart3,
 } from 'lucide-react'
 import '@/app/styles/chronos-obsidian-os.css'
 

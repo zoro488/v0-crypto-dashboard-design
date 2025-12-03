@@ -34,9 +34,9 @@ export const ObsidianModal = memo(forwardRef<HTMLDivElement, ObsidianModalProps>
       subtitle,
       size = 'md',
       showClose = true,
-      className = ''
+      className = '',
     },
-    ref
+    ref,
   ) {
     const handleBackdropClick = useCallback((e: React.MouseEvent) => {
       if (e.target === e.currentTarget) {
@@ -48,7 +48,7 @@ export const ObsidianModal = memo(forwardRef<HTMLDivElement, ObsidianModalProps>
       sm: 'max-w-[400px]',
       md: 'max-w-[560px]',
       lg: 'max-w-[720px]',
-      xl: 'max-w-[900px]'
+      xl: 'max-w-[900px]',
     }
     
     return (
@@ -82,27 +82,27 @@ export const ObsidianModal = memo(forwardRef<HTMLDivElement, ObsidianModalProps>
                 scale: 0.9, 
                 y: '-45%',
                 x: '-50%',
-                filter: 'blur(10px)'
+                filter: 'blur(10px)',
               }}
               animate={{ 
                 opacity: 1, 
                 scale: 1, 
                 y: '-50%',
                 x: '-50%',
-                filter: 'blur(0px)'
+                filter: 'blur(0px)',
               }}
               exit={{ 
                 opacity: 0, 
                 scale: 0.95, 
                 y: '-48%',
                 x: '-50%',
-                filter: 'blur(8px)'
+                filter: 'blur(8px)',
               }}
               transition={{
                 type: 'spring',
                 stiffness: 300,
                 damping: 30,
-                mass: 0.8
+                mass: 0.8,
               }}
               style={{
                 // Vidrio de Obsidiana grueso
@@ -117,7 +117,7 @@ export const ObsidianModal = memo(forwardRef<HTMLDivElement, ObsidianModalProps>
                   0 50px 100px -20px rgba(0, 0, 0, 0.8),
                   0 30px 60px -15px rgba(0, 0, 0, 0.5),
                   0 0 0 1px rgba(255, 255, 255, 0.05)
-                `
+                `,
               }}
             >
               {/* Borde degradado superior (luz atrapada en el canto) */}
@@ -134,7 +134,7 @@ export const ObsidianModal = memo(forwardRef<HTMLDivElement, ObsidianModalProps>
                   WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
                   mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
                   WebkitMaskComposite: 'xor',
-                  maskComposite: 'exclude'
+                  maskComposite: 'exclude',
                 }}
               />
               
@@ -199,7 +199,7 @@ export const ObsidianModal = memo(forwardRef<HTMLDivElement, ObsidianModalProps>
         )}
       </AnimatePresence>
     )
-  }
+  },
 ))
 
 export default ObsidianModal

@@ -162,7 +162,7 @@ export default function FloatingIslandHeader() {
             // Obsidian Glass effect
             isScrolled
               ? 'bg-[rgba(10,10,15,0.85)] shadow-[0_16px_48px_-8px_rgba(0,0,0,0.7)]'
-              : 'bg-[rgba(10,10,15,0.6)] shadow-[0_8px_32px_-4px_rgba(0,0,0,0.5)]'
+              : 'bg-[rgba(10,10,15,0.6)] shadow-[0_8px_32px_-4px_rgba(0,0,0,0.5)]',
           )}
           style={{
             backdropFilter: `blur(${headerBlur}px) saturate(180%)`,
@@ -357,7 +357,7 @@ const NavItem = ({ icon: Icon, label, isActive, onClick }: NavItemProps) => (
       'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
       isActive
         ? 'bg-white/10 text-white'
-        : 'text-white/60 hover:text-white hover:bg-white/5'
+        : 'text-white/60 hover:text-white hover:bg-white/5',
     )}
     whileHover={{ scale: 1.02 }}
     whileTap={{ scale: 0.98 }}
@@ -391,7 +391,7 @@ const NavDropdown = ({ label, isOpen, onToggle, items, currentPanel, onSelect }:
         'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
         isOpen
           ? 'bg-white/10 text-white'
-          : 'text-white/60 hover:text-white hover:bg-white/5'
+          : 'text-white/60 hover:text-white hover:bg-white/5',
       )}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
@@ -425,14 +425,14 @@ const NavDropdown = ({ label, isOpen, onToggle, items, currentPanel, onSelect }:
                   'w-full flex items-center gap-3 p-2.5 rounded-xl text-left transition-all',
                   isActive
                     ? 'bg-white/10 text-white'
-                    : 'text-white/70 hover:text-white hover:bg-white/5'
+                    : 'text-white/70 hover:text-white hover:bg-white/5',
                 )}
                 whileHover={{ x: 4 }}
                 whileTap={{ scale: 0.98 }}
               >
                 <div className={cn(
                   'w-8 h-8 rounded-lg flex items-center justify-center bg-gradient-to-br',
-                  item.color
+                  item.color,
                 )}>
                   <Icon className="w-4 h-4 text-white" />
                 </div>
@@ -570,20 +570,20 @@ const MobileMenu = ({ isOpen, onClose, currentPanel, onPanelSelect, onAction }: 
                         'w-full flex items-center gap-3 p-3 rounded-xl transition-all',
                         isActive
                           ? 'bg-white/10 border border-white/10'
-                          : 'hover:bg-white/5'
+                          : 'hover:bg-white/5',
                       )}
                       whileTap={{ scale: 0.98 }}
                     >
                       <div className={cn(
                         'w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br',
-                        panel.color
+                        panel.color,
                       )}>
                         <Icon className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex-1 text-left">
                         <p className={cn(
                           'font-medium',
-                          isActive ? 'text-white' : 'text-white/70'
+                          isActive ? 'text-white' : 'text-white/70',
                         )}>{panel.label}</p>
                         {panel.description && (
                           <p className="text-xs text-white/40">{panel.description}</p>
@@ -664,14 +664,14 @@ const SearchModal = ({ isOpen, onClose, onSelect, currentPanel }: SearchModalPro
                         'flex items-center gap-2 p-3 rounded-xl transition-all',
                         isActive
                           ? 'bg-white/10 border border-white/10'
-                          : 'bg-white/5 hover:bg-white/10 border border-transparent'
+                          : 'bg-white/5 hover:bg-white/10 border border-transparent',
                       )}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
                       <div className={cn(
                         'w-8 h-8 rounded-lg flex items-center justify-center bg-gradient-to-br',
-                        panel.color
+                        panel.color,
                       )}>
                         <Icon className="w-4 h-4 text-white" />
                       </div>

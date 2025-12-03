@@ -39,40 +39,40 @@ export const HeroMetricCard = memo(function HeroMetricCard({
   variant = 'sapphire',
   sparklineData,
   className = '',
-  onClick
+  onClick,
 }: HeroMetricCardProps) {
   
   const colorMap = {
     sapphire: {
       glow: 'rgba(59, 130, 246, 0.4)',
       accent: '#3b82f6',
-      light: '#60a5fa'
+      light: '#60a5fa',
     },
     emerald: {
       glow: 'rgba(16, 185, 129, 0.4)',
       accent: '#10b981',
-      light: '#34d399'
+      light: '#34d399',
     },
     amethyst: {
       glow: 'rgba(139, 92, 246, 0.4)',
       accent: '#8b5cf6',
-      light: '#a78bfa'
+      light: '#a78bfa',
     },
     cyan: {
       glow: 'rgba(6, 182, 212, 0.4)',
       accent: '#06b6d4',
-      light: '#22d3ee'
+      light: '#22d3ee',
     },
     gold: {
       glow: 'rgba(245, 158, 11, 0.4)',
       accent: '#f59e0b',
-      light: '#fbbf24'
+      light: '#fbbf24',
     },
     ruby: {
       glow: 'rgba(239, 68, 68, 0.4)',
       accent: '#ef4444',
-      light: '#f87171'
-    }
+      light: '#f87171',
+    },
   }
   
   const colors = colorMap[variant]
@@ -103,7 +103,7 @@ export const HeroMetricCard = memo(function HeroMetricCard({
           inset 0 0 80px -30px ${colors.glow},
           0 20px 60px -20px rgba(0, 0, 0, 0.6),
           0 10px 30px -10px rgba(0, 0, 0, 0.4)
-        `
+        `,
       }}
       whileHover={{
         y: -6,
@@ -113,7 +113,7 @@ export const HeroMetricCard = memo(function HeroMetricCard({
           inset 0 0 100px -30px ${colors.glow},
           0 30px 80px -20px ${colors.glow},
           0 15px 40px -10px rgba(0, 0, 0, 0.5)
-        `
+        `,
       }}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       onClick={onClick}
@@ -133,7 +133,7 @@ export const HeroMetricCard = memo(function HeroMetricCard({
           WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
           mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
           WebkitMaskComposite: 'xor',
-          maskComposite: 'exclude'
+          maskComposite: 'exclude',
         }}
       />
       
@@ -159,11 +159,11 @@ export const HeroMetricCard = memo(function HeroMetricCard({
               className="absolute inset-0 rounded-2xl"
               style={{
                 background: `radial-gradient(circle at center, ${colors.glow} 0%, transparent 70%)`,
-                filter: 'blur(20px)'
+                filter: 'blur(20px)',
               }}
               animate={{
                 scale: [1, 1.2, 1],
-                opacity: [0.5, 0.8, 0.5]
+                opacity: [0.5, 0.8, 0.5],
               }}
               transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
             />
@@ -173,7 +173,7 @@ export const HeroMetricCard = memo(function HeroMetricCard({
               className="relative p-4 rounded-2xl"
               style={{
                 background: `rgba(${variant === 'sapphire' ? '59, 130, 246' : variant === 'emerald' ? '16, 185, 129' : variant === 'amethyst' ? '139, 92, 246' : variant === 'cyan' ? '6, 182, 212' : variant === 'gold' ? '245, 158, 11' : '239, 68, 68'}, 0.15)`,
-                boxShadow: `0 0 30px ${colors.glow}`
+                boxShadow: `0 0 30px ${colors.glow}`,
               }}
             >
               <span style={{ color: colors.light }}>
@@ -193,7 +193,7 @@ export const HeroMetricCard = memo(function HeroMetricCard({
                 background: isTrendPositive 
                   ? 'rgba(16, 185, 129, 0.15)' 
                   : 'rgba(239, 68, 68, 0.15)',
-                color: isTrendPositive ? '#10b981' : '#ef4444'
+                color: isTrendPositive ? '#10b981' : '#ef4444',
               }}
             >
               {isTrendPositive ? (
@@ -230,7 +230,7 @@ export const HeroMetricCard = memo(function HeroMetricCard({
                 className="text-3xl md:text-4xl font-semibold"
                 style={{ 
                   fontFamily: "'JetBrains Mono', monospace",
-                  color: 'rgba(255, 255, 255, 0.5)'
+                  color: 'rgba(255, 255, 255, 0.5)',
                 }}
               >
                 {prefix}
@@ -243,7 +243,7 @@ export const HeroMetricCard = memo(function HeroMetricCard({
                 fontFeatureSettings: "'tnum' 1",
                 letterSpacing: '-0.02em',
                 color: '#ffffff',
-                textShadow: `0 0 40px ${colors.glow}`
+                textShadow: `0 0 40px ${colors.glow}`,
               }}
             >
               {formattedValue}

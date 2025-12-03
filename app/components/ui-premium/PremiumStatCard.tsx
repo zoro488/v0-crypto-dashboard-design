@@ -68,7 +68,7 @@ function useCountUp(target: number, duration: number = 2000) {
 // Componente Sparkline SVG minimalista
 const MiniSparkline = memo(function MiniSparkline({ 
   data, 
-  color 
+  color, 
 }: { 
   data: number[]
   color: string 
@@ -142,7 +142,7 @@ export const PremiumStatCard = memo(function PremiumStatCard({
   variant = 'emerald',
   sparklineData,
   className = '',
-  onClick
+  onClick,
 }: PremiumStatCardProps) {
   const cardRef = useRef<HTMLDivElement>(null)
   
@@ -153,21 +153,21 @@ export const PremiumStatCard = memo(function PremiumStatCard({
   // Transformaciones suaves con spring
   const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [10, -10]), {
     stiffness: 150,
-    damping: 20
+    damping: 20,
   })
   const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-10, 10]), {
     stiffness: 150,
-    damping: 20
+    damping: 20,
   })
   
   // Movimiento de luz ambiental (opuesto al mouse)
   const ambientX = useSpring(useTransform(mouseX, [-0.5, 0.5], ['60%', '40%']), {
     stiffness: 100,
-    damping: 30
+    damping: 30,
   })
   const ambientY = useSpring(useTransform(mouseY, [-0.5, 0.5], ['60%', '40%']), {
     stiffness: 100,
-    damping: 30
+    damping: 30,
   })
   
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -196,38 +196,38 @@ export const PremiumStatCard = memo(function PremiumStatCard({
       primary: '#10b981', 
       glow: 'rgba(16, 185, 129, 0.4)',
       light: '#34d399',
-      rgb: '16, 185, 129'
+      rgb: '16, 185, 129',
     },
     sapphire: { 
       primary: '#3b82f6', 
       glow: 'rgba(59, 130, 246, 0.4)',
       light: '#60a5fa',
-      rgb: '59, 130, 246'
+      rgb: '59, 130, 246',
     },
     amethyst: { 
       primary: '#8b5cf6', 
       glow: 'rgba(139, 92, 246, 0.4)',
       light: '#a78bfa',
-      rgb: '139, 92, 246'
+      rgb: '139, 92, 246',
     },
     cyan: { 
       primary: '#06b6d4', 
       glow: 'rgba(6, 182, 212, 0.4)',
       light: '#22d3ee',
-      rgb: '6, 182, 212'
+      rgb: '6, 182, 212',
     },
     gold: { 
       primary: '#f59e0b', 
       glow: 'rgba(245, 158, 11, 0.4)',
       light: '#fbbf24',
-      rgb: '245, 158, 11'
+      rgb: '245, 158, 11',
     },
     ruby: { 
       primary: '#ef4444', 
       glow: 'rgba(239, 68, 68, 0.4)',
       light: '#f87171',
-      rgb: '239, 68, 68'
-    }
+      rgb: '239, 68, 68',
+    },
   }
   
   const colors = colorMap[variant]
@@ -302,7 +302,7 @@ export const PremiumStatCard = memo(function PremiumStatCard({
                 rgba(255,255,255,0.4) 50%, 
                 rgba(255,255,255,0.2) 80%, 
                 transparent 100%
-              )`
+              )`,
             }}
           />
           
@@ -320,7 +320,7 @@ export const PremiumStatCard = memo(function PremiumStatCard({
               WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
               mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
               WebkitMaskComposite: 'xor',
-              maskComposite: 'exclude'
+              maskComposite: 'exclude',
             }}
           />
           
@@ -381,7 +381,7 @@ export const PremiumStatCard = memo(function PremiumStatCard({
                     color: isTrendPositive ? '#10b981' : '#ef4444',
                     boxShadow: isTrendPositive
                       ? '0 0 15px rgba(16, 185, 129, 0.2)'
-                      : '0 0 15px rgba(239, 68, 68, 0.2)'
+                      : '0 0 15px rgba(239, 68, 68, 0.2)',
                   }}
                 >
                   {isTrendPositive ? (
@@ -405,7 +405,7 @@ export const PremiumStatCard = memo(function PremiumStatCard({
                     className="text-2xl font-semibold"
                     style={{ 
                       fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
-                      color: 'rgba(255, 255, 255, 0.5)'
+                      color: 'rgba(255, 255, 255, 0.5)',
                     }}
                   >
                     {prefix}
@@ -417,7 +417,7 @@ export const PremiumStatCard = memo(function PremiumStatCard({
                     fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
                     fontVariantNumeric: 'tabular-nums',
                     color: '#ffffff',
-                    textShadow: `0 0 30px ${colors.glow}`
+                    textShadow: `0 0 30px ${colors.glow}`,
                   }}
                 >
                   {formattedValue}

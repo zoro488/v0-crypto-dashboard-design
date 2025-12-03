@@ -53,6 +53,7 @@ import {
 
 // Analytics Avanzados Tesla
 import { AdvancedAnalyticsTesla } from '@/app/components/analytics/AdvancedAnalyticsTesla'
+import { ReportsTimeline } from '@/app/components/visualizations/ReportsTimeline'
 
 // Hooks de datos
 import { useVentas, useClientes, useOrdenesCompra } from '@/app/lib/firebase/firestore-hooks.service'
@@ -696,6 +697,27 @@ export function BentoReportesPremium() {
                     />
                   </PieChart>
                 </ResponsiveContainer>
+              </div>
+            </GlassCard3D>
+          </div>
+          
+          {/* Timeline de Reportes Canvas */}
+          <div className="relative z-10 mb-8">
+            <GlassCard3D variant="info" size="lg">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Calendar size={20} className="text-cyan-400" />
+                  <h3 className="text-lg font-semibold text-white">Timeline de Actividad</h3>
+                  <span className="text-xs text-white/40 ml-2">Historial visual</span>
+                </div>
+                <PulseIndicator variant="info" label="Actualizado" />
+              </div>
+              <div className="h-[500px] rounded-xl overflow-hidden bg-black/40">
+                <ReportsTimeline 
+                  width={1000}
+                  height={500}
+                  className="w-full h-full"
+                />
               </div>
             </GlassCard3D>
           </div>

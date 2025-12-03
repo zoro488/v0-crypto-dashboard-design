@@ -14,3 +14,6 @@ export { default as ImmersiveAIChat } from './ImmersiveAIChat'
 
 // 🔮 Insights Dashboard - The Oracle View (detección de anomalías)
 export { default as AIInsightsDashboard } from './AIInsightsDashboard'
+
+// 🎙️ Premium Widget - Orbe reactivo a voz con R3F y Web Audio API
+export { default as AIPremiumWidget } from './AIPremiumWidget'

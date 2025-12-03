@@ -349,11 +349,11 @@ const MobileMenu = ({ isOpen, onClose, currentPanel, onPanelSelect, onAction }: 
             {/* Header */}
             <div className="sticky top-0 flex items-center justify-between p-4 border-b border-white/10 bg-black/80 backdrop-blur-xl">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center">
-                  <span className="font-bold text-white text-lg">C</span>
+                <div className="w-10 h-10 rounded-xl icon-mirror-chrome flex items-center justify-center">
+                  <span className="font-bold text-gray-800 text-lg">C</span>
                 </div>
                 <div>
-                  <h2 className="font-bold text-white">Chronos</h2>
+                  <h2 className="text-mirror-chrome font-bold">CHRONOS</h2>
                   <p className="text-xs text-white/40">Sistema de Gestión</p>
                 </div>
               </div>
@@ -555,7 +555,8 @@ export default function ChronosHeader() {
               </div>
             </motion.div>
             <div className="hidden sm:flex flex-col">
-              <span className="font-bold text-base md:text-lg tracking-tight text-white">Chronos</span>
+              {/* Título CHRONOS con efecto Mirror Chrome estilo Apple */}
+              <span className="text-mirror-chrome font-bold text-base md:text-lg tracking-wider">CHRONOS</span>
               <div className="flex items-center gap-1.5">
                 <span className="text-[9px] md:text-[10px] text-white/40 tracking-widest uppercase">System</span>
                 <div className="flex items-center gap-1">

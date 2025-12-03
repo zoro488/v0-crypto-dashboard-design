@@ -5,7 +5,7 @@ import { motion, AnimatePresence, LayoutGroup } from 'framer-motion'
 import { 
   Users, Building2, Phone, Mail, MapPin, TrendingUp, TrendingDown,
   DollarSign, CreditCard, ShoppingBag, MessageCircle, Search,
-  Filter, ChevronRight, X, Award, Clock, AlertCircle
+  Filter, ChevronRight, X, Award, Clock, AlertCircle,
 } from 'lucide-react'
 import { cn } from '@/app/lib/utils'
 import type { Cliente, Distribuidor, Venta, OrdenCompra } from '@/app/types'
@@ -53,7 +53,7 @@ const LEVEL_CONFIG: Record<CustomerLevel, {
     bgColor: 'bg-amber-900/30',
     borderColor: 'border-amber-600/50',
     icon: '🥉',
-    minPurchases: 0
+    minPurchases: 0,
   },
   plata: {
     label: 'Plata',
@@ -61,7 +61,7 @@ const LEVEL_CONFIG: Record<CustomerLevel, {
     bgColor: 'bg-gray-500/20',
     borderColor: 'border-gray-400/50',
     icon: '🥈',
-    minPurchases: 10000
+    minPurchases: 10000,
   },
   oro: {
     label: 'Oro',
@@ -69,7 +69,7 @@ const LEVEL_CONFIG: Record<CustomerLevel, {
     bgColor: 'bg-yellow-500/20',
     borderColor: 'border-yellow-500/50',
     icon: '🥇',
-    minPurchases: 50000
+    minPurchases: 50000,
   },
   diamante: {
     label: 'Diamante',
@@ -77,8 +77,8 @@ const LEVEL_CONFIG: Record<CustomerLevel, {
     bgColor: 'bg-cyan-500/20',
     borderColor: 'border-cyan-400/50',
     icon: '💎',
-    minPurchases: 100000
-  }
+    minPurchases: 100000,
+  },
 }
 
 export default function EntityRelationshipManager({
@@ -89,7 +89,7 @@ export default function EntityRelationshipManager({
   onContactar,
   onCobrar,
   onNuevoPedido,
-  onEdit
+  onEdit,
 }: EntityRelationshipManagerProps) {
   const [entityType, setEntityType] = useState<EntityType>('clientes')
   const [searchQuery, setSearchQuery] = useState('')
@@ -135,7 +135,7 @@ export default function EntityRelationshipManager({
       result = result.filter(e => 
         e.nombre.toLowerCase().includes(lower) ||
         (e.telefono && e.telefono.includes(searchQuery)) ||
-        (e.email && e.email.toLowerCase().includes(lower))
+        (e.email && e.email.toLowerCase().includes(lower)),
       )
     }
     
@@ -179,7 +179,7 @@ export default function EntityRelationshipManager({
           fecha: v.fecha,
           tipo: 'venta' as const,
           monto: v.totalVenta || v.ingreso || 0,
-          concepto: `${v.cantidad} unidades`
+          concepto: `${v.cantidad} unidades`,
         }))
     }
     return ordenesCompra
@@ -190,7 +190,7 @@ export default function EntityRelationshipManager({
         fecha: oc.fecha,
         tipo: 'compra' as const,
         monto: oc.costoTotal || 0,
-        concepto: `${oc.cantidad} unidades`
+        concepto: `${oc.cantidad} unidades`,
       }))
   }, [entityType, ventas, ordenesCompra])
 
@@ -203,10 +203,10 @@ export default function EntityRelationshipManager({
           <button
             onClick={() => setEntityType('clientes')}
             className={cn(
-              "flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all",
+              'flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all',
               entityType === 'clientes' 
-                ? "bg-white/10 text-white" 
-                : "text-white/40 hover:text-white/60"
+                ? 'bg-white/10 text-white' 
+                : 'text-white/40 hover:text-white/60',
             )}
           >
             <Users className="w-4 h-4" />
@@ -218,10 +218,10 @@ export default function EntityRelationshipManager({
           <button
             onClick={() => setEntityType('distribuidores')}
             className={cn(
-              "flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all",
+              'flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all',
               entityType === 'distribuidores' 
-                ? "bg-white/10 text-white" 
-                : "text-white/40 hover:text-white/60"
+                ? 'bg-white/10 text-white' 
+                : 'text-white/40 hover:text-white/60',
             )}
           >
             <Building2 className="w-4 h-4" />
@@ -259,10 +259,10 @@ export default function EntityRelationshipManager({
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={`Buscar ${entityType}...`}
             className={cn(
-              "w-full h-11 pl-11 pr-4 rounded-xl",
-              "bg-black/40 border border-white/10",
-              "text-white text-sm placeholder:text-white/30",
-              "focus:outline-none focus:border-white/20"
+              'w-full h-11 pl-11 pr-4 rounded-xl',
+              'bg-black/40 border border-white/10',
+              'text-white text-sm placeholder:text-white/30',
+              'focus:outline-none focus:border-white/20',
             )}
           />
         </div>
@@ -273,10 +273,10 @@ export default function EntityRelationshipManager({
               key={f}
               onClick={() => setFilter(f)}
               className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                'px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
                 filter === f 
-                  ? "bg-white/10 text-white" 
-                  : "text-white/40 hover:text-white/60"
+                  ? 'bg-white/10 text-white' 
+                  : 'text-white/40 hover:text-white/60',
               )}
             >
               {f === 'all' ? 'Todos' : f === 'deuda' ? 'Con Deuda' : 'Al Día'}
@@ -312,12 +312,12 @@ export default function EntityRelationshipManager({
                     opacity: 1, 
                     scale: 1,
                     gridColumn: isExpanded ? 'span 2' : 'span 1',
-                    gridRow: isExpanded ? 'span 2' : 'span 1'
+                    gridRow: isExpanded ? 'span 2' : 'span 1',
                   }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ 
                     layout: { type: 'spring', stiffness: 300, damping: 30 },
-                    delay: Math.min(index * 0.02, 0.2)
+                    delay: Math.min(index * 0.02, 0.2),
                   }}
                   onClick={() => setExpandedId(isExpanded ? null : entity.id)}
                   className="cursor-pointer"
@@ -384,7 +384,7 @@ function EntityCard({
   onContactar,
   onCobrar,
   onNuevoPedido,
-  onClose
+  onClose,
 }: EntityCardProps) {
   const levelConfig = LEVEL_CONFIG[level]
   const deuda = entity.deudaTotal || entity.pendiente || 0
@@ -398,17 +398,17 @@ function EntityCard({
   const borderColors = {
     none: 'border-emerald-500/50 hover:border-emerald-400',
     current: 'border-orange-500/50 hover:border-orange-400',
-    overdue: 'border-red-500/50 hover:border-red-400'
+    overdue: 'border-red-500/50 hover:border-red-400',
   }
 
   return (
     <motion.div
       className={cn(
-        "relative h-full rounded-2xl overflow-hidden",
-        "bg-black/40 backdrop-blur-xl",
-        "border-2 transition-colors",
+        'relative h-full rounded-2xl overflow-hidden',
+        'bg-black/40 backdrop-blur-xl',
+        'border-2 transition-colors',
         borderColors[debtLevel],
-        isExpanded && "bg-black/60"
+        isExpanded && 'bg-black/60',
       )}
       whileHover={!isExpanded ? { scale: 1.02 } : undefined}
     >
@@ -419,26 +419,26 @@ function EntityCard({
           <div className="relative">
             <motion.div
               className={cn(
-                "absolute -inset-1 rounded-full",
-                debtLevel === 'none' && "bg-emerald-500/30",
-                debtLevel === 'current' && "bg-orange-500/30",
-                debtLevel === 'overdue' && "bg-red-500/30"
+                'absolute -inset-1 rounded-full',
+                debtLevel === 'none' && 'bg-emerald-500/30',
+                debtLevel === 'current' && 'bg-orange-500/30',
+                debtLevel === 'overdue' && 'bg-red-500/30',
               )}
               animate={debtLevel === 'overdue' ? { 
                 scale: [1, 1.1, 1],
-                opacity: [0.3, 0.6, 0.3]
+                opacity: [0.3, 0.6, 0.3],
               } : undefined}
               transition={{ duration: 1.5, repeat: Infinity }}
             />
             
             {/* Avatar */}
             <div className={cn(
-              "relative w-14 h-14 rounded-full flex items-center justify-center",
-              "bg-gradient-to-br from-white/10 to-white/5",
-              "border-2",
-              debtLevel === 'none' && "border-emerald-500",
-              debtLevel === 'current' && "border-orange-500",
-              debtLevel === 'overdue' && "border-red-500"
+              'relative w-14 h-14 rounded-full flex items-center justify-center',
+              'bg-gradient-to-br from-white/10 to-white/5',
+              'border-2',
+              debtLevel === 'none' && 'border-emerald-500',
+              debtLevel === 'current' && 'border-orange-500',
+              debtLevel === 'overdue' && 'border-red-500',
             )}>
               <span className="text-xl font-bold text-white">
                 {entity.nombre.charAt(0).toUpperCase()}
@@ -455,17 +455,17 @@ function EntityCard({
                     initial={{ 
                       x: 28, 
                       y: 56, 
-                      opacity: 0 
+                      opacity: 0, 
                     }}
                     animate={{
                       y: [56, 80],
                       opacity: [0, 1, 0],
-                      x: [28 + Math.random() * 10 - 5]
+                      x: [28 + Math.random() * 10 - 5],
                     }}
                     transition={{
                       duration: 1.5,
                       repeat: Infinity,
-                      delay: i * 0.3
+                      delay: i * 0.3,
                     }}
                   />
                 ))}
@@ -481,11 +481,11 @@ function EntityCard({
               {/* Badge de Nivel */}
               <motion.span 
                 className={cn(
-                  "px-2 py-0.5 rounded-full text-[10px] font-medium",
-                  "border",
+                  'px-2 py-0.5 rounded-full text-[10px] font-medium',
+                  'border',
                   levelConfig.bgColor,
                   levelConfig.color,
-                  levelConfig.borderColor
+                  levelConfig.borderColor,
                 )}
                 whileHover={{ scale: 1.1 }}
               >
@@ -531,18 +531,18 @@ function EntityCard({
             </div>
           </div>
           <div className={cn(
-            "p-3 rounded-xl",
-            deuda > 0 ? "bg-red-500/10" : "bg-emerald-500/10"
+            'p-3 rounded-xl',
+            deuda > 0 ? 'bg-red-500/10' : 'bg-emerald-500/10',
           )}>
             <div className={cn(
-              "text-xs",
-              deuda > 0 ? "text-red-400" : "text-emerald-400"
+              'text-xs',
+              deuda > 0 ? 'text-red-400' : 'text-emerald-400',
             )}>
               {deuda > 0 ? 'Deuda' : 'Al día'}
             </div>
             <div className={cn(
-              "font-mono font-bold mt-0.5",
-              deuda > 0 ? "text-red-400" : "text-emerald-400"
+              'font-mono font-bold mt-0.5',
+              deuda > 0 ? 'text-red-400' : 'text-emerald-400',
             )}>
               ${Math.abs(deuda).toLocaleString('es-MX')}
             </div>
@@ -638,9 +638,9 @@ function EntityCard({
                 <motion.button
                   onClick={(e) => { e.stopPropagation(); onContactar?.(entity, 'whatsapp') }}
                   className={cn(
-                    "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl",
-                    "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400",
-                    "border border-emerald-500/30 transition-colors"
+                    'flex-1 flex items-center justify-center gap-2 py-3 rounded-xl',
+                    'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400',
+                    'border border-emerald-500/30 transition-colors',
                   )}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -653,9 +653,9 @@ function EntityCard({
                   <motion.button
                     onClick={(e) => { e.stopPropagation(); onCobrar?.(entity) }}
                     className={cn(
-                      "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl",
-                      "bg-amber-500/20 hover:bg-amber-500/30 text-amber-400",
-                      "border border-amber-500/30 transition-colors"
+                      'flex-1 flex items-center justify-center gap-2 py-3 rounded-xl',
+                      'bg-amber-500/20 hover:bg-amber-500/30 text-amber-400',
+                      'border border-amber-500/30 transition-colors',
                     )}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -668,9 +668,9 @@ function EntityCard({
                 <motion.button
                   onClick={(e) => { e.stopPropagation(); onNuevoPedido?.(entity) }}
                   className={cn(
-                    "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl",
-                    "bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400",
-                    "border border-indigo-500/30 transition-colors"
+                    'flex-1 flex items-center justify-center gap-2 py-3 rounded-xl',
+                    'bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400',
+                    'border border-indigo-500/30 transition-colors',
                   )}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}

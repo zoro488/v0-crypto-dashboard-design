@@ -108,7 +108,7 @@ export const LuminousIcon = memo(({
           container,
           'relative rounded-xl flex items-center justify-center',
           `bg-gradient-to-br ${gradient}`,
-          'shadow-lg'
+          'shadow-lg',
         )}
       >
         {/* Reflejo superior sutil */}
@@ -195,7 +195,7 @@ export const BadgeLuminous = memo(({
         text,
         border,
         badgeSizes[size],
-        className
+        className,
       )}
       style={{ boxShadow: glow }}
     >

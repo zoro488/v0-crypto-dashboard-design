@@ -10,7 +10,7 @@ import dynamic from 'next/dynamic'
 // Importar dinámicamente para evitar SSR con WebGL
 const AINeuralHub = dynamic(
   () => import('@/app/components/ai/AINeuralHub'),
-  { ssr: false }
+  { ssr: false },
 )
 
 export default function AIPanelPage() {

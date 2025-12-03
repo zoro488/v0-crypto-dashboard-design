@@ -10,7 +10,7 @@ import dynamic from 'next/dynamic'
 // Importar dinámicamente para evitar SSR
 const ImmersiveAIChat = dynamic(
   () => import('@/app/components/ai/ImmersiveAIChat'),
-  { ssr: false }
+  { ssr: false },
 )
 
 export default function AIChatPage() {

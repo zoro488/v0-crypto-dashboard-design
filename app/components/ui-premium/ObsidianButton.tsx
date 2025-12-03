@@ -45,13 +45,13 @@ export const ObsidianButton = memo(forwardRef<HTMLButtonElement, ObsidianButtonP
       disabled,
       ...props
     },
-    ref
+    ref,
   ) {
     const sizeStyles = {
       sm: 'px-4 py-2 text-sm gap-1.5',
       md: 'px-6 py-3 text-base gap-2',
       lg: 'px-8 py-4 text-lg gap-2.5',
-      xl: 'px-10 py-5 text-xl gap-3'
+      xl: 'px-10 py-5 text-xl gap-3',
     }
     
     const variantStyles = {
@@ -59,38 +59,38 @@ export const ObsidianButton = memo(forwardRef<HTMLButtonElement, ObsidianButtonP
         background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%)',
         glow: 'rgba(239, 68, 68, 0.5)',
         hoverGlow: 'rgba(239, 68, 68, 0.7)',
-        shimmer: 'rgba(255, 200, 100, 0.3)'
+        shimmer: 'rgba(255, 200, 100, 0.3)',
       },
       plasma: {
         background: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%)',
         glow: 'rgba(16, 185, 129, 0.5)',
         hoverGlow: 'rgba(16, 185, 129, 0.7)',
-        shimmer: 'rgba(150, 255, 200, 0.3)'
+        shimmer: 'rgba(150, 255, 200, 0.3)',
       },
       sapphire: {
         background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)',
         glow: 'rgba(59, 130, 246, 0.5)',
         hoverGlow: 'rgba(59, 130, 246, 0.7)',
-        shimmer: 'rgba(150, 200, 255, 0.3)'
+        shimmer: 'rgba(150, 200, 255, 0.3)',
       },
       amethyst: {
         background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%)',
         glow: 'rgba(139, 92, 246, 0.5)',
         hoverGlow: 'rgba(139, 92, 246, 0.7)',
-        shimmer: 'rgba(200, 150, 255, 0.3)'
+        shimmer: 'rgba(200, 150, 255, 0.3)',
       },
       obsidian: {
         background: 'rgba(20, 20, 28, 0.8)',
         glow: 'rgba(0, 0, 0, 0.3)',
         hoverGlow: 'rgba(255, 255, 255, 0.1)',
-        shimmer: 'rgba(255, 255, 255, 0.1)'
+        shimmer: 'rgba(255, 255, 255, 0.1)',
       },
       ghost: {
         background: 'transparent',
         glow: 'transparent',
         hoverGlow: 'rgba(255, 255, 255, 0.05)',
-        shimmer: 'rgba(255, 255, 255, 0.05)'
-      }
+        shimmer: 'rgba(255, 255, 255, 0.05)',
+      },
     }
     
     const style = variantStyles[variant]
@@ -129,7 +129,7 @@ export const ObsidianButton = memo(forwardRef<HTMLButtonElement, ObsidianButtonP
             `
             : `
               inset 0 0 0 1px rgba(255, 255, 255, 0.1)
-            `
+            `,
         }}
         whileHover={!disabled && !loading ? {
           y: -2,
@@ -149,13 +149,13 @@ export const ObsidianButton = memo(forwardRef<HTMLButtonElement, ObsidianButtonP
             : `
               inset 0 0 0 1px rgba(255, 255, 255, 0.2),
               0 4px 12px -4px rgba(255, 255, 255, 0.1)
-            `
+            `,
         } : undefined}
         whileTap={!disabled && !loading ? { scale: 0.98, y: 0 } : undefined}
         transition={{
           type: 'spring',
           stiffness: 400,
-          damping: 25
+          damping: 25,
         }}
         onClick={props.onClick}
         type={props.type || 'button'}
@@ -165,7 +165,7 @@ export const ObsidianButton = memo(forwardRef<HTMLButtonElement, ObsidianButtonP
           <div 
             className="absolute inset-0 rounded-2xl pointer-events-none"
             style={{
-              background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%)'
+              background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%)',
             }}
           />
         )}
@@ -180,16 +180,16 @@ export const ObsidianButton = memo(forwardRef<HTMLButtonElement, ObsidianButtonP
             <motion.div
               className="absolute inset-[-50%]"
               style={{
-                background: `radial-gradient(circle at center, ${style.shimmer} 0%, transparent 50%)`
+                background: `radial-gradient(circle at center, ${style.shimmer} 0%, transparent 50%)`,
               }}
               animate={{
                 scale: [1, 1.1, 1],
-                opacity: [0.3, 0.5, 0.3]
+                opacity: [0.3, 0.5, 0.3],
               }}
               transition={{
                 duration: 3,
                 repeat: Infinity,
-                ease: 'easeInOut'
+                ease: 'easeInOut',
               }}
             />
           </motion.div>
@@ -205,7 +205,7 @@ export const ObsidianButton = memo(forwardRef<HTMLButtonElement, ObsidianButtonP
               WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
               mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
               WebkitMaskComposite: 'xor',
-              maskComposite: 'exclude'
+              maskComposite: 'exclude',
             }}
           />
         )}
@@ -232,7 +232,7 @@ export const ObsidianButton = memo(forwardRef<HTMLButtonElement, ObsidianButtonP
         </span>
       </motion.button>
     )
-  }
+  },
 ))
 
 export default ObsidianButton

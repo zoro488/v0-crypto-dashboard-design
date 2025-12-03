@@ -10,7 +10,7 @@ import dynamic from 'next/dynamic'
 // Importar dinámicamente para evitar SSR con WebGL
 const AIInsightsDashboard = dynamic(
   () => import('@/app/components/ai/AIInsightsDashboard'),
-  { ssr: false }
+  { ssr: false },
 )
 
 export default function OraclePage() {

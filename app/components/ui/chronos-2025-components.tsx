@@ -58,7 +58,7 @@ export function HeroCard({
         'border border-[rgba(255,255,255,0.08)]',
         'hover:border-[rgba(255,255,255,0.12)]',
         'transition-all duration-300',
-        className
+        className,
       )}
       style={{
         boxShadow: CHRONOS_2025.shadows.lg,
@@ -119,7 +119,7 @@ export function HeroCard({
                 'text-[14px] font-semibold px-3 py-1 rounded-full mb-2',
                 trend.isPositive 
                   ? 'bg-[rgba(0,255,87,0.15)] text-[#00FF57]' 
-                  : 'bg-[rgba(255,0,51,0.15)] text-[#FF0033]'
+                  : 'bg-[rgba(255,0,51,0.15)] text-[#FF0033]',
               )}
             >
               {trend.isPositive ? '+' : ''}{trend.value}%
@@ -189,7 +189,7 @@ export function KPICard({
         'border border-[rgba(255,255,255,0.08)]',
         'hover:border-[rgba(255,255,255,0.12)]',
         'transition-all duration-300 cursor-pointer group',
-        className
+        className,
       )}
     >
       {/* Hover glow effect */}
@@ -223,7 +223,7 @@ export function KPICard({
                 'px-2.5 py-1 rounded-full text-[12px] font-semibold',
                 trend === 'up' && 'bg-[rgba(0,255,87,0.15)] text-[#00FF57]',
                 trend === 'down' && 'bg-[rgba(255,0,51,0.15)] text-[#FF0033]',
-                trend === 'neutral' && 'bg-[rgba(255,255,255,0.05)] text-[#A0A0A0]'
+                trend === 'neutral' && 'bg-[rgba(255,255,255,0.05)] text-[#A0A0A0]',
               )}
             >
               {change}
@@ -319,24 +319,24 @@ export function ChronosButton({
       'bg-[#0066FF] text-white font-semibold',
       'hover:bg-[#0052CC]',
       'shadow-[0_4px_16px_rgba(0,102,255,0.3)]',
-      'hover:shadow-[0_8px_24px_rgba(0,102,255,0.4)]'
+      'hover:shadow-[0_8px_24px_rgba(0,102,255,0.4)]',
     ),
     secondary: cn(
       'bg-transparent text-white font-medium',
       'border border-[rgba(255,255,255,0.15)]',
       'hover:bg-[rgba(255,255,255,0.05)]',
-      'hover:border-[rgba(255,255,255,0.25)]'
+      'hover:border-[rgba(255,255,255,0.25)]',
     ),
     ghost: cn(
       'bg-transparent text-[#A0A0A0] font-medium',
       'hover:text-white',
-      'hover:bg-[rgba(255,255,255,0.05)]'
+      'hover:bg-[rgba(255,255,255,0.05)]',
     ),
     danger: cn(
       'bg-[#FF0033] text-white font-semibold',
       'hover:bg-[#CC0029]',
       'shadow-[0_4px_16px_rgba(255,0,51,0.3)]',
-      'hover:shadow-[0_8px_24px_rgba(255,0,51,0.4)]'
+      'hover:shadow-[0_8px_24px_rgba(255,0,51,0.4)]',
     ),
   }
 
@@ -348,7 +348,7 @@ export function ChronosButton({
         'focus:outline-none focus:ring-2 focus:ring-[#0066FF] focus:ring-offset-2 focus:ring-offset-black',
         sizeStyles[size],
         variantStyles[variant],
-        className
+        className,
       )}
       whileHover={{ scale: 1.02, y: -2 }}
       whileTap={{ scale: 0.98 }}
@@ -391,7 +391,7 @@ export function GlassCard({
         'border border-[rgba(255,255,255,0.08)]',
         hover && 'hover:border-[rgba(255,255,255,0.12)]',
         'transition-all duration-300',
-        className
+        className,
       )}
       {...(hover && {
         whileHover: { y: -4, scale: 1.02 },
@@ -421,7 +421,7 @@ export function StatusBadge({ status, children, className }: StatusBadgeProps) {
       className={cn(
         'inline-flex items-center px-3 py-1 rounded-full',
         'text-[12px] font-semibold',
-        className
+        className,
       )}
       style={{
         backgroundColor: colors.bg,
@@ -466,7 +466,7 @@ export function EmptyState({
         'flex flex-col items-center justify-center py-16 px-8',
         'rounded-[16px] bg-[rgba(20,20,30,0.4)] backdrop-blur-[20px]',
         'border border-[rgba(255,255,255,0.05)]',
-        className
+        className,
       )}
     >
       {/* Ilustración 3D o Icono */}
@@ -560,7 +560,7 @@ export function ActivityListItem({
         day: '2-digit', 
         month: 'short', 
         hour: '2-digit', 
-        minute: '2-digit' 
+        minute: '2-digit', 
       })
   
   // Formatear amount

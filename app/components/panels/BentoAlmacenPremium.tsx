@@ -69,6 +69,7 @@ import type { Producto, MovimientoAlmacen as MovimientoAlmacenType } from '@/app
 // 🌑 OBSIDIAN GLASS PREMIUM COMPONENTS
 // ═══════════════════════════════════════════════════════════════════════════
 import WarehouseGrid from '@/app/components/premium/warehouse/WarehouseGrid'
+import { InventoryHeatGrid } from '@/app/components/visualizations/InventoryHeatGrid'
 
 // ============================================================================
 // ANIMACIONES SPRING ULTRA-PREMIUM (Apple/Tesla style)
@@ -797,6 +798,22 @@ function TabStock({ productos, loading }: { productos: ProductoAlmacen[]; loadin
         </GlassCard3D>
       </div>
       
+      {/* Mapa de Calor de Inventario Canvas */}
+      <GlassCard3D variant="info" size="lg">
+        <div className="flex items-center gap-2 mb-4">
+          <Package size={20} className="text-cyan-400" />
+          <h3 className="text-lg font-semibold text-white">Mapa de Calor de Inventario</h3>
+          <span className="text-xs text-white/40 ml-2">Vista visual del stock</span>
+        </div>
+        <div className="h-[500px] rounded-xl overflow-hidden bg-black/40">
+          <InventoryHeatGrid 
+            gridSize={6}
+            cellSize={70}
+            className="w-full h-full"
+          />
+        </div>
+      </GlassCard3D>
+      
       {/* Tabla de productos */}
       <GlassCard3D variant="info" size="md">
         <div className="flex items-center justify-between mb-4">
@@ -1240,14 +1257,14 @@ export function BentoAlmacenPremium() {
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
                   onClick={() => { setShowWarehouseGrid(!showWarehouseGrid); haptic.light() }}
-                  variant={showWarehouseGrid ? "default" : "outline"}
+                  variant={showWarehouseGrid ? 'default' : 'outline'}
                   className={showWarehouseGrid 
-                    ? "bg-gradient-to-r from-purple-600 to-cyan-500 text-white border-0"
-                    : "border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+                    ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white border-0'
+                    : 'border-purple-500/30 text-purple-400 hover:bg-purple-500/10'
                   }
                 >
                   <Sparkles size={16} className="mr-2" />
-                  {showWarehouseGrid ? "Vista Clásica" : "Heatmap Grid"}
+                  {showWarehouseGrid ? 'Vista Clásica' : 'Heatmap Grid'}
                 </Button>
               </motion.div>
 

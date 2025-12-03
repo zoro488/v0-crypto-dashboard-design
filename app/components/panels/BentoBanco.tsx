@@ -40,6 +40,7 @@ import {
 import { BANCOS } from '@/app/lib/constants'
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import SimpleCurrencyWidget from '@/app/components/widgets/SimpleCurrencyWidget'
+import CasaCambioWidget from '@/app/components/widgets/CasaCambioWidget'
 import { CreateGastoModalPremium } from '@/app/components/modals/CreateGastoModalPremium'
 import { CreateTransferenciaModalPremium } from '@/app/components/modals/CreateTransferenciaModalPremium'
 import { CreateIngresoModalPremium } from '@/app/components/modals/CreateIngresoModalPremium'
@@ -1307,6 +1308,16 @@ export default function BentoBanco() {
           <p className="text-sm text-white/60">Movimiento de dinero entre cuentas bancarias</p>
         </div>
         <FinancialRiverFlow width={900} height={600} className="w-full" />
+      </motion.div>
+
+      {/* Casa de Cambio Widget - Premium Exchange Rates */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.9 }}
+        className="mt-6"
+      >
+        <CasaCambioWidget />
       </motion.div>
     </div>
   )

@@ -77,6 +77,7 @@ import {
 // 🌑 OBSIDIAN GLASS PREMIUM COMPONENTS
 // ═══════════════════════════════════════════════════════════════════════════
 import ExpenseCommandCenter from '@/app/components/premium/expenses/ExpenseCommandCenter'
+import { ProfitWaterfallChart } from '@/app/components/visualizations/ProfitWaterfallChart'
 
 // ============================================
 // TIPOS
@@ -433,10 +434,10 @@ export default memo(function BentoGYA() {
             size="sm"
             onClick={() => setShowExpenseCenter(!showExpenseCenter)}
             className={cn(
-              "transition-all",
+              'transition-all',
               showExpenseCenter 
-                ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0"
-                : "border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0'
+                : 'border-purple-500/30 text-purple-400 hover:bg-purple-500/10',
             )}
           >
             <Sparkles className="w-4 h-4 mr-2" />
@@ -767,6 +768,34 @@ export default memo(function BentoGYA() {
           </div>
         </motion.div>
       </div>
+
+      {/* ════════════════════════════════════════════════════════════════════
+          GRÁFICO CASCADA DE GANANCIAS - Canvas
+          ════════════════════════════════════════════════════════════════════ */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6 }}
+        className="relative group"
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-violet-500/5 to-purple-500/5 rounded-2xl blur-2xl" />
+        <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 hover:border-purple-500/30 transition-all duration-300">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-purple-400" />
+              <h3 className="text-lg font-bold text-white">Cascada de Ganancias</h3>
+              <span className="text-xs text-white/40 ml-2">Visualización del flujo financiero</span>
+            </div>
+          </div>
+          <div className="h-[500px] rounded-xl overflow-hidden bg-black/40">
+            <ProfitWaterfallChart 
+              width={900}
+              height={500}
+              className="w-full h-full"
+            />
+          </div>
+        </div>
+      </motion.div>
 
       {/* ════════════════════════════════════════════════════════════════════
           TABLA DE MOVIMIENTOS

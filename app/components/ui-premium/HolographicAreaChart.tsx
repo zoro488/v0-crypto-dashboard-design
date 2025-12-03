@@ -236,32 +236,32 @@ export const HolographicAreaChart = memo(function HolographicAreaChart({
     cyan: { 
       primary: '#06b6d4', 
       secondary: '#0891b2',
-      gradient: ['#06b6d4', '#0ea5e9', '#3b82f6']
+      gradient: ['#06b6d4', '#0ea5e9', '#3b82f6'],
     },
     emerald: { 
       primary: '#10b981', 
       secondary: '#059669',
-      gradient: ['#10b981', '#34d399', '#6ee7b7']
+      gradient: ['#10b981', '#34d399', '#6ee7b7'],
     },
     amethyst: { 
       primary: '#8b5cf6', 
       secondary: '#7c3aed',
-      gradient: ['#8b5cf6', '#a78bfa', '#c4b5fd']
+      gradient: ['#8b5cf6', '#a78bfa', '#c4b5fd'],
     },
     sapphire: { 
       primary: '#3b82f6', 
       secondary: '#2563eb',
-      gradient: ['#3b82f6', '#60a5fa', '#93c5fd']
+      gradient: ['#3b82f6', '#60a5fa', '#93c5fd'],
     },
     gold: { 
       primary: '#f59e0b', 
       secondary: '#d97706',
-      gradient: ['#f59e0b', '#fbbf24', '#fcd34d']
+      gradient: ['#f59e0b', '#fbbf24', '#fcd34d'],
     },
     ruby: { 
       primary: '#ef4444', 
       secondary: '#dc2626',
-      gradient: ['#ef4444', '#f87171', '#fca5a5']
+      gradient: ['#ef4444', '#f87171', '#fca5a5'],
     },
   }
   

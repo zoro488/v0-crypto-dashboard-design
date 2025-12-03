@@ -30,40 +30,40 @@ export const BentoMetricCard = memo(function BentoMetricCard({
   trend,
   variant = 'sapphire',
   className = '',
-  onClick
+  onClick,
 }: BentoMetricCardProps) {
   
   const colorMap = {
     sapphire: {
       glow: 'rgba(59, 130, 246, 0.3)',
       accent: '#3b82f6',
-      bg: 'rgba(59, 130, 246, 0.1)'
+      bg: 'rgba(59, 130, 246, 0.1)',
     },
     emerald: {
       glow: 'rgba(16, 185, 129, 0.3)',
       accent: '#10b981',
-      bg: 'rgba(16, 185, 129, 0.1)'
+      bg: 'rgba(16, 185, 129, 0.1)',
     },
     amethyst: {
       glow: 'rgba(139, 92, 246, 0.3)',
       accent: '#8b5cf6',
-      bg: 'rgba(139, 92, 246, 0.1)'
+      bg: 'rgba(139, 92, 246, 0.1)',
     },
     cyan: {
       glow: 'rgba(6, 182, 212, 0.3)',
       accent: '#06b6d4',
-      bg: 'rgba(6, 182, 212, 0.1)'
+      bg: 'rgba(6, 182, 212, 0.1)',
     },
     gold: {
       glow: 'rgba(245, 158, 11, 0.3)',
       accent: '#f59e0b',
-      bg: 'rgba(245, 158, 11, 0.1)'
+      bg: 'rgba(245, 158, 11, 0.1)',
     },
     ruby: {
       glow: 'rgba(239, 68, 68, 0.3)',
       accent: '#ef4444',
-      bg: 'rgba(239, 68, 68, 0.1)'
-    }
+      bg: 'rgba(239, 68, 68, 0.1)',
+    },
   }
   
   const colors = colorMap[variant]
@@ -81,7 +81,7 @@ export const BentoMetricCard = memo(function BentoMetricCard({
           inset 1px 1px 0 0 rgba(255, 255, 255, 0.08),
           inset -1px -1px 0 0 rgba(0, 0, 0, 0.4),
           0 8px 32px -8px rgba(0, 0, 0, 0.5)
-        `
+        `,
       }}
       whileHover={{
         y: -4,
@@ -91,7 +91,7 @@ export const BentoMetricCard = memo(function BentoMetricCard({
           inset -1px -1px 0 0 rgba(0, 0, 0, 0.4),
           0 20px 50px -15px ${colors.glow},
           0 10px 30px -10px rgba(0, 0, 0, 0.5)
-        `
+        `,
       }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
       onClick={onClick}
@@ -110,7 +110,7 @@ export const BentoMetricCard = memo(function BentoMetricCard({
           WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
           mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
           WebkitMaskComposite: 'xor',
-          maskComposite: 'exclude'
+          maskComposite: 'exclude',
         }}
       />
       
@@ -120,7 +120,7 @@ export const BentoMetricCard = memo(function BentoMetricCard({
         initial={{ opacity: 0 }}
         whileHover={{ opacity: 1 }}
         style={{
-          background: `radial-gradient(ellipse at bottom right, ${colors.glow} 0%, transparent 70%)`
+          background: `radial-gradient(ellipse at bottom right, ${colors.glow} 0%, transparent 70%)`,
         }}
       />
       
@@ -163,7 +163,7 @@ export const BentoMetricCard = memo(function BentoMetricCard({
             className="text-2xl md:text-3xl font-bold text-white"
             style={{ 
               fontFamily: "'JetBrains Mono', monospace",
-              fontFeatureSettings: "'tnum' 1"
+              fontFeatureSettings: "'tnum' 1",
             }}
           >
             {value}

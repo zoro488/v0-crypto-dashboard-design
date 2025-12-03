@@ -6,7 +6,7 @@ import {
   Truck, ShoppingBag, Zap, Coffee, Wrench, Layers, Receipt,
   Plus, Upload, Camera, X, Calendar, DollarSign, CheckCircle2,
   ChevronLeft, ChevronRight, Trash2, AlertCircle,
-  type LucideIcon
+  type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/app/lib/utils'
 import type { BancoId, GastoAbono } from '@/app/types'
@@ -74,7 +74,7 @@ export default function ExpenseCommandCenter({
   onCreateGasto,
   onDeleteGasto,
   onApproveGasto,
-  categoriasBudget
+  categoriasBudget,
 }: ExpenseCommandCenterProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<CategoryId | null>(null)
@@ -93,7 +93,7 @@ export default function ExpenseCommandCenter({
       icon: cat.icon,
       color: cat.color,
       budget: categoriasBudget?.[cat.id]?.budget ?? cat.budget,
-      spent: categoriasBudget?.[cat.id]?.spent ?? cat.spent
+      spent: categoriasBudget?.[cat.id]?.spent ?? cat.spent,
     }))
   }, [categoriasBudget])
 
@@ -144,7 +144,7 @@ export default function ExpenseCommandCenter({
         pesos: Number(monto),
         destino: bancoDestino,
         bancoId: bancoDestino,
-        concepto: `[${selectedCategory.toUpperCase()}] ${concepto}`
+        concepto: `[${selectedCategory.toUpperCase()}] ${concepto}`,
       })
       
       // Reset form
@@ -204,10 +204,10 @@ export default function ExpenseCommandCenter({
           <motion.button
             onClick={() => setIsModalOpen(true)}
             className={cn(
-              "flex items-center gap-2 px-6 py-3 rounded-xl",
-              "bg-gradient-to-r from-red-500 to-rose-600",
-              "text-white font-semibold shadow-lg shadow-red-500/25",
-              "hover:from-red-400 hover:to-rose-500 transition-all"
+              'flex items-center gap-2 px-6 py-3 rounded-xl',
+              'bg-gradient-to-r from-red-500 to-rose-600',
+              'text-white font-semibold shadow-lg shadow-red-500/25',
+              'hover:from-red-400 hover:to-rose-500 transition-all',
             )}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -231,13 +231,13 @@ export default function ExpenseCommandCenter({
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
               className={cn(
-                "p-4 rounded-2xl",
-                "bg-black/40 border border-white/10",
-                "hover:bg-white/5 transition-colors"
+                'p-4 rounded-2xl',
+                'bg-black/40 border border-white/10',
+                'hover:bg-white/5 transition-colors',
               )}
             >
               <div className="flex items-center gap-2 mb-3">
-                <cat.icon className={cn("w-5 h-5", getColorClass(cat.color, 'text', 400))} />
+                <cat.icon className={cn('w-5 h-5', getColorClass(cat.color, 'text', 400))} />
                 <span className="text-sm text-white/80">{cat.label}</span>
               </div>
               
@@ -245,8 +245,8 @@ export default function ExpenseCommandCenter({
                 <div className="flex justify-between text-xs">
                   <span className="text-white/40">Gastado</span>
                   <span className={cn(
-                    "font-mono",
-                    isCritical ? "text-red-400" : "text-white/60"
+                    'font-mono',
+                    isCritical ? 'text-red-400' : 'text-white/60',
                   )}>
                     {percent.toFixed(0)}%
                   </span>
@@ -255,12 +255,12 @@ export default function ExpenseCommandCenter({
                 <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                   <motion.div
                     className={cn(
-                      "h-full rounded-full",
-                      isCritical ? "bg-red-500" : getColorClass(cat.color, 'bg', 500)
+                      'h-full rounded-full',
+                      isCritical ? 'bg-red-500' : getColorClass(cat.color, 'bg', 500),
                     )}
                     initial={{ width: 0 }}
                     animate={{ width: `${Math.min(percent, 100)}%` }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    transition={{ duration: 0.8, ease: 'easeOut' }}
                   />
                 </div>
                 
@@ -335,7 +335,7 @@ function ExpenseRow({
   gasto,
   index,
   onDelete,
-  onApprove
+  onApprove,
 }: {
   gasto: GastoAbono
   index: number
@@ -381,19 +381,19 @@ function ExpenseRow({
       <motion.div
         style={{ x: swipeX }}
         className={cn(
-          "flex items-center gap-4 p-4 rounded-xl",
-          "bg-black/40 border border-white/10",
-          "hover:bg-white/5 transition-colors cursor-grab active:cursor-grabbing"
+          'flex items-center gap-4 p-4 rounded-xl',
+          'bg-black/40 border border-white/10',
+          'hover:bg-white/5 transition-colors cursor-grab active:cursor-grabbing',
         )}
       >
         {/* Icono */}
         <div className={cn(
-          "p-2.5 rounded-xl",
-          getColorClass(categoryConfig.color, 'bg', 20)
+          'p-2.5 rounded-xl',
+          getColorClass(categoryConfig.color, 'bg', 20),
         )}>
           <categoryConfig.icon className={cn(
-            "w-5 h-5",
-            getColorClass(categoryConfig.color, 'text', 400)
+            'w-5 h-5',
+            getColorClass(categoryConfig.color, 'text', 400),
           )} />
         </div>
 
@@ -468,7 +468,7 @@ function ExpenseModal({
   onScan,
   isSubmitting,
   onSubmit,
-  onClose
+  onClose,
 }: ExpenseModalProps) {
   const selectedCategoryData = categories.find(c => c.id === selectedCategory)
   const budgetRemaining = selectedCategoryData 
@@ -493,11 +493,11 @@ function ExpenseModal({
         exit={{ opacity: 0, y: 50, rotateX: 5 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         className={cn(
-          "fixed bottom-0 left-0 right-0 z-50",
-          "max-h-[90vh] overflow-y-auto",
-          "bg-[rgba(8,8,12,0.98)] backdrop-blur-2xl",
-          "rounded-t-[2rem] border-t border-white/10",
-          "shadow-2xl"
+          'fixed bottom-0 left-0 right-0 z-50',
+          'max-h-[90vh] overflow-y-auto',
+          'bg-[rgba(8,8,12,0.98)] backdrop-blur-2xl',
+          'rounded-t-[2rem] border-t border-white/10',
+          'shadow-2xl',
         )}
         onClick={(e) => e.stopPropagation()}
       >
@@ -512,8 +512,8 @@ function ExpenseModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.05 }}
             className={cn(
-              "absolute inset-0 pointer-events-none",
-              `bg-${selectedCategoryData?.color || 'white'}-500`
+              'absolute inset-0 pointer-events-none',
+              `bg-${selectedCategoryData?.color || 'white'}-500`,
             )}
           />
         )}
@@ -545,29 +545,29 @@ function ExpenseModal({
                     key={cat.id}
                     onClick={() => onSelectCategory(cat.id)}
                     className={cn(
-                      "relative p-4 rounded-2xl text-left transition-all",
-                      "border h-28 flex flex-col justify-between",
+                      'relative p-4 rounded-2xl text-left transition-all',
+                      'border h-28 flex flex-col justify-between',
                       isSelected 
-                        ? cn(getColorClass(cat.color, 'bg', 20), "border-white/30 ring-1 ring-white/20")
-                        : "bg-black/40 border-white/10 hover:bg-white/5 hover:border-white/20"
+                        ? cn(getColorClass(cat.color, 'bg', 20), 'border-white/30 ring-1 ring-white/20')
+                        : 'bg-black/40 border-white/10 hover:bg-white/5 hover:border-white/20',
                     )}
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     <div className="flex items-center gap-2">
                       <div className={cn(
-                        "p-2 rounded-xl",
-                        isSelected ? getColorClass(cat.color, 'bg', 30) : "bg-white/5"
+                        'p-2 rounded-xl',
+                        isSelected ? getColorClass(cat.color, 'bg', 30) : 'bg-white/5',
                       )}>
                         {IconComponent && (
                           <IconComponent 
-                            className={cn("w-5 h-5", isSelected ? getColorClass(cat.color, 'text', 400) : "text-white/40")}
+                            className={cn('w-5 h-5', isSelected ? getColorClass(cat.color, 'text', 400) : 'text-white/40')}
                           />
                         )}
                       </div>
                       <span className={cn(
-                        "font-medium",
-                        isSelected ? "text-white" : "text-white/60"
+                        'font-medium',
+                        isSelected ? 'text-white' : 'text-white/60',
                       )}>
                         {cat.label}
                       </span>
@@ -577,15 +577,15 @@ function ExpenseModal({
                       <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
                         <div 
                           className={cn(
-                            "h-full rounded-full transition-all",
-                            isCritical ? "bg-red-500" : getColorClass(cat.color, 'bg', 500)
+                            'h-full rounded-full transition-all',
+                            isCritical ? 'bg-red-500' : getColorClass(cat.color, 'bg', 500),
                           )}
                           style={{ width: `${Math.min(percent, 100)}%` }}
                         />
                       </div>
                       <div className="flex justify-between text-[10px] font-mono text-white/40">
                         <span>Quedan</span>
-                        <span className={isCritical ? "text-red-400" : ""}>
+                        <span className={isCritical ? 'text-red-400' : ''}>
                           ${((cat.budget - cat.spent) / 1000).toFixed(1)}k
                         </span>
                       </div>
@@ -607,10 +607,10 @@ function ExpenseModal({
                 onChange={(e) => onMontoChange(e.target.value)}
                 placeholder="0.00"
                 className={cn(
-                  "w-full h-20 pl-14 pr-6 rounded-2xl text-4xl font-mono font-bold text-center",
-                  "bg-black/40 border border-white/10",
-                  "text-white placeholder:text-white/20",
-                  "focus:outline-none focus:border-red-500/50 focus:ring-2 focus:ring-red-500/20"
+                  'w-full h-20 pl-14 pr-6 rounded-2xl text-4xl font-mono font-bold text-center',
+                  'bg-black/40 border border-white/10',
+                  'text-white placeholder:text-white/20',
+                  'focus:outline-none focus:border-red-500/50 focus:ring-2 focus:ring-red-500/20',
                 )}
               />
             </div>
@@ -625,8 +625,8 @@ function ExpenseModal({
                 <div className="flex items-center justify-between text-sm mb-2">
                   <span className="text-white/40">Presupuesto restante</span>
                   <span className={cn(
-                    "font-mono",
-                    budgetRemaining - Number(monto) < 0 ? "text-red-400" : "text-white/60"
+                    'font-mono',
+                    budgetRemaining - Number(monto) < 0 ? 'text-red-400' : 'text-white/60',
                   )}>
                     ${(budgetRemaining - Number(monto)).toLocaleString('es-MX')}
                   </span>
@@ -634,8 +634,8 @@ function ExpenseModal({
                 <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                   <motion.div
                     className={cn(
-                      "h-full rounded-full",
-                      (Number(monto) / budgetRemaining) > 0.8 ? "bg-red-500" : "bg-emerald-500"
+                      'h-full rounded-full',
+                      (Number(monto) / budgetRemaining) > 0.8 ? 'bg-red-500' : 'bg-emerald-500',
                     )}
                     initial={{ width: 0 }}
                     animate={{ width: `${Math.min((Number(monto) / budgetRemaining) * 100, 100)}%` }}
@@ -654,10 +654,10 @@ function ExpenseModal({
               onChange={(e) => onConceptoChange(e.target.value)}
               placeholder="Describe el gasto..."
               className={cn(
-                "w-full h-12 px-4 rounded-xl",
-                "bg-black/40 border border-white/10",
-                "text-white placeholder:text-white/30",
-                "focus:outline-none focus:border-white/20"
+                'w-full h-12 px-4 rounded-xl',
+                'bg-black/40 border border-white/10',
+                'text-white placeholder:text-white/30',
+                'focus:outline-none focus:border-white/20',
               )}
             />
           </div>
@@ -667,10 +667,10 @@ function ExpenseModal({
             onClick={onScan}
             disabled={isScanning}
             className={cn(
-              "relative w-full p-6 rounded-2xl border-2 border-dashed",
-              "bg-gradient-to-b from-white/5 to-transparent",
-              "hover:from-white/10 transition-all",
-              isScanning ? "border-emerald-500/50" : "border-white/20 hover:border-white/40"
+              'relative w-full p-6 rounded-2xl border-2 border-dashed',
+              'bg-gradient-to-b from-white/5 to-transparent',
+              'hover:from-white/10 transition-all',
+              isScanning ? 'border-emerald-500/50' : 'border-white/20 hover:border-white/40',
             )}
             whileHover={{ scale: 1.01 }}
           >
@@ -680,7 +680,7 @@ function ExpenseModal({
                 <motion.div
                   className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-500 to-transparent"
                   animate={{ top: ['10%', '90%', '10%'] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
                 />
                 <div className="flex flex-col items-center gap-2">
                   <motion.div
@@ -710,10 +710,10 @@ function ExpenseModal({
                 value={fecha}
                 onChange={(e) => onFechaChange(e.target.value)}
                 className={cn(
-                  "w-full h-12 px-4 rounded-xl",
-                  "bg-black/40 border border-white/10",
-                  "text-white",
-                  "focus:outline-none focus:border-white/20"
+                  'w-full h-12 px-4 rounded-xl',
+                  'bg-black/40 border border-white/10',
+                  'text-white',
+                  'focus:outline-none focus:border-white/20',
                 )}
               />
             </div>
@@ -723,10 +723,10 @@ function ExpenseModal({
                 value={bancoDestino}
                 onChange={(e) => onBancoDestinoChange(e.target.value as BancoId)}
                 className={cn(
-                  "w-full h-12 px-4 rounded-xl appearance-none",
-                  "bg-black/40 border border-white/10",
-                  "text-white",
-                  "focus:outline-none focus:border-white/20"
+                  'w-full h-12 px-4 rounded-xl appearance-none',
+                  'bg-black/40 border border-white/10',
+                  'text-white',
+                  'focus:outline-none focus:border-white/20',
                 )}
               >
                 <option value="profit">Profit</option>
@@ -743,12 +743,12 @@ function ExpenseModal({
             onClick={onSubmit}
             disabled={!selectedCategory || !monto || !concepto || isSubmitting}
             className={cn(
-              "w-full py-4 rounded-2xl font-semibold text-lg",
-              "bg-gradient-to-r from-red-500 to-rose-600",
-              "hover:from-red-400 hover:to-rose-500",
-              "text-white shadow-lg shadow-red-500/25",
-              "transition-all",
-              (!selectedCategory || !monto || !concepto || isSubmitting) && "opacity-50 cursor-not-allowed"
+              'w-full py-4 rounded-2xl font-semibold text-lg',
+              'bg-gradient-to-r from-red-500 to-rose-600',
+              'hover:from-red-400 hover:to-rose-500',
+              'text-white shadow-lg shadow-red-500/25',
+              'transition-all',
+              (!selectedCategory || !monto || !concepto || isSubmitting) && 'opacity-50 cursor-not-allowed',
             )}
             whileHover={selectedCategory && monto && concepto ? { scale: 1.02 } : undefined}
             whileTap={selectedCategory && monto && concepto ? { scale: 0.98 } : undefined}
@@ -758,7 +758,7 @@ function ExpenseModal({
                 <motion.div
                   className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
                   animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                 />
                 Registrando...
               </span>

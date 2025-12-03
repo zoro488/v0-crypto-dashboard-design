@@ -67,7 +67,7 @@ import { SparklineBackground } from '@/app/components/ui-premium/SparklineBackgr
 
 // Lazy load 3D components
 const PremiumSplineOrb = lazy(() =>
-  import('@/app/components/3d/PremiumSplineOrb').then(mod => ({ default: mod.PremiumSplineOrb }))
+  import('@/app/components/3d/PremiumSplineOrb').then(mod => ({ default: mod.PremiumSplineOrb })),
 )
 
 // ============================================================
@@ -323,7 +323,7 @@ export default function ObsidianDashboard() {
       { name: 'Utilidades', value: 15, color: '#047857' },
       { name: 'Otros', value: 15, color: '#7c3aed' },
     ],
-    []
+    [],
   )
 
   const activities = useMemo(
@@ -334,7 +334,7 @@ export default function ObsidianDashboard() {
       { type: 'stock', title: 'Stock Actualizado', description: 'Premium Box (+50 uds)', amount: undefined, time: 'Hace 2 hr', status: 'success' as const },
       { type: 'alerta', title: 'Stock Bajo', description: 'Producto A por debajo del mínimo', amount: undefined, time: 'Hace 4 hr', status: 'pending' as const },
     ],
-    []
+    [],
   )
 
   // Loading State

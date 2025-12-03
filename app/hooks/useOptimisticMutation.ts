@@ -121,7 +121,7 @@ export function useOptimisticCreate<T extends { id?: string }>(
         ...old,
       ])
       
-      logger.info(`[useOptimisticCreate] Optimistic update aplicado`, {
+      logger.info('[useOptimisticCreate] Optimistic update aplicado', {
         context: 'OptimisticMutation',
       })
       
@@ -134,7 +134,7 @@ export function useOptimisticCreate<T extends { id?: string }>(
         queryClient.setQueryData(queryKey as string[], context.previousData)
       }
       
-      logger.error(`[useOptimisticCreate] Error, rollback aplicado`, error, {
+      logger.error('[useOptimisticCreate] Error, rollback aplicado', error, {
         context: 'OptimisticMutation',
         data: { collection: collectionPath },
       })
@@ -150,7 +150,7 @@ export function useOptimisticCreate<T extends { id?: string }>(
         queryClient.invalidateQueries({ queryKey: key as string[] })
       }
       
-      logger.info(`[useOptimisticCreate] Éxito, queries invalidadas`, {
+      logger.info('[useOptimisticCreate] Éxito, queries invalidadas', {
         context: 'OptimisticMutation',
       })
       

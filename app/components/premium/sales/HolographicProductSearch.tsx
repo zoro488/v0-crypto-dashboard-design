@@ -47,8 +47,8 @@ export default function HolographicProductSearch({
   selectedProducts,
   onProductSelect,
   onProductRemove,
-  placeholder = "Buscar producto por nombre o SKU...",
-  maxItems = 10
+  placeholder = 'Buscar producto por nombre o SKU...',
+  maxItems = 10,
 }: HolographicProductSearchProps) {
   const [query, setQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
@@ -66,7 +66,7 @@ export default function HolographicProductSearch({
       .filter(p => 
         p.nombre.toLowerCase().includes(lowerQuery) ||
         p.sku?.toLowerCase().includes(lowerQuery) ||
-        p.origen?.toLowerCase().includes(lowerQuery)
+        p.origen?.toLowerCase().includes(lowerQuery),
       )
       .slice(0, 8)
   }, [query, products])
@@ -135,7 +135,7 @@ export default function HolographicProductSearch({
           animate={{
             boxShadow: isOpen 
               ? '0 0 40px rgba(99, 102, 241, 0.2), 0 0 80px rgba(99, 102, 241, 0.1)'
-              : '0 0 0px transparent'
+              : '0 0 0px transparent',
           }}
           style={{ borderRadius: '1rem' }}
         >
@@ -155,12 +155,12 @@ export default function HolographicProductSearch({
               onKeyDown={handleKeyDown}
               placeholder={placeholder}
               className={cn(
-                "w-full h-14 pl-12 pr-4 rounded-2xl",
-                "bg-black/40 backdrop-blur-xl border border-white/10",
-                "text-white placeholder:text-white/30",
-                "focus:outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20",
-                "transition-all duration-300",
-                "text-lg font-light tracking-wide"
+                'w-full h-14 pl-12 pr-4 rounded-2xl',
+                'bg-black/40 backdrop-blur-xl border border-white/10',
+                'text-white placeholder:text-white/30',
+                'focus:outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20',
+                'transition-all duration-300',
+                'text-lg font-light tracking-wide',
               )}
             />
             
@@ -186,11 +186,11 @@ export default function HolographicProductSearch({
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
               className={cn(
-                "absolute z-50 w-full mt-2 p-2",
-                "bg-black/80 backdrop-blur-2xl",
-                "border border-white/10 rounded-2xl",
-                "shadow-2xl shadow-black/50",
-                "max-h-[400px] overflow-y-auto scrollbar-obsidian"
+                'absolute z-50 w-full mt-2 p-2',
+                'bg-black/80 backdrop-blur-2xl',
+                'border border-white/10 rounded-2xl',
+                'shadow-2xl shadow-black/50',
+                'max-h-[400px] overflow-y-auto scrollbar-obsidian',
               )}
             >
               <div className="grid gap-2">
@@ -205,11 +205,11 @@ export default function HolographicProductSearch({
                       onClick={() => handleSelect(product)}
                       disabled={isOutOfStock}
                       className={cn(
-                        "relative w-full p-3 rounded-xl text-left",
-                        "transition-all duration-200",
-                        isHighlighted && !isOutOfStock && "bg-white/10",
-                        !isHighlighted && "hover:bg-white/5",
-                        isOutOfStock && "opacity-50 cursor-not-allowed"
+                        'relative w-full p-3 rounded-xl text-left',
+                        'transition-all duration-200',
+                        isHighlighted && !isOutOfStock && 'bg-white/10',
+                        !isHighlighted && 'hover:bg-white/5',
+                        isOutOfStock && 'opacity-50 cursor-not-allowed',
                       )}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -219,9 +219,9 @@ export default function HolographicProductSearch({
                       <div className="flex items-center gap-4">
                         {/* Imagen o placeholder */}
                         <div className={cn(
-                          "w-12 h-12 rounded-xl flex items-center justify-center",
-                          "bg-gradient-to-br from-white/10 to-white/5",
-                          "border border-white/10"
+                          'w-12 h-12 rounded-xl flex items-center justify-center',
+                          'bg-gradient-to-br from-white/10 to-white/5',
+                          'border border-white/10',
                         )}>
                           {product.imagen ? (
                             <img 
@@ -256,10 +256,10 @@ export default function HolographicProductSearch({
                         <div className="flex flex-col items-end gap-1">
                           <div className="flex items-center gap-2">
                             <motion.div 
-                              className={cn("w-2.5 h-2.5 rounded-full", status.color)}
+                              className={cn('w-2.5 h-2.5 rounded-full', status.color)}
                               animate={status.level === 'critical' ? { 
                                 scale: [1, 1.3, 1],
-                                opacity: [1, 0.5, 1]
+                                opacity: [1, 0.5, 1],
                               } : undefined}
                               transition={{ duration: 0.8, repeat: Infinity }}
                             />
@@ -301,7 +301,7 @@ export default function HolographicProductSearch({
                 x: 200,
               }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.4, ease: "easeIn" }}
+              transition={{ duration: 0.4, ease: 'easeIn' }}
               className="absolute z-60 top-0 left-0 w-full h-14 pointer-events-none"
             >
               <div className="h-full bg-indigo-500/20 rounded-2xl border border-indigo-500/50 flex items-center justify-center">
@@ -339,9 +339,9 @@ export default function HolographicProductSearch({
                   exit={{ opacity: 0, x: -50, scale: 0.8 }}
                   transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                   className={cn(
-                    "flex items-center gap-3 p-3 rounded-xl",
-                    "bg-white/5 border border-white/10",
-                    "group hover:bg-white/10 transition-colors"
+                    'flex items-center gap-3 p-3 rounded-xl',
+                    'bg-white/5 border border-white/10',
+                    'group hover:bg-white/10 transition-colors',
                   )}
                 >
                   <div className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center">

@@ -33,7 +33,7 @@ export const MetalCardSelector = memo(function MetalCardSelector({
   value,
   onChange,
   className = '',
-  columns = 2
+  columns = 2,
 }: MetalCardSelectorProps) {
   
   const [hoveredId, setHoveredId] = useState<string | null>(null)
@@ -46,39 +46,39 @@ export const MetalCardSelector = memo(function MetalCardSelector({
     sapphire: {
       glow: 'rgba(59, 130, 246, 0.4)',
       border: '#3b82f6',
-      text: '#60a5fa'
+      text: '#60a5fa',
     },
     emerald: {
       glow: 'rgba(16, 185, 129, 0.4)',
       border: '#10b981',
-      text: '#34d399'
+      text: '#34d399',
     },
     amethyst: {
       glow: 'rgba(139, 92, 246, 0.4)',
       border: '#8b5cf6',
-      text: '#a78bfa'
+      text: '#a78bfa',
     },
     ruby: {
       glow: 'rgba(239, 68, 68, 0.4)',
       border: '#ef4444',
-      text: '#f87171'
+      text: '#f87171',
     },
     gold: {
       glow: 'rgba(245, 158, 11, 0.4)',
       border: '#f59e0b',
-      text: '#fbbf24'
+      text: '#fbbf24',
     },
     cyan: {
       glow: 'rgba(6, 182, 212, 0.4)',
       border: '#06b6d4',
-      text: '#22d3ee'
-    }
+      text: '#22d3ee',
+    },
   }
   
   const gridCols = {
     2: 'grid-cols-2',
     3: 'grid-cols-3',
-    4: 'grid-cols-4'
+    4: 'grid-cols-4',
   }
   
   return (
@@ -104,7 +104,7 @@ export const MetalCardSelector = memo(function MetalCardSelector({
                 delay: index * 0.05,
                 type: 'spring',
                 stiffness: 400,
-                damping: 25
+                damping: 25,
               }}
               whileTap={{ scale: 0.98 }}
             >
@@ -117,7 +117,7 @@ export const MetalCardSelector = memo(function MetalCardSelector({
                 transition={{
                   type: 'spring',
                   stiffness: 400,
-                  damping: 25
+                  damping: 25,
                 }}
                 style={{
                   // Degradado metálico oscuro
@@ -146,7 +146,7 @@ export const MetalCardSelector = memo(function MetalCardSelector({
                       inset 1px 1px 0 0 rgba(255, 255, 255, 0.08),
                       inset -1px -1px 0 0 rgba(0, 0, 0, 0.3),
                       0 4px 16px -4px rgba(0, 0, 0, 0.4)
-                    `
+                    `,
                 }}
               >
                 {/* Borde degradado */}
@@ -156,12 +156,12 @@ export const MetalCardSelector = memo(function MetalCardSelector({
                     padding: '1px',
                     background: isActive
                       ? `linear-gradient(135deg, ${accent.border} 0%, transparent 50%, rgba(0, 0, 0, 0.2) 100%)`
-                      : `linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(0, 0, 0, 0.2) 100%)`,
+                      : 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(0, 0, 0, 0.2) 100%)',
                     opacity: isActive ? 0.8 : 1,
                     WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
                     mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
                     WebkitMaskComposite: 'xor',
-                    maskComposite: 'exclude'
+                    maskComposite: 'exclude',
                   }}
                 />
                 
@@ -172,7 +172,7 @@ export const MetalCardSelector = memo(function MetalCardSelector({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     style={{
-                      background: `radial-gradient(ellipse at center, ${accent.glow} 0%, transparent 70%)`
+                      background: `radial-gradient(ellipse at center, ${accent.glow} 0%, transparent 70%)`,
                     }}
                   />
                 )}
@@ -186,7 +186,7 @@ export const MetalCardSelector = memo(function MetalCardSelector({
                       style={{
                         background: isActive 
                           ? `rgba(${option.color === 'emerald' ? '16, 185, 129' : option.color === 'sapphire' ? '59, 130, 246' : option.color === 'amethyst' ? '139, 92, 246' : '59, 130, 246'}, 0.15)`
-                          : 'rgba(255, 255, 255, 0.05)'
+                          : 'rgba(255, 255, 255, 0.05)',
                       }}
                     >
                       <span style={{ color: isActive ? accent.text : 'rgba(255, 255, 255, 0.6)' }}>
@@ -200,7 +200,7 @@ export const MetalCardSelector = memo(function MetalCardSelector({
                     <p 
                       className="font-medium truncate"
                       style={{ 
-                        color: isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.8)'
+                        color: isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.8)',
                       }}
                     >
                       {option.label}
@@ -209,7 +209,7 @@ export const MetalCardSelector = memo(function MetalCardSelector({
                       <p 
                         className="text-xs truncate mt-0.5"
                         style={{ 
-                          color: isActive ? accent.text : 'rgba(255, 255, 255, 0.4)'
+                          color: isActive ? accent.text : 'rgba(255, 255, 255, 0.4)',
                         }}
                       >
                         {option.sublabel}
@@ -228,7 +228,7 @@ export const MetalCardSelector = memo(function MetalCardSelector({
                         className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center"
                         style={{
                           background: accent.border,
-                          boxShadow: `0 0 20px ${accent.glow}`
+                          boxShadow: `0 0 20px ${accent.glow}`,
                         }}
                       >
                         <Check className="w-3.5 h-3.5 text-white" />

@@ -50,7 +50,7 @@ import {
   MoreVertical,
   Star,
   Gift,
-  Award
+  Award,
 } from 'lucide-react'
 import { cn } from '@/app/lib/utils'
 import type { Cliente, Distribuidor, Movimiento, BancoId } from '@/app/types'
@@ -109,7 +109,7 @@ const STATUS_CONFIG = {
     icon: CheckCircle2,
     gradient: 'from-emerald-500/20 to-emerald-600/10',
     ring: 'ring-emerald-500/50',
-    text: 'text-emerald-400'
+    text: 'text-emerald-400',
   },
   overdue: {
     label: 'Vencido',
@@ -117,7 +117,7 @@ const STATUS_CONFIG = {
     icon: Clock,
     gradient: 'from-amber-500/20 to-amber-600/10',
     ring: 'ring-amber-500/50',
-    text: 'text-amber-400'
+    text: 'text-amber-400',
   },
   critical: {
     label: 'Crítico',
@@ -125,7 +125,7 @@ const STATUS_CONFIG = {
     icon: AlertTriangle,
     gradient: 'from-red-500/20 to-red-600/10',
     ring: 'ring-red-500/50',
-    text: 'text-red-400'
+    text: 'text-red-400',
   },
   paid: {
     label: 'Pagado',
@@ -133,15 +133,15 @@ const STATUS_CONFIG = {
     icon: CheckCircle2,
     gradient: 'from-blue-500/20 to-blue-600/10',
     ring: 'ring-blue-500/50',
-    text: 'text-blue-400'
-  }
+    text: 'text-blue-400',
+  },
 }
 
 const PAYMENT_METHODS = [
   { id: 'efectivo', label: 'Efectivo', icon: Banknote, color: 'emerald' },
   { id: 'transferencia', label: 'Transferencia', icon: Send, color: 'blue' },
   { id: 'tarjeta', label: 'Tarjeta', icon: CreditCard, color: 'purple' },
-  { id: 'cheque', label: 'Cheque', icon: FileText, color: 'amber' }
+  { id: 'cheque', label: 'Cheque', icon: FileText, color: 'amber' },
 ]
 
 const DENOMINATIONS = [1000, 500, 200, 100, 50, 20]
@@ -155,7 +155,7 @@ function LifeRing({
   percentage, 
   status,
   size = 80,
-  strokeWidth = 6
+  strokeWidth = 6,
 }: { 
   percentage: number
   status: DebtRecord['status']
@@ -170,7 +170,7 @@ function LifeRing({
     current: { stroke: '#10b981', glow: '0 0 20px rgba(16, 185, 129, 0.5)' },
     overdue: { stroke: '#f59e0b', glow: '0 0 20px rgba(245, 158, 11, 0.5)' },
     critical: { stroke: '#ef4444', glow: '0 0 20px rgba(239, 68, 68, 0.5)' },
-    paid: { stroke: '#3b82f6', glow: '0 0 20px rgba(59, 130, 246, 0.5)' }
+    paid: { stroke: '#3b82f6', glow: '0 0 20px rgba(59, 130, 246, 0.5)' },
   }
   
   const colors = statusColors[status]
@@ -237,7 +237,7 @@ function DebtCard({
   debt,
   isSelected,
   onSelect,
-  onQuickPay
+  onQuickPay,
 }: {
   debt: DebtRecord
   isSelected: boolean
@@ -258,19 +258,19 @@ function DebtCard({
       whileHover={{ scale: 1.02 }}
       onClick={onSelect}
       className={cn(
-        "relative overflow-hidden rounded-2xl cursor-pointer",
-        "bg-gradient-to-br from-white/5 to-white/[0.02]",
-        "border backdrop-blur-xl",
-        "transition-all duration-300",
+        'relative overflow-hidden rounded-2xl cursor-pointer',
+        'bg-gradient-to-br from-white/5 to-white/[0.02]',
+        'border backdrop-blur-xl',
+        'transition-all duration-300',
         isSelected 
           ? `border-${config.color}-500/50 shadow-lg shadow-${config.color}-500/20`
-          : "border-white/10 hover:border-white/20"
+          : 'border-white/10 hover:border-white/20',
       )}
     >
       {/* Gradiente de fondo basado en status */}
       <div className={cn(
-        "absolute inset-0 bg-gradient-to-br opacity-50",
-        config.gradient
+        'absolute inset-0 bg-gradient-to-br opacity-50',
+        config.gradient,
       )} />
       
       <div className="relative p-4">
@@ -291,8 +291,8 @@ function DebtCard({
               </h3>
               <div className="flex items-center gap-2 mt-1">
                 <span className={cn(
-                  "px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider",
-                  `bg-${config.color}-500/20 ${config.text}`
+                  'px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider',
+                  `bg-${config.color}-500/20 ${config.text}`,
                 )}>
                   {config.label}
                 </span>
@@ -305,7 +305,7 @@ function DebtCard({
             </div>
           </div>
           
-          <StatusIcon className={cn("w-5 h-5", config.text)} />
+          <StatusIcon className={cn('w-5 h-5', config.text)} />
         </div>
         
         {/* Montos */}
@@ -319,7 +319,7 @@ function DebtCard({
           
           <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
             <motion.div
-              className={cn("h-full rounded-full", `bg-${config.color}-500`)}
+              className={cn('h-full rounded-full', `bg-${config.color}-500`)}
               initial={{ width: 0 }}
               animate={{ width: `${percentage}%` }}
               transition={{ duration: 1, ease: 'easeOut' }}
@@ -346,10 +346,10 @@ function DebtCard({
               onQuickPay()
             }}
             className={cn(
-              "flex items-center gap-1 px-3 py-1.5 rounded-lg",
-              "bg-white/10 hover:bg-white/20",
-              "text-xs font-medium text-white",
-              "transition-colors"
+              'flex items-center gap-1 px-3 py-1.5 rounded-lg',
+              'bg-white/10 hover:bg-white/20',
+              'text-xs font-medium text-white',
+              'transition-colors',
             )}
           >
             <Zap className="w-3 h-3" />
@@ -366,8 +366,8 @@ function DebtCard({
             animate={{ scaleY: 1 }}
             exit={{ scaleY: 0 }}
             className={cn(
-              "absolute left-0 top-0 bottom-0 w-1",
-              `bg-${config.color}-500`
+              'absolute left-0 top-0 bottom-0 w-1',
+              `bg-${config.color}-500`,
             )}
             style={{ originY: 0 }}
           />
@@ -382,7 +382,7 @@ function PaymentInjectionModal({
   debt,
   isOpen,
   onClose,
-  onConfirm
+  onConfirm,
 }: {
   debt: DebtRecord | null
   isOpen: boolean
@@ -392,7 +392,7 @@ function PaymentInjectionModal({
   const [amount, setAmount] = useState<number>(0)
   const [method, setMethod] = useState<string>('efectivo')
   const [notes, setNotes] = useState<PaymentNote[]>(
-    DENOMINATIONS.map(d => ({ denomination: d, quantity: 0 }))
+    DENOMINATIONS.map(d => ({ denomination: d, quantity: 0 })),
   )
   const [isProcessing, setIsProcessing] = useState(false)
   const [showReceipt, setShowReceipt] = useState(false)
@@ -400,7 +400,7 @@ function PaymentInjectionModal({
   // Calcular total de billetes
   const notesTotal = useMemo(() => 
     notes.reduce((sum, note) => sum + (note.denomination * note.quantity), 0),
-    [notes]
+    [notes],
   )
   
   // Actualizar cantidad de billete
@@ -408,7 +408,7 @@ function PaymentInjectionModal({
     setNotes(prev => prev.map(note => 
       note.denomination === denomination
         ? { ...note, quantity: Math.max(0, note.quantity + delta) }
-        : note
+        : note,
     ))
   }, [])
   
@@ -473,10 +473,10 @@ function PaymentInjectionModal({
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={cn(
-              "relative w-full max-w-2xl max-h-[90vh] overflow-hidden",
-              "bg-gradient-to-br from-[#1a1a2e] to-[#0a0a0f]",
-              "border border-white/10 rounded-3xl",
-              "shadow-2xl"
+              'relative w-full max-w-2xl max-h-[90vh] overflow-hidden',
+              'bg-gradient-to-br from-[#1a1a2e] to-[#0a0a0f]',
+              'border border-white/10 rounded-3xl',
+              'shadow-2xl',
             )}
           >
             {showReceipt ? (
@@ -494,9 +494,9 @@ function PaymentInjectionModal({
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className={cn(
-                        "w-12 h-12 rounded-xl flex items-center justify-center",
-                        "bg-gradient-to-br from-emerald-500/20 to-emerald-600/10",
-                        "border border-emerald-500/30"
+                        'w-12 h-12 rounded-xl flex items-center justify-center',
+                        'bg-gradient-to-br from-emerald-500/20 to-emerald-600/10',
+                        'border border-emerald-500/30',
                       )}>
                         <Wallet className="w-6 h-6 text-emerald-400" />
                       </div>
@@ -579,20 +579,20 @@ function PaymentInjectionModal({
                             whileTap={{ scale: 0.95 }}
                             onClick={() => setMethod(pm.id)}
                             className={cn(
-                              "flex flex-col items-center gap-2 p-3 rounded-xl",
-                              "border transition-all duration-200",
+                              'flex flex-col items-center gap-2 p-3 rounded-xl',
+                              'border transition-all duration-200',
                               isActive
                                 ? `bg-${pm.color}-500/20 border-${pm.color}-500/50`
-                                : "bg-white/5 border-white/10 hover:border-white/20"
+                                : 'bg-white/5 border-white/10 hover:border-white/20',
                             )}
                           >
                             <Icon className={cn(
-                              "w-5 h-5",
-                              isActive ? `text-${pm.color}-400` : "text-white/50"
+                              'w-5 h-5',
+                              isActive ? `text-${pm.color}-400` : 'text-white/50',
                             )} />
                             <span className={cn(
-                              "text-xs font-medium",
-                              isActive ? "text-white" : "text-white/50"
+                              'text-xs font-medium',
+                              isActive ? 'text-white' : 'text-white/50',
                             )}>
                               {pm.label}
                             </span>
@@ -622,9 +622,9 @@ function PaymentInjectionModal({
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: index * 0.05 }}
                               className={cn(
-                                "relative p-3 rounded-xl",
-                                "bg-gradient-to-br from-white/5 to-white/[0.02]",
-                                "border border-white/10"
+                                'relative p-3 rounded-xl',
+                                'bg-gradient-to-br from-white/5 to-white/[0.02]',
+                                'border border-white/10',
                               )}
                             >
                               <div className="flex items-center justify-between mb-2">
@@ -647,9 +647,9 @@ function PaymentInjectionModal({
                                   whileTap={{ scale: 0.9 }}
                                   onClick={() => updateNoteQuantity(note.denomination, -1)}
                                   className={cn(
-                                    "flex-1 py-1 rounded-lg",
-                                    "bg-red-500/20 hover:bg-red-500/30",
-                                    "text-red-400 transition-colors"
+                                    'flex-1 py-1 rounded-lg',
+                                    'bg-red-500/20 hover:bg-red-500/30',
+                                    'text-red-400 transition-colors',
                                   )}
                                 >
                                   <Minus className="w-4 h-4 mx-auto" />
@@ -659,9 +659,9 @@ function PaymentInjectionModal({
                                   whileTap={{ scale: 0.9 }}
                                   onClick={() => updateNoteQuantity(note.denomination, 1)}
                                   className={cn(
-                                    "flex-1 py-1 rounded-lg",
-                                    "bg-emerald-500/20 hover:bg-emerald-500/30",
-                                    "text-emerald-400 transition-colors"
+                                    'flex-1 py-1 rounded-lg',
+                                    'bg-emerald-500/20 hover:bg-emerald-500/30',
+                                    'text-emerald-400 transition-colors',
                                   )}
                                 >
                                   <Plus className="w-4 h-4 mx-auto" />
@@ -717,11 +717,11 @@ function PaymentInjectionModal({
                           onChange={(e) => setAmount(Number(e.target.value))}
                           placeholder="0.00"
                           className={cn(
-                            "w-full pl-12 pr-4 py-4 rounded-xl",
-                            "bg-white/5 border border-white/10",
-                            "text-2xl font-mono text-white placeholder:text-white/30",
-                            "focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50",
-                            "transition-all"
+                            'w-full pl-12 pr-4 py-4 rounded-xl',
+                            'bg-white/5 border border-white/10',
+                            'text-2xl font-mono text-white placeholder:text-white/30',
+                            'focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50',
+                            'transition-all',
                           )}
                         />
                       </div>
@@ -770,12 +770,12 @@ function PaymentInjectionModal({
                     onClick={handleConfirm}
                     disabled={amount <= 0 || isProcessing}
                     className={cn(
-                      "w-full py-4 rounded-xl font-semibold text-lg",
-                      "bg-gradient-to-r from-emerald-600 to-emerald-500",
-                      "hover:from-emerald-500 hover:to-emerald-400",
-                      "disabled:opacity-50 disabled:cursor-not-allowed",
-                      "text-white transition-all duration-300",
-                      "shadow-lg shadow-emerald-500/25"
+                      'w-full py-4 rounded-xl font-semibold text-lg',
+                      'bg-gradient-to-r from-emerald-600 to-emerald-500',
+                      'hover:from-emerald-500 hover:to-emerald-400',
+                      'disabled:opacity-50 disabled:cursor-not-allowed',
+                      'text-white transition-all duration-300',
+                      'shadow-lg shadow-emerald-500/25',
                     )}
                   >
                     {isProcessing ? (
@@ -806,7 +806,7 @@ function DigitalReceipt({
   debt,
   amount,
   method,
-  onClose
+  onClose,
 }: {
   debt: DebtRecord
   amount: number
@@ -834,24 +834,24 @@ function DigitalReceipt({
                   opacity: 1, 
                   y: -20, 
                   x: Math.random() * 400 - 200,
-                  rotate: 0
+                  rotate: 0,
                 }}
                 animate={{ 
                   opacity: 0, 
                   y: 300, 
-                  rotate: Math.random() * 360
+                  rotate: Math.random() * 360,
                 }}
                 transition={{ 
                   duration: 2 + Math.random() * 2,
-                  delay: Math.random() * 0.5
+                  delay: Math.random() * 0.5,
                 }}
                 className={cn(
-                  "absolute w-3 h-3 rounded-full",
-                  ['bg-emerald-500', 'bg-blue-500', 'bg-purple-500', 'bg-amber-500'][i % 4]
+                  'absolute w-3 h-3 rounded-full',
+                  ['bg-emerald-500', 'bg-blue-500', 'bg-purple-500', 'bg-amber-500'][i % 4],
                 )}
                 style={{
                   left: '50%',
-                  top: 0
+                  top: 0,
                 }}
               />
             ))}
@@ -867,9 +867,9 @@ function DigitalReceipt({
         className="flex justify-center mb-6"
       >
         <div className={cn(
-          "w-20 h-20 rounded-full flex items-center justify-center",
-          "bg-gradient-to-br from-emerald-500/20 to-emerald-600/10",
-          "border-2 border-emerald-500/50"
+          'w-20 h-20 rounded-full flex items-center justify-center',
+          'bg-gradient-to-br from-emerald-500/20 to-emerald-600/10',
+          'border-2 border-emerald-500/50',
         )}>
           <motion.div
             initial={{ scale: 0 }}
@@ -900,9 +900,9 @@ function DigitalReceipt({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
         className={cn(
-          "p-6 rounded-2xl mb-6",
-          "bg-gradient-to-br from-white/5 to-white/[0.02]",
-          "border border-white/10"
+          'p-6 rounded-2xl mb-6',
+          'bg-gradient-to-br from-white/5 to-white/[0.02]',
+          'border border-white/10',
         )}
       >
         <div className="space-y-4">
@@ -929,7 +929,7 @@ function DigitalReceipt({
                 month: 'short', 
                 day: 'numeric',
                 hour: '2-digit',
-                minute: '2-digit'
+                minute: '2-digit',
               })}
             </span>
           </div>
@@ -944,8 +944,8 @@ function DigitalReceipt({
           <div className="flex justify-between items-center">
             <span className="text-white/50">Saldo Pendiente</span>
             <span className={cn(
-              "text-xl font-bold font-mono tabular-nums",
-              isPaidInFull ? "text-emerald-400" : "text-amber-400"
+              'text-xl font-bold font-mono tabular-nums',
+              isPaidInFull ? 'text-emerald-400' : 'text-amber-400',
             )}>
               ${newBalance.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
             </span>
@@ -961,8 +961,8 @@ function DigitalReceipt({
         className="flex justify-center mb-6"
       >
         <div className={cn(
-          "w-32 h-32 rounded-xl flex items-center justify-center",
-          "bg-white/5 border border-white/10"
+          'w-32 h-32 rounded-xl flex items-center justify-center',
+          'bg-white/5 border border-white/10',
         )}>
           <QrCode className="w-20 h-20 text-white/30" />
         </div>
@@ -979,9 +979,9 @@ function DigitalReceipt({
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className={cn(
-            "flex flex-col items-center gap-2 p-3 rounded-xl",
-            "bg-white/5 hover:bg-white/10 border border-white/10",
-            "transition-colors"
+            'flex flex-col items-center gap-2 p-3 rounded-xl',
+            'bg-white/5 hover:bg-white/10 border border-white/10',
+            'transition-colors',
           )}
         >
           <Download className="w-5 h-5 text-white/50" />
@@ -992,9 +992,9 @@ function DigitalReceipt({
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className={cn(
-            "flex flex-col items-center gap-2 p-3 rounded-xl",
-            "bg-white/5 hover:bg-white/10 border border-white/10",
-            "transition-colors"
+            'flex flex-col items-center gap-2 p-3 rounded-xl',
+            'bg-white/5 hover:bg-white/10 border border-white/10',
+            'transition-colors',
           )}
         >
           <Share2 className="w-5 h-5 text-white/50" />
@@ -1005,9 +1005,9 @@ function DigitalReceipt({
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className={cn(
-            "flex flex-col items-center gap-2 p-3 rounded-xl",
-            "bg-white/5 hover:bg-white/10 border border-white/10",
-            "transition-colors"
+            'flex flex-col items-center gap-2 p-3 rounded-xl',
+            'bg-white/5 hover:bg-white/10 border border-white/10',
+            'transition-colors',
           )}
         >
           <Printer className="w-5 h-5 text-white/50" />
@@ -1024,9 +1024,9 @@ function DigitalReceipt({
         whileTap={{ scale: 0.98 }}
         onClick={onClose}
         className={cn(
-          "w-full py-4 rounded-xl font-semibold",
-          "bg-white/10 hover:bg-white/20",
-          "text-white transition-all"
+          'w-full py-4 rounded-xl font-semibold',
+          'bg-white/10 hover:bg-white/20',
+          'text-white transition-all',
         )}
       >
         Cerrar
@@ -1045,7 +1045,7 @@ export default function SettlementTerminal({
   distributors,
   onPayment,
   onGenerateReceipt,
-  className
+  className,
 }: SettlementTerminalProps) {
   const [selectedDebt, setSelectedDebt] = useState<DebtRecord | null>(null)
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false)
@@ -1062,7 +1062,7 @@ export default function SettlementTerminal({
       const query = searchQuery.toLowerCase()
       result = result.filter(d => 
         d.entityName.toLowerCase().includes(query) ||
-        d.concept.toLowerCase().includes(query)
+        d.concept.toLowerCase().includes(query),
       )
     }
     
@@ -1108,9 +1108,9 @@ export default function SettlementTerminal({
   
   return (
     <div className={cn(
-      "relative min-h-screen",
-      "bg-gradient-to-br from-[#0a0a0f] via-[#0d0d15] to-[#0a0a0f]",
-      className
+      'relative min-h-screen',
+      'bg-gradient-to-br from-[#0a0a0f] via-[#0d0d15] to-[#0a0a0f]',
+      className,
     )}>
       {/* Header con estadísticas */}
       <div className="sticky top-0 z-40 backdrop-blur-xl bg-black/50 border-b border-white/10">
@@ -1118,9 +1118,9 @@ export default function SettlementTerminal({
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
               <div className={cn(
-                "w-12 h-12 rounded-xl flex items-center justify-center",
-                "bg-gradient-to-br from-purple-500/20 to-purple-600/10",
-                "border border-purple-500/30"
+                'w-12 h-12 rounded-xl flex items-center justify-center',
+                'bg-gradient-to-br from-purple-500/20 to-purple-600/10',
+                'border border-purple-500/30',
               )}>
                 <Receipt className="w-6 h-6 text-purple-400" />
               </div>
@@ -1175,11 +1175,11 @@ export default function SettlementTerminal({
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Buscar por cliente o concepto..."
                 className={cn(
-                  "w-full pl-12 pr-4 py-3 rounded-xl",
-                  "bg-white/5 border border-white/10",
-                  "text-white placeholder:text-white/30",
-                  "focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50",
-                  "transition-all"
+                  'w-full pl-12 pr-4 py-3 rounded-xl',
+                  'bg-white/5 border border-white/10',
+                  'text-white placeholder:text-white/30',
+                  'focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50',
+                  'transition-all',
                 )}
               />
             </div>
@@ -1193,13 +1193,13 @@ export default function SettlementTerminal({
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setStatusFilter(status)}
                   className={cn(
-                    "px-4 py-2 rounded-lg text-sm font-medium",
-                    "border transition-all",
+                    'px-4 py-2 rounded-lg text-sm font-medium',
+                    'border transition-all',
                     statusFilter === status
                       ? status === 'all'
-                        ? "bg-white/20 border-white/30 text-white"
+                        ? 'bg-white/20 border-white/30 text-white'
                         : `bg-${STATUS_CONFIG[status as keyof typeof STATUS_CONFIG]?.color || 'white'}-500/20 border-${STATUS_CONFIG[status as keyof typeof STATUS_CONFIG]?.color || 'white'}-500/30 text-${STATUS_CONFIG[status as keyof typeof STATUS_CONFIG]?.color || 'white'}-400`
-                      : "bg-white/5 border-white/10 text-white/50 hover:border-white/20"
+                      : 'bg-white/5 border-white/10 text-white/50 hover:border-white/20',
                   )}
                 >
                   {status === 'all' ? 'Todos' : STATUS_CONFIG[status as keyof typeof STATUS_CONFIG]?.label}
@@ -1254,8 +1254,8 @@ export default function SettlementTerminal({
             className="flex flex-col items-center justify-center py-20"
           >
             <div className={cn(
-              "w-20 h-20 rounded-full flex items-center justify-center mb-4",
-              "bg-white/5 border border-white/10"
+              'w-20 h-20 rounded-full flex items-center justify-center mb-4',
+              'bg-white/5 border border-white/10',
             )}>
               <CheckCircle2 className="w-10 h-10 text-emerald-400" />
             </div>
@@ -1288,11 +1288,11 @@ export default function SettlementTerminal({
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         className={cn(
-          "fixed bottom-8 right-8 w-16 h-16 rounded-full",
-          "bg-gradient-to-br from-purple-600 to-purple-500",
-          "shadow-lg shadow-purple-500/30",
-          "flex items-center justify-center",
-          "text-white"
+          'fixed bottom-8 right-8 w-16 h-16 rounded-full',
+          'bg-gradient-to-br from-purple-600 to-purple-500',
+          'shadow-lg shadow-purple-500/30',
+          'flex items-center justify-center',
+          'text-white',
         )}
       >
         <Plus className="w-7 h-7" />

@@ -74,7 +74,7 @@ export {
   ObsidianCard, 
   ObsidianCardHeader, 
   ObsidianCardContent, 
-  ObsidianCardFooter 
+  ObsidianCardFooter, 
 } from './ObsidianCard'
 
 // Tarjeta KPI con count-up y sparklines

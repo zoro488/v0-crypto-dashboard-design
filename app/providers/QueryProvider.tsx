@@ -16,12 +16,11 @@
 
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, ReactNode } from 'react'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
-import { ReactNode } from 'react'
 import { getQueryClient } from '@/app/lib/query/queryClient'
 import { logger } from '@/app/lib/utils/logger'
 

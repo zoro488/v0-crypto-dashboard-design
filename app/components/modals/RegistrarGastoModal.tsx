@@ -13,7 +13,7 @@ import {
   FileText,
   Calendar,
   Tag,
-  ArrowDownCircle
+  ArrowDownCircle,
 } from 'lucide-react'
 import { ObsidianModal } from '@/app/components/ui-premium/ObsidianModal'
 import { MetalCardSelector } from '@/app/components/ui-premium/MetalCardSelector'
@@ -43,42 +43,42 @@ const BANCOS_OPTIONS = [
     label: 'Bóveda Monte', 
     sublabel: 'Principal',
     icon: <Landmark className="w-5 h-5" />,
-    color: 'sapphire' as const
+    color: 'sapphire' as const,
   },
   { 
     id: 'boveda_usa' as BancoId, 
     label: 'Bóveda USA', 
     sublabel: 'Internacional',
     icon: <DollarSign className="w-5 h-5" />,
-    color: 'emerald' as const
+    color: 'emerald' as const,
   },
   { 
     id: 'profit' as BancoId, 
     label: 'Profit', 
     sublabel: 'Ganancias',
     icon: <PiggyBank className="w-5 h-5" />,
-    color: 'gold' as const
+    color: 'gold' as const,
   },
   { 
     id: 'leftie' as BancoId, 
     label: 'Leftie', 
     sublabel: 'Operaciones',
     icon: <Building2 className="w-5 h-5" />,
-    color: 'amethyst' as const
+    color: 'amethyst' as const,
   },
   { 
     id: 'azteca' as BancoId, 
     label: 'Azteca', 
     sublabel: 'Nacional',
     icon: <Wallet className="w-5 h-5" />,
-    color: 'ruby' as const
+    color: 'ruby' as const,
   },
   { 
     id: 'flete_sur' as BancoId, 
     label: 'Flete Sur', 
     sublabel: 'Logística',
     icon: <Truck className="w-5 h-5" />,
-    color: 'cyan' as const
+    color: 'cyan' as const,
   },
 ]
 
@@ -104,7 +104,7 @@ export function RegistrarGastoModal({
   isOpen,
   onClose,
   onSubmit,
-  loading = false
+  loading = false,
 }: RegistrarGastoModalProps) {
   const [bancoId, setBancoId] = useState<string | null>(null)
   const [monto, setMonto] = useState('')
@@ -127,7 +127,7 @@ export function RegistrarGastoModal({
       concepto: concepto.trim(),
       categoria,
       fecha,
-      notas: notas.trim() || undefined
+      notas: notas.trim() || undefined,
     })
   }, [isValid, bancoId, monto, concepto, categoria, fecha, notas, onSubmit])
   
@@ -187,7 +187,7 @@ export function RegistrarGastoModal({
                     : 'rgba(255, 255, 255, 0.4)',
                   boxShadow: s === step 
                     ? '0 0 20px rgba(239, 68, 68, 0.3)' 
-                    : 'none'
+                    : 'none',
                 }}
               >
                 {s < step ? '✓' : s}
@@ -198,7 +198,7 @@ export function RegistrarGastoModal({
                   animate={{
                     background: s < step 
                       ? 'rgba(16, 185, 129, 0.5)' 
-                      : 'rgba(255, 255, 255, 0.1)'
+                      : 'rgba(255, 255, 255, 0.1)',
                   }}
                 />
               )}
@@ -264,14 +264,14 @@ export function RegistrarGastoModal({
                   className="p-4 rounded-2xl"
                   style={{
                     background: 'rgba(239, 68, 68, 0.15)',
-                    boxShadow: '0 0 40px rgba(239, 68, 68, 0.2)'
+                    boxShadow: '0 0 40px rgba(239, 68, 68, 0.2)',
                   }}
                   animate={{
                     boxShadow: [
                       '0 0 40px rgba(239, 68, 68, 0.2)',
                       '0 0 60px rgba(239, 68, 68, 0.3)',
-                      '0 0 40px rgba(239, 68, 68, 0.2)'
-                    ]
+                      '0 0 40px rgba(239, 68, 68, 0.2)',
+                    ],
                   }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
@@ -296,7 +296,7 @@ export function RegistrarGastoModal({
                   className="px-4 py-2 rounded-xl text-sm"
                   style={{
                     background: 'rgba(255, 255, 255, 0.05)',
-                    color: 'rgba(255, 255, 255, 0.6)'
+                    color: 'rgba(255, 255, 255, 0.6)',
                   }}
                 >
                   Desde: <span className="text-white font-medium">
@@ -330,7 +330,7 @@ export function RegistrarGastoModal({
                 className="p-4 rounded-2xl flex items-center justify-between"
                 style={{
                   background: 'rgba(239, 68, 68, 0.1)',
-                  border: '1px solid rgba(239, 68, 68, 0.2)'
+                  border: '1px solid rgba(239, 68, 68, 0.2)',
                 }}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -355,7 +355,7 @@ export function RegistrarGastoModal({
                     style={{ 
                       fontFamily: "'JetBrains Mono', monospace",
                       color: '#ef4444',
-                      textShadow: '0 0 20px rgba(239, 68, 68, 0.4)'
+                      textShadow: '0 0 20px rgba(239, 68, 68, 0.4)',
                     }}
                   >
                     -${parseFloat(monto || '0').toLocaleString()}
@@ -388,7 +388,7 @@ export function RegistrarGastoModal({
                           : 'rgba(255, 255, 255, 0.5)',
                         border: categoria === cat.id 
                           ? '1px solid rgba(255, 255, 255, 0.2)' 
-                          : '1px solid transparent'
+                          : '1px solid transparent',
                       }}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -468,7 +468,7 @@ export function RegistrarGastoModal({
         <div 
           className="h-px"
           style={{
-            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)'
+            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)',
           }}
         />
         

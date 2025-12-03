@@ -113,19 +113,19 @@ export default function FluidBackground({
     material.uniforms.uMouse.value.x = THREE.MathUtils.lerp(
       material.uniforms.uMouse.value.x,
       state.pointer.x,
-      0.05
+      0.05,
     )
     material.uniforms.uMouse.value.y = THREE.MathUtils.lerp(
       material.uniforms.uMouse.value.y,
       state.pointer.y,
-      0.05
+      0.05,
     )
     
     // Energía con suavizado
     material.uniforms.uEnergy.value = THREE.MathUtils.lerp(
       material.uniforms.uEnergy.value,
       energy,
-      0.1
+      0.1,
     )
   })
 
@@ -323,17 +323,17 @@ export function FluidBackgroundAdvanced({
     material.uniforms.uMouse.value.x = THREE.MathUtils.lerp(
       material.uniforms.uMouse.value.x,
       state.pointer.x,
-      0.03
+      0.03,
     )
     material.uniforms.uMouse.value.y = THREE.MathUtils.lerp(
       material.uniforms.uMouse.value.y,
       state.pointer.y,
-      0.03
+      0.03,
     )
     material.uniforms.uEnergy.value = THREE.MathUtils.lerp(
       material.uniforms.uEnergy.value,
       energy,
-      0.1
+      0.1,
     )
   })
 

@@ -5,7 +5,7 @@ import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-mo
 import { 
   Wallet, ArrowUpRight, ArrowDownLeft, ArrowRightLeft, Clock,
   TrendingUp, TrendingDown, Calendar, Filter, Download, RefreshCcw,
-  ChevronRight, CheckCircle2, X, Scan, FileText
+  ChevronRight, CheckCircle2, X, Scan, FileText,
 } from 'lucide-react'
 import { cn } from '@/app/lib/utils'
 import type { BancoId, Banco, Movimiento, CorteBancario } from '@/app/types'
@@ -49,50 +49,50 @@ const THEME_CONFIGS: Record<ThemeColor, {
     accent: 'bg-blue-500',
     glow: 'shadow-blue-500/30',
     border: 'border-blue-500/30',
-    text: 'text-blue-400'
+    text: 'text-blue-400',
   },
   emerald: {
     gradient: 'from-emerald-600 via-teal-500 to-emerald-600',
     accent: 'bg-emerald-500',
     glow: 'shadow-emerald-500/30',
     border: 'border-emerald-500/30',
-    text: 'text-emerald-400'
+    text: 'text-emerald-400',
   },
   purple: {
     gradient: 'from-purple-600 via-violet-500 to-purple-600',
     accent: 'bg-purple-500',
     glow: 'shadow-purple-500/30',
     border: 'border-purple-500/30',
-    text: 'text-purple-400'
+    text: 'text-purple-400',
   },
   amber: {
     gradient: 'from-amber-600 via-orange-500 to-amber-600',
     accent: 'bg-amber-500',
     glow: 'shadow-amber-500/30',
     border: 'border-amber-500/30',
-    text: 'text-amber-400'
+    text: 'text-amber-400',
   },
   rose: {
     gradient: 'from-rose-600 via-pink-500 to-rose-600',
     accent: 'bg-rose-500',
     glow: 'shadow-rose-500/30',
     border: 'border-rose-500/30',
-    text: 'text-rose-400'
+    text: 'text-rose-400',
   },
   cyan: {
     gradient: 'from-cyan-600 via-teal-400 to-cyan-600',
     accent: 'bg-cyan-500',
     glow: 'shadow-cyan-500/30',
     border: 'border-cyan-500/30',
-    text: 'text-cyan-400'
+    text: 'text-cyan-400',
   },
   indigo: {
     gradient: 'from-indigo-600 via-blue-500 to-indigo-600',
     accent: 'bg-indigo-500',
     glow: 'shadow-indigo-500/30',
     border: 'border-indigo-500/30',
-    text: 'text-indigo-400'
-  }
+    text: 'text-indigo-400',
+  },
 }
 
 const BANCO_THEMES: Record<BancoId, ThemeColor> = {
@@ -102,7 +102,7 @@ const BANCO_THEMES: Record<BancoId, ThemeColor> = {
   leftie: 'cyan',
   azteca: 'amber',
   flete_sur: 'rose',
-  utilidades: 'indigo'
+  utilidades: 'indigo',
 }
 
 export default function BankVaultPanel({
@@ -112,7 +112,7 @@ export default function BankVaultPanel({
   themeColor,
   onTransfer,
   onCorte,
-  onExport
+  onExport,
 }: BankVaultPanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>('movimientos')
   const [isScanning, setIsScanning] = useState(false)
@@ -167,7 +167,7 @@ export default function BankVaultPanel({
       ingresos,
       gastos,
       balance: ingresos - gastos,
-      transacciones: filteredMovimientos.length
+      transacciones: filteredMovimientos.length,
     }
   }, [filteredMovimientos])
 
@@ -206,31 +206,31 @@ export default function BankVaultPanel({
           rotateX,
           rotateY,
           transformStyle: 'preserve-3d',
-          perspective: '1000px'
+          perspective: '1000px',
         }}
         className={cn(
-          "relative h-56 md:h-64 rounded-3xl overflow-hidden cursor-pointer",
-          `shadow-2xl ${theme.glow}`
+          'relative h-56 md:h-64 rounded-3xl overflow-hidden cursor-pointer',
+          `shadow-2xl ${theme.glow}`,
         )}
       >
         {/* Fondo con Gradiente Mesh Animado */}
         <div className={cn(
-          "absolute inset-0 bg-gradient-to-br",
-          theme.gradient
+          'absolute inset-0 bg-gradient-to-br',
+          theme.gradient,
         )}>
           {/* Mesh pattern animado */}
           <motion.div
             className="absolute inset-0"
             animate={{
               background: [
-                `radial-gradient(circle at 20% 20%, rgba(255,255,255,0.1) 0%, transparent 50%)`,
-                `radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%)`,
-                `radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%)`,
-                `radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%)`,
-                `radial-gradient(circle at 20% 20%, rgba(255,255,255,0.1) 0%, transparent 50%)`,
-              ]
+                'radial-gradient(circle at 20% 20%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+                'radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+                'radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+                'radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+                'radial-gradient(circle at 20% 20%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+              ],
             }}
-            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
           />
         </div>
 
@@ -238,7 +238,7 @@ export default function BankVaultPanel({
         <motion.div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: `radial-gradient(600px circle at ${mouseX.get()}px ${mouseY.get()}px, rgba(255,255,255,0.15), transparent 40%)`
+            background: `radial-gradient(600px circle at ${mouseX.get()}px ${mouseY.get()}px, rgba(255,255,255,0.15), transparent 40%)`,
           }}
         />
 
@@ -246,7 +246,7 @@ export default function BankVaultPanel({
         <div 
           className="absolute inset-0 opacity-[0.03] pointer-events-none"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+            backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
           }}
         />
 
@@ -276,7 +276,7 @@ export default function BankVaultPanel({
             >
               ${banco.capitalActual.toLocaleString('es-MX', { 
                 minimumFractionDigits: 2, 
-                maximumFractionDigits: 2 
+                maximumFractionDigits: 2, 
               })}
             </div>
           </div>
@@ -324,10 +324,10 @@ export default function BankVaultPanel({
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={cn(
-              "relative flex items-center gap-2 px-5 py-2.5 rounded-xl transition-colors",
+              'relative flex items-center gap-2 px-5 py-2.5 rounded-xl transition-colors',
               activeTab === tab.id 
-                ? "text-white" 
-                : "text-white/40 hover:text-white/60"
+                ? 'text-white' 
+                : 'text-white/40 hover:text-white/60',
             )}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -336,12 +336,12 @@ export default function BankVaultPanel({
               <motion.div
                 layoutId="activeTab"
                 className={cn(
-                  "absolute inset-0 rounded-xl",
-                  "bg-white/10",
-                  `shadow-lg ${theme.glow}`
+                  'absolute inset-0 rounded-xl',
+                  'bg-white/10',
+                  `shadow-lg ${theme.glow}`,
                 )}
                 style={{
-                  boxShadow: `0 0 20px ${theme.glow.replace('shadow-', '').replace('/30', '')}`
+                  boxShadow: `0 0 20px ${theme.glow.replace('shadow-', '').replace('/30', '')}`,
                 }}
               />
             )}
@@ -365,12 +365,12 @@ export default function BankVaultPanel({
             onClick={handleCorte}
             disabled={isScanning}
             className={cn(
-              "flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all",
-              "bg-gradient-to-r",
+              'flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all',
+              'bg-gradient-to-r',
               theme.gradient,
-              "text-white shadow-lg",
+              'text-white shadow-lg',
               theme.glow,
-              isScanning && "opacity-50 cursor-wait"
+              isScanning && 'opacity-50 cursor-wait',
             )}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -379,7 +379,7 @@ export default function BankVaultPanel({
               <>
                 <motion.div
                   animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                 >
                   <RefreshCcw className="w-4 h-4" />
                 </motion.div>
@@ -413,10 +413,10 @@ export default function BankVaultPanel({
                   key={f}
                   onClick={() => setFilterType(f)}
                   className={cn(
-                    "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                    'px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
                     filterType === f 
                       ? `bg-white/10 ${theme.text}` 
-                      : "text-white/40 hover:text-white/60"
+                      : 'text-white/40 hover:text-white/60',
                   )}
                 >
                   {f === 'all' ? 'Todos' : f.charAt(0).toUpperCase() + f.slice(1)}
@@ -508,7 +508,7 @@ export default function BankVaultPanel({
 function TransactionRow({ 
   movimiento, 
   index,
-  theme
+  theme,
 }: { 
   movimiento: Movimiento
   index: number
@@ -534,15 +534,15 @@ function TransactionRow({
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: Math.min(index * 0.03, 0.3) }}
       className={cn(
-        "flex items-center gap-4 p-4 rounded-xl",
-        "bg-black/40 border border-white/5",
-        "hover:bg-white/5 hover:border-white/10 transition-all",
-        "group cursor-pointer"
+        'flex items-center gap-4 p-4 rounded-xl',
+        'bg-black/40 border border-white/5',
+        'hover:bg-white/5 hover:border-white/10 transition-all',
+        'group cursor-pointer',
       )}
     >
       {/* Icono */}
-      <div className={cn("p-2.5 rounded-xl", iconBg)}>
-        <Icon className={cn("w-5 h-5", iconColor)} />
+      <div className={cn('p-2.5 rounded-xl', iconBg)}>
+        <Icon className={cn('w-5 h-5', iconColor)} />
       </div>
 
       {/* Info */}
@@ -559,8 +559,8 @@ function TransactionRow({
       {/* Monto */}
       <div className="text-right">
         <div className={cn(
-          "text-lg font-mono font-bold",
-          isIngreso ? "text-emerald-400" : isGasto ? "text-red-400" : theme.text
+          'text-lg font-mono font-bold',
+          isIngreso ? 'text-emerald-400' : isGasto ? 'text-red-400' : theme.text,
         )}>
           {isIngreso ? '+' : isGasto ? '-' : ''}
           ${movimiento.monto.toLocaleString('es-MX')}
@@ -577,7 +577,7 @@ function TransactionRow({
 function TransferPanel({ 
   banco, 
   theme,
-  onTransfer 
+  onTransfer, 
 }: { 
   banco: Banco
   theme: typeof THEME_CONFIGS.blue
@@ -611,10 +611,10 @@ function TransferPanel({
               onChange={(e) => setMonto(e.target.value)}
               placeholder="0.00"
               className={cn(
-                "w-full h-14 pl-8 pr-4 rounded-xl text-xl font-mono",
-                "bg-black/40 border border-white/10",
-                "text-white placeholder:text-white/20",
-                "focus:outline-none focus:border-white/20"
+                'w-full h-14 pl-8 pr-4 rounded-xl text-xl font-mono',
+                'bg-black/40 border border-white/10',
+                'text-white placeholder:text-white/20',
+                'focus:outline-none focus:border-white/20',
               )}
             />
           </div>
@@ -628,10 +628,10 @@ function TransferPanel({
                 key={b.id}
                 onClick={() => setDestino(b.id)}
                 className={cn(
-                  "p-3 rounded-xl text-left transition-all border",
+                  'p-3 rounded-xl text-left transition-all border',
                   destino === b.id 
                     ? `bg-white/10 ${theme.border} text-white` 
-                    : "bg-white/5 border-transparent text-white/60 hover:bg-white/10"
+                    : 'bg-white/5 border-transparent text-white/60 hover:bg-white/10',
                 )}
               >
                 <span className="text-sm font-medium">{b.nombre}</span>
@@ -650,12 +650,12 @@ function TransferPanel({
           }}
           disabled={!monto || !destino}
           className={cn(
-            "w-full py-4 rounded-xl font-semibold transition-all",
-            "bg-gradient-to-r",
+            'w-full py-4 rounded-xl font-semibold transition-all',
+            'bg-gradient-to-r',
             theme.gradient,
-            "text-white shadow-lg",
+            'text-white shadow-lg',
             theme.glow,
-            (!monto || !destino) && "opacity-50 cursor-not-allowed"
+            (!monto || !destino) && 'opacity-50 cursor-not-allowed',
           )}
         >
           Transferir
@@ -668,7 +668,7 @@ function TransferPanel({
 function CorteCard({ 
   corte, 
   index,
-  theme 
+  theme, 
 }: { 
   corte: CorteBancario
   index: number
@@ -683,8 +683,8 @@ function CorteCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
       className={cn(
-        "p-5 rounded-xl",
-        "bg-black/40 border border-white/10"
+        'p-5 rounded-xl',
+        'bg-black/40 border border-white/10',
       )}
     >
       <div className="flex items-center justify-between mb-4">
@@ -698,10 +698,10 @@ function CorteCard({
           </div>
         </div>
         <div className={cn(
-          "px-3 py-1 rounded-full text-xs font-medium",
-          corte.estado === 'positivo' ? "bg-emerald-500/20 text-emerald-400" :
-          corte.estado === 'negativo' ? "bg-red-500/20 text-red-400" :
-          "bg-white/10 text-white/60"
+          'px-3 py-1 rounded-full text-xs font-medium',
+          corte.estado === 'positivo' ? 'bg-emerald-500/20 text-emerald-400' :
+          corte.estado === 'negativo' ? 'bg-red-500/20 text-red-400' :
+          'bg-white/10 text-white/60',
         )}>
           {corte.variacionPorcentaje > 0 ? '+' : ''}{corte.variacionPorcentaje.toFixed(1)}%
         </div>
@@ -723,8 +723,8 @@ function CorteCard({
         <div>
           <div className="text-xs text-white/40">Balance</div>
           <div className={cn(
-            "font-mono font-bold",
-            corte.diferencia >= 0 ? "text-emerald-400" : "text-red-400"
+            'font-mono font-bold',
+            corte.diferencia >= 0 ? 'text-emerald-400' : 'text-red-400',
           )}>
             ${corte.diferencia.toLocaleString('es-MX')}
           </div>
@@ -747,9 +747,9 @@ function ScanningOverlay({ theme }: { theme: typeof THEME_CONFIGS.blue }) {
           className="w-64 h-1 bg-white/10 rounded-full overflow-hidden mb-8"
         >
           <motion.div
-            className={cn("h-full rounded-full bg-gradient-to-r", theme.gradient)}
+            className={cn('h-full rounded-full bg-gradient-to-r', theme.gradient)}
             animate={{ x: ['-100%', '200%'] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
           />
         </motion.div>
         <motion.div
@@ -768,7 +768,7 @@ function ScanningOverlay({ theme }: { theme: typeof THEME_CONFIGS.blue }) {
 function CorteResultModal({ 
   corte, 
   theme,
-  onClose 
+  onClose, 
 }: { 
   corte: CorteBancario
   theme: typeof THEME_CONFIGS.blue
@@ -788,10 +788,10 @@ function CorteResultModal({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95 }}
         className={cn(
-          "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50",
-          "w-full max-w-md p-6",
-          "bg-[rgba(8,8,12,0.95)] backdrop-blur-2xl",
-          "rounded-3xl border border-white/10"
+          'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50',
+          'w-full max-w-md p-6',
+          'bg-[rgba(8,8,12,0.95)] backdrop-blur-2xl',
+          'rounded-3xl border border-white/10',
         )}
       >
         {/* Header con check */}
@@ -799,11 +799,11 @@ function CorteResultModal({
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ type: "spring", delay: 0.2 }}
+            transition={{ type: 'spring', delay: 0.2 }}
             className={cn(
-              "w-16 h-16 rounded-full mx-auto mb-4",
-              "bg-gradient-to-br from-emerald-500 to-teal-600",
-              "flex items-center justify-center"
+              'w-16 h-16 rounded-full mx-auto mb-4',
+              'bg-gradient-to-br from-emerald-500 to-teal-600',
+              'flex items-center justify-center',
             )}
           >
             <CheckCircle2 className="w-8 h-8 text-white" />
@@ -833,8 +833,8 @@ function CorteResultModal({
           <div className="flex justify-between items-center py-3">
             <span className="text-white font-semibold">Capital Final</span>
             <span className={cn(
-              "text-2xl font-mono font-bold",
-              corte.estado === 'positivo' ? "text-emerald-400" : "text-red-400"
+              'text-2xl font-mono font-bold',
+              corte.estado === 'positivo' ? 'text-emerald-400' : 'text-red-400',
             )}>
               ${corte.capitalFinal.toLocaleString('es-MX')}
             </span>
@@ -844,10 +844,10 @@ function CorteResultModal({
         <button
           onClick={onClose}
           className={cn(
-            "w-full py-4 rounded-xl font-semibold",
-            "bg-gradient-to-r",
+            'w-full py-4 rounded-xl font-semibold',
+            'bg-gradient-to-r',
             theme.gradient,
-            "text-white"
+            'text-white',
           )}
         >
           Cerrar

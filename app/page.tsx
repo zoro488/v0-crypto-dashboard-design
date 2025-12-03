@@ -13,16 +13,26 @@ import { ScrollProgress, ScrollReveal } from '@/app/components/ui/ScrollReveal'
 import { QuickStats3D } from '@/app/components/ui/QuickStats3D'
 import { useFirestoreCRUD } from '@/app/hooks/useFirestoreCRUD'
 import type { Venta, Cliente, OrdenCompra, Banco } from '@/app/types'
+import dynamic from 'next/dynamic'
 import { 
   ShoppingCart, Users, FileText, 
   TrendingUp, Wallet,
 } from 'lucide-react'
+
+// 🎙️ AI Premium Widget con Orbe Reactivo a Voz (carga dinámica)
+const AIPremiumWidget = dynamic(
+  () => import('@/app/components/ai/AIPremiumWidget'),
+  { ssr: false },
+)
 
 // Nuevo Dashboard Premium con animación CHRONOS
 const ChronosDashboard = lazy(() => import('@/app/components/panels/ChronosDashboard'))
 
 // 🔮 Nuevo Dashboard Obsidian Glass Ultra-Premium
 const ObsidianDashboard = lazy(() => import('@/app/components/panels/ObsidianDashboard'))
+
+// 🚀 CHRONOS 2026 - Dashboard Ultra-Premium con tendencias 2026
+const Dashboard2026 = lazy(() => import('@/app/components/chronos-2026/Dashboard2026'))
 
 // Paneles Premium - TODOS los paneles usan versiones Premium con componentes 3D avanzados
 const BentoOrdenesCompraPremium = lazy(() => import('@/app/components/panels/BentoOrdenesCompraPremium'))
@@ -180,11 +190,14 @@ export default function Chronos() {
   }, [currentPanel])
 
   // 🔮 Activar Obsidian Glass Dashboard (Ultra-Premium Experience)
-  const useObsidianDashboard = true
+  // 🚀 CHRONOS 2026 - El dashboard más avanzado (activar para experiencia completa 2026)
+  const useChronos2026 = true // Activar Dashboard 2026
+  const useObsidianDashboard = false // Fallback a Obsidian si 2026 está desactivado
 
   const renderPanel = () => {
     switch (currentPanel) {
       case 'dashboard':
+        if (useChronos2026) return <Dashboard2026 />
         return useObsidianDashboard ? <ObsidianDashboard /> : <ChronosDashboard />
       case 'ordenes':
         return <BentoOrdenesCompraPremium />
@@ -340,6 +353,9 @@ export default function Chronos() {
       </div>
 
       {/* 🤖 GrokAIOrb movido a layout.tsx para posición fixed global */}
+
+      {/* 🎙️ AI Premium Widget - Orbe Reactivo a Voz */}
+      <AIPremiumWidget position="bottom-right" />
 
       {/* Command Menu - Cmd+K para búsqueda rápida */}
       <CommandMenu />
