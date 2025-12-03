@@ -687,18 +687,6 @@ export const ChronosSkeleton = memo(({ className }: { className?: string }) => (
 ChronosSkeleton.displayName = 'ChronosSkeleton'
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 📤 EXPORTS
+// 📤 EXPORTS - Solo named exports para evitar React Error #31
 // ═══════════════════════════════════════════════════════════════════════════
-
-export default {
-  CHRONOS,
-  AmbientBackground,
-  ChronosButton,
-  ChronosInput,
-  ChronosBadge,
-  GlassCard,
-  KPICard,
-  HeroCard,
-  BentoGrid,
-  ChronosSkeleton,
-}
+// Todos los componentes ya están exportados con 'export const'

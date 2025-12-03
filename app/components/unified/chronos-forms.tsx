@@ -588,15 +588,6 @@ export const ChronosCheckbox = memo(({ checked, onChange, label, disabled }: Che
 ChronosCheckbox.displayName = 'ChronosCheckbox'
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 📤 EXPORTS
+// 📤 EXPORTS - Solo named exports para evitar React Error #31
 // ═══════════════════════════════════════════════════════════════════════════
-
-export default {
-  ChronosModal,
-  AlertDialog,
-  ChronosSelect,
-  ChronosTextarea,
-  FormField,
-  ChronosSlider,
-  ChronosCheckbox,
-}
+// Todos los componentes ya están exportados con 'export const'

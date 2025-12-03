@@ -572,12 +572,6 @@ export const ChronosLayout = memo(({
 ChronosLayout.displayName = 'ChronosLayout'
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 📤 EXPORTS
+// 📤 EXPORTS - Solo named exports para evitar React Error #31
 // ═══════════════════════════════════════════════════════════════════════════
-
-export default {
-  ChronosSidebar,
-  ChronosHeader,
-  ChronosLayout,
-  MAIN_NAV_ITEMS,
-}
+// Todos los componentes ya están exportados con 'export const'

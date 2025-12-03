@@ -751,13 +751,6 @@ export const ActivityItem = memo(({
 ActivityItem.displayName = 'ActivityItem'
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 📤 EXPORTS
+// 📤 EXPORTS - Solo named exports para evitar React Error #31
 // ═══════════════════════════════════════════════════════════════════════════
-
-export default {
-  QuantumTable,
-  StatCard,
-  BankCard,
-  MiniChart,
-  ActivityItem,
-}
+// Todos los componentes ya están exportados con 'export const' o 'export function'
