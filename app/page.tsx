@@ -34,6 +34,9 @@ const ObsidianDashboard = lazy(() => import('@/app/components/panels/ObsidianDas
 // 🚀 CHRONOS 2026 - Dashboard Ultra-Premium con tendencias 2026
 const Dashboard2026 = lazy(() => import('@/app/components/chronos-2026/Dashboard2026'))
 
+// 🔥 CHRONOS 2026 ULTRA - EL DISEÑO MÁS AVANZADO Y PREMIUM DEL MUNDO
+const Dashboard2026Ultra = lazy(() => import('@/app/components/chronos-2026-ultra/Dashboard2026Ultra'))
+
 // Paneles Premium - TODOS los paneles usan versiones Premium con componentes 3D avanzados
 const BentoOrdenesCompraPremium = lazy(() => import('@/app/components/panels/BentoOrdenesCompraPremium'))
 const BentoBanco = lazy(() => import('@/app/components/panels/BentoBanco'))
@@ -191,12 +194,16 @@ export default function Chronos() {
 
   // 🔮 Activar Obsidian Glass Dashboard (Ultra-Premium Experience)
   // 🚀 CHRONOS 2026 - El dashboard más avanzado (activar para experiencia completa 2026)
-  const useChronos2026 = true // Activar Dashboard 2026
+  // 🔥 CHRONOS 2026 ULTRA - EL DISEÑO MÁS AVANZADO Y PREMIUM DEL MUNDO 2025-2026
+  const useChronos2026Ultra = true // ⭐ DISEÑO PREMIUM MUNDIAL ACTIVADO
+  const useChronos2026 = false // Fallback legacy
   const useObsidianDashboard = false // Fallback a Obsidian si 2026 está desactivado
 
   const renderPanel = () => {
     switch (currentPanel) {
       case 'dashboard':
+        // 🔥 CHRONOS 2026 ULTRA - EL DISEÑO MÁS AVANZADO DEL MUNDO
+        if (useChronos2026Ultra) return <Dashboard2026Ultra />
         if (useChronos2026) return <Dashboard2026 />
         return useObsidianDashboard ? <ObsidianDashboard /> : <ChronosDashboard />
       case 'ordenes':

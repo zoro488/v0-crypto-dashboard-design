@@ -7,6 +7,7 @@ import Script from 'next/script'
 import './globals.css'
 import './styles/obsidian-glass.css'
 import './styles/chronos-obsidian-os.css'
+import './styles/chronos-2026-ultra.css'
 import { AppProvider } from '@/app/lib/context/AppContext'
 import { Toaster } from '@/app/components/ui/toaster'
 import { ErrorBoundary } from '@/app/components/ErrorBoundary'
@@ -22,6 +23,8 @@ import { NoiseTexture } from '@/app/components/ui-premium/NoiseTexture'
 import { ChronosShell } from '@/app/components/layout/ChronosShell'
 // 🤖 GrokAIOrb - Widget flotante IA movido al layout para garantizar posición fixed global
 import { GrokAIOrb } from '@/app/components/widgets/GrokAIOrb'
+// 🎤 VoiceWorkerProvider - Web Worker para voz y AI (0 bloqueo UI)
+import { VoiceWorkerProvider } from '@/app/providers/VoiceWorkerProvider'
 
 const geist = Geist({ 
   subsets: ['latin'],
@@ -118,31 +121,34 @@ export default function RootLayout({
                 <QueryProvider>
                   <AuthProvider>
                     <AppProvider>
-                      {/* 🎬 SPLASH SCREEN - Partículas CHRONOS (deshabilitado temporalmente para testing) */}
-                      <SplashScreen duration={5500} enabled={false}>
-                        {/* <PerformanceMonitor /> */}
-                        
-                        {/* 🌌 FONDO 3D GLOBAL - Siempre visible */}
-                        <ImmersiveWrapper />
-                        
-                        {/* 📦 CONTENIDO PRINCIPAL - Con z-index superior */}
-                        <div className="relative z-10 min-h-screen w-full overflow-auto">
-                          <ChronosShell>
-                            {children}
-                          </ChronosShell>
-                        </div>
-                        
-                        {/* 🤖 AGENTE IA FLOTANTE - Siempre visible con posición fixed global */}
-                        <GrokAIOrb />
-                        
-                        {/* 🎯 FEATURE FLAGS DEBUG PANEL - Solo en desarrollo */}
-                        <FeatureFlagsDebugPanel />
-                        
-                        {/* 🔮 TEXTURA DE RUIDO OBSIDIAN - Efecto táctil premium */}
-                        <NoiseTexture />
-                        
-                        <Toaster />
-                      </SplashScreen>
+                      {/* 🎤 VOICE WORKER - AI y Voz off-main-thread */}
+                      <VoiceWorkerProvider>
+                        {/* 🎬 SPLASH SCREEN - Partículas CHRONOS (deshabilitado temporalmente para testing) */}
+                        <SplashScreen duration={5500} enabled={false}>
+                          {/* <PerformanceMonitor /> */}
+                          
+                          {/* 🌌 FONDO 3D GLOBAL - Siempre visible */}
+                          <ImmersiveWrapper />
+                          
+                          {/* 📦 CONTENIDO PRINCIPAL - Con z-index superior */}
+                          <div className="relative z-10 min-h-screen w-full overflow-auto">
+                            <ChronosShell>
+                              {children}
+                            </ChronosShell>
+                          </div>
+                          
+                          {/* 🤖 AGENTE IA FLOTANTE - Siempre visible con posición fixed global */}
+                          <GrokAIOrb />
+                          
+                          {/* 🎯 FEATURE FLAGS DEBUG PANEL - Solo en desarrollo */}
+                          <FeatureFlagsDebugPanel />
+                          
+                          {/* 🔮 TEXTURA DE RUIDO OBSIDIAN - Efecto táctil premium */}
+                          <NoiseTexture />
+                          
+                          <Toaster />
+                        </SplashScreen>
+                      </VoiceWorkerProvider>
                     </AppProvider>
                   </AuthProvider>
                 </QueryProvider>

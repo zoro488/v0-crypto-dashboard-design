@@ -1,17 +1,19 @@
 /**
  * 🔥 HOOK UNIVERSAL DE TIEMPO REAL - CHRONOS SYSTEM
  * 
- * Hook que GARANTIZA actualizaciones en tiempo real usando onSnapshot.
- * Este hook reemplaza cualquier getDocs() que no esté funcionando.
+ * Hook que GARANTIZA actualizaciones en tiempo real.
+ * Usa onSnapshot de Firebase cuando está disponible,
+ * o localStorage como fallback automático.
  * 
  * Características:
  * - 'use client' obligatorio
- * - onSnapshot para actualizaciones instantáneas
+ * - Fallback automático a localStorage
+ * - onSnapshot para actualizaciones instantáneas (Firebase)
  * - Cleanup automático de listeners
  * - Manejo de errores con fallback
  * - isMounted para evitar memory leaks
  * 
- * @version 1.0.0
+ * @version 2.0.0 - Con fallback a localStorage
  * @author CHRONOS Team
  */
 
@@ -28,8 +30,10 @@ import {
   QueryConstraint,
   DocumentData,
 } from 'firebase/firestore'
-import { db, isFirebaseConfigured } from '@/app/lib/firebase/config'
+import { db, isFirebaseConfigured, isFirestoreAvailable } from '@/app/lib/firebase/config'
+import * as unifiedService from '@/app/lib/services/unified-data-service'
 import { logger } from '@/app/lib/utils/logger'
+import { useAppStore } from '@/app/lib/store/useAppStore'
 
 // ============================================================
 // TIPOS
@@ -247,128 +251,133 @@ export function useRealtimeCollection<T extends { id: string }>(
 
 // ============================================================
 // HOOKS PRE-CONFIGURADOS PARA CADA COLECCIÓN
+// (Con fallback automático a localStorage)
 // ============================================================
 
 /**
- * Hook para ventas en tiempo real
+ * Hook para ventas en tiempo real (con fallback a localStorage)
  */
 export function useRealtimeVentas() {
-  return useRealtimeCollection<{
-    id: string
-    cliente: string
-    clienteId?: string
-    producto?: string
-    cantidad: number
-    precioTotalVenta: number
-    montoPagado: number
-    montoRestante: number
-    estadoPago: 'completo' | 'parcial' | 'pendiente'
-    fecha: string | Date
-    [key: string]: unknown
-  }>('ventas', {
-    orderByField: 'fecha',
-    orderDirection: 'desc',
-  })
+  const [data, setData] = useState<DocumentData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const dataRefreshTrigger = useAppStore((state) => state.dataRefreshTrigger)
+  
+  useEffect(() => {
+    const unsubscribe = unifiedService.suscribirVentas((ventas) => {
+      setData(ventas as DocumentData[])
+      setLoading(false)
+      setError(null)
+    })
+    return () => unsubscribe()
+  }, [dataRefreshTrigger])
+  
+  return { data, loading, error, refresh: () => setLoading(true), isConnected: !loading }
 }
 
 /**
- * Hook para clientes en tiempo real
+ * Hook para clientes en tiempo real (con fallback a localStorage)
  */
 export function useRealtimeClientes() {
-  return useRealtimeCollection<{
-    id: string
-    nombre: string
-    telefono?: string
-    email?: string
-    direccion?: string
-    deudaTotal: number
-    totalPagado: number
-    totalVentas: number
-    estado?: 'activo' | 'inactivo'
-    [key: string]: unknown
-  }>('clientes', {
-    orderByField: 'nombre',
-    orderDirection: 'asc',
-  })
+  const [data, setData] = useState<DocumentData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const dataRefreshTrigger = useAppStore((state) => state.dataRefreshTrigger)
+  
+  useEffect(() => {
+    const unsubscribe = unifiedService.suscribirClientes((clientes) => {
+      setData(clientes as DocumentData[])
+      setLoading(false)
+      setError(null)
+    })
+    return () => unsubscribe()
+  }, [dataRefreshTrigger])
+  
+  return { data, loading, error, refresh: () => setLoading(true), isConnected: !loading }
 }
 
 /**
- * Hook para distribuidores en tiempo real
+ * Hook para distribuidores en tiempo real (con fallback a localStorage)
  */
 export function useRealtimeDistribuidores() {
-  return useRealtimeCollection<{
-    id: string
-    nombre: string
-    empresa?: string
-    telefono?: string
-    email?: string
-    deudaTotal: number
-    totalOrdenesCompra: number
-    totalPagado: number
-    [key: string]: unknown
-  }>('distribuidores', {
-    orderByField: 'nombre',
-    orderDirection: 'asc',
-  })
+  const [data, setData] = useState<DocumentData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const dataRefreshTrigger = useAppStore((state) => state.dataRefreshTrigger)
+  
+  useEffect(() => {
+    const unsubscribe = unifiedService.suscribirDistribuidores((distribuidores) => {
+      setData(distribuidores as DocumentData[])
+      setLoading(false)
+      setError(null)
+    })
+    return () => unsubscribe()
+  }, [dataRefreshTrigger])
+  
+  return { data, loading, error, refresh: () => setLoading(true), isConnected: !loading }
 }
 
 /**
- * Hook para órdenes de compra en tiempo real
+ * Hook para órdenes de compra en tiempo real (con fallback a localStorage)
  */
 export function useRealtimeOrdenesCompra() {
-  return useRealtimeCollection<{
-    id: string
-    distribuidor: string
-    distribuidorId?: string
-    producto?: string
-    cantidad: number
-    costoTotal: number
-    pagoDistribuidor: number
-    deuda: number
-    estado: string
-    fecha: string | Date
-    stockActual?: number
-    [key: string]: unknown
-  }>('ordenes_compra', {
-    orderByField: 'fecha',
-    orderDirection: 'desc',
-  })
+  const [data, setData] = useState<DocumentData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const dataRefreshTrigger = useAppStore((state) => state.dataRefreshTrigger)
+  
+  useEffect(() => {
+    const unsubscribe = unifiedService.suscribirOrdenesCompra((ordenes) => {
+      setData(ordenes as DocumentData[])
+      setLoading(false)
+      setError(null)
+    })
+    return () => unsubscribe()
+  }, [dataRefreshTrigger])
+  
+  return { data, loading, error, refresh: () => setLoading(true), isConnected: !loading }
 }
 
 /**
- * Hook para productos de almacén en tiempo real
+ * Hook para productos de almacén en tiempo real (con fallback a localStorage)
  */
 export function useRealtimeAlmacen() {
-  return useRealtimeCollection<{
-    id: string
-    nombre: string
-    categoria?: string
-    origen?: string
-    stockActual: number
-    stockMinimo?: number
-    valorUnitario?: number
-    [key: string]: unknown
-  }>('almacen_productos', {
-    orderByField: 'nombre',
-    orderDirection: 'asc',
-  })
+  const [data, setData] = useState<DocumentData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const dataRefreshTrigger = useAppStore((state) => state.dataRefreshTrigger)
+  
+  useEffect(() => {
+    const unsubscribe = unifiedService.suscribirAlmacen((productos) => {
+      setData(productos as DocumentData[])
+      setLoading(false)
+      setError(null)
+    })
+    return () => unsubscribe()
+  }, [dataRefreshTrigger])
+  
+  return { data, loading, error, refresh: () => setLoading(true), isConnected: !loading }
 }
 
 /**
- * Hook para bancos en tiempo real
+ * Hook para bancos en tiempo real (con fallback a localStorage)
  */
 export function useRealtimeBancos() {
-  return useRealtimeCollection<{
-    id: string
-    nombre: string
-    capitalActual: number
-    historicoIngresos: number
-    historicoGastos: number
-    [key: string]: unknown
-  }>('bancos', {
-    orderByField: 'nombre',
-    orderDirection: 'asc',
-  })
+  const [data, setData] = useState<DocumentData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const dataRefreshTrigger = useAppStore((state) => state.dataRefreshTrigger)
+  
+  useEffect(() => {
+    const unsubscribe = unifiedService.suscribirBancos((bancos) => {
+      setData(bancos as DocumentData[])
+      setLoading(false)
+      setError(null)
+    })
+    return () => unsubscribe()
+  }, [dataRefreshTrigger])
+  
+  return { data, loading, error, refresh: () => setLoading(true), isConnected: !loading }
 }
 
 /**

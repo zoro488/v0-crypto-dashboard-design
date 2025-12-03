@@ -66,6 +66,7 @@ async function withFallback<T>(
 
 /**
  * Wrapper para suscripciones con fallback
+ * MEJORADO: Siempre llama al callback local primero para mostrar datos inmediatamente
  */
 function subscribeWithFallback<T>(
   operationName: string,
@@ -73,17 +74,36 @@ function subscribeWithFallback<T>(
   localSubscribe: (cb: (data: T[]) => void) => () => void,
   callback: (data: T[]) => void,
 ): () => void {
+  // ✅ SIEMPRE suscribirse a localStorage primero para datos inmediatos
+  const localUnsubscribe = localSubscribe(callback)
+  
+  // Si estamos en modo localStorage, retornar solo esa suscripción
   if (checkStorageMode()) {
-    return localSubscribe(callback)
+    logger.info(`[UnifiedDataService] ${operationName}: Usando solo localStorage`, { context: 'UnifiedDataService' })
+    return localUnsubscribe
   }
   
+  // Intentar también Firebase (los datos de Firebase sobrescribirán los locales si llegan)
+  let firestoreUnsubscribe: (() => void) | null = null
   try {
-    return firestoreSubscribe(callback)
+    firestoreUnsubscribe = firestoreSubscribe((data) => {
+      // Solo usar datos de Firebase si hay datos
+      if (data && data.length > 0) {
+        callback(data)
+      }
+    })
   } catch (error) {
-    logger.warn(`[UnifiedDataService] Firebase suscripción falló para ${operationName}, usando localStorage`, { 
+    logger.warn(`[UnifiedDataService] Firebase suscripción falló para ${operationName}, usando solo localStorage`, { 
       context: 'UnifiedDataService',
     })
-    return localSubscribe(callback)
+  }
+  
+  // Retornar función que desuscribe de ambos
+  return () => {
+    localUnsubscribe()
+    if (firestoreUnsubscribe) {
+      firestoreUnsubscribe()
+    }
   }
 }
 
