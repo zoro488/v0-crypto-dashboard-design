@@ -47,6 +47,7 @@ import {
   CheckCircle,
   Clock,
   Database,
+  type LucideIcon,
 } from 'lucide-react'
 
 // Componentes 3D
@@ -68,7 +69,7 @@ type SatelliteId = 'analytics' | 'automation' | 'learning' | 'health' | null
 interface SatellitePanel {
   id: SatelliteId
   title: string
-  icon: React.ElementType
+  icon: LucideIcon
   description: string
   color: string
   position: [number, number]
@@ -464,8 +465,8 @@ function ExpandedPanel({ satellite, onClose }: ExpandedPanelProps) {
                 style={{ backgroundColor: `${panel.color}30` }}
               >
                 {(() => {
-                  const IconComp = PanelIcon as React.ComponentType<{ className?: string; style?: React.CSSProperties }>
-                  return <IconComp className="w-6 h-6" style={{ color: panel.color }} />
+                  const Icon = panel.icon
+                  return <Icon className="w-6 h-6" style={{ color: panel.color } as React.CSSProperties} />
                 })()}
               </div>
               <div>
