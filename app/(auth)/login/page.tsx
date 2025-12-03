@@ -11,101 +11,117 @@ import React from 'react'
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- * STELLAR GLASS NEBULA - Premium Login Experience
+ * LIQUID CHROME NEBULA - Ultra Interactive Login Experience
  * ═══════════════════════════════════════════════════════════════════════════
  * 
- * Experiencia de login cinematográfica con:
- * - Nebulosa espacial con paleta plateada/glass (plata, hielo, titanio, cristal)
- * - Física fluida con atracción/repulsión hacia el cursor
- * - Múltiples capas de partículas con diferentes velocidades
- * - Iluminación volumétrica fría y efectos de cristal
+ * Experiencia de login con:
+ * - Partículas cromadas tipo mercurio líquido/espejo reflejante
+ * - Física avanzada: atracción magnética, ondas expansivas, vórtices
+ * - Interactividad ultra-reactiva al cursor
+ * - Efecto de estela y resplandor dinámico
  */
 
 // ═══════════════════════════════════════════════════════════════════════════
-// COSMIC NEBULA - Sistema de partículas con física fluida
+// LIQUID CHROME PARTICLES - Sistema de partículas ultra-interactivo
 // ═══════════════════════════════════════════════════════════════════════════
 
-function CosmicNebula({ count = 8000 }: { count?: number }) {
+function LiquidChromeParticles({ count = 12000 }: { count?: number }) {
   const points = React.useRef<THREE.Points>(null!)
-  const innerPoints = React.useRef<THREE.Points>(null!)
+  const glowPoints = React.useRef<THREE.Points>(null!)
   const { mouse, viewport, clock } = useThree()
   
-  // Sistema principal de partículas - nebulosa exterior
-  const [mainData] = React.useMemo(() => {
+  // Mouse tracking suavizado con historial para estelas
+  const mouseHistory = React.useRef<{x: number, y: number, time: number}[]>([])
+  const smoothMouse = React.useRef({ x: 0, y: 0, vx: 0, vy: 0 })
+  const prevMouse = React.useRef({ x: 0, y: 0 })
+  
+  // Sistema principal de partículas
+  const [particleData] = React.useMemo(() => {
     const positions = new Float32Array(count * 3)
     const colors = new Float32Array(count * 3)
     const velocities = new Float32Array(count * 3)
+    const originalPositions = new Float32Array(count * 3)
     const sizes = new Float32Array(count)
     const phases = new Float32Array(count)
-    
-    // Paleta espacial plateada/glass: plata, hielo, titanio, cristal azulado
-    const palette = [
-      { r: 0.85, g: 0.88, b: 0.95 },  // Plata helada
-      { r: 0.75, g: 0.82, b: 0.92 },  // Azul cristal
-      { r: 0.90, g: 0.92, b: 0.98 },  // Blanco espacial
-      { r: 0.60, g: 0.68, b: 0.80 },  // Titanio
-      { r: 0.70, g: 0.78, b: 0.90 },  // Hielo azulado
-      { r: 0.95, g: 0.97, b: 1.0 },   // Blanco puro cristalino
-      { r: 0.55, g: 0.65, b: 0.82 },  // Acero azulado
-      { r: 0.80, g: 0.85, b: 0.95 },  // Glass frost
-    ]
+    const masses = new Float32Array(count)
     
     for (let i = 0; i < count; i++) {
-      // Distribución nebulosa con múltiples brazos espirales
-      const arm = Math.floor(Math.random() * 3)
-      const armAngle = (arm * Math.PI * 2) / 3
-      const spiralAngle = Math.random() * Math.PI * 4
-      const radius = 2 + Math.pow(Math.random(), 0.5) * 6
-      const spread = Math.random() * 1.5
+      // Distribución esférica con concentración variable
+      const theta = Math.random() * Math.PI * 2
+      const phi = Math.acos((Math.random() * 2) - 1)
+      const r = Math.pow(Math.random(), 0.7) * 5
       
-      const angle = armAngle + spiralAngle * 0.15 + Math.random() * 0.5
+      const x = r * Math.sin(phi) * Math.cos(theta)
+      const y = r * Math.sin(phi) * Math.sin(theta) * 0.8
+      const z = r * Math.cos(phi)
       
-      positions[i * 3] = Math.cos(angle) * radius + (Math.random() - 0.5) * spread
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 3 + Math.sin(spiralAngle * 0.5) * 0.5
-      positions[i * 3 + 2] = Math.sin(angle) * radius + (Math.random() - 0.5) * spread
+      positions[i * 3] = x
+      positions[i * 3 + 1] = y
+      positions[i * 3 + 2] = z
       
-      // Color de la paleta con variación
-      const colorIndex = Math.floor(Math.random() * palette.length)
-      const color = palette[colorIndex]
-      const brightness = 0.7 + Math.random() * 0.3
+      originalPositions[i * 3] = x
+      originalPositions[i * 3 + 1] = y
+      originalPositions[i * 3 + 2] = z
       
-      colors[i * 3] = color.r * brightness
-      colors[i * 3 + 1] = color.g * brightness
-      colors[i * 3 + 2] = color.b * brightness
+      // Colores CHROME/ESPEJO - plateado brillante con reflejos
+      // Gama de grises metálicos a blancos brillantes
+      const brightness = 0.75 + Math.random() * 0.25
+      const chromeVariation = Math.random()
+      
+      if (chromeVariation < 0.4) {
+        // Plata pura brillante
+        colors[i * 3] = 0.92 * brightness
+        colors[i * 3 + 1] = 0.92 * brightness
+        colors[i * 3 + 2] = 0.95 * brightness
+      } else if (chromeVariation < 0.7) {
+        // Chrome con leve tinte cálido (como espejo real)
+        colors[i * 3] = 0.95 * brightness
+        colors[i * 3 + 1] = 0.93 * brightness
+        colors[i * 3 + 2] = 0.90 * brightness
+      } else if (chromeVariation < 0.9) {
+        // Blanco brillante puro
+        colors[i * 3] = 1.0 * brightness
+        colors[i * 3 + 1] = 1.0 * brightness
+        colors[i * 3 + 2] = 1.0 * brightness
+      } else {
+        // Highlight especular ultra brillante
+        colors[i * 3] = 1.0
+        colors[i * 3 + 1] = 1.0
+        colors[i * 3 + 2] = 1.0
+      }
       
       velocities[i * 3] = 0
       velocities[i * 3 + 1] = 0
       velocities[i * 3 + 2] = 0
       
-      sizes[i] = 0.015 + Math.random() * 0.03
+      sizes[i] = 0.02 + Math.random() * 0.04
       phases[i] = Math.random() * Math.PI * 2
+      masses[i] = 0.5 + Math.random() * 1.5
     }
     
-    return [{ positions, colors, velocities, sizes, phases }]
+    return [{ positions, colors, velocities, originalPositions, sizes, phases, masses }]
   }, [count])
 
-  // Sistema interno de partículas - núcleo brillante
-  const innerCount = Math.floor(count * 0.3)
-  const [innerData] = React.useMemo(() => {
-    const positions = new Float32Array(innerCount * 3)
-    const colors = new Float32Array(innerCount * 3)
-    const velocities = new Float32Array(innerCount * 3)
+  // Partículas de resplandor interior
+  const glowCount = Math.floor(count * 0.15)
+  const [glowData] = React.useMemo(() => {
+    const positions = new Float32Array(glowCount * 3)
+    const colors = new Float32Array(glowCount * 3)
+    const velocities = new Float32Array(glowCount * 3)
     
-    for (let i = 0; i < innerCount; i++) {
-      // Distribución más concentrada en el centro
+    for (let i = 0; i < glowCount; i++) {
       const theta = Math.random() * Math.PI * 2
       const phi = Math.acos((Math.random() * 2) - 1)
-      const r = Math.pow(Math.random(), 2) * 2.5
+      const r = Math.pow(Math.random(), 1.5) * 2
       
       positions[i * 3] = r * Math.sin(phi) * Math.cos(theta)
-      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta) * 0.6
+      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta) * 0.7
       positions[i * 3 + 2] = r * Math.cos(phi)
       
-      // Colores más brillantes en el centro (blancos plateados cristalinos)
-      const intensity = 1 - (r / 2.5) * 0.3
-      colors[i * 3] = 0.90 * intensity
-      colors[i * 3 + 1] = 0.93 * intensity
-      colors[i * 3 + 2] = 1.0 * intensity
+      // Colores ultra brillantes para el núcleo
+      colors[i * 3] = 1.0
+      colors[i * 3 + 1] = 1.0
+      colors[i * 3 + 2] = 1.0
       
       velocities[i * 3] = 0
       velocities[i * 3 + 1] = 0
@@ -113,22 +129,37 @@ function CosmicNebula({ count = 8000 }: { count?: number }) {
     }
     
     return [{ positions, colors, velocities }]
-  }, [innerCount])
-  
-  // Posición del mouse suavizada
-  const smoothMouse = React.useRef({ x: 0, y: 0 })
+  }, [glowCount])
   
   useFrame((state, delta) => {
     const time = clock.getElapsedTime()
     
-    // Suavizar movimiento del mouse
-    smoothMouse.current.x += (mouse.x - smoothMouse.current.x) * 0.08
-    smoothMouse.current.y += (mouse.y - smoothMouse.current.y) * 0.08
+    // Calcular velocidad del mouse para efectos de estela
+    const mouseVelX = mouse.x - prevMouse.current.x
+    const mouseVelY = mouse.y - prevMouse.current.y
+    const mouseSpeed = Math.sqrt(mouseVelX * mouseVelX + mouseVelY * mouseVelY)
+    prevMouse.current = { x: mouse.x, y: mouse.y }
+    
+    // Suavizado del mouse con inercia
+    const smoothFactor = 0.12
+    smoothMouse.current.vx = (mouse.x - smoothMouse.current.x) * 0.3
+    smoothMouse.current.vy = (mouse.y - smoothMouse.current.y) * 0.3
+    smoothMouse.current.x += (mouse.x - smoothMouse.current.x) * smoothFactor
+    smoothMouse.current.y += (mouse.y - smoothMouse.current.y) * smoothFactor
+    
+    // Historial del mouse para efectos de estela
+    mouseHistory.current.push({ 
+      x: smoothMouse.current.x, 
+      y: smoothMouse.current.y, 
+      time 
+    })
+    if (mouseHistory.current.length > 20) mouseHistory.current.shift()
     
     const mouseX = (smoothMouse.current.x * viewport.width) / 2
     const mouseY = (smoothMouse.current.y * viewport.height) / 2
+    const mouseVelMag = Math.sqrt(smoothMouse.current.vx ** 2 + smoothMouse.current.vy ** 2)
     
-    // Actualizar partículas principales
+    // Actualizar partículas principales con física avanzada
     if (points.current) {
       const posArray = points.current.geometry.attributes.position.array as Float32Array
       const colorArray = points.current.geometry.attributes.color.array as Float32Array
@@ -138,115 +169,170 @@ function CosmicNebula({ count = 8000 }: { count?: number }) {
         const x = posArray[i3]
         const y = posArray[i3 + 1]
         const z = posArray[i3 + 2]
+        const mass = particleData.masses[i]
         
-        // Distancia al mouse en 2D proyectada
+        // Vector hacia el mouse
         const dx = mouseX - x
         const dy = mouseY - y
-        const dist = Math.sqrt(dx * dx + dy * dy)
+        const dist = Math.sqrt(dx * dx + dy * dy + 0.1)
         
-        // Física fluida: atracción suave + turbulencia
-        const interactionRadius = 4
-        if (dist < interactionRadius) {
-          const force = Math.pow(1 - dist / interactionRadius, 2) * 0.15
-          // Atracción orbital en lugar de repulsión directa
-          const angle = Math.atan2(dy, dx) + Math.PI * 0.5
-          mainData.velocities[i3] += Math.cos(angle) * force * 0.3 + dx * force * 0.1
-          mainData.velocities[i3 + 1] += Math.sin(angle) * force * 0.3 + dy * force * 0.1
-          mainData.velocities[i3 + 2] += (Math.random() - 0.5) * force * 0.1
+        // === FÍSICA AVANZADA ===
+        
+        // 1. Atracción magnética - las partículas son atraídas hacia el cursor
+        const attractionRadius = 5
+        if (dist < attractionRadius) {
+          const attractionStrength = Math.pow(1 - dist / attractionRadius, 2) * 0.25 / mass
+          particleData.velocities[i3] += dx * attractionStrength * 0.15
+          particleData.velocities[i3 + 1] += dy * attractionStrength * 0.15
         }
         
-        // Movimiento orbital natural
-        const orbitSpeed = 0.0003 + (i % 100) * 0.00001
-        const centerDist = Math.sqrt(x * x + z * z)
-        if (centerDist > 0.1) {
-          const orbitAngle = Math.atan2(z, x)
-          mainData.velocities[i3] += -Math.sin(orbitAngle) * orbitSpeed * centerDist
-          mainData.velocities[i3 + 2] += Math.cos(orbitAngle) * orbitSpeed * centerDist
+        // 2. Repulsión cercana - evitar que se amontonen en el cursor
+        const repulsionRadius = 1.5
+        if (dist < repulsionRadius) {
+          const repulsionStrength = Math.pow(1 - dist / repulsionRadius, 3) * 0.4
+          particleData.velocities[i3] -= dx * repulsionStrength / dist
+          particleData.velocities[i3 + 1] -= dy * repulsionStrength / dist
+          particleData.velocities[i3 + 2] += (Math.random() - 0.5) * repulsionStrength * 0.5
         }
         
-        // Turbulencia ondulante
-        const turbulence = Math.sin(time * 0.5 + mainData.phases[i]) * 0.0005
-        mainData.velocities[i3 + 1] += turbulence
+        // 3. Efecto de vórtice - rotación alrededor del cursor
+        const vortexRadius = 3.5
+        if (dist < vortexRadius && dist > 0.5) {
+          const vortexStrength = (1 - dist / vortexRadius) * 0.08 * (1 + mouseVelMag * 3)
+          const perpX = -dy / dist
+          const perpY = dx / dist
+          particleData.velocities[i3] += perpX * vortexStrength
+          particleData.velocities[i3 + 1] += perpY * vortexStrength
+        }
         
-        // Damping más suave para movimiento fluido
-        mainData.velocities[i3] *= 0.985
-        mainData.velocities[i3 + 1] *= 0.985
-        mainData.velocities[i3 + 2] *= 0.985
+        // 4. Onda expansiva basada en velocidad del mouse
+        if (mouseSpeed > 0.01) {
+          const waveRadius = 4
+          if (dist < waveRadius) {
+            const waveForce = mouseSpeed * 15 * Math.pow(1 - dist / waveRadius, 2)
+            particleData.velocities[i3] -= dx / dist * waveForce * 0.1
+            particleData.velocities[i3 + 1] -= dy / dist * waveForce * 0.1
+          }
+        }
         
-        // Fuerza restauradora suave al centro
-        mainData.velocities[i3] -= x * 0.0002
-        mainData.velocities[i3 + 1] -= y * 0.0003
-        mainData.velocities[i3 + 2] -= z * 0.0002
+        // 5. Fuerza de retorno elástica a posición original
+        const origX = particleData.originalPositions[i3]
+        const origY = particleData.originalPositions[i3 + 1]
+        const origZ = particleData.originalPositions[i3 + 2]
+        const returnStrength = 0.008
+        particleData.velocities[i3] += (origX - x) * returnStrength
+        particleData.velocities[i3 + 1] += (origY - y) * returnStrength
+        particleData.velocities[i3 + 2] += (origZ - z) * returnStrength
+        
+        // 6. Movimiento ondulatorio natural
+        const wave = Math.sin(time * 0.8 + particleData.phases[i]) * 0.003
+        particleData.velocities[i3 + 1] += wave
+        
+        // 7. Damping - fricción para movimiento fluido
+        const damping = 0.94
+        particleData.velocities[i3] *= damping
+        particleData.velocities[i3 + 1] *= damping
+        particleData.velocities[i3 + 2] *= damping
         
         // Aplicar velocidad
-        posArray[i3] += mainData.velocities[i3]
-        posArray[i3 + 1] += mainData.velocities[i3 + 1]
-        posArray[i3 + 2] += mainData.velocities[i3 + 2]
+        posArray[i3] += particleData.velocities[i3]
+        posArray[i3 + 1] += particleData.velocities[i3 + 1]
+        posArray[i3 + 2] += particleData.velocities[i3 + 2]
         
-        // Pulso de brillo basado en distancia al mouse
-        if (dist < interactionRadius) {
-          const glow = 1 + (1 - dist / interactionRadius) * 0.5
-          const baseColor = mainData.colors[i3]
-          colorArray[i3] = Math.min(baseColor * glow, 1)
-          colorArray[i3 + 1] = Math.min(mainData.colors[i3 + 1] * glow, 1)
-          colorArray[i3 + 2] = Math.min(mainData.colors[i3 + 2] * glow, 1)
-        }
+        // === EFECTOS VISUALES DINÁMICOS ===
+        
+        // Brillo dinámico basado en proximidad y velocidad
+        const particleVel = Math.sqrt(
+          particleData.velocities[i3] ** 2 + 
+          particleData.velocities[i3 + 1] ** 2 + 
+          particleData.velocities[i3 + 2] ** 2
+        )
+        
+        // Efecto chrome: brillo aumenta cerca del cursor
+        const proximityGlow = dist < attractionRadius ? 
+          1 + (1 - dist / attractionRadius) * 0.6 : 1
+        
+        // Efecto de velocidad: partículas rápidas brillan más
+        const velocityGlow = 1 + particleVel * 8
+        
+        const totalGlow = Math.min(proximityGlow * velocityGlow, 1.5)
+        
+        // Aplicar brillo con efecto espejo/chrome
+        const baseR = particleData.colors[i3]
+        const baseG = particleData.colors[i3 + 1]
+        const baseB = particleData.colors[i3 + 2]
+        
+        colorArray[i3] = Math.min(baseR * totalGlow, 1)
+        colorArray[i3 + 1] = Math.min(baseG * totalGlow, 1)
+        colorArray[i3 + 2] = Math.min(baseB * totalGlow, 1)
       }
       
       points.current.geometry.attributes.position.needsUpdate = true
       points.current.geometry.attributes.color.needsUpdate = true
-      points.current.rotation.y += delta * 0.02
+      
+      // Rotación lenta del conjunto
+      points.current.rotation.y += delta * 0.015
     }
     
-    // Actualizar núcleo interno
-    if (innerPoints.current) {
-      const innerPosArray = innerPoints.current.geometry.attributes.position.array as Float32Array
+    // Actualizar partículas de resplandor
+    if (glowPoints.current) {
+      const glowPosArray = glowPoints.current.geometry.attributes.position.array as Float32Array
       
-      for (let i = 0; i < innerCount; i++) {
+      for (let i = 0; i < glowCount; i++) {
         const i3 = i * 3
-        const x = innerPosArray[i3]
-        const y = innerPosArray[i3 + 1]
-        const z = innerPosArray[i3 + 2]
+        const x = glowPosArray[i3]
+        const y = glowPosArray[i3 + 1]
+        const z = glowPosArray[i3 + 2]
         
-        // Respiración del núcleo
-        const breathe = Math.sin(time * 0.8 + i * 0.01) * 0.002
-        innerData.velocities[i3] += (x > 0 ? 1 : -1) * breathe
-        innerData.velocities[i3 + 1] += (y > 0 ? 1 : -1) * breathe * 0.5
-        innerData.velocities[i3 + 2] += (z > 0 ? 1 : -1) * breathe
+        // Pulsación del núcleo
+        const pulse = Math.sin(time * 1.2 + i * 0.05) * 0.015
+        const centerDist = Math.sqrt(x*x + y*y + z*z)
         
-        // Atracción hacia el centro
-        innerData.velocities[i3] -= x * 0.002
-        innerData.velocities[i3 + 1] -= y * 0.002
-        innerData.velocities[i3 + 2] -= z * 0.002
+        if (centerDist > 0.01) {
+          glowData.velocities[i3] += (x / centerDist) * pulse
+          glowData.velocities[i3 + 1] += (y / centerDist) * pulse
+          glowData.velocities[i3 + 2] += (z / centerDist) * pulse
+        }
         
-        innerData.velocities[i3] *= 0.95
-        innerData.velocities[i3 + 1] *= 0.95
-        innerData.velocities[i3 + 2] *= 0.95
+        // Atracción suave hacia el mouse
+        const dx = mouseX * 0.3 - x
+        const dy = mouseY * 0.3 - y
+        glowData.velocities[i3] += dx * 0.002
+        glowData.velocities[i3 + 1] += dy * 0.002
         
-        innerPosArray[i3] += innerData.velocities[i3]
-        innerPosArray[i3 + 1] += innerData.velocities[i3 + 1]
-        innerPosArray[i3 + 2] += innerData.velocities[i3 + 2]
+        // Retorno al centro
+        glowData.velocities[i3] -= x * 0.01
+        glowData.velocities[i3 + 1] -= y * 0.01
+        glowData.velocities[i3 + 2] -= z * 0.01
+        
+        // Damping
+        glowData.velocities[i3] *= 0.92
+        glowData.velocities[i3 + 1] *= 0.92
+        glowData.velocities[i3 + 2] *= 0.92
+        
+        glowPosArray[i3] += glowData.velocities[i3]
+        glowPosArray[i3 + 1] += glowData.velocities[i3 + 1]
+        glowPosArray[i3 + 2] += glowData.velocities[i3 + 2]
       }
       
-      innerPoints.current.geometry.attributes.position.needsUpdate = true
-      innerPoints.current.rotation.y -= delta * 0.03
-      innerPoints.current.rotation.x = Math.sin(time * 0.3) * 0.1
+      glowPoints.current.geometry.attributes.position.needsUpdate = true
+      glowPoints.current.rotation.y -= delta * 0.025
     }
   })
   
   return (
     <group>
-      {/* Nebulosa exterior */}
+      {/* Partículas principales chrome */}
       <points ref={points}>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[mainData.positions, 3]} />
-          <bufferAttribute attach="attributes-color" args={[mainData.colors, 3]} />
+          <bufferAttribute attach="attributes-position" args={[particleData.positions, 3]} />
+          <bufferAttribute attach="attributes-color" args={[particleData.colors, 3]} />
         </bufferGeometry>
         <pointsMaterial
-          size={0.035}
+          size={0.04}
           vertexColors
           transparent
-          opacity={0.85}
+          opacity={0.92}
           sizeAttenuation
           blending={THREE.AdditiveBlending}
           depthWrite={false}
@@ -254,13 +340,13 @@ function CosmicNebula({ count = 8000 }: { count?: number }) {
       </points>
       
       {/* Núcleo brillante */}
-      <points ref={innerPoints}>
+      <points ref={glowPoints}>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[innerData.positions, 3]} />
-          <bufferAttribute attach="attributes-color" args={[innerData.colors, 3]} />
+          <bufferAttribute attach="attributes-position" args={[glowData.positions, 3]} />
+          <bufferAttribute attach="attributes-color" args={[glowData.colors, 3]} />
         </bufferGeometry>
         <pointsMaterial
-          size={0.06}
+          size={0.08}
           vertexColors
           transparent
           opacity={0.95}
@@ -270,38 +356,41 @@ function CosmicNebula({ count = 8000 }: { count?: number }) {
         />
       </points>
       
-      {/* Luz central volumétrica - tonos fríos plateados */}
-      <pointLight position={[0, 0, 0]} color="#E8ECF4" intensity={2.5} distance={10} />
-      <pointLight position={[2, 1, -2]} color="#B8C4D8" intensity={1.2} distance={8} />
-      <pointLight position={[-2, -1, 2]} color="#D0D8E8" intensity={1} distance={6} />
-      <pointLight position={[0, 2, 1]} color="#FFFFFF" intensity={0.8} distance={5} />
+      {/* Iluminación cromada */}
+      <pointLight position={[0, 0, 0]} color="#FFFFFF" intensity={3} distance={12} />
+      <pointLight position={[3, 2, -2]} color="#F8F8FF" intensity={1.5} distance={10} />
+      <pointLight position={[-3, -1, 2]} color="#FFFFF0" intensity={1.2} distance={8} />
+      <pointLight position={[0, 3, 0]} color="#FFFFFF" intensity={1} distance={6} />
     </group>
   )
 }
 
-// Estrellas de fondo
-function BackgroundStars({ count = 500 }: { count?: number }) {
+// Estrellas de fondo con parpadeo
+function BackgroundStars({ count = 300 }: { count?: number }) {
   const starsRef = React.useRef<THREE.Points>(null!)
   
-  const [positions, sizes] = React.useMemo(() => {
+  const [positions, originalBrightness] = React.useMemo(() => {
     const pos = new Float32Array(count * 3)
-    const s = new Float32Array(count)
+    const brightness = new Float32Array(count)
     
     for (let i = 0; i < count; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 50
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 50
-      pos[i * 3 + 2] = -10 - Math.random() * 30
-      s[i] = Math.random() * 0.5 + 0.1
+      pos[i * 3] = (Math.random() - 0.5) * 60
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 60
+      pos[i * 3 + 2] = -15 - Math.random() * 25
+      brightness[i] = 0.3 + Math.random() * 0.7
     }
     
-    return [pos, s]
+    return [pos, brightness]
   }, [count])
   
   useFrame((state) => {
     if (starsRef.current) {
-      // Parpadeo sutil
       const time = state.clock.getElapsedTime()
-      starsRef.current.rotation.z = time * 0.01
+      starsRef.current.rotation.z = time * 0.005
+      
+      // Opacidad pulsante para parpadeo
+      const material = starsRef.current.material as THREE.PointsMaterial
+      material.opacity = 0.5 + Math.sin(time * 0.5) * 0.1
     }
   })
   
@@ -311,10 +400,10 @@ function BackgroundStars({ count = 500 }: { count?: number }) {
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
       <pointsMaterial
-        size={0.08}
-        color="#E0E8F8"
+        size={0.06}
+        color="#FFFFFF"
         transparent
-        opacity={0.7}
+        opacity={0.6}
         sizeAttenuation
         blending={THREE.AdditiveBlending}
       />
@@ -351,8 +440,8 @@ function GlowInput({
         <motion.div
           className="absolute left-4 z-10"
           animate={{
-            color: isFocused ? '#A8B8D8' : 'rgba(255, 255, 255, 0.3)',
-            filter: isFocused ? 'drop-shadow(0 0 8px rgba(168, 184, 216, 0.6))' : 'none',
+            color: isFocused ? '#FFFFFF' : 'rgba(255, 255, 255, 0.3)',
+            filter: isFocused ? 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.8))' : 'none',
           }}
           transition={{ duration: 0.3 }}
         >
@@ -385,9 +474,14 @@ function GlowInput({
       
       <motion.div
         className="absolute bottom-0 left-0 h-px"
-        style={{ background: 'linear-gradient(90deg, #8090B0, #C0D0F0, #8090B0)' }}
-        initial={{ width: '0%' }}
-        animate={{ width: isFocused ? '100%' : '0%' }}
+        style={{ 
+          background: 'linear-gradient(90deg, transparent, #FFFFFF, #E8E8E8, #FFFFFF, transparent)',
+        }}
+        initial={{ width: '0%', opacity: 0 }}
+        animate={{ 
+          width: isFocused ? '100%' : '0%',
+          opacity: isFocused ? 1 : 0,
+        }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
       />
     </div>
@@ -412,13 +506,15 @@ function SubmitButton({ isLoading, isSuccess }: { isLoading: boolean; isSuccess:
       style={{
         background: isSuccess 
           ? '#10b981' 
-          : 'linear-gradient(135deg, #6878A0 0%, #A0B0D0 50%, #8090B8 100%)',
+          : 'linear-gradient(135deg, #2A2A2A 0%, #4A4A4A 25%, #6A6A6A 50%, #4A4A4A 75%, #2A2A2A 100%)',
         boxShadow: isSuccess
           ? '0 0 40px rgba(16, 185, 129, 0.4)'
-          : '0 0 40px rgba(128, 144, 184, 0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
+          : '0 4px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 0 rgba(0,0,0,0.3)',
+        border: isSuccess ? 'none' : '1px solid rgba(255,255,255,0.1)',
       }}
       whileHover={!isLoading && !isSuccess ? { 
-        boxShadow: '0 0 60px rgba(160, 176, 208, 0.5), inset 0 1px 0 rgba(255,255,255,0.3)',
+        background: 'linear-gradient(135deg, #3A3A3A 0%, #5A5A5A 25%, #8A8A8A 50%, #5A5A5A 75%, #3A3A3A 100%)',
+        boxShadow: '0 6px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.4), inset 0 -1px 0 rgba(0,0,0,0.2)',
       } : undefined}
       whileTap={!isLoading && !isSuccess ? { scale: 0.98 } : undefined}
     >
@@ -523,7 +619,7 @@ function MiniConfetti({ show }: { show: boolean }) {
           style={{
             left: `${50 + (Math.random() - 0.5) * 30}%`,
             top: '50%',
-            background: ['#A8B8D8', '#D0E0F8', '#10b981', '#8090B0'][i % 4],
+            background: ['#FFFFFF', '#E0E0E0', '#10b981', '#C0C0C0'][i % 4],
           }}
           initial={{ y: 0, x: 0, opacity: 1, scale: 1 }}
           animate={{
@@ -571,11 +667,11 @@ export default function LoginPage() {
   }
   
   return (
-    <main className="flex h-screen w-full overflow-hidden bg-[#050810]">
+    <main className="flex h-screen w-full overflow-hidden bg-[#0A0A0A]">
       <MiniConfetti show={showConfetti} />
       
       {/* ════════════════════════════════════════════════════════════════════
-          SECCIÓN IZQUIERDA: NEBULOSA ESPACIAL PLATEADA
+          SECCIÓN IZQUIERDA: LIQUID CHROME NEBULA INTERACTIVA
           ════════════════════════════════════════════════════════════════════ */}
       <div className="hidden lg:flex w-1/2 relative items-center justify-center">
         <div className="absolute inset-0 z-0">
@@ -585,9 +681,9 @@ export default function LoginPage() {
             dpr={[1, 2]}
           >
             <Suspense fallback={null}>
-              <CosmicNebula count={10000} />
-              <BackgroundStars count={400} />
-              <ambientLight intensity={0.4} color="#D0D8E8" />
+              <LiquidChromeParticles count={12000} />
+              <BackgroundStars count={300} />
+              <ambientLight intensity={0.3} color="#FFFFFF" />
             </Suspense>
           </Canvas>
         </div>
@@ -602,10 +698,10 @@ export default function LoginPage() {
           <motion.h1 
             className="text-8xl font-bold tracking-tighter"
             style={{
-              background: 'linear-gradient(to bottom, #ffffff 0%, rgba(180,195,220,0.3) 100%)',
+              background: 'linear-gradient(to bottom, #FFFFFF 0%, #808080 50%, #404040 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              filter: 'drop-shadow(0 0 40px rgba(180,195,220,0.4))',
+              filter: 'drop-shadow(0 0 40px rgba(255,255,255,0.3))',
             }}
           >
             CHRONOS
@@ -616,7 +712,9 @@ export default function LoginPage() {
             animate={{ opacity: 1, width: '100%' }}
             transition={{ delay: 0.8, duration: 1 }}
             className="h-px mx-auto max-w-xs"
-            style={{ background: 'linear-gradient(90deg, transparent, #A0B0D0, transparent)' }}
+            style={{ 
+              background: 'linear-gradient(90deg, transparent, #FFFFFF, #C0C0C0, #FFFFFF, transparent)',
+            }}
           />
           
           <motion.p 
@@ -624,7 +722,7 @@ export default function LoginPage() {
             animate={{ opacity: 1 }}
             transition={{ delay: 1, duration: 0.5 }}
             className="text-xl font-light tracking-[0.5em] uppercase"
-            style={{ color: 'rgba(180, 195, 220, 0.9)' }}
+            style={{ color: 'rgba(200, 200, 200, 0.9)' }}
           >
             Singularity OS
           </motion.p>
@@ -634,9 +732,9 @@ export default function LoginPage() {
             animate={{ opacity: 1 }}
             transition={{ delay: 1.2, duration: 0.5 }}
             className="flex items-center justify-center gap-2 text-sm"
-            style={{ color: 'rgba(160, 176, 208, 0.6)' }}
+            style={{ color: 'rgba(180, 180, 180, 0.6)' }}
           >
-            <Sparkles className="w-4 h-4" style={{ color: '#A8B8D8' }} />
+            <Sparkles className="w-4 h-4" style={{ color: '#FFFFFF' }} />
             <span>Sistema de Gestión Neural</span>
           </motion.div>
         </motion.div>
@@ -646,8 +744,13 @@ export default function LoginPage() {
           SECCIÓN DERECHA: FORMULARIO DE LOGIN
           ════════════════════════════════════════════════════════════════════ */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative">
-        {/* Fondo sutil plateado espacial */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-400/5 via-transparent to-blue-200/5" />
+        {/* Fondo sutil chrome */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse at 30% 20%, rgba(60,60,60,0.15) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(40,40,40,0.1) 0%, transparent 50%)',
+          }}
+        />
         
         <motion.div
           initial={{ opacity: 0, x: 20 }}
@@ -655,14 +758,14 @@ export default function LoginPage() {
           transition={{ delay: 0.3, duration: 0.6 }}
           className="w-full max-w-md relative z-10"
         >
-          {/* Card de vidrio premium plateado */}
+          {/* Card de vidrio premium chrome */}
           <div 
             className="rounded-3xl p-8 md:p-10"
             style={{
-              background: 'rgba(8, 12, 24, 0.75)',
+              background: 'linear-gradient(145deg, rgba(25,25,25,0.9) 0%, rgba(15,15,15,0.95) 100%)',
               backdropFilter: 'blur(40px)',
-              border: '1px solid rgba(160, 176, 208, 0.12)',
-              boxShadow: '0 0 80px rgba(160, 176, 208, 0.06), inset 0 1px 0 rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              boxShadow: '0 25px 80px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.05), inset 0 -1px 0 rgba(0,0,0,0.2)',
             }}
           >
             {/* Header */}
@@ -673,12 +776,12 @@ export default function LoginPage() {
                 transition={{ type: 'spring', delay: 0.2 }}
                 className="w-16 h-16 mx-auto mb-6 rounded-2xl flex items-center justify-center"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(128, 144, 184, 0.15), rgba(180, 195, 220, 0.1))',
-                  border: '1px solid rgba(160, 176, 208, 0.2)',
-                  boxShadow: '0 0 30px rgba(160, 176, 208, 0.08)',
+                  background: 'linear-gradient(145deg, #3A3A3A 0%, #1A1A1A 100%)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
                 }}
               >
-                <Sparkles className="w-8 h-8" style={{ color: '#A8B8D8' }} />
+                <Sparkles className="w-8 h-8" style={{ color: '#FFFFFF' }} />
               </motion.div>
               
               <h1 className="text-2xl font-bold text-white mb-2">
@@ -712,7 +815,7 @@ export default function LoginPage() {
               <div className="flex justify-end">
                 <Link
                   href="/forgot-password"
-                  className="text-sm text-white/40 hover:text-slate-300 transition-colors"
+                  className="text-sm text-white/40 hover:text-white transition-colors"
                 >
                   ¿Olvidaste tu contraseña?
                 </Link>
@@ -756,7 +859,7 @@ export default function LoginPage() {
             {/* Register link */}
             <p className="text-center mt-8 text-white/40 text-sm">
               ¿No tienes cuenta?{' '}
-              <Link href="/register" className="text-slate-300 hover:text-white transition-colors">
+              <Link href="/register" className="text-white/80 hover:text-white transition-colors">
                 Regístrate
               </Link>
             </p>
