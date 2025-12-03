@@ -259,13 +259,4 @@ export function PrefetchOnHover({
   )
 }
 
-export default {
-  Skeleton,
-  PanelSkeleton,
-  ChartSkeleton,
-  TableSkeleton,
-  Scene3DSkeleton,
-  LazyComponent,
-  LazyOnViewport,
-  PrefetchOnHover,
-}
+// Todos los componentes se exportan con named exports arriba

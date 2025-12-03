@@ -448,8 +448,4 @@ export const PremiumQuickAction = memo(function PremiumQuickAction({
   )
 })
 
-export default {
-  PremiumBankCard,
-  PremiumActivityItem,
-  PremiumQuickAction,
-}
+// Todos los componentes se exportan con named exports arriba

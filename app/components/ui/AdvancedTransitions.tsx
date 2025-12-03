@@ -522,24 +522,4 @@ export const transitionPresets = {
   springStiff: { type: 'spring', stiffness: 500, damping: 30 },
 }
 
-export default {
-  TransitionWrapper,
-  ViewportReveal,
-  ParallaxScroll,
-  StaggerList,
-  HoverLift,
-  HoverGlow,
-  HoverTilt,
-  fadeVariants,
-  slideUpVariants,
-  slideRightVariants,
-  scaleBlurVariants,
-  springVariants,
-  revealVariants,
-  staggerContainerVariants,
-  staggerItemVariants,
-  flip3DVariants,
-  glowPulseVariants,
-  generateStaggerDelay,
-  transitionPresets,
-}
+// Todos los componentes y variantes se exportan con named exports arriba

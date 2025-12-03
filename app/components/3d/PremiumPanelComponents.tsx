@@ -682,12 +682,4 @@ export function GradientText({
   )
 }
 
-export default {
-  StatOrb3D,
-  GlassCard3D,
-  ParticleBackground,
-  PulseIndicator,
-  MiniChart3D,
-  GradientText,
-  VARIANT_COLORS,
-}
+// Todos los componentes se exportan con named exports arriba

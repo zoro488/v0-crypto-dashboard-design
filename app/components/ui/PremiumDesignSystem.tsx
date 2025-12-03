@@ -892,16 +892,4 @@ export const ShimmerLoader = ({ className, width, height }: ShimmerLoaderProps) 
 }
 
 // Animation variants already exported above with their definitions
-
-export default {
-  GlassCard,
-  PremiumButton,
-  AnimatedCounter,
-  GlowOrb,
-  PremiumInput,
-  MagneticButton,
-  PremiumProgress,
-  AnimatedBadge,
-  Skeleton,
-  Tooltip,
-}
+// Todos los componentes se exportan con named exports arriba

@@ -479,4 +479,4 @@ export const PremiumPieChart = memo(function PremiumPieChart({
   )
 })
 
-export default { PremiumAreaChart, PremiumPieChart }
+// Todos los componentes se exportan con named exports arriba

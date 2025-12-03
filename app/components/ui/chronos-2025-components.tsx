@@ -602,15 +602,4 @@ export function ActivityListItem({
   )
 }
 
-// Export all components
-export default {
-  HeroCard,
-  KPICard,
-  ChronosIcon,
-  ChronosButton,
-  GlassCard,
-  StatusBadge,
-  EmptyState,
-  GradientText,
-  ActivityListItem,
-}
+// Todos los componentes se exportan con named exports arriba
