@@ -20,8 +20,8 @@ import { RollbarProvider } from '@/app/lib/rollbar/RollbarProvider'
 import { FeatureFlagsDebugPanel } from '@/app/components/debug/FeatureFlagsDebugPanel'
 import { NoiseTexture } from '@/app/components/ui-premium/NoiseTexture'
 import { ChronosShell } from '@/app/components/layout/ChronosShell'
-// FloatingAIWidget removido - usar FloatingSplineAIWidget desde page.tsx
-// para evitar widgets duplicados
+// 🤖 GrokAIOrb - Widget flotante IA movido al layout para garantizar posición fixed global
+import { GrokAIOrb } from '@/app/components/widgets/GrokAIOrb'
 
 const geist = Geist({ 
   subsets: ['latin'],
@@ -132,7 +132,8 @@ export default function RootLayout({
                           </ChronosShell>
                         </div>
                         
-                        {/* 🤖 AGENTE IA FLOTANTE - Manejado en page.tsx con FloatingSplineAIWidget */}
+                        {/* 🤖 AGENTE IA FLOTANTE - Siempre visible con posición fixed global */}
+                        <GrokAIOrb />
                         
                         {/* 🎯 FEATURE FLAGS DEBUG PANEL - Solo en desarrollo */}
                         <FeatureFlagsDebugPanel />

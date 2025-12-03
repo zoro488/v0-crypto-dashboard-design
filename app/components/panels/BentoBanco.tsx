@@ -81,6 +81,7 @@ interface IngresoBanco {
   fecha?: string | Date | { seconds: number }
   cliente?: string
   ingreso?: number
+  monto?: number
   concepto?: string
   observaciones?: string
   tc?: number
@@ -94,6 +95,7 @@ interface GastoBanco {
   fecha?: string | Date | { seconds: number }
   origen?: string
   gasto?: number
+  monto?: number
   concepto?: string
   observaciones?: string
   destino?: string
@@ -271,14 +273,48 @@ export default function BentoBanco() {
     })
   }, [selectedBanco, ingresos, gastos, transferencias, cortes, totalIngresos, totalGastos, saldoActual, toast])
 
-  // Datos para gráficos - DEBE estar antes de cualquier return condicional
+  // Datos para gráficos - DATOS REALES agrupados por día
   const trendData = useMemo(() => {
-    return Array.from({ length: 7 }, (_, i) => ({
-      name: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'][i],
-      ingresos: Math.floor(Math.random() * 50000) + 20000,
-      gastos: Math.floor(Math.random() * 30000) + 10000,
-    }))
-  }, [])
+    const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
+    const datosPorDia = diasSemana.map(dia => ({ name: dia, ingresos: 0, gastos: 0 }))
+    
+    // Procesar ingresos
+    ingresos.forEach(ingreso => {
+      const fecha = ingreso.fecha
+      if (fecha) {
+        let dateObj: Date
+        if (typeof fecha === 'object' && 'seconds' in fecha) {
+          dateObj = new Date((fecha as { seconds: number }).seconds * 1000)
+        } else if (typeof fecha === 'string' || fecha instanceof Date) {
+          dateObj = new Date(fecha)
+        } else {
+          return
+        }
+        const diaSemana = dateObj.getDay()
+        datosPorDia[diaSemana].ingresos += ingreso.ingreso ?? ingreso.monto ?? 0
+      }
+    })
+    
+    // Procesar gastos
+    gastos.forEach(gasto => {
+      const fecha = gasto.fecha
+      if (fecha) {
+        let dateObj: Date
+        if (typeof fecha === 'object' && 'seconds' in fecha) {
+          dateObj = new Date((fecha as { seconds: number }).seconds * 1000)
+        } else if (typeof fecha === 'string' || fecha instanceof Date) {
+          dateObj = new Date(fecha)
+        } else {
+          return
+        }
+        const diaSemana = dateObj.getDay()
+        datosPorDia[diaSemana].gastos += gasto.gasto ?? gasto.monto ?? 0
+      }
+    })
+    
+    // Reordenar para empezar en Lunes
+    return [...datosPorDia.slice(1), datosPorDia[0]]
+  }, [ingresos, gastos])
 
   // Distribución por tipo de movimiento
   const distribucionMovimientos = useMemo(() => [

@@ -426,22 +426,187 @@ export function useGYAData(): HookResult<DocumentData> {
   })
 }
 
+/**
+ * Hook para ingresos de banco - combina colección legacy + movimientos
+ */
 export function useIngresosBanco(bancoId: string): HookResult<DocumentData> {
-  const collectionName = `${bancoId}_ingresos`
+  const [data, setData] = useState<DocumentData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const dataRefreshTrigger = useAppStore((state) => state.dataRefreshTrigger)
   
-  return useRealtimeQuery(collectionName, {
-    orderByField: 'fecha',
-    orderDirection: 'desc',
-  })
+  const refresh = useCallback(async () => {
+    setLoading(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isFirebaseConfigured || !db) {
+      setData([])
+      setLoading(false)
+      setError('Firebase no configurado')
+      return
+    }
+
+    // Suscribirse a ambas colecciones en paralelo
+    const unsubscribes: (() => void)[] = []
+    let legacyData: DocumentData[] = []
+    let movimientosData: DocumentData[] = []
+    
+    const updateCombinedData = () => {
+      // Combinar y ordenar por fecha
+      const combined = [...legacyData, ...movimientosData].sort((a, b) => {
+        const fechaA = a.fecha?.seconds ? a.fecha.seconds : new Date(a.fecha || 0).getTime() / 1000
+        const fechaB = b.fecha?.seconds ? b.fecha.seconds : new Date(b.fecha || 0).getTime() / 1000
+        return fechaB - fechaA
+      })
+      setData(combined)
+      setLoading(false)
+      setError(null)
+    }
+    
+    // 1. Colección legacy (boveda_monte_ingresos, etc.)
+    try {
+      const legacyQuery = query(
+        collection(db, `${bancoId}_ingresos`),
+        orderBy('fecha', 'desc'),
+      )
+      unsubscribes.push(
+        onSnapshot(legacyQuery, (snapshot) => {
+          legacyData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+          updateCombinedData()
+        }, (err) => {
+          logger.warn(`No hay colección legacy ${bancoId}_ingresos`, { context: 'firestore-hooks' })
+          legacyData = []
+          updateCombinedData()
+        }),
+      )
+    } catch (err) {
+      legacyData = []
+    }
+    
+    // 2. Colección movimientos filtrada
+    try {
+      const movQuery = query(
+        collection(db, 'movimientos'),
+        where('bancoId', '==', bancoId),
+        where('tipoMovimiento', '==', 'ingreso'),
+        orderBy('fecha', 'desc'),
+      )
+      unsubscribes.push(
+        onSnapshot(movQuery, (snapshot) => {
+          movimientosData = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+            // Mapear campos para compatibilidad
+            ingreso: doc.data().monto,
+            cliente: doc.data().cliente || doc.data().concepto,
+          }))
+          updateCombinedData()
+        }, (err) => {
+          logger.warn('Error en movimientos para ingresos', { context: 'firestore-hooks' })
+          movimientosData = []
+          updateCombinedData()
+        }),
+      )
+    } catch (err) {
+      movimientosData = []
+    }
+
+    return () => {
+      unsubscribes.forEach(unsub => unsub())
+    }
+  }, [bancoId, dataRefreshTrigger])
+
+  return { data, loading, error, refresh }
 }
 
+/**
+ * Hook para gastos de banco - combina colección legacy + movimientos
+ */
 export function useGastos(bancoId: string): HookResult<DocumentData> {
-  const collectionName = `${bancoId}_gastos`
+  const [data, setData] = useState<DocumentData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const dataRefreshTrigger = useAppStore((state) => state.dataRefreshTrigger)
   
-  return useRealtimeQuery(collectionName, {
-    orderByField: 'fecha',
-    orderDirection: 'desc',
-  })
+  const refresh = useCallback(async () => {
+    setLoading(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isFirebaseConfigured || !db) {
+      setData([])
+      setLoading(false)
+      setError('Firebase no configurado')
+      return
+    }
+
+    const unsubscribes: (() => void)[] = []
+    let legacyData: DocumentData[] = []
+    let movimientosData: DocumentData[] = []
+    
+    const updateCombinedData = () => {
+      const combined = [...legacyData, ...movimientosData].sort((a, b) => {
+        const fechaA = a.fecha?.seconds ? a.fecha.seconds : new Date(a.fecha || 0).getTime() / 1000
+        const fechaB = b.fecha?.seconds ? b.fecha.seconds : new Date(b.fecha || 0).getTime() / 1000
+        return fechaB - fechaA
+      })
+      setData(combined)
+      setLoading(false)
+      setError(null)
+    }
+    
+    // 1. Colección legacy
+    try {
+      const legacyQuery = query(
+        collection(db, `${bancoId}_gastos`),
+        orderBy('fecha', 'desc'),
+      )
+      unsubscribes.push(
+        onSnapshot(legacyQuery, (snapshot) => {
+          legacyData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+          updateCombinedData()
+        }, () => {
+          legacyData = []
+          updateCombinedData()
+        }),
+      )
+    } catch (err) {
+      legacyData = []
+    }
+    
+    // 2. Colección movimientos (gastos)
+    try {
+      const movQuery = query(
+        collection(db, 'movimientos'),
+        where('bancoId', '==', bancoId),
+        where('tipoMovimiento', '==', 'gasto'),
+        orderBy('fecha', 'desc'),
+      )
+      unsubscribes.push(
+        onSnapshot(movQuery, (snapshot) => {
+          movimientosData = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+            gasto: doc.data().monto,
+            origen: doc.data().concepto,
+          }))
+          updateCombinedData()
+        }, () => {
+          movimientosData = []
+          updateCombinedData()
+        }),
+      )
+    } catch (err) {
+      movimientosData = []
+    }
+
+    return () => {
+      unsubscribes.forEach(unsub => unsub())
+    }
+  }, [bancoId, dataRefreshTrigger])
+
+  return { data, loading, error, refresh }
 }
 
 export function useTransferencias(bancoId?: string): HookResult<DocumentData> {

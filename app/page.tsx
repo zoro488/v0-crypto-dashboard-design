@@ -2,7 +2,7 @@
 
 import { useAppStore } from '@/app/lib/store/useAppStore'
 import ChronosHeader from '@/app/components/layout/ChronosHeader'
-import { GrokAIOrb } from '@/app/components/widgets/GrokAIOrb'
+// GrokAIOrb movido a layout.tsx para posición fixed global
 import { FirestoreSetupAlert } from '@/app/components/ui/FirestoreSetupAlert'
 import { CommandMenu } from '@/app/components/CommandMenu'
 import { SystemShowcase } from '@/app/components/ui/SystemShowcase'
@@ -339,8 +339,7 @@ export default function Chronos() {
         </main>
       </div>
 
-      {/* 🤖 Widget Flotante IA estilo Grok/Tesla - Siempre visible */}
-      <GrokAIOrb />
+      {/* 🤖 GrokAIOrb movido a layout.tsx para posición fixed global */}
 
       {/* Command Menu - Cmd+K para búsqueda rápida */}
       <CommandMenu />

@@ -436,14 +436,35 @@ export default function BentoClientesPremium() {
   const totalCobrado = clientes.reduce((acc, c) => acc + c.totalPagado, 0)
   const clientesPendientes = clientes.filter((c) => c.deudaTotal > 0).length
 
-  // Trend data
+  // Trend data - DATOS REALES de ventas por día
   const trendData = useMemo(() => {
-    return Array.from({ length: 7 }, (_, i) => ({
-      name: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'][i],
-      ventas: Math.floor(Math.random() * 50000) + 30000,
-      cobros: Math.floor(Math.random() * 40000) + 20000,
-    }))
-  }, [])
+    const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
+    const datosPorDia = diasSemana.map(dia => ({ name: dia, ventas: 0, cobros: 0 }))
+    
+    ventas.forEach(venta => {
+      if (venta.fecha) {
+        let fecha: Date
+        if (typeof venta.fecha === 'string') {
+          fecha = new Date(venta.fecha)
+        } else if (typeof venta.fecha === 'object' && venta.fecha !== null) {
+          const f = venta.fecha as unknown
+          if (f && typeof f === 'object' && 'seconds' in (f as Record<string, unknown>)) {
+            fecha = new Date((f as { seconds: number }).seconds * 1000)
+          } else {
+            fecha = new Date()
+          }
+        } else {
+          fecha = new Date()
+        }
+        const diaSemana = fecha.getDay()
+        datosPorDia[diaSemana].ventas += venta.precioTotalVenta || 0
+        datosPorDia[diaSemana].cobros += venta.montoPagado || 0
+      }
+    })
+    
+    // Reordenar para empezar en Lunes
+    return [...datosPorDia.slice(1), datosPorDia[0]]
+  }, [ventas])
 
   // Status distribution
   const clientesPorEstado = useMemo(() => {

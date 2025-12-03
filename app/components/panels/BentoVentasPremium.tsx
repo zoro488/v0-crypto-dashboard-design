@@ -380,16 +380,36 @@ export default memo(function BentoVentasPremium() {
     }
   }, [ventasData])
 
-  // Datos para gráficos
-  const chartData = useMemo(() => [
-    { name: 'Lun', ventas: 125000, cobrado: 98000 },
-    { name: 'Mar', ventas: 230000, cobrado: 180000 },
-    { name: 'Mie', ventas: 185000, cobrado: 160000 },
-    { name: 'Jue', ventas: 320000, cobrado: 280000 },
-    { name: 'Vie', ventas: 280000, cobrado: 250000 },
-    { name: 'Sab', ventas: 150000, cobrado: 130000 },
-    { name: 'Dom', ventas: 90000, cobrado: 80000 },
-  ], [])
+  // Datos para gráficos - DATOS REALES agrupados por día de la semana
+  const chartData = useMemo(() => {
+    const diasSemana = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab']
+    const datosPorDia = diasSemana.map(dia => ({ name: dia, ventas: 0, cobrado: 0 }))
+    
+    ventasData.forEach(venta => {
+      if (venta.fecha) {
+        let fecha: Date
+        if (typeof venta.fecha === 'string') {
+          fecha = new Date(venta.fecha)
+        } else if (typeof venta.fecha === 'object' && venta.fecha !== null) {
+          // Podría ser Firestore Timestamp o Date
+          const f = venta.fecha as unknown
+          if (f && typeof f === 'object' && 'seconds' in (f as Record<string, unknown>)) {
+            fecha = new Date((f as { seconds: number }).seconds * 1000)
+          } else {
+            fecha = new Date()
+          }
+        } else {
+          fecha = new Date()
+        }
+        const diaSemana = fecha.getDay()
+        datosPorDia[diaSemana].ventas += venta.precioTotalVenta || 0
+        datosPorDia[diaSemana].cobrado += venta.montoPagado || 0
+      }
+    })
+    
+    // Reordenar para empezar en Lunes
+    return [...datosPorDia.slice(1), datosPorDia[0]]
+  }, [ventasData])
 
   const pieData = useMemo(() => [
     { name: 'Completas', value: metrics.ventasCompletas, color: '#22c55e' },

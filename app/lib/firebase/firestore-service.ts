@@ -284,9 +284,12 @@ export const crearOrdenCompra = async (data: CrearOrdenCompraInput) => {
     const prodQuery = query(collection(db!, COLLECTIONS.ALMACEN), where('nombre', '==', ordenCompleta.producto))
     const prodSnapshot = await getDocs(prodQuery)
 
+    let productoId = ''
+    
     if (prodSnapshot.empty) {
       // Crear nuevo producto
       const prodRef = doc(collection(db!, COLLECTIONS.ALMACEN))
+      productoId = prodRef.id
       batch.set(prodRef, {
         nombre: ordenCompleta.producto,
         origen: ordenCompleta.origen,
@@ -309,6 +312,7 @@ export const crearOrdenCompra = async (data: CrearOrdenCompraInput) => {
       })
     } else {
       // Actualizar producto existente
+      productoId = prodSnapshot.docs[0].id
       const prodRef = doc(db!, COLLECTIONS.ALMACEN, prodSnapshot.docs[0].id)
       const prodData = prodSnapshot.docs[0].data()
       batch.update(prodRef, {
@@ -327,6 +331,30 @@ export const crearOrdenCompra = async (data: CrearOrdenCompraInput) => {
         updatedAt: Timestamp.now(),
       })
     }
+    
+    // ✅ CREAR DOCUMENTO EN COLECCIÓN almacen_entradas (para el panel de almacén)
+    const entradaRef = doc(collection(db!, COLLECTIONS.ALMACEN_ENTRADAS))
+    batch.set(entradaRef, {
+      id: entradaRef.id,
+      productoId: productoId,
+      producto: ordenCompleta.producto,
+      ordenCompraId: ocRef.id,
+      distribuidorId: distribuidorId,
+      distribuidor: ordenCompleta.distribuidor,
+      cantidad: ordenCompleta.cantidad,
+      valorUnitario: ordenCompleta.costoPorUnidad || 0,
+      valorTotal: ordenCompleta.costoTotal || 0,
+      origen: ordenCompleta.origen || ordenCompleta.distribuidor,
+      tipo: 'entrada',
+      fecha: ordenCompleta.fecha || Timestamp.now(),
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    })
+    
+    logger.info('Entrada de almacén registrada en almacen_entradas', {
+      context: 'FirestoreService',
+      data: { entradaId: entradaRef.id, ordenId: ocRef.id, cantidad: ordenCompleta.cantidad },
+    })
 
     // Si hay pago, actualizar banco
     if ((ordenCompleta.pagoDistribuidor || 0) > 0 && ordenCompleta.bancoOrigen) {
@@ -636,6 +664,31 @@ export const crearVenta = async (data: CrearVentaInput) => {
           },
         ],
         updatedAt: Timestamp.now(),
+      })
+      
+      // ✅ CREAR DOCUMENTO EN COLECCIÓN almacen_salidas (para el panel de almacén)
+      const salidaRef = doc(collection(db!, COLLECTIONS.ALMACEN_SALIDAS))
+      batch.set(salidaRef, {
+        id: salidaRef.id,
+        productoId: prodSnapshot.docs[0].id,
+        producto: data.producto || prodData.nombre,
+        ventaId: ventaRef.id,
+        cantidad: cantidad,
+        destino: data.cliente,
+        cliente: data.cliente,
+        clienteId: clienteId,
+        valorUnitario: precioVentaUnitario,
+        valorTotal: totalVenta,
+        precioCompra: costoUnitarioBase,
+        tipo: 'salida',
+        fecha: data.fecha || Timestamp.now(),
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
+      })
+      
+      logger.info('Salida de almacén registrada en almacen_salidas', {
+        context: 'FirestoreService',
+        data: { salidaId: salidaRef.id, ventaId: ventaRef.id, cantidad },
       })
     }
 
