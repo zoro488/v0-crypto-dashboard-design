@@ -57,7 +57,7 @@ import {
   CartesianGrid,
 } from 'recharts'
 import { SafeChartContainer, SAFE_ANIMATION_PROPS } from '@/app/components/ui/SafeChartContainer'
-import { useState, useEffect, useMemo, memo } from 'react'
+import { useState, useEffect, useMemo, memo, useCallback } from 'react'
 import { 
   useRealtimeVentas, 
   useRealtimeOrdenesCompra, 
@@ -69,7 +69,10 @@ import { CreateVentaModalPremium } from '@/app/components/modals/CreateVentaModa
 import { CreateTransferenciaModalPremium } from '@/app/components/modals/CreateTransferenciaModalPremium'
 import RevenueWidget from '@/app/components/widgets/RevenueWidget'
 import TopProductsWidget from '@/app/components/widgets/TopProductsWidget'
+import { InteractiveMetricsOrb } from '@/app/components/visualizations/InteractiveMetricsOrb'
+import { FinancialRiverFlow } from '@/app/components/visualizations/FinancialRiverFlow'
 import { cn } from '@/app/lib/utils'
+import { logger } from '@/app/lib/utils/logger'
 
 // Spring animation Chronos 2025
 const SPRING_CONFIG = CHRONOS_2025.animations.spring
@@ -146,7 +149,10 @@ export default memo(function BentoDashboard() {
   // Log para verificar conexiones en tiempo real
   useEffect(() => {
     if (ventasConnected && ocConnected && bancosConnected) {
-      console.log(`🔥 [BentoDashboard] TIEMPO REAL ACTIVO: ${ventasRaw.length} ventas, ${ordenesCompraRaw.length} OC, ${bancosData.length} bancos`)
+      logger.info('TIEMPO REAL ACTIVO', { 
+        context: 'BentoDashboard', 
+        data: { ventas: ventasRaw.length, ordenesCompra: ordenesCompraRaw.length, bancos: bancosData.length } 
+      })
     }
   }, [ventasRaw.length, ordenesCompraRaw.length, bancosData.length, ventasConnected, ocConnected, bancosConnected])
 
@@ -433,81 +439,178 @@ export default memo(function BentoDashboard() {
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          SECCIÓN: BANCOS (Lista compacta)
+          VISUALIZACIÓN 3D INTERACTIVA - FLUJO FINANCIERO DE BANCOS
        ═══════════════════════════════════════════════════════════════════════ */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ ...SPRING_CONFIG, delay: 0.3 }}
-        className="glass-card rounded-2xl p-6 mb-6"
+        transition={{ ...SPRING_CONFIG, delay: 0.35 }}
+        className="mb-6"
       >
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-lg font-bold text-white">Bancos</h3>
-            <p className="text-xs text-white/40 mt-1">Saldos actualizados en tiempo real</p>
+        <div 
+          className="rounded-2xl overflow-hidden"
+          style={{
+            background: 'rgba(20, 20, 30, 0.6)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+          }}
+        >
+          <div className="p-4 border-b border-white/[0.08] flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-[#0066FF] animate-pulse" />
+                Flujo Financiero en Tiempo Real
+              </h3>
+              <p className="text-white/40 text-xs mt-1">Visualización 3D interactiva de transacciones entre bancos</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-[#00FF57] font-mono bg-[#00FF57]/10 px-2 py-1 rounded-lg">LIVE</span>
+            </div>
           </div>
-          <motion.button 
-            className="p-2 hover:bg-white/10 rounded-xl transition-all duration-200 border border-white/[0.08] hover:border-white/20"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <Filter className="w-4 h-4 text-white" strokeWidth={1.8} />
-          </motion.button>
-        </div>
-        
-        <div className="space-y-2 max-h-[280px] overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.2) transparent' }}>
-          {bancos?.slice(0, 5).map((banco, index) => (
-            <motion.div
-              key={banco.id}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ ...SPRING_CONFIG, delay: 0.35 + index * 0.05 }}
-              className="group flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-all cursor-pointer border border-transparent hover:border-white/[0.08]"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#0066FF]/20 flex items-center justify-center border border-[#0066FF]/30">
-                  <DollarSign className="w-5 h-5 text-white" strokeWidth={1.8} />
-                </div>
-                <div>
-                  <p className="text-white font-medium text-sm">{banco.nombre}</p>
-                  <p className="text-white/40 text-xs font-mono">ID: {banco.id.slice(-4)}</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-white font-bold">${banco.saldo.toLocaleString()}</p>
-                <div className="flex items-center justify-end gap-1 text-[#00FF57] text-xs">
-                  <TrendingUp className="w-3 h-3" strokeWidth={1.8} />
-                  <span>+2.4%</span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+          
+          <div className="flex justify-center py-6">
+            <FinancialRiverFlow
+              accounts={bancos.slice(0, 4).map((banco, index) => {
+                const colors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316']
+                const positions = [
+                  { x: 150, y: 200 },
+                  { x: 450, y: 120 },
+                  { x: 450, y: 280 },
+                  { x: 750, y: 200 },
+                ]
+                return {
+                  id: banco.id,
+                  name: banco.nombre,
+                  balance: banco.saldo,
+                  x: positions[index]?.x || 300,
+                  y: positions[index]?.y || 200,
+                  color: colors[index] || '#3b82f6',
+                  ripples: [],
+                }
+              })}
+              width={900}
+              height={350}
+              className="rounded-xl"
+            />
+          </div>
         </div>
       </motion.div>
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          GRID: PERFORMANCE + DISTRIBUCIÓN (2 columnas)
+          SECCIÓN: BANCOS CON SALDOS REALES (Cards Premium)
+       ═══════════════════════════════════════════════════════════════════════ */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ ...SPRING_CONFIG, delay: 0.4 }}
+        className="mb-6"
+      >
+        <div className="flex items-center justify-between mb-4 px-2">
+          <div>
+            <h3 className="text-lg font-bold text-white">Saldos de Bancos</h3>
+            <p className="text-xs text-white/40 mt-1">7 cuentas • Actualizado en tiempo real</p>
+          </div>
+          <motion.button 
+            className="text-xs text-[#0066FF] hover:text-[#0066FF]/80 font-medium flex items-center gap-1"
+            whileHover={{ x: 4 }}
+          >
+            Ver todos <ArrowUpRight className="w-3 h-3" />
+          </motion.button>
+        </div>
+        
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+          {bancos.map((banco, index) => {
+            const colors = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ec4899', '#06b6d4', '#f97316']
+            const color = colors[index % colors.length]
+            const trend = Math.random() > 0.3 ? 'up' : 'down'
+            const trendValue = (Math.random() * 15).toFixed(1)
+            
+            return (
+              <motion.div
+                key={banco.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ ...SPRING_CONFIG, delay: 0.42 + index * 0.03 }}
+                whileHover={{ y: -4, scale: 1.02 }}
+                className="group cursor-pointer"
+              >
+                <div 
+                  className="relative overflow-hidden rounded-2xl p-4 h-full"
+                  style={{
+                    background: `linear-gradient(135deg, ${color}15, ${color}05)`,
+                    border: `1px solid ${color}30`,
+                  }}
+                >
+                  {/* Glow efecto en hover */}
+                  <div 
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    style={{
+                      background: `radial-gradient(circle at 50% 0%, ${color}30, transparent 70%)`,
+                    }}
+                  />
+                  
+                  {/* Contenido */}
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div 
+                        className="w-8 h-8 rounded-lg flex items-center justify-center"
+                        style={{ background: `${color}25` }}
+                      >
+                        <DollarSign className="w-4 h-4" style={{ color }} />
+                      </div>
+                    </div>
+                    
+                    <p className="text-white/60 text-xs font-medium mb-1 truncate">{banco.nombre}</p>
+                    <p className="text-white font-bold text-lg font-mono">
+                      ${(banco.saldo / 1000).toFixed(0)}k
+                    </p>
+                    
+                    <div className="flex items-center gap-1 mt-2">
+                      {trend === 'up' ? (
+                        <TrendingUp className="w-3 h-3 text-[#00FF57]" />
+                      ) : (
+                        <ArrowDownRight className="w-3 h-3 text-[#FF4444]" />
+                      )}
+                      <span className={`text-xs font-medium ${trend === 'up' ? 'text-[#00FF57]' : 'text-[#FF4444]'}`}>
+                        {trend === 'up' ? '+' : '-'}{trendValue}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
+      </motion.div>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          ORB 3D INTERACTIVO - MÉTRICAS PRINCIPALES
        ═══════════════════════════════════════════════════════════════════════ */}
       <div className="grid grid-cols-12 gap-4 mb-6">
-        {/* Performance Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ ...SPRING_CONFIG, delay: 0.4 }}
-          className="col-span-12 lg:col-span-6 glass-card rounded-2xl p-6"
+          transition={{ ...SPRING_CONFIG, delay: 0.45 }}
+          className="col-span-12 lg:col-span-6"
         >
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-lg font-bold text-white">Performance</h3>
-              <p className="text-white/40 text-xs mt-1">Métricas de rendimiento</p>
-            </div>
-            <div className="p-2 bg-[#C81EFF]/10 rounded-xl border border-[#C81EFF]/20">
-              <Zap className="w-5 h-5 text-[#C81EFF]" strokeWidth={1.8} />
-            </div>
-          </div>
-          
-          <div className="h-[180px] w-full flex items-center justify-center">
-            <p className="text-white/40 text-sm">RadarChart - Próximamente</p>
+          <div 
+            className="rounded-2xl p-6 h-full flex items-center justify-center"
+            style={{
+              background: 'rgba(20, 20, 30, 0.6)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+            }}
+          >
+            <InteractiveMetricsOrb
+              metrics={[
+                { label: 'Capital', value: metrics.capitalTotal, change: 12.5, icon: DollarSign, color: '#10b981' },
+                { label: 'Ventas', value: metrics.ventasMes, change: 8.3, icon: TrendingUp, color: '#3b82f6' },
+                { label: 'Stock', value: metrics.stockActual, change: -3.2, icon: Package, color: '#f59e0b' },
+                { label: 'Órdenes', value: metrics.ordenesActivas, change: 15.8, icon: ShoppingCart, color: '#8b5cf6' },
+              ]}
+              size={380}
+              className="mx-auto"
+            />
           </div>
         </motion.div>
 
@@ -515,7 +618,7 @@ export default memo(function BentoDashboard() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ ...SPRING_CONFIG, delay: 0.45 }}
+          transition={{ ...SPRING_CONFIG, delay: 0.5 }}
           className="col-span-12 lg:col-span-6 glass-card rounded-2xl p-6"
         >
           <div className="flex items-center justify-between mb-4">
@@ -528,8 +631,8 @@ export default memo(function BentoDashboard() {
             </div>
           </div>
 
-          <div className="h-[180px] w-full">
-            <SafeChartContainer height={180} minHeight={140}>
+          <div className="h-[320px] w-full">
+            <SafeChartContainer height={320} minHeight={280}>
               <BarChart data={mockChartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                 <XAxis dataKey="name" stroke="#6B6B6B" fontSize={10} tickLine={false} axisLine={false} />

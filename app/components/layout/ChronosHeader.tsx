@@ -537,7 +537,7 @@ export default function ChronosHeader() {
         `}
       >
         <div className="h-16 md:h-[72px] max-w-[2000px] mx-auto px-3 md:px-6 flex items-center justify-between gap-2 md:gap-4">
-          {/* Logo */}
+          {/* Logo Premium CHRONOS */}
           <motion.div
             className="flex items-center gap-2 md:gap-3 cursor-pointer group shrink-0"
             whileHover={{ scale: 1.02 }}
@@ -545,23 +545,85 @@ export default function ChronosHeader() {
             onClick={() => setCurrentPanel('dashboard')}
           >
             <motion.div
-              className="relative w-9 h-9 md:w-10 md:h-10 rounded-xl md:rounded-2xl overflow-hidden"
+              className="relative w-10 h-10 md:w-11 md:h-11 rounded-xl md:rounded-2xl overflow-hidden"
               whileHover={{ rotate: 360 }}
-              transition={{ duration: 0.6, ease: 'easeInOut' }}
+              transition={{ duration: 0.8, ease: 'easeInOut' }}
             >
-              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500" />
-              <div className="absolute inset-[2px] bg-black rounded-[10px] md:rounded-[14px] flex items-center justify-center">
-                <span className="font-bold text-white text-lg md:text-xl">C</span>
+              {/* Fondo con gradiente animado */}
+              <motion.div 
+                className="absolute inset-0"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(0,245,255,0.2) 0%, rgba(139,92,246,0.2) 50%, rgba(255,0,170,0.2) 100%)',
+                }}
+                animate={{
+                  background: [
+                    'linear-gradient(135deg, rgba(0,245,255,0.2) 0%, rgba(139,92,246,0.2) 50%, rgba(255,0,170,0.2) 100%)',
+                    'linear-gradient(225deg, rgba(255,0,170,0.2) 0%, rgba(0,245,255,0.2) 50%, rgba(139,92,246,0.2) 100%)',
+                    'linear-gradient(135deg, rgba(0,245,255,0.2) 0%, rgba(139,92,246,0.2) 50%, rgba(255,0,170,0.2) 100%)',
+                  ],
+                }}
+                transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
+              />
+              {/* Borde con gradiente */}
+              <div 
+                className="absolute inset-0 rounded-xl md:rounded-2xl"
+                style={{
+                  padding: '1px',
+                  background: 'linear-gradient(135deg, rgba(0,245,255,0.5), rgba(255,0,170,0.3))',
+                  WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                  mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                  WebkitMaskComposite: 'xor',
+                  maskComposite: 'exclude',
+                }}
+              />
+              <div className="absolute inset-[1px] bg-black rounded-[10px] md:rounded-[14px] flex items-center justify-center">
+                <span 
+                  className="font-black text-lg md:text-xl"
+                  style={{
+                    background: 'linear-gradient(135deg, #00F5FF 0%, #FFFFFF 50%, #FF00AA 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    filter: 'drop-shadow(0 0 8px rgba(0,245,255,0.5))',
+                  }}
+                >
+                  C
+                </span>
               </div>
             </motion.div>
             <div className="hidden sm:flex flex-col">
-              {/* Título CHRONOS con efecto Mirror Chrome estilo Apple */}
-              <span className="text-mirror-chrome font-bold text-base md:text-lg tracking-wider">CHRONOS</span>
+              {/* Título CHRONOS con gradiente premium */}
+              <span 
+                className="font-black text-base md:text-lg tracking-[0.15em]"
+                style={{
+                  background: 'linear-gradient(135deg, #00F5FF 0%, #FFFFFF 50%, #FF00AA 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  filter: 'drop-shadow(0 0 10px rgba(0,245,255,0.3))',
+                }}
+              >
+                CHRONOS
+              </span>
               <div className="flex items-center gap-1.5">
-                <span className="text-[9px] md:text-[10px] text-white/40 tracking-widest uppercase">System</span>
+                <span className="text-[9px] md:text-[10px] text-white/40 tracking-widest uppercase">Enterprise</span>
                 <div className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-[8px] md:text-[9px] text-green-400/60">ONLINE</span>
+                  <motion.span 
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{ 
+                      background: '#00F5FF',
+                      boxShadow: '0 0 8px #00F5FF',
+                    }}
+                    animate={{
+                      scale: [1, 1.3, 1],
+                      opacity: [0.7, 1, 0.7],
+                    }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  />
+                  <span 
+                    className="text-[8px] md:text-[9px] font-medium tracking-wider"
+                    style={{ color: 'rgba(0,245,255,0.7)' }}
+                  >
+                    ONLINE
+                  </span>
                 </div>
               </div>
             </div>

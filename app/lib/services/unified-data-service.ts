@@ -63,7 +63,7 @@ export const actualizarCapitalBanco = async (
   tipo: 'ingreso' | 'gasto' | 'transferencia',
 ) => {
   return withFallback('actualizarCapitalBanco', () => 
-    localService.localActualizarCapitalBanco(bancoId, monto, tipo)
+    localService.localActualizarCapitalBanco(bancoId, monto, tipo),
   )
 }
 
@@ -96,7 +96,7 @@ export const cobrarCliente = async (
   monto: number,
 ): Promise<void> => {
   return withFallback('cobrarCliente', () => 
-    localService.localCobrarCliente(clienteId, ventaId, monto)
+    localService.localCobrarCliente(clienteId, ventaId, monto),
   )
 }
 
@@ -144,14 +144,14 @@ export const pagarDistribuidor = async (
   bancoOrigenId: BancoId,
 ): Promise<void> => {
   await withFallback('pagarDistribuidor', () => 
-    localService.localPagarDistribuidor(distribuidorId, ordenCompraId, monto, bancoOrigenId)
+    localService.localPagarDistribuidor(distribuidorId, ordenCompraId, monto, bancoOrigenId),
   )
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const actualizarDistribuidor = async (distribuidorId: string, data: any): Promise<void> => {
   await withFallback('actualizarDistribuidor', () => 
-    localService.localActualizarDistribuidor(distribuidorId, data)
+    localService.localActualizarDistribuidor(distribuidorId, data),
   )
 }
 
@@ -227,7 +227,7 @@ export const crearMovimiento = async (data: any): Promise<string> => {
 export const suscribirEntradasAlmacen = (callback: (entradas: any[]) => void) => {
   return subscribeWithFallback('suscribirEntradasAlmacen', 
     localService.localSuscribirEntradasAlmacen || (() => () => {}), 
-    callback
+    callback,
   )
 }
 
@@ -235,21 +235,21 @@ export const suscribirEntradasAlmacen = (callback: (entradas: any[]) => void) =>
 export const suscribirSalidasAlmacen = (callback: (salidas: any[]) => void) => {
   return subscribeWithFallback('suscribirSalidasAlmacen', 
     localService.localSuscribirSalidasAlmacen || (() => () => {}), 
-    callback
+    callback,
   )
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const crearEntradaAlmacen = async (data: any): Promise<string> => {
   return withFallback('crearEntradaAlmacen', () => 
-    localService.localCrearEntradaAlmacen ? localService.localCrearEntradaAlmacen(data) : 'local-' + Date.now()
+    localService.localCrearEntradaAlmacen ? localService.localCrearEntradaAlmacen(data) : 'local-' + Date.now(),
   )
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const crearSalidaAlmacen = async (data: any): Promise<string> => {
   return withFallback('crearSalidaAlmacen', () => 
-    localService.localCrearSalidaAlmacen ? localService.localCrearSalidaAlmacen(data) : 'local-' + Date.now()
+    localService.localCrearSalidaAlmacen ? localService.localCrearSalidaAlmacen(data) : 'local-' + Date.now(),
   )
 }
 
@@ -292,13 +292,13 @@ export interface TransferenciaData {
   fecha?: string
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export const addTransferencia = async (data: TransferenciaData): Promise<string | null> => {
   return withFallback('addTransferencia', () => 
     localService.localCrearTransferencia ? localService.localCrearTransferencia({
       ...data,
       concepto: data.concepto || `Transferencia de ${data.bancoOrigenId} a ${data.bancoDestinoId}`,
-    }) : 'local-' + Date.now()
+    }) : 'local-' + Date.now(),
   )
 }
 
@@ -324,7 +324,7 @@ export interface AbonoData {
   fecha?: string
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export const addAbono = async (data: AbonoData): Promise<string | null> => {
   return withFallback('addAbono', () => 
     localService.localCrearAbono ? localService.localCrearAbono({
@@ -333,7 +333,7 @@ export const addAbono = async (data: AbonoData): Promise<string | null> => {
       monto: data.monto,
       bancoDestino: data.bancoDestinoId || 'utilidades',
       metodo: (data.concepto || 'efectivo') as 'efectivo' | 'transferencia' | 'cheque',
-    }) : 'local-' + Date.now()
+    }) : 'local-' + Date.now(),
   )
 }
 
@@ -344,14 +344,14 @@ export const addAbono = async (data: AbonoData): Promise<string | null> => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const crearIngreso = async (data: any): Promise<string | null> => {
   return withFallback('crearIngreso', () => 
-    localService.localCrearIngreso ? localService.localCrearIngreso(data) : 'local-' + Date.now()
+    localService.localCrearIngreso ? localService.localCrearIngreso(data) : 'local-' + Date.now(),
   )
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const crearGasto = async (data: any): Promise<string | null> => {
   return withFallback('crearGasto', () => 
-    localService.localCrearGasto ? localService.localCrearGasto(data) : 'local-' + Date.now()
+    localService.localCrearGasto ? localService.localCrearGasto(data) : 'local-' + Date.now(),
   )
 }
 

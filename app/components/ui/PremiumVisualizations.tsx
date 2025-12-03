@@ -54,6 +54,10 @@ export const Card3D = ({ children, className, depth = 10, glare = true }: Card3D
 
   const glareX = useTransform(x, [-100, 100], [0, 100])
   const glareY = useTransform(y, [-100, 100], [0, 100])
+  const glareBackground = useTransform(
+    [glareX, glareY],
+    ([gX, gY]) => `radial-gradient(circle at ${gX}% ${gY}%, rgba(255,255,255,0.15) 0%, transparent 50%)`,
+  )
 
   return (
     <motion.div
@@ -77,10 +81,7 @@ export const Card3D = ({ children, className, depth = 10, glare = true }: Card3D
         <motion.div
           className="absolute inset-0 rounded-2xl pointer-events-none overflow-hidden"
           style={{
-            background: useTransform(
-              [glareX, glareY],
-              ([x, y]) => `radial-gradient(circle at ${x}% ${y}%, rgba(255,255,255,0.15) 0%, transparent 50%)`,
-            ),
+            background: glareBackground,
           }}
         />
       )}

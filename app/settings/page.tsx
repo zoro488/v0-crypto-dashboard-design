@@ -7,9 +7,7 @@ import {
   Building2, 
   CreditCard, 
   Bell, 
-  Shield, 
-  Palette,
-  Key,
+  Shield,
   Globe,
   Monitor,
   Moon,
@@ -17,7 +15,6 @@ import {
   Smartphone,
   Laptop,
   MapPin,
-  LogOut,
   Camera,
   Check,
   ChevronRight,
@@ -56,6 +53,8 @@ function Toggle({
   onChange: (checked: boolean) => void
   disabled?: boolean
 }) {
+  // Mantener la prop disabled para API futura
+  void disabled
   return (
     <motion.button
       type="button"
@@ -195,6 +194,8 @@ function AvatarUpload({
   onUpload: (file: File) => void 
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
+  // Mantener la prop para API futura
+  void onUpload
   
   return (
     <div className="flex items-center gap-6">

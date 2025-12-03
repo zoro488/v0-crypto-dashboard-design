@@ -1,6 +1,8 @@
 /**
- * Hook de autenticación con Firebase Auth
+ * Hook de autenticación - MODO LOCAL
  * @module hooks/useAuth
+ * 
+ * ⚠️ FIREBASE DESHABILITADO - Autenticación simulada con localStorage
  * 
  * Proporciona estado de autenticación, métodos de login/logout,
  * y protección de rutas para la aplicación.
@@ -9,18 +11,14 @@
 'use client'
 
 import { useState, useEffect, useCallback, createContext, useContext, type ReactNode } from 'react'
-import {
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  sendPasswordResetEmail,
-  updateProfile,
+import { 
+  signIn, 
+  signOut as localSignOut, 
+  signUp,
+  onAuthChange, 
+  resetPassword as localResetPassword,
   type User,
-  type UserCredential,
-} from 'firebase/auth'
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
-import { auth, db, isFirebaseConfigured } from '../lib/firebase/config'
+} from '../lib/firebase/auth'
 import { logger } from '../lib/utils/logger'
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -38,6 +36,11 @@ export interface UserProfile {
   createdAt: Date
   lastLogin: Date
   permissions: string[]
+}
+
+// Tipo de credencial mock (compatible con UserCredential de Firebase)
+export interface UserCredential {
+  user: User
 }
 
 export interface AuthState {
@@ -81,63 +84,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
   })
 
   /**
-   * Obtener perfil de usuario desde Firestore
+   * Crear perfil de usuario desde User
    */
-  const fetchUserProfile = useCallback(async (user: User): Promise<UserProfile | null> => {
-    // Guard: verificar que Firestore está disponible
-    if (!isFirebaseConfigured || !db) {
-      logger.warn('fetchUserProfile: Firestore no disponible', { context: 'useAuth' })
-      return {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-        role: 'user',
-        createdAt: new Date(),
-        lastLogin: new Date(),
-        permissions: ['read'],
-      }
-    }
-    
-    try {
-      const userRef = doc(db, 'users', user.uid)
-      const userSnap = await getDoc(userRef)
-
-      if (userSnap.exists()) {
-        const data = userSnap.data()
-        return {
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName || data.displayName,
-          photoURL: user.photoURL || data.photoURL,
-          role: data.role || 'user',
-          createdAt: data.createdAt?.toDate() || new Date(),
-          lastLogin: data.lastLogin?.toDate() || new Date(),
-          permissions: data.permissions || [],
-        }
-      }
-
-      // Crear perfil si no existe
-      const newProfile: Omit<UserProfile, 'uid'> = {
-        email: user.email,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-        role: 'user',
-        createdAt: new Date(),
-        lastLogin: new Date(),
-        permissions: ['read'],
-      }
-
-      await setDoc(userRef, {
-        ...newProfile,
-        createdAt: serverTimestamp(),
-        lastLogin: serverTimestamp(),
-      })
-
-      return { uid: user.uid, ...newProfile }
-    } catch (error) {
-      logger.error('Error fetching user profile', error, { context: 'useAuth' })
-      return null
+  const createProfile = useCallback((user: User): UserProfile => {
+    return {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL,
+      role: 'admin', // Por defecto admin en modo local
+      createdAt: new Date(),
+      lastLogin: new Date(),
+      permissions: ['read', 'write', 'admin'],
     }
   }, [])
 
@@ -145,39 +103,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
    * Escuchar cambios de autenticación
    */
   useEffect(() => {
-    // Guard: verificar que auth está disponible
-    if (!auth) {
-      setState({
-        user: null,
-        profile: null,
-        loading: false,
-        error: 'Firebase Auth no configurado',
-      })
-      return
-    }
-    
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthChange((user) => {
       if (user) {
-        const profile = await fetchUserProfile(user)
-        
-        // Actualizar último login (solo si db está disponible)
-        if (isFirebaseConfigured && db) {
-          try {
-            await setDoc(
-              doc(db, 'users', user.uid),
-              { lastLogin: serverTimestamp() },
-              { merge: true },
-            )
-          } catch (error) {
-            logger.warn('No se pudo actualizar lastLogin', { context: 'useAuth' })
-          }
-        }
-
+        const profile = createProfile(user)
         setState({
           user,
           profile,
           loading: false,
           error: null,
+        })
+        logger.info('Usuario autenticado (LOCAL)', { 
+          context: 'useAuth', 
+          data: { userId: user.uid }, 
         })
       } else {
         setState({
@@ -190,24 +127,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
     })
 
     return () => unsubscribe()
-  }, [fetchUserProfile])
+  }, [createProfile])
 
   /**
-   * Iniciar sesión
+   * Iniciar sesión (LOCAL)
    */
   const login = useCallback(async (email: string, password: string): Promise<UserCredential> => {
-    if (!auth) {
-      throw new Error('Firebase Auth no configurado')
-    }
-    
     setState((prev) => ({ ...prev, loading: true, error: null }))
     
     try {
-      const credential = await signInWithEmailAndPassword(auth, email, password)
-      logger.info('Usuario autenticado', { context: 'useAuth', data: { userId: credential.user.uid } })
-      return credential
+      const result = await signIn(email, password)
+      if (result.error || !result.user) {
+        throw new Error(result.error || 'Error de autenticación')
+      }
+      logger.info('Usuario autenticado (LOCAL)', { context: 'useAuth', data: { userId: result.user.uid } })
+      return { user: result.user }
     } catch (error) {
-      const message = getAuthErrorMessage(error)
+      const message = error instanceof Error ? error.message : 'Error de autenticación'
       setState((prev) => ({ ...prev, loading: false, error: message }))
       logger.error('Error en login', error, { context: 'useAuth' })
       throw error
@@ -218,13 +154,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
    * Cerrar sesión
    */
   const logout = useCallback(async (): Promise<void> => {
-    if (!auth) {
-      throw new Error('Firebase Auth no configurado')
-    }
-    
     try {
-      await signOut(auth)
-      logger.info('Usuario desconectado', { context: 'useAuth' })
+      await localSignOut()
+      logger.info('Usuario desconectado (LOCAL)', { context: 'useAuth' })
     } catch (error) {
       logger.error('Error en logout', error, { context: 'useAuth' })
       throw error
@@ -232,41 +164,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [])
 
   /**
-   * Registrar nuevo usuario
+   * Registrar nuevo usuario (LOCAL)
    */
   const register = useCallback(async (
     email: string,
     password: string,
     displayName: string,
   ): Promise<UserCredential> => {
-    if (!auth) {
-      throw new Error('Firebase Auth no configurado')
-    }
-    
     setState((prev) => ({ ...prev, loading: true, error: null }))
     
     try {
-      const credential = await createUserWithEmailAndPassword(auth, email, password)
-      
-      // Actualizar perfil con nombre
-      await updateProfile(credential.user, { displayName })
-      
-      // Crear documento en Firestore (solo si db está disponible)
-      if (isFirebaseConfigured && db) {
-        await setDoc(doc(db, 'users', credential.user.uid), {
-          email,
-          displayName,
-          role: 'user',
-          permissions: ['read'],
-          createdAt: serverTimestamp(),
-          lastLogin: serverTimestamp(),
-        })
+      const result = await signUp(email, password, displayName)
+      if (result.error || !result.user) {
+        throw new Error(result.error || 'Error en registro')
       }
-
-      logger.info('Usuario registrado', { context: 'useAuth', data: { userId: credential.user.uid } })
-      return credential
+      logger.info('Usuario registrado (LOCAL)', { context: 'useAuth', data: { userId: result.user.uid } })
+      return { user: result.user }
     } catch (error) {
-      const message = getAuthErrorMessage(error)
+      const message = error instanceof Error ? error.message : 'Error en registro'
       setState((prev) => ({ ...prev, loading: false, error: message }))
       logger.error('Error en registro', error, { context: 'useAuth' })
       throw error
@@ -274,26 +189,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [])
 
   /**
-   * Restablecer contraseña
+   * Restablecer contraseña (simulado en LOCAL)
    */
   const resetPassword = useCallback(async (email: string): Promise<void> => {
-    if (!auth) {
-      throw new Error('Firebase Auth no configurado')
-    }
-    
     try {
-      await sendPasswordResetEmail(auth, email)
-      logger.info('Email de recuperación enviado', { context: 'useAuth', data: { email } })
+      await localResetPassword(email)
+      logger.info('Email de recuperación enviado (LOCAL - simulado)', { context: 'useAuth', data: { email } })
     } catch (error) {
-      const message = getAuthErrorMessage(error)
-      setState((prev) => ({ ...prev, error: message }))
       logger.error('Error en resetPassword', error, { context: 'useAuth' })
       throw error
     }
   }, [])
 
   /**
-   * Actualizar perfil de usuario
+   * Actualizar perfil de usuario (LOCAL)
    */
   const updateUserProfile = useCallback(async (
     data: Partial<Pick<UserProfile, 'displayName' | 'photoURL'>>,
@@ -301,23 +210,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (!state.user) throw new Error('No hay usuario autenticado')
 
     try {
-      await updateProfile(state.user, data)
-      
-      // Actualizar en Firestore solo si está disponible
-      if (isFirebaseConfigured && db) {
-        await setDoc(
-          doc(db, 'users', state.user.uid),
-          { ...data, updatedAt: serverTimestamp() },
-          { merge: true },
-        )
-      }
-
+      // Actualizar estado local
       setState((prev) => ({
         ...prev,
+        user: prev.user ? { ...prev.user, ...data } : null,
         profile: prev.profile ? { ...prev.profile, ...data } : null,
       }))
 
-      logger.info('Perfil actualizado', { context: 'useAuth' })
+      // Persistir en localStorage
+      if (typeof window !== 'undefined') {
+        const updatedUser = { ...state.user, ...data }
+        localStorage.setItem('chronos_auth_user', JSON.stringify(updatedUser))
+      }
+
+      logger.info('Perfil actualizado (LOCAL)', { context: 'useAuth' })
     } catch (error) {
       logger.error('Error actualizando perfil', error, { context: 'useAuth' })
       throw error
@@ -401,42 +307,6 @@ export function useHasPermission(permission: string): boolean {
 export function useIsAuthenticated(): boolean {
   const { user, loading } = useAuth()
   return !loading && user !== null
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// UTILIDADES
-// ═══════════════════════════════════════════════════════════════════════════
-
-/**
- * Traduce errores de Firebase Auth a mensajes en español
- */
-function getAuthErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    const code = (error as { code?: string }).code
-    
-    switch (code) {
-      case 'auth/invalid-email':
-        return 'El correo electrónico no es válido'
-      case 'auth/user-disabled':
-        return 'Esta cuenta ha sido deshabilitada'
-      case 'auth/user-not-found':
-        return 'No existe una cuenta con este correo'
-      case 'auth/wrong-password':
-        return 'Contraseña incorrecta'
-      case 'auth/email-already-in-use':
-        return 'Ya existe una cuenta con este correo'
-      case 'auth/weak-password':
-        return 'La contraseña debe tener al menos 6 caracteres'
-      case 'auth/too-many-requests':
-        return 'Demasiados intentos. Intenta más tarde'
-      case 'auth/network-request-failed':
-        return 'Error de conexión. Verifica tu internet'
-      default:
-        return error.message || 'Error de autenticación'
-    }
-  }
-  
-  return 'Error desconocido'
 }
 
 export default useAuth

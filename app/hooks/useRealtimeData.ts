@@ -286,7 +286,7 @@ export function useRealtimeData(): UseRealtimeDataReturn {
 export function useBanco(bancoId: BancoId) {
   const banco = useChronosStore((state) => state.bancos[bancoId])
   const movimientos = useChronosStore((state) => 
-    state.movimientos.filter((m) => m.bancoId === bancoId)
+    state.movimientos.filter((m) => m.bancoId === bancoId),
   )
   const registrarIngreso = useChronosStore((state) => state.registrarIngreso)
   const registrarGasto = useChronosStore((state) => state.registrarGasto)

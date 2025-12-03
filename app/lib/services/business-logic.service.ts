@@ -280,7 +280,7 @@ export async function registrarPagoDistribuidor(input: PagoDistribuidorInput): P
         input.distribuidorId, 
         input.ordenCompraRelacionada, 
         input.monto, 
-        input.bancoOrigen
+        input.bancoOrigen,
       )
     }
     

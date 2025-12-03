@@ -13,10 +13,15 @@ const baseConfig: NextConfig = {
     ignoreBuildErrors: false,
     tsconfigPath: './tsconfig.json',
   },
+  
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 🖼️ OPTIMIZACIÓN DE IMÁGENES
+  // ═══════════════════════════════════════════════════════════════════════════
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    minimumCacheTTL: 60 * 60 * 24 * 30, // 30 días
     remotePatterns: [
       {
         protocol: 'https',
@@ -37,27 +42,58 @@ const baseConfig: NextConfig = {
       },
     ],
   },
+  
   reactStrictMode: true,
+  
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ⚡ SWC COMPILER - OPTIMIZACIONES MÁXIMAS
+  // ═══════════════════════════════════════════════════════════════════════════
   compiler: {
+    // Eliminar console.log en producción (excepto error/warn)
     removeConsole: process.env.NODE_ENV === 'production' ? {
       exclude: ['error', 'warn'],
     } : false,
+    // Minificación React optimizada
+    reactRemoveProperties: process.env.NODE_ENV === 'production',
+    // Eliminar data-testid en producción
+    ...(process.env.NODE_ENV === 'production' && {
+      removeDataTestIdAttributes: true,
+    }),
   },
+  
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 🧪 EXPERIMENTAL - OPTIMIZACIONES AVANZADAS
+  // ═══════════════════════════════════════════════════════════════════════════
   experimental: {
+    // Tree-shaking optimizado para paquetes grandes
     optimizePackageImports: [
       'lucide-react',
       'framer-motion',
       '@radix-ui/react-icons',
       '@radix-ui/react-dialog',
       '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-select',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-tooltip',
+      '@radix-ui/react-popover',
       'recharts',
       'three',
       '@react-three/fiber',
       '@react-three/drei',
+      '@react-three/postprocessing',
       'botid',
       '@azure-rest/ai-inference',
+      'date-fns',
+      'zod',
+      '@tanstack/react-query',
+      '@tanstack/react-table',
     ],
+    // Optimización de memoria webpack
     webpackMemoryOptimizations: true,
+    // Parallel Routes optimizado
+    parallelServerCompiles: true,
+    // CSS optimizado
+    optimizeCss: true,
   },
   // Turbopack deshabilitado temporalmente por issues en Codespaces
   // turbopack: {},

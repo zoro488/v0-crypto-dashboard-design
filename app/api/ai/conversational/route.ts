@@ -25,7 +25,7 @@ type ProviderType = 'github' | 'openai' | 'anthropic' | 'google' | 'none'
 
 interface ProviderConfig {
   type: ProviderType
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   provider: any
   modelId: string
 }

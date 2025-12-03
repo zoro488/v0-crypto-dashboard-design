@@ -588,7 +588,7 @@ export default function ChronosDashboard() {
       </div>
 
       {/* ============================================================ */}
-      {/* INTRO ANIMATION - CHRONOS */}
+      {/* INTRO ANIMATION - CHRONOS PREMIUM */}
       {/* ============================================================ */}
       <AnimatePresence mode="wait">
         {showChronos && (
@@ -600,24 +600,60 @@ export default function ChronosDashboard() {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="col-span-12 relative z-50 mb-4 md:mb-8"
           >
-            <div className="relative h-64 md:h-[400px] rounded-3xl md:rounded-[48px] overflow-hidden bg-gradient-to-br from-black via-gray-900 to-black border border-white/10">
-              {/* Animated Background */}
+            <div className="relative h-72 md:h-[450px] rounded-3xl md:rounded-[48px] overflow-hidden bg-black border border-white/10">
+              {/* Animated Background - Aurora Effect */}
               <div className="absolute inset-0">
+                {/* Cyan orb */}
                 <motion.div
-                  className="absolute top-1/4 left-1/4 w-48 md:w-96 h-48 md:h-96 rounded-full bg-blue-500/20 blur-[100px]"
+                  className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full"
+                  style={{
+                    background: 'radial-gradient(circle, rgba(0,245,255,0.15) 0%, transparent 70%)',
+                    filter: 'blur(80px)',
+                  }}
                   animate={{
                     scale: [1, 1.3, 1],
-                    opacity: [0.3, 0.6, 0.3],
+                    x: [0, 50, 0],
+                    y: [0, 30, 0],
                   }}
-                  transition={{ duration: 4, repeat: Infinity }}
+                  transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
                 />
+                {/* Magenta orb */}
                 <motion.div
-                  className="absolute bottom-1/4 right-1/4 w-48 md:w-96 h-48 md:h-96 rounded-full bg-purple-500/20 blur-[100px]"
-                  animate={{
-                    scale: [1, 1.3, 1],
-                    opacity: [0.3, 0.6, 0.3],
+                  className="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full"
+                  style={{
+                    background: 'radial-gradient(circle, rgba(255,0,170,0.12) 0%, transparent 70%)',
+                    filter: 'blur(80px)',
                   }}
-                  transition={{ duration: 4, repeat: Infinity, delay: 2 }}
+                  animate={{
+                    scale: [1, 1.4, 1],
+                    x: [0, -40, 0],
+                    y: [0, -20, 0],
+                  }}
+                  transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+                />
+                {/* Violet orb */}
+                <motion.div
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full"
+                  style={{
+                    background: 'radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%)',
+                    filter: 'blur(60px)',
+                  }}
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    rotate: [0, 360],
+                  }}
+                  transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+                />
+                {/* Grid pattern */}
+                <div 
+                  className="absolute inset-0 opacity-[0.02]"
+                  style={{
+                    backgroundImage: `
+                      linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+                    `,
+                    backgroundSize: '50px 50px',
+                  }}
                 />
               </div>
 
@@ -629,66 +665,177 @@ export default function ChronosDashboard() {
                   transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
                   className="text-center"
                 >
-                  {/* Logo */}
+                  {/* Logo Premium con efectos 3D */}
                   <motion.div
-                    className="w-16 h-16 md:w-24 md:h-24 mx-auto mb-4 md:mb-6 rounded-2xl md:rounded-3xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center"
-                    animate={{ 
-                      boxShadow: [
-                        '0 0 60px rgba(59, 130, 246, 0.3)',
-                        '0 0 80px rgba(168, 85, 247, 0.4)',
-                        '0 0 60px rgba(59, 130, 246, 0.3)',
-                      ],
-                    }}
-                    transition={{ duration: 3, repeat: Infinity }}
+                    className="relative w-20 h-20 md:w-28 md:h-28 mx-auto mb-6 md:mb-8"
+                    whileHover={{ scale: 1.05 }}
                   >
-                    <span className="text-3xl md:text-5xl font-bold text-white">C</span>
+                    {/* Anillos orbitales */}
+                    {[0, 1, 2].map((i) => (
+                      <motion.div
+                        key={i}
+                        className="absolute inset-[-15px]"
+                        style={{
+                          border: `1px solid ${i === 0 ? 'rgba(0,245,255,0.3)' : i === 1 ? 'rgba(255,0,170,0.25)' : 'rgba(139,92,246,0.2)'}`,
+                          borderRadius: '50%',
+                        }}
+                        animate={{ rotate: 360 * (i % 2 === 0 ? 1 : -1) }}
+                        transition={{
+                          duration: 8 + i * 4,
+                          repeat: Infinity,
+                          ease: 'linear',
+                        }}
+                      />
+                    ))}
+                    {/* Glow dinámico */}
+                    <motion.div
+                      className="absolute inset-[-30px]"
+                      style={{
+                        background: 'radial-gradient(circle, rgba(0,245,255,0.3) 0%, transparent 70%)',
+                        filter: 'blur(25px)',
+                      }}
+                      animate={{
+                        opacity: [0.4, 0.7, 0.4],
+                        scale: [1, 1.2, 1],
+                      }}
+                      transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                    />
+                    {/* Logo container */}
+                    <div 
+                      className="relative w-full h-full rounded-3xl flex items-center justify-center overflow-hidden"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(0,245,255,0.1) 0%, rgba(139,92,246,0.1) 50%, rgba(255,0,170,0.1) 100%)',
+                        border: '1px solid rgba(255,255,255,0.15)',
+                        backdropFilter: 'blur(20px)',
+                      }}
+                    >
+                      {/* Gradiente animado de borde */}
+                      <motion.div
+                        className="absolute inset-0 rounded-3xl"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(0,245,255,0.2), transparent, rgba(255,0,170,0.2))',
+                        }}
+                        animate={{
+                          rotate: [0, 360],
+                        }}
+                        transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+                      />
+                      <span 
+                        className="relative text-4xl md:text-6xl font-black"
+                        style={{
+                          background: 'linear-gradient(135deg, #00F5FF 0%, #FFFFFF 50%, #FF00AA 100%)',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                          filter: 'drop-shadow(0 0 20px rgba(0,245,255,0.5))',
+                        }}
+                      >
+                        C
+                      </span>
+                    </div>
                   </motion.div>
 
-                  <motion.h1
-                    className="text-4xl md:text-7xl lg:text-8xl font-bold text-white tracking-tight mb-2 md:mb-4"
-                    style={{
-                      textShadow: '0 0 80px rgba(59, 130, 246, 0.5)',
-                    }}
-                  >
-                    CHRONOS
-                  </motion.h1>
+                  {/* Texto CHRONOS animado */}
+                  <div className="flex items-center justify-center gap-0.5 md:gap-1 mb-4">
+                    {'CHRONOS'.split('').map((letter, i) => (
+                      <motion.span
+                        key={i}
+                        className="text-4xl md:text-7xl lg:text-8xl font-black tracking-[0.05em]"
+                        style={{
+                          background: 'linear-gradient(135deg, #00F5FF 0%, #FFFFFF 50%, #FF00AA 100%)',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                          textShadow: '0 0 60px rgba(0,245,255,0.5)',
+                        }}
+                        initial={{ opacity: 0, y: 50, rotateX: -90 }}
+                        animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                        transition={{
+                          delay: 0.5 + i * 0.08,
+                          type: 'spring',
+                          stiffness: 200,
+                          damping: 20,
+                        }}
+                      >
+                        {letter}
+                      </motion.span>
+                    ))}
+                  </div>
 
+                  {/* Línea separadora con gradiente */}
                   <motion.div
-                    initial={{ scaleX: 0 }}
-                    animate={{ scaleX: 1 }}
-                    transition={{ delay: 0.5, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    className="h-px w-48 md:w-96 mx-auto bg-gradient-to-r from-transparent via-white/50 to-transparent"
+                    initial={{ scaleX: 0, opacity: 0 }}
+                    animate={{ scaleX: 1, opacity: 1 }}
+                    transition={{ delay: 1.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                    className="h-px w-56 md:w-[400px] mx-auto mb-4"
+                    style={{
+                      background: 'linear-gradient(90deg, transparent, rgba(0,245,255,0.5), rgba(255,0,170,0.5), transparent)',
+                    }}
                   />
 
+                  {/* Subtítulo */}
                   <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.8, duration: 0.6 }}
-                    className="text-white/40 text-xs md:text-sm mt-4 md:mt-6 tracking-[0.3em] uppercase"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.4, duration: 0.6 }}
+                    className="text-xs md:text-sm tracking-[0.4em] uppercase"
+                    style={{ color: 'rgba(0,245,255,0.6)' }}
                   >
-                    Sistema de Gestión Inteligente
+                    Enterprise Capital Flow System
                   </motion.p>
 
-                  {/* Status Indicators */}
+                  {/* Status Indicators Premium */}
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 1.2 }}
-                    className="flex items-center justify-center gap-4 md:gap-6 mt-4 md:mt-8"
+                    transition={{ delay: 1.6 }}
+                    className="flex items-center justify-center gap-6 md:gap-8 mt-6 md:mt-8"
                   >
                     {[
-                      { label: 'Sistema', status: 'Online' },
-                      { label: 'Firebase', status: 'Connected' },
-                      { label: 'AI', status: 'Active' },
+                      { label: 'Sistema', color: '#00F5FF' },
+                      { label: 'Firebase', color: '#FF00AA' },
+                      { label: 'AI', color: '#8B5CF6' },
                     ].map((item, i) => (
-                      <div key={item.label} className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                        <span className="text-[10px] md:text-xs text-white/40">{item.label}</span>
-                      </div>
+                      <motion.div 
+                        key={item.label} 
+                        className="flex items-center gap-2"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 1.7 + i * 0.1 }}
+                      >
+                        <motion.div 
+                          className="w-2 h-2 rounded-full"
+                          style={{ 
+                            background: item.color,
+                            boxShadow: `0 0 10px ${item.color}`,
+                          }}
+                          animate={{
+                            scale: [1, 1.3, 1],
+                            opacity: [0.7, 1, 0.7],
+                          }}
+                          transition={{
+                            duration: 1.5,
+                            repeat: Infinity,
+                            delay: i * 0.2,
+                          }}
+                        />
+                        <span 
+                          className="text-[10px] md:text-xs tracking-wider uppercase font-medium"
+                          style={{ color: `${item.color}80` }}
+                        >
+                          {item.label}
+                        </span>
+                      </motion.div>
                     ))}
                   </motion.div>
                 </motion.div>
               </div>
+              
+              {/* Vignette */}
+              <div 
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: 'radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.5) 100%)',
+                }}
+              />
             </div>
           </motion.div>
         )}

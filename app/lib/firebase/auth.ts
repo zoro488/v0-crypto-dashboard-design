@@ -1,76 +1,85 @@
 /**
- * 🔐 Firebase Authentication Service
+ * 🔐 Authentication Service - MODO LOCAL
  * 
- * Maneja autenticación de usuarios con:
- * - Email/Password
- * - Google OAuth
- * - Persistent sessions
- * - Protected routes
+ * ⚠️ FIREBASE DESHABILITADO - Autenticación simulada
+ * Todos los datos se almacenan en localStorage
+ * 
+ * Simula autenticación para desarrollo sin Firebase
  */
 
-import { 
-  getAuth, 
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut as firebaseSignOut,
-  onAuthStateChanged,
-  User,
-  GoogleAuthProvider,
-  signInWithPopup,
-  sendPasswordResetEmail,
-  updateProfile,
-  setPersistence,
-  browserLocalPersistence,
-  type Auth,
-} from 'firebase/auth'
-import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore'
-import { db } from './config'
 import { logger } from '../utils/logger'
 
-// Singleton de Auth
-let authInstance: Auth | null = null
+// ============================================================
+// 🚨 MODO LOCAL - Sin Firebase Auth
+// ============================================================
 
-/**
- * Obtener instancia de Auth
- */
-export function getAuthInstance(): Auth {
-  if (!authInstance) {
-    authInstance = getAuth()
-    
-    // Configurar persistencia
-    setPersistence(authInstance, browserLocalPersistence).catch((error) => {
-      logger.error('Error configurando persistencia', error, { context: 'Auth' })
-    })
+// Tipo de usuario local (compatible con Firebase User)
+export interface User {
+  uid: string
+  email: string | null
+  displayName: string | null
+  photoURL: string | null
+}
+
+// Usuario mock para desarrollo
+const MOCK_USER: User = {
+  uid: 'local-user-001',
+  email: 'admin@chronos.local',
+  displayName: 'Admin CHRONOS',
+  photoURL: null,
+}
+
+// Estado de autenticación local
+let currentUser: User | null = null
+let authListeners: Array<(user: User | null) => void> = []
+
+// Cargar usuario de localStorage al iniciar
+if (typeof window !== 'undefined') {
+  const savedUser = localStorage.getItem('chronos_auth_user')
+  if (savedUser) {
+    try {
+      currentUser = JSON.parse(savedUser)
+    } catch {
+      currentUser = null
+    }
   }
-  return authInstance
 }
 
 /**
- * Crear usuario con email/password
+ * Notificar a todos los listeners
+ */
+function notifyAuthListeners() {
+  authListeners.forEach((callback) => callback(currentUser))
+}
+
+/**
+ * Obtener instancia de Auth (mock)
+ */
+export function getAuthInstance() {
+  return {
+    currentUser,
+  }
+}
+
+/**
+ * Crear usuario (mock - desarrollo local)
  */
 export async function signUp(email: string, password: string, displayName?: string) {
   try {
-    const auth = getAuthInstance()
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-    const user = userCredential.user
-
-    // Actualizar perfil con nombre
-    if (displayName) {
-      await updateProfile(user, { displayName })
+    const user: User = {
+      uid: `local-${Date.now()}`,
+      email,
+      displayName: displayName || email.split('@')[0],
+      photoURL: null,
     }
 
-    // Crear documento de usuario en Firestore
-    if (db) {
-      await setDoc(doc(db, 'usuarios', user.uid), {
-        email: user.email,
-        displayName: displayName || '',
-        createdAt: serverTimestamp(),
-        role: 'user',
-        active: true,
-      })
+    currentUser = user
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('chronos_auth_user', JSON.stringify(user))
     }
+    notifyAuthListeners()
 
-    logger.info('Usuario registrado', { 
+    logger.info('Usuario registrado (LOCAL)', { 
       context: 'Auth',
       data: { userId: user.uid, email: user.email },
     })
@@ -86,15 +95,25 @@ export async function signUp(email: string, password: string, displayName?: stri
 }
 
 /**
- * Login con email/password
+ * Login (mock - desarrollo local)
+ * Acepta cualquier credencial para desarrollo
  */
-export async function signIn(email: string, password: string) {
+export async function signIn(email: string, _password: string) {
   try {
-    const auth = getAuthInstance()
-    const userCredential = await signInWithEmailAndPassword(auth, email, password)
-    const user = userCredential.user
+    const user: User = {
+      uid: `local-${Date.now()}`,
+      email,
+      displayName: email.split('@')[0],
+      photoURL: null,
+    }
 
-    logger.info('Usuario inició sesión', { 
+    currentUser = user
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('chronos_auth_user', JSON.stringify(user))
+    }
+    notifyAuthListeners()
+
+    logger.info('Usuario inició sesión (LOCAL)', { 
       context: 'Auth',
       data: { userId: user.uid, email: user.email },
     })
@@ -102,79 +121,30 @@ export async function signIn(email: string, password: string) {
     return { user, error: null }
   } catch (error) {
     logger.error('Error en signIn', error, { context: 'Auth' })
-    
-    let errorMessage = 'Error al iniciar sesión'
-    if (error instanceof Error) {
-      if (error.message.includes('user-not-found')) {
-        errorMessage = 'Usuario no encontrado'
-      } else if (error.message.includes('wrong-password')) {
-        errorMessage = 'Contraseña incorrecta'
-      } else if (error.message.includes('invalid-email')) {
-        errorMessage = 'Email inválido'
-      }
-    }
-    
-    return { user: null, error: errorMessage }
+    return { user: null, error: 'Error al iniciar sesión' }
   }
 }
 
 /**
- * Login con Google OAuth
+ * Login con Google (mock - desarrollo local)
  */
 export async function signInWithGoogle() {
   try {
-    const auth = getAuthInstance()
-    const provider = new GoogleAuthProvider()
-    
-    // Configurar provider
-    provider.addScope('profile')
-    provider.addScope('email')
-
-    const userCredential = await signInWithPopup(auth, provider)
-    const user = userCredential.user
-
-    // Crear/actualizar documento de usuario
-    if (db) {
-      const userRef = doc(db, 'usuarios', user.uid)
-      const userDoc = await getDoc(userRef)
-
-      if (!userDoc.exists()) {
-        await setDoc(userRef, {
-          email: user.email,
-          displayName: user.displayName || '',
-          photoURL: user.photoURL || '',
-          createdAt: serverTimestamp(),
-          role: 'user',
-          active: true,
-          provider: 'google',
-        })
-      } else {
-        // Actualizar última sesión
-        await setDoc(userRef, {
-          lastLoginAt: serverTimestamp(),
-        }, { merge: true })
-      }
+    currentUser = MOCK_USER
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('chronos_auth_user', JSON.stringify(MOCK_USER))
     }
+    notifyAuthListeners()
 
-    logger.info('Usuario inició sesión con Google', { 
+    logger.info('Usuario inició sesión con Google (LOCAL)', { 
       context: 'Auth',
-      data: { userId: user.uid, email: user.email },
+      data: { userId: MOCK_USER.uid, email: MOCK_USER.email },
     })
 
-    return { user, error: null }
+    return { user: MOCK_USER, error: null }
   } catch (error) {
     logger.error('Error en signInWithGoogle', error, { context: 'Auth' })
-    
-    let errorMessage = 'Error al iniciar sesión con Google'
-    if (error instanceof Error) {
-      if (error.message.includes('popup-closed')) {
-        errorMessage = 'Ventana cerrada'
-      } else if (error.message.includes('cancelled')) {
-        errorMessage = 'Login cancelado'
-      }
-    }
-    
-    return { user: null, error: errorMessage }
+    return { user: null, error: 'Error al iniciar sesión con Google' }
   }
 }
 
@@ -183,10 +153,13 @@ export async function signInWithGoogle() {
  */
 export async function signOut() {
   try {
-    const auth = getAuthInstance()
-    await firebaseSignOut(auth)
+    currentUser = null
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('chronos_auth_user')
+    }
+    notifyAuthListeners()
 
-    logger.info('Usuario cerró sesión', { context: 'Auth' })
+    logger.info('Usuario cerró sesión (LOCAL)', { context: 'Auth' })
 
     return { error: null }
   } catch (error) {
@@ -198,54 +171,53 @@ export async function signOut() {
 }
 
 /**
- * Restablecer contraseña
+ * Restablecer contraseña (mock)
  */
 export async function resetPassword(email: string) {
-  try {
-    const auth = getAuthInstance()
-    await sendPasswordResetEmail(auth, email)
-
-    logger.info('Email de restablecimiento enviado', { 
-      context: 'Auth',
-      data: { email },
-    })
-
-    return { error: null }
-  } catch (error) {
-    logger.error('Error en resetPassword', error, { context: 'Auth' })
-    
-    let errorMessage = 'Error al enviar email'
-    if (error instanceof Error) {
-      if (error.message.includes('user-not-found')) {
-        errorMessage = 'Usuario no encontrado'
-      } else if (error.message.includes('invalid-email')) {
-        errorMessage = 'Email inválido'
-      }
-    }
-    
-    return { error: errorMessage }
-  }
+  logger.info('Email de restablecimiento enviado (LOCAL - simulado)', { 
+    context: 'Auth',
+    data: { email },
+  })
+  return { error: null }
 }
 
 /**
  * Observar cambios de autenticación
  */
 export function onAuthChange(callback: (user: User | null) => void) {
-  const auth = getAuthInstance()
-  return onAuthStateChanged(auth, callback)
+  authListeners.push(callback)
+  
+  // Llamar inmediatamente con el estado actual
+  callback(currentUser)
+  
+  // Retornar función de cleanup
+  return () => {
+    authListeners = authListeners.filter((cb) => cb !== callback)
+  }
 }
 
 /**
  * Obtener usuario actual
  */
 export function getCurrentUser(): User | null {
-  const auth = getAuthInstance()
-  return auth.currentUser
+  return currentUser
 }
 
 /**
  * Verificar si hay usuario autenticado
  */
 export function isAuthenticated(): boolean {
-  return getCurrentUser() !== null
+  return currentUser !== null
+}
+
+/**
+ * Auto-login para desarrollo (usar en desarrollo)
+ */
+export function autoLoginForDevelopment() {
+  if (typeof window !== 'undefined' && !currentUser) {
+    currentUser = MOCK_USER
+    localStorage.setItem('chronos_auth_user', JSON.stringify(MOCK_USER))
+    notifyAuthListeners()
+    logger.info('Auto-login para desarrollo activado', { context: 'Auth' })
+  }
 }

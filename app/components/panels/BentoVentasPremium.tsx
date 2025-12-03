@@ -13,6 +13,7 @@ import {
 // ═══════════════════════════════════════════════════════════════════════════
 import { 
   ButtonTesla,
+  ButtonUltra,
   CardTesla, 
   StatCard as StatCardTesla,
   ModalTesla, 
@@ -566,20 +567,25 @@ export default memo(function BentoVentasPremium() {
         </div>
         <div className="flex items-center gap-3">
           {/* Botón Cockpit Premium */}
-          <ButtonTesla
-            variant="secondary"
+          <ButtonUltra
+            variant="glass"
+            size="md"
+            icon={Sparkles}
+            glow
             onClick={() => setIsCockpitOpen(true)}
           >
-            <Sparkles className="w-4 h-4 mr-2" />
             Cockpit
-          </ButtonTesla>
-          <ButtonTesla
-            variant="primary"
+          </ButtonUltra>
+          <ButtonUltra
+            variant="success"
+            size="md"
+            icon={Plus}
+            glow
+            pulse
             onClick={() => setIsModalOpen(true)}
           >
-            <Plus className="w-4 h-4 mr-2" />
             Nueva Venta
-          </ButtonTesla>
+          </ButtonUltra>
         </div>
       </motion.div>
 
@@ -657,19 +663,15 @@ export default memo(function BentoVentasPremium() {
               </div>
               <div className="flex gap-2">
                 {(['day', 'week', 'month'] as const).map((range) => (
-                  <motion.button
+                  <ButtonUltra
                     key={range}
                     onClick={() => setSelectedTimeRange(range)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                      selectedTimeRange === range
-                        ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                        : 'bg-zinc-800/50 text-zinc-400 hover:text-white'
-                    }`}
+                    variant={selectedTimeRange === range ? 'success' : 'ghost'}
+                    size="xs"
+                    glow={selectedTimeRange === range}
                   >
                     {range === 'day' ? 'Día' : range === 'week' ? 'Semana' : 'Mes'}
-                  </motion.button>
+                  </ButtonUltra>
                 ))}
               </div>
             </div>

@@ -85,7 +85,7 @@ const SidebarItem = memo(({
   icon: Icon, 
   isActive, 
   isExpanded, 
-  onClick 
+  onClick, 
 }: SidebarItemProps) => {
   const prefersReducedMotion = useReducedMotion()
   
@@ -93,10 +93,10 @@ const SidebarItem = memo(({
     <motion.button
       onClick={onClick}
       className={cn(
-        "relative w-full flex items-center gap-4 px-4 py-3 rounded-xl",
-        "transition-all duration-200 outline-none",
-        isActive && "text-white",
-        !isActive && "text-white/60 hover:text-white hover:bg-white/[0.03]",
+        'relative w-full flex items-center gap-4 px-4 py-3 rounded-xl',
+        'transition-all duration-200 outline-none',
+        isActive && 'text-white',
+        !isActive && 'text-white/60 hover:text-white hover:bg-white/[0.03]',
       )}
       style={{
         background: isActive ? C26_COLORS.cyanMuted : 'transparent',
@@ -116,8 +116,8 @@ const SidebarItem = memo(({
       
       {/* Icon */}
       <div className={cn(
-        "flex-shrink-0 w-6 h-6",
-        isActive && "text-cyan-400",
+        'flex-shrink-0 w-6 h-6',
+        isActive && 'text-cyan-400',
       )}>
         <Icon className="w-full h-full" />
       </div>

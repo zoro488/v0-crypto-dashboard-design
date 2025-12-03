@@ -78,7 +78,7 @@ function ParticleField({ isActive, audioLevel }: ParticleFieldProps) {
 // ==========================================
 function ReactiveOrb({ isListening, state, getAudioData }: ReactiveOrbProps) {
   const meshRef = useRef<THREE.Mesh>(null!)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const materialRef = useRef<any>(null!)
   const innerGlowRef = useRef<THREE.Mesh>(null!)
   

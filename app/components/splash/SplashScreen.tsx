@@ -1,29 +1,67 @@
 'use client'
 
 /**
- * 🎬 SPLASH SCREEN WRAPPER - WARP SINGULARITY EDITION
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 🎬 SPLASH SCREEN WRAPPER - PREMIUM EDITION 2026
+ * ═══════════════════════════════════════════════════════════════════════════
  * 
- * Experiencia cinematográfica de viaje en el tiempo con túnel de hipervelocidad
- * Shaders GLSL personalizados a 120fps con post-procesamiento avanzado
+ * Experiencia cinematográfica ultra-premium con:
+ * - Logo CHRONOS animado con efectos 3D
+ * - Partículas flotantes GPU-accelerated
+ * - Transiciones suaves estilo Apple
+ * - Fallbacks inteligentes según capacidades del dispositivo
+ * 
+ * Tipos disponibles:
+ * - 'premium': Nuevo diseño 2026 con logo animado (recomendado)
+ * - 'ultra': Versión con imagen del logo
+ * - 'warp': Efecto singularidad con efecto warping
+ * - 'particles': Partículas 3D formando texto
+ * ═══════════════════════════════════════════════════════════════════════════
  */
 
 import { useState, useEffect, ReactNode } from 'react'
 import dynamic from 'next/dynamic'
 
-// Carga dinámica para evitar SSR issues con Three.js
-const WarpSingularity = dynamic(
-  () => import('./WarpSingularity').then(mod => ({ default: mod.ChronosSingularityIntro })),
+// 🌟 NUEVO: Splash Premium 2026 con logo animado y efectos premium
+const ChronosSplashPremium = dynamic(
+  () => import('./ChronosSplashPremium'),
   { 
     ssr: false,
     loading: () => (
       <div className="fixed inset-0 z-[9999] bg-black flex items-center justify-center">
         <div className="relative">
-          {/* Warp loading animation */}
-          <div className="w-32 h-32 rounded-full border-2 border-cyan-500/20 animate-ping absolute inset-0" />
-          <div className="w-32 h-32 rounded-full border border-cyan-400/40 animate-spin" style={{ animationDuration: '3s' }} />
+          {/* Logo contenedor animado */}
+          <div className="w-24 h-24 rounded-3xl border border-cyan-500/30 animate-pulse bg-gradient-to-br from-cyan-500/10 to-purple-500/10" />
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-cyan-400/70 text-xs tracking-[0.3em] font-light">
-              WARP
+            <div className="text-center">
+              <span className="text-cyan-400/80 text-2xl font-bold tracking-[0.2em]">
+                C
+              </span>
+              <div className="mt-2 flex gap-1 justify-center">
+                <div className="w-1 h-1 rounded-full bg-cyan-400/60 animate-pulse" />
+                <div className="w-1 h-1 rounded-full bg-purple-400/60 animate-pulse" style={{ animationDelay: '0.2s' }} />
+                <div className="w-1 h-1 rounded-full bg-pink-400/60 animate-pulse" style={{ animationDelay: '0.4s' }} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+)
+
+// Carga dinámica - Splash Ultra con imagen
+const ChronosSplashUltra = dynamic(
+  () => import('./ChronosSplashUltra'),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="fixed inset-0 z-[9999] bg-black flex items-center justify-center">
+        <div className="relative">
+          <div className="w-20 h-20 rounded-2xl border border-cyan-500/30 animate-pulse" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-cyan-400/70 text-xs tracking-[0.2em] font-light">
+              C
             </span>
           </div>
         </div>
@@ -32,30 +70,38 @@ const WarpSingularity = dynamic(
   },
 )
 
-// Fallback para navegadores sin soporte WebGL
+// Fallback: Warp Singularity
+const WarpSingularity = dynamic(
+  () => import('./WarpSingularity').then(mod => ({ default: mod.ChronosSingularityIntro })),
+  { ssr: false },
+)
+
+// Fallback: Partículas clásicas
 const ChronosParticles = dynamic(
   () => import('./ChronosParticles'),
   { ssr: false },
 )
 
+type SplashType = 'premium' | 'ultra' | 'warp' | 'particles'
+
 interface SplashScreenProps {
   children: ReactNode
-  /** Duración del splash en ms (default: 6000 para warp experience) */
+  /** Duración del splash en ms (default: 4500) */
   duration?: number
   /** Si está habilitado (default: true) */
   enabled?: boolean
   /** Key para forzar mostrar splash de nuevo */
   forceShowKey?: string
-  /** Usar experiencia Warp Singularity (default: true) */
-  useWarp?: boolean
+  /** Tipo de splash: 'premium' (2026), 'ultra', 'warp', 'particles' */
+  type?: SplashType
 }
 
-export default function SplashScreen({ 
+export function SplashScreen({ 
   children, 
-  duration = 6000,
+  duration = 4500,
   enabled = true,
-  forceShowKey = 'chronos-warp-shown',
-  useWarp = true,
+  forceShowKey = 'chronos-splash-shown-v4',
+  type = 'premium', // 🌟 Nuevo default: Premium 2026
 }: SplashScreenProps) {
   const [showSplash, setShowSplash] = useState(false)
   const [isReady, setIsReady] = useState(false)
@@ -71,7 +117,6 @@ export default function SplashScreen({
       setWebglSupported(false)
     }
     
-    // Verificar si ya se mostró el splash en esta sesión
     if (!enabled) {
       setIsReady(true)
       return
@@ -89,21 +134,38 @@ export default function SplashScreen({
   const handleSplashComplete = () => {
     sessionStorage.setItem(forceShowKey, 'true')
     setShowSplash(false)
-    // Pequeño delay para transición suave
     setTimeout(() => setIsReady(true), 100)
   }
   
-  // Mientras carga, mostrar pantalla negra con efecto warp
   if (!isReady && !showSplash) {
     return (
       <div className="fixed inset-0 bg-black">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.05)_0%,transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,245,255,0.05)_0%,transparent_70%)]" />
       </div>
     )
   }
   
-  // Determinar qué componente usar
-  const SplashComponent = useWarp && webglSupported ? WarpSingularity : ChronosParticles
+  // Seleccionar componente de splash
+  const getSplashComponent = () => {
+    if (!webglSupported) {
+      // Fallback simple sin WebGL - usar Premium que no requiere WebGL
+      return ChronosSplashPremium
+    }
+    
+    switch (type) {
+      case 'premium':
+        return ChronosSplashPremium
+      case 'warp':
+        return WarpSingularity
+      case 'particles':
+        return ChronosParticles
+      case 'ultra':
+      default:
+        return ChronosSplashUltra
+    }
+  }
+  
+  const SplashComponent = getSplashComponent()
   
   return (
     <>
@@ -118,3 +180,5 @@ export default function SplashScreen({
     </>
   )
 }
+
+export default SplashScreen

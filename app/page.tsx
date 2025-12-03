@@ -19,11 +19,8 @@ import {
   TrendingUp, Wallet,
 } from 'lucide-react'
 
-// 🎙️ AI Premium Widget con Orbe Reactivo a Voz (carga dinámica)
-const AIPremiumWidget = dynamic(
-  () => import('@/app/components/ai/AIPremiumWidget'),
-  { ssr: false },
-)
+// 🤖 NOTA: GrokAIOrb (widget IA único) está en layout.tsx para posición fixed global
+// Se eliminó AIPremiumWidget duplicado para evitar 3 widgets IA
 
 // Nuevo Dashboard Premium con animación CHRONOS
 const ChronosDashboard = lazy(() => import('@/app/components/panels/ChronosDashboard'))
@@ -36,6 +33,9 @@ const Dashboard2026 = lazy(() => import('@/app/components/chronos-2026/Dashboard
 
 // 🔥 CHRONOS 2026 ULTRA - EL DISEÑO MÁS AVANZADO Y PREMIUM DEL MUNDO
 const Dashboard2026Ultra = lazy(() => import('@/app/components/chronos-2026-ultra/Dashboard2026Ultra'))
+
+// 🎨 BentoDashboard - Dashboard Principal con Visualizaciones 3D Interactivas
+const BentoDashboard = lazy(() => import('@/app/components/panels/BentoDashboard'))
 
 // Paneles Premium - TODOS los paneles usan versiones Premium con componentes 3D avanzados
 const BentoOrdenesCompraPremium = lazy(() => import('@/app/components/panels/BentoOrdenesCompraPremium'))
@@ -60,19 +60,31 @@ const PanelLoader = () => (
       transition={{ duration: 0.5 }}
       className="relative"
     >
-      {/* Orbe 3D de carga */}
+      {/* Orbe 3D Premium de carga con colores CHRONOS */}
       <motion.div 
-        className="w-20 h-20 rounded-full border-4 border-white/10 border-t-cyan-500 border-r-purple-500"
+        className="w-24 h-24 rounded-full"
+        style={{
+          border: '3px solid transparent',
+          background: 'linear-gradient(#000, #000) padding-box, linear-gradient(135deg, #00F5FF, #FF00AA, #8B5CF6) border-box',
+        }}
         animate={{ rotate: 360 }}
-        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+        transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
       />
       <motion.div 
-        className="absolute inset-2 w-16 h-16 rounded-full border-4 border-white/5 border-b-blue-500"
+        className="absolute inset-3 w-18 h-18 rounded-full"
+        style={{
+          border: '2px solid transparent',
+          background: 'linear-gradient(#000, #000) padding-box, linear-gradient(135deg, #FF00AA, #8B5CF6, #00F5FF) border-box',
+        }}
         animate={{ rotate: -360 }}
         transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
       />
       <motion.div 
-        className="absolute inset-0 w-20 h-20 rounded-full bg-gradient-to-r from-cyan-500/30 to-purple-500/30 blur-xl"
+        className="absolute inset-0 w-24 h-24 rounded-full"
+        style={{
+          background: 'radial-gradient(circle, rgba(0,245,255,0.3) 0%, rgba(255,0,170,0.2) 50%, transparent 70%)',
+          filter: 'blur(15px)',
+        }}
         animate={{
           scale: [1, 1.3, 1],
           opacity: [0.5, 0.8, 0.5],
@@ -88,15 +100,25 @@ const PanelLoader = () => (
         animate={{ scale: [0.8, 1, 0.8] }}
         transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
       >
-        <div className="w-3 h-3 rounded-full bg-white/80" />
+        <span 
+          className="text-lg font-bold"
+          style={{
+            background: 'linear-gradient(135deg, #00F5FF 0%, #FF00AA 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}
+        >
+          C
+        </span>
       </motion.div>
       <motion.p
-        className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-sm text-white/60 whitespace-nowrap font-medium tracking-wider"
+        className="absolute -bottom-12 left-1/2 -translate-x-1/2 text-sm whitespace-nowrap font-medium tracking-[0.2em] uppercase"
+        style={{ color: 'rgba(0,245,255,0.6)' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
       >
-        Cargando panel...
+        Cargando...
       </motion.p>
     </motion.div>
   </div>
@@ -193,13 +215,17 @@ export default function Chronos() {
   // 🔮 Activar Obsidian Glass Dashboard (Ultra-Premium Experience)
   // 🚀 CHRONOS 2026 - El dashboard más avanzado (activar para experiencia completa 2026)
   // 🔥 CHRONOS 2026 ULTRA - EL DISEÑO MÁS AVANZADO Y PREMIUM DEL MUNDO 2025-2026
-  const useChronos2026Ultra = true // ⭐ DISEÑO PREMIUM MUNDIAL ACTIVADO
+  // 🎨 BentoDashboard - Dashboard con Visualizaciones 3D Interactivas (NUEVO)
+  const useBentoDashboard = true // ⭐ DASHBOARD CON GRÁFICOS 3D INTERACTIVOS
+  const useChronos2026Ultra = false // DISEÑO PREMIUM MUNDIAL
   const useChronos2026 = false // Fallback legacy
   const useObsidianDashboard = false // Fallback a Obsidian si 2026 está desactivado
 
   const renderPanel = () => {
     switch (currentPanel) {
       case 'dashboard':
+        // 🎨 BentoDashboard - Dashboard con Gráficos 3D Interactivos
+        if (useBentoDashboard) return <BentoDashboard />
         // 🔥 CHRONOS 2026 ULTRA - EL DISEÑO MÁS AVANZADO DEL MUNDO
         if (useChronos2026Ultra) return <Dashboard2026Ultra />
         if (useChronos2026) return <Dashboard2026 />
@@ -357,10 +383,7 @@ export default function Chronos() {
         </main>
       </div>
 
-      {/* 🤖 GrokAIOrb movido a layout.tsx para posición fixed global */}
-
-      {/* 🎙️ AI Premium Widget - Orbe Reactivo a Voz */}
-      <AIPremiumWidget position="bottom-right" />
+      {/* 🤖 GrokAIOrb está en layout.tsx para posición fixed global - ÚNICO WIDGET IA */}
 
       {/* Command Menu - Cmd+K para búsqueda rápida */}
       <CommandMenu />

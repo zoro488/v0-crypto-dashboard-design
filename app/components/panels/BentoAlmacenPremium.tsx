@@ -36,6 +36,7 @@ import { useRealtimeAlmacen } from '@/app/hooks/useRealtimeCollection'
 import { useEntradasAlmacen, useSalidasAlmacen } from '@/app/lib/firebase/firestore-hooks.service'
 import { Skeleton } from '@/app/components/ui/skeleton'
 import { Button } from '@/app/components/ui/button'
+import { ButtonUltra } from '@/app/components/ui/ButtonUltra'
 import { Badge } from '@/app/components/ui/badge'
 import { Input } from '@/app/components/ui/input'
 import {
@@ -1254,51 +1255,40 @@ export function BentoAlmacenPremium() {
             {/* Acciones */}
             <div className="flex items-center gap-3">
               {/* Toggle WarehouseGrid Premium */}
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  onClick={() => { setShowWarehouseGrid(!showWarehouseGrid); haptic.light() }}
-                  variant={showWarehouseGrid ? 'default' : 'outline'}
-                  className={showWarehouseGrid 
-                    ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white border-0'
-                    : 'border-purple-500/30 text-purple-400 hover:bg-purple-500/10'
-                  }
-                >
-                  <Sparkles size={16} className="mr-2" />
-                  {showWarehouseGrid ? 'Vista Clásica' : 'Heatmap Grid'}
-                </Button>
-              </motion.div>
+              <ButtonUltra
+                onClick={() => { setShowWarehouseGrid(!showWarehouseGrid); haptic.light() }}
+                variant={showWarehouseGrid ? 'primary' : 'glass'}
+                icon={Sparkles}
+                glow={showWarehouseGrid}
+              >
+                {showWarehouseGrid ? 'Vista Clásica' : 'Heatmap Grid'}
+              </ButtonUltra>
 
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  onClick={() => { setShowEntradaModal(true); haptic.light() }}
-                  className="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white border-0 shadow-lg shadow-emerald-500/20"
-                >
-                  <Plus size={16} className="mr-2" />
-                  Nueva Entrada
-                </Button>
-              </motion.div>
+              <ButtonUltra
+                onClick={() => { setShowEntradaModal(true); haptic.light() }}
+                variant="success"
+                icon={Plus}
+                glow
+                pulse
+              >
+                Nueva Entrada
+              </ButtonUltra>
               
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  onClick={() => { setShowSalidaModal(true); haptic.light() }}
-                  variant="outline"
-                  className="border-rose-500/30 text-rose-400 hover:bg-rose-500/10 hover:border-rose-500/50"
-                >
-                  <Truck size={16} className="mr-2" />
-                  Registrar Salida
-                </Button>
-              </motion.div>
+              <ButtonUltra
+                onClick={() => { setShowSalidaModal(true); haptic.light() }}
+                variant="danger"
+                icon={Truck}
+                glow
+              >
+                Registrar Salida
+              </ButtonUltra>
               
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="text-white/60 hover:text-white hover:bg-white/5"
-                  onClick={handleRefresh}
-                >
-                  <RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} />
-                </Button>
-              </motion.div>
+              <ButtonUltra 
+                variant="ghost" 
+                size="sm"
+                onClick={handleRefresh}
+                icon={RefreshCw}
+              />
             </div>
           </div>
           

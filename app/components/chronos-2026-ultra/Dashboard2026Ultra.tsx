@@ -51,12 +51,12 @@ import { cn } from '@/lib/utils'
 
 const UltraBackground = dynamic(
   () => import('./UltraBackground'),
-  { ssr: false }
+  { ssr: false },
 )
 
 const UltraOrb = dynamic(
   () => import('./UltraOrb'),
-  { ssr: false }
+  { ssr: false },
 )
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -315,8 +315,8 @@ const KPICard = memo(({
       onHoverEnd={() => setIsHovered(false)}
       onClick={onClick}
       className={cn(
-        "relative overflow-hidden rounded-[20px] p-6 cursor-pointer",
-        "transition-all duration-300",
+        'relative overflow-hidden rounded-[20px] p-6 cursor-pointer',
+        'transition-all duration-300',
       )}
       style={{
         background: C26_COLORS.glassBg,
@@ -446,7 +446,7 @@ const GlassCard = memo(({ children, className, padding = 'md', delay = 0 }: Glas
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.5, ease: C26_ANIMATIONS.ease.spring }}
       className={cn(
-        "relative overflow-hidden rounded-[20px]",
+        'relative overflow-hidden rounded-[20px]',
         paddingClass,
         className,
       )}

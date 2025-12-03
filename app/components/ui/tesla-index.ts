@@ -35,6 +35,8 @@
 export { ButtonTesla } from './ButtonTesla'
 export type { ButtonTeslaProps } from './ButtonTesla'
 
+export { ButtonUltra } from './ButtonUltra'
+
 // ═══════════════════════════════════════════════════════════════════════════
 // INPUTS
 // ═══════════════════════════════════════════════════════════════════════════

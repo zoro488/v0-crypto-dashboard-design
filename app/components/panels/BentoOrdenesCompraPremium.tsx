@@ -33,6 +33,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
+import { ButtonUltra } from '@/app/components/ui/ButtonUltra'
 import { Badge } from '@/app/components/ui/badge'
 import { Input } from '@/app/components/ui/input'
 import { Skeleton } from '@/app/components/ui/skeleton'
@@ -687,36 +688,29 @@ export function BentoOrdenesCompraPremium() {
             
             {/* Acciones */}
             <div className="flex items-center gap-3">
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  onClick={() => { setIsModalOpen(true); haptic.light() }}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white border-0 shadow-lg shadow-blue-500/20"
-                >
-                  <Plus size={16} className="mr-2" />
-                  Nueva Orden
-                </Button>
-              </motion.div>
+              <ButtonUltra
+                onClick={() => { setIsModalOpen(true); haptic.light() }}
+                variant="primary"
+                icon={Plus}
+                glow
+                pulse
+              >
+                Nueva Orden
+              </ButtonUltra>
               
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  variant="outline"
-                  className="border-white/20 text-white/70 hover:bg-white/5 hover:border-white/30"
-                >
-                  <Download size={16} className="mr-2" />
-                  Exportar
-                </Button>
-              </motion.div>
+              <ButtonUltra
+                variant="glass"
+                icon={Download}
+              >
+                Exportar
+              </ButtonUltra>
               
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="text-white/60 hover:text-white hover:bg-white/5"
-                  onClick={handleRefresh}
-                >
-                  <RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} />
-                </Button>
-              </motion.div>
+              <ButtonUltra 
+                variant="ghost" 
+                size="sm"
+                onClick={handleRefresh}
+                icon={RefreshCw}
+              />
             </div>
           </div>
           

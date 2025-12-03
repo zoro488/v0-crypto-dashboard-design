@@ -209,7 +209,7 @@ export const useDataStore = create<DataState>()(
         updateVenta: (id, data) => {
           set((state) => ({
             ventas: state.ventas.map(v => 
-              v.id === id ? { ...v, ...data, updatedAt: new Date().toISOString() } : v
+              v.id === id ? { ...v, ...data, updatedAt: new Date().toISOString() } : v,
             ),
           }))
           logger.info(`Venta actualizada: ${id}`, { context: 'DataStore' })
@@ -257,7 +257,7 @@ export const useDataStore = create<DataState>()(
         updateCliente: (id, data) => {
           set((state) => ({
             clientes: state.clientes.map(c => 
-              c.id === id ? { ...c, ...data, updatedAt: new Date().toISOString() } : c
+              c.id === id ? { ...c, ...data, updatedAt: new Date().toISOString() } : c,
             ),
           }))
           logger.info(`Cliente actualizado: ${id}`, { context: 'DataStore' })
@@ -304,7 +304,7 @@ export const useDataStore = create<DataState>()(
         updateDistribuidor: (id, data) => {
           set((state) => ({
             distribuidores: state.distribuidores.map(d => 
-              d.id === id ? { ...d, ...data, updatedAt: new Date().toISOString() } : d
+              d.id === id ? { ...d, ...data, updatedAt: new Date().toISOString() } : d,
             ),
           }))
           logger.info(`Distribuidor actualizado: ${id}`, { context: 'DataStore' })
@@ -352,7 +352,7 @@ export const useDataStore = create<DataState>()(
         updateOrdenCompra: (id, data) => {
           set((state) => ({
             ordenesCompra: state.ordenesCompra.map(o => 
-              o.id === id ? { ...o, ...data, updatedAt: new Date().toISOString() } : o
+              o.id === id ? { ...o, ...data, updatedAt: new Date().toISOString() } : o,
             ),
           }))
           logger.info(`Orden de compra actualizada: ${id}`, { context: 'DataStore' })

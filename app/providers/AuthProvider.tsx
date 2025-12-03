@@ -1,14 +1,14 @@
 /**
- * 🔒 Authentication Context Provider
+ * 🔒 Authentication Context Provider - MODO LOCAL
  * 
+ * ⚠️ Firebase deshabilitado - Autenticación simulada
  * Proporciona estado de autenticación a toda la app
  */
 
 'use client'
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import { User } from 'firebase/auth'
-import { onAuthChange, getCurrentUser } from '@/app/lib/firebase/auth'
+import { onAuthChange, getCurrentUser, type User } from '@/app/lib/firebase/auth'
 import { logger } from '@/app/lib/utils/logger'
 
 interface AuthContextType {
@@ -53,7 +53,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setLoading(false)
 
       if (newUser) {
-        logger.info('Usuario autenticado', {
+        logger.info('Usuario autenticado (LOCAL)', {
           context: 'AuthProvider',
           data: {
             userId: newUser.uid,

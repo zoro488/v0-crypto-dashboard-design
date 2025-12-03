@@ -8,6 +8,7 @@ import {
   X, Edit2, Eye, History, CreditCard, Truck, ShoppingBag,
 } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
+import { ButtonUltra } from '@/app/components/ui/ButtonUltra'
 import { Badge } from '@/app/components/ui/badge'
 import { useRealtimeDistribuidores, useRealtimeOrdenesCompra } from '@/app/hooks/useRealtimeCollection'
 import { useFirestoreCRUD } from '@/app/hooks/useFirestoreCRUD'
@@ -160,23 +161,20 @@ function DistribuidorProfileModal({ distribuidor, isOpen, onClose, onEdit, orden
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
+                <ButtonUltra
+                  variant="glass"
                   size="sm"
                   onClick={() => onEdit(distribuidor)}
-                  className="border-purple-500/20 text-purple-400 hover:bg-purple-500/10"
+                  icon={Edit2}
                 >
-                  <Edit2 className="w-4 h-4 mr-2" />
                   Editar
-                </Button>
-                <Button
+                </ButtonUltra>
+                <ButtonUltra
                   variant="ghost"
-                  size="icon"
+                  size="sm"
                   onClick={onClose}
-                  className="text-zinc-400 hover:text-white"
-                >
-                  <X className="w-5 h-5" />
-                </Button>
+                  icon={X}
+                />
               </div>
             </div>
           </div>
@@ -656,21 +654,23 @@ export default function BentoDistribuidoresPremium() {
           </div>
         </div>
         <div className="flex gap-3">
-          <Button
+          <ButtonUltra
             onClick={() => setShowPagoModal(true)}
-            variant="outline"
-            className="border-green-500/20 hover:bg-green-500/10 text-green-400"
+            variant="success"
+            icon={DollarSign}
+            glow
           >
-            <DollarSign className="w-4 h-4 mr-2" />
             Registrar Pago
-          </Button>
-          <Button
+          </ButtonUltra>
+          <ButtonUltra
             onClick={() => setShowCreateModal(true)}
-            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+            variant="primary"
+            icon={Plus}
+            glow
+            pulse
           >
-            <Plus className="w-4 h-4 mr-2" />
             Nuevo Distribuidor
-          </Button>
+          </ButtonUltra>
         </div>
       </motion.div>
 

@@ -195,25 +195,68 @@ function PremiumSidebar({
               exit={{ opacity: 0 }}
               className="flex items-center gap-3"
             >
-              {/* Logo */}
-              <div 
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-xl font-black text-white"
-                style={{ background: CHRONOS_COLORS.gradientPrimary }}
+              {/* Logo Premium con gradiente animado */}
+              <motion.div 
+                className="relative w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden"
+                style={{ 
+                  background: 'linear-gradient(135deg, rgba(0,245,255,0.15) 0%, rgba(255,0,170,0.15) 100%)',
+                  border: '1px solid rgba(0,245,255,0.3)',
+                }}
+                whileHover={{ scale: 1.05 }}
               >
-                C
-              </div>
-              <span className="text-xl font-bold text-white">Chronos</span>
+                <motion.div
+                  className="absolute inset-0"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(0,245,255,0.2), transparent, rgba(255,0,170,0.2))',
+                  }}
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+                />
+                <span 
+                  className="relative text-xl font-black"
+                  style={{
+                    background: 'linear-gradient(135deg, #00F5FF 0%, #FFFFFF 50%, #FF00AA 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}
+                >
+                  C
+                </span>
+              </motion.div>
+              <span 
+                className="text-xl font-bold tracking-wide"
+                style={{
+                  background: 'linear-gradient(135deg, #00F5FF 0%, #FFFFFF 50%, #FF00AA 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                CHRONOS
+              </span>
             </motion.div>
           )}
         </AnimatePresence>
         
         {isCollapsed && (
-          <div 
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-xl font-black text-white mx-auto"
-            style={{ background: CHRONOS_COLORS.gradientPrimary }}
+          <motion.div 
+            className="relative w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden mx-auto"
+            style={{ 
+              background: 'linear-gradient(135deg, rgba(0,245,255,0.15) 0%, rgba(255,0,170,0.15) 100%)',
+              border: '1px solid rgba(0,245,255,0.3)',
+            }}
+            whileHover={{ scale: 1.1 }}
           >
-            C
-          </div>
+            <span 
+              className="text-xl font-black"
+              style={{
+                background: 'linear-gradient(135deg, #00F5FF 0%, #FF00AA 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
+              C
+            </span>
+          </motion.div>
         )}
         
         {/* Toggle button */}

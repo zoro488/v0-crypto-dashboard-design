@@ -24,7 +24,7 @@ import {
   Activity, Layers, Archive, CreditCard, Brain,
   type LucideIcon,
 } from 'lucide-react'
-import { ButtonTesla, DESIGN_TOKENS } from '@/app/components/ui/tesla-index'
+import { ButtonTesla, ButtonUltra, DESIGN_TOKENS } from '@/app/components/ui/tesla-index'
 import { Badge } from '@/app/components/ui/badge'
 import { Input } from '@/app/components/ui/input'
 import {
@@ -554,37 +554,37 @@ export function BentoReportesPremium() {
           <div className="flex items-center gap-3">
             {/* Switch de Vista */}
             <div 
-              className="flex p-1 rounded-xl"
+              className="flex p-1 rounded-xl gap-2"
               style={{ backgroundColor: DESIGN_TOKENS.colors.surface }}
             >
-              <ButtonTesla
+              <ButtonUltra
                 variant={vistaActiva === 'reportes' ? 'primary' : 'ghost'}
                 size="sm"
                 onClick={() => setVistaActiva('reportes')}
+                icon={FileText}
+                glow={vistaActiva === 'reportes'}
               >
-                <FileText size={14} className="mr-1" />
                 Reportes
-              </ButtonTesla>
-              <ButtonTesla
+              </ButtonUltra>
+              <ButtonUltra
                 variant={vistaActiva === 'analytics' ? 'primary' : 'ghost'}
                 size="sm"
                 onClick={() => setVistaActiva('analytics')}
+                icon={Brain}
+                glow={vistaActiva === 'analytics'}
               >
-                <Brain size={14} className="mr-1" />
                 Analytics IA
-              </ButtonTesla>
+              </ButtonUltra>
             </div>
             
-            <ButtonTesla
-              variant="secondary"
+            <ButtonUltra
+              variant="glass"
               size="sm"
+              icon={Calendar}
             >
-              <Calendar size={16} className="mr-2" />
               Programar
-            </ButtonTesla>
-            <ButtonTesla variant="ghost" size="icon">
-              <RefreshCw size={18} />
-            </ButtonTesla>
+            </ButtonUltra>
+            <ButtonUltra variant="ghost" size="sm" icon={RefreshCw} />
           </div>
         </div>
       </div>

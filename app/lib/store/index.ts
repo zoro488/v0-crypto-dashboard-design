@@ -465,7 +465,7 @@ export const useChronosStore = create<ChronosState>()(
         actualizarVenta: (id, cambios) => {
           set((state) => ({
             ventas: state.ventas.map(v => 
-              v.id === id ? { ...v, ...cambios, updatedAt: new Date().toISOString() } : v
+              v.id === id ? { ...v, ...cambios, updatedAt: new Date().toISOString() } : v,
             ),
             lastSync: Date.now(),
           }))
@@ -654,7 +654,7 @@ export const useChronosStore = create<ChronosState>()(
         actualizarOrdenCompra: (id, cambios) => {
           set((state) => ({
             ordenesCompra: state.ordenesCompra.map(oc => 
-              oc.id === id ? { ...oc, ...cambios, updatedAt: new Date().toISOString() } : oc
+              oc.id === id ? { ...oc, ...cambios, updatedAt: new Date().toISOString() } : oc,
             ),
             lastSync: Date.now(),
           }))
@@ -780,7 +780,7 @@ export const useChronosStore = create<ChronosState>()(
         actualizarCliente: (id, cambios) => {
           set((state) => ({
             clientes: state.clientes.map(c => 
-              c.id === id ? { ...c, ...cambios, updatedAt: new Date().toISOString() } : c
+              c.id === id ? { ...c, ...cambios, updatedAt: new Date().toISOString() } : c,
             ),
             lastSync: Date.now(),
           }))
@@ -827,7 +827,7 @@ export const useChronosStore = create<ChronosState>()(
         actualizarDistribuidor: (id, cambios) => {
           set((state) => ({
             distribuidores: state.distribuidores.map(d => 
-              d.id === id ? { ...d, ...cambios, updatedAt: new Date().toISOString() } : d
+              d.id === id ? { ...d, ...cambios, updatedAt: new Date().toISOString() } : d,
             ),
             lastSync: Date.now(),
           }))

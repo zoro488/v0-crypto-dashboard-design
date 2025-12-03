@@ -220,7 +220,7 @@ export function useBancosCRUD() {
         bancoOrigenId as BancoId, 
         bancoDestinoId as BancoId, 
         monto, 
-        concepto
+        concepto,
       )
       triggerDataRefresh()
       return id

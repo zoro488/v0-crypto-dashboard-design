@@ -484,7 +484,7 @@ export function recalcularCliente(
     numeroCompras: ventasCliente.length,
     ultimaCompra: ventasCliente.length > 0 
       ? ventasCliente.sort((a, b) => 
-          new Date(b.fecha as string).getTime() - new Date(a.fecha as string).getTime()
+          new Date(b.fecha as string).getTime() - new Date(a.fecha as string).getTime(),
         )[0].fecha 
       : undefined,
     updatedAt: new Date().toISOString(),
@@ -512,7 +512,7 @@ export function recalcularDistribuidor(
     numeroOrdenes: ordenesDistribuidor.length,
     ultimaOrden: ordenesDistribuidor.length > 0 
       ? ordenesDistribuidor.sort((a, b) => 
-          new Date(b.fecha as string).getTime() - new Date(a.fecha as string).getTime()
+          new Date(b.fecha as string).getTime() - new Date(a.fecha as string).getTime(),
         )[0].fecha 
       : undefined,
     updatedAt: new Date().toISOString(),

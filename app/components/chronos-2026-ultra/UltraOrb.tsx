@@ -99,7 +99,7 @@ function UltraOrb({ state = 'idle' }: UltraOrbProps) {
         <motion.div
           className="absolute inset-2 rounded-full"
           style={{
-            background: `radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.3) 0%, transparent 60%)`,
+            background: 'radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.3) 0%, transparent 60%)',
           }}
         />
         

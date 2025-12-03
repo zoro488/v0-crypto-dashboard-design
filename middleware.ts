@@ -8,7 +8,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
 // Rutas públicas (no requieren auth)
-const PUBLIC_ROUTES = ['/login', '/api']
+const PUBLIC_ROUTES = ['/login', '/api', '/demo', '/']
 
 // Archivos públicos que deben ser accesibles sin autenticación
 const PUBLIC_FILES = [

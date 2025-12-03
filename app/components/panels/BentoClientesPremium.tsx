@@ -12,6 +12,7 @@ import {
 // ═══════════════════════════════════════════════════════════════════════════
 import { 
   ButtonTesla,
+  ButtonUltra,
   CardTesla,
   Badge as BadgeTesla,
   SkeletonDashboard,
@@ -612,27 +613,31 @@ export default function BentoClientesPremium() {
         </div>
         <div className="flex gap-3">
           {/* Toggle CRM View */}
-          <ButtonTesla
+          <ButtonUltra
             onClick={() => setShowCRMView(!showCRMView)}
-            variant={showCRMView ? 'primary' : 'secondary'}
+            variant={showCRMView ? 'primary' : 'glass'}
+            icon={Users}
+            glow={showCRMView}
           >
-            <Users className="w-4 h-4 mr-2" />
             {showCRMView ? 'Vista Clásica' : 'CRM Premium'}
-          </ButtonTesla>
-          <ButtonTesla
+          </ButtonUltra>
+          <ButtonUltra
             onClick={() => setShowAbonoModal(true)}
-            variant="secondary"
+            variant="warning"
+            icon={DollarSign}
+            glow
           >
-            <DollarSign className="w-4 h-4 mr-2" />
             Registrar Abono
-          </ButtonTesla>
-          <ButtonTesla
+          </ButtonUltra>
+          <ButtonUltra
             onClick={() => setShowCreateModal(true)}
             variant="primary"
+            icon={Plus}
+            glow
+            pulse
           >
-            <Plus className="w-4 h-4 mr-2" />
             Nuevo Cliente
-          </ButtonTesla>
+          </ButtonUltra>
         </div>
       </motion.div>
 

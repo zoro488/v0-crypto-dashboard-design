@@ -125,8 +125,8 @@ export default function RootLayout({
                     <AppProvider>
                       {/* 🎤 VOICE WORKER - AI y Voz off-main-thread */}
                       <VoiceWorkerProvider>
-                        {/* 🎬 SPLASH SCREEN - Partículas CHRONOS (deshabilitado temporalmente para testing) */}
-                        <SplashScreen duration={5500} enabled={false}>
+                        {/* 🎬 SPLASH SCREEN PREMIUM 2026 - Con logo animado y efectos cinematográficos */}
+                        <SplashScreen duration={4500} enabled={true} type="premium">
                           {/* 🎯 SCROLL CONTROLLER - Sistema unificado */}
                           <ScrollProvider>
                             {/* <PerformanceMonitor /> */}

@@ -89,13 +89,14 @@ export function VoiceWorkerProvider({ children }: { children: React.ReactNode })
             setState(prev => ({ ...prev, lastTranscription: data.text }))
             break
             
-          case 'AI_RESPONSE':
+          case 'AI_RESPONSE': {
             const aiPromise = pendingPromises.current.get('ai_query')
             if (aiPromise) {
               aiPromise.resolve(data.response)
               pendingPromises.current.delete('ai_query')
             }
             break
+          }
             
           case 'PONG':
             logger.debug('[VoiceWorker] Ping-pong OK', { context: 'VoiceWorkerProvider' })
@@ -103,11 +104,11 @@ export function VoiceWorkerProvider({ children }: { children: React.ReactNode })
         }
       }
       
-      workerRef.current.onerror = (error) => {
-        logger.error('[VoiceWorker] Error en worker', error, { context: 'VoiceWorkerProvider' })
+      workerRef.current.onerror = (_error) => {
+        logger.error('[VoiceWorker] Error en worker', _error, { context: 'VoiceWorkerProvider' })
       }
       
-    } catch (error) {
+    } catch (_error) {
       logger.warn('[VoiceWorker] No se pudo inicializar worker, funcionando sin él', { context: 'VoiceWorkerProvider' })
     }
 

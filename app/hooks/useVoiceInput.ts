@@ -120,9 +120,9 @@ interface ISpeechRecognition extends EventTarget {
 function getSpeechRecognition(): (new () => ISpeechRecognition) | null {
   if (typeof window === 'undefined') return null
   
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const SpeechRecognitionConstructor = (window as any).SpeechRecognition || 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     (window as any).webkitSpeechRecognition
     
   return SpeechRecognitionConstructor || null
