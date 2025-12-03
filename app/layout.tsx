@@ -32,12 +32,16 @@ const geist = Geist({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
+  preload: true,
+  fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
 })
 
 const geistMono = Geist_Mono({ 
   subsets: ['latin'],
   variable: '--font-mono',
   display: 'swap',
+  preload: true,
+  fallback: ['SF Mono', 'Monaco', 'Consolas', 'monospace'],
 })
 
 export const viewport: Viewport = {
@@ -52,31 +56,59 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'Chronos - Sistema de Gestión Empresarial Premium',
-  description: 'Sistema completo de gestión de flujos de capital con arquitectura 3D y AI',
-  generator: 'v0.app',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://chronos.vercel.app'),
+  title: {
+    default: 'Chronos - Sistema de Gestión Empresarial Premium',
+    template: '%s | Chronos',
+  },
+  description: 'Sistema completo de gestión de flujos de capital con arquitectura 3D, AI avanzada y visualizaciones premium en tiempo real.',
+  keywords: ['gestión empresarial', 'finanzas', 'dashboard', '3D', 'AI', 'capital', 'ventas', 'clientes'],
+  authors: [{ name: 'Chronos Team' }],
+  creator: 'Chronos',
+  publisher: 'Chronos',
+  generator: 'Next.js',
   manifest: '/manifest.json',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'es_MX',
+    siteName: 'Chronos',
+    title: 'Chronos - Sistema de Gestión Empresarial Premium',
+    description: 'Sistema completo de gestión de flujos de capital con arquitectura 3D y AI',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Chronos Dashboard' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Chronos - Sistema de Gestión Empresarial Premium',
+    description: 'Sistema completo de gestión de flujos de capital con arquitectura 3D y AI',
+    images: ['/og-image.png'],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'Chronos',
   },
+  formatDetection: {
+    telephone: false,
+  },
   icons: {
     icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
+      { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
+      { url: '/icon-dark-32x32.png', media: '(prefers-color-scheme: dark)' },
+      { url: '/icon.svg', type: 'image/svg+xml' },
     ],
     apple: '/apple-icon.png',
+    shortcut: '/favicon.ico',
   },
 }
 
