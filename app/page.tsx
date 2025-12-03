@@ -120,9 +120,7 @@ export default function Chronos() {
   const totalOrdenes = ordenes.length
   const capitalTotal = bancos.reduce((acc, b) => acc + (b.capitalActual || 0), 0)
   const ventasMes = ventas.filter(v => {
-    const fecha = v.fecha instanceof Date ? v.fecha : 
-                  typeof v.fecha === 'string' ? new Date(v.fecha) :
-                  'toDate' in v.fecha ? v.fecha.toDate() : new Date()
+    const fecha = v.fecha instanceof Date ? v.fecha : new Date(v.fecha as string)
     const hoy = new Date()
     return fecha.getMonth() === hoy.getMonth() && fecha.getFullYear() === hoy.getFullYear()
   }).length
@@ -239,7 +237,7 @@ export default function Chronos() {
   }
 
   return (
-    <div id="root" className="min-h-screen bg-black relative overflow-x-hidden w-full max-w-[100vw]">
+    <div id="root" className="min-h-screen bg-black relative w-full">
       <ScrollProgress />
 
       <FirestoreSetupAlert />
@@ -325,7 +323,7 @@ export default function Chronos() {
         {/* Nuevo Header Ultra Premium */}
         <ChronosHeader />
 
-        <main className="pt-20 px-4 md:px-6 lg:px-8 pb-8 overflow-x-hidden max-w-full">
+        <main className="pt-20 px-4 md:px-6 lg:px-8 pb-8">
           {/* Quick Stats 3D */}
           {_showStats && (
             <motion.div

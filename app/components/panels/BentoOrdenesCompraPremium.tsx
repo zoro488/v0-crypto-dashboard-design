@@ -110,15 +110,28 @@ function useCountUp(end: number, duration: number = 2000) {
 // ============================================================================
 // HELPERS
 // ============================================================================
-function formatearFecha(fecha: string | FirestoreTimestamp | undefined): string {
+
+// Helper para parsear LocalTimestamp (compatible con Firebase y localStorage)
+function parseLocalTimestamp(ts: unknown): Date {
+  if (!ts) return new Date()
+  if (ts instanceof Date) return ts
+  if (typeof ts === 'string') return new Date(ts)
+  if (typeof ts === 'number') return new Date(ts)
+  // Firebase Timestamp-like object
+  if (typeof ts === 'object' && ts !== null && 'seconds' in ts) {
+    return new Date((ts as { seconds: number }).seconds * 1000)
+  }
+  if (typeof ts === 'object' && ts !== null && 'toDate' in ts && typeof (ts as { toDate: () => Date }).toDate === 'function') {
+    return (ts as { toDate: () => Date }).toDate()
+  }
+  return new Date()
+}
+
+function formatearFecha(fecha: unknown): string {
   if (!fecha) return '-'
   try {
-    if (typeof fecha === 'object' && 'seconds' in fecha) {
-      return new Date(fecha.seconds * 1000).toLocaleDateString('es-MX', {
-        day: '2-digit', month: 'short', year: 'numeric',
-      })
-    }
-    return new Date(fecha).toLocaleDateString('es-MX', {
+    const dateObj = parseLocalTimestamp(fecha)
+    return dateObj.toLocaleDateString('es-MX', {
       day: '2-digit', month: 'short', year: 'numeric',
     })
   } catch {
@@ -547,7 +560,8 @@ export function BentoOrdenesCompraPremium() {
     ordenes.forEach(oc => {
       const fecha = oc.fecha
       if (fecha) {
-        const semana = `Sem ${Math.ceil(new Date(typeof fecha === 'object' && 'seconds' in fecha ? fecha.seconds * 1000 : fecha).getDate() / 7)}`
+        const fechaDate = fecha instanceof Date ? fecha : new Date(fecha as string)
+        const semana = `Sem ${Math.ceil(fechaDate.getDate() / 7)}`
         if (!ultimasSemanas[semana]) ultimasSemanas[semana] = { total: 0, pagado: 0 }
         ultimasSemanas[semana].total += oc.costoTotal || 0
         ultimasSemanas[semana].pagado += oc.pagoDistribuidor || oc.pagoInicial || 0

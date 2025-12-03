@@ -23,6 +23,8 @@ import { NoiseTexture } from '@/app/components/ui-premium/NoiseTexture'
 import { ChronosShell } from '@/app/components/layout/ChronosShell'
 // 🤖 GrokAIOrb - Widget flotante IA movido al layout para garantizar posición fixed global
 import { GrokAIOrb } from '@/app/components/widgets/GrokAIOrb'
+// 🎯 ScrollProvider - Sistema de scroll unificado
+import { ScrollProvider } from '@/app/components/ui/ScrollController'
 // 🎤 VoiceWorkerProvider - Web Worker para voz y AI (0 bloqueo UI)
 import { VoiceWorkerProvider } from '@/app/providers/VoiceWorkerProvider'
 
@@ -125,28 +127,31 @@ export default function RootLayout({
                       <VoiceWorkerProvider>
                         {/* 🎬 SPLASH SCREEN - Partículas CHRONOS (deshabilitado temporalmente para testing) */}
                         <SplashScreen duration={5500} enabled={false}>
-                          {/* <PerformanceMonitor /> */}
-                          
-                          {/* 🌌 FONDO 3D GLOBAL - Siempre visible */}
-                          <ImmersiveWrapper />
-                          
-                          {/* 📦 CONTENIDO PRINCIPAL - Con z-index superior */}
-                          <div className="relative z-10 min-h-screen w-full overflow-auto">
-                            <ChronosShell>
-                              {children}
-                            </ChronosShell>
-                          </div>
-                          
-                          {/* 🤖 AGENTE IA FLOTANTE - Siempre visible con posición fixed global */}
-                          <GrokAIOrb />
-                          
-                          {/* 🎯 FEATURE FLAGS DEBUG PANEL - Solo en desarrollo */}
-                          <FeatureFlagsDebugPanel />
-                          
-                          {/* 🔮 TEXTURA DE RUIDO OBSIDIAN - Efecto táctil premium */}
-                          <NoiseTexture />
-                          
-                          <Toaster />
+                          {/* 🎯 SCROLL CONTROLLER - Sistema unificado */}
+                          <ScrollProvider>
+                            {/* <PerformanceMonitor /> */}
+                            
+                            {/* 🌌 FONDO 3D GLOBAL - Siempre visible */}
+                            <ImmersiveWrapper />
+                            
+                            {/* 📦 CONTENIDO PRINCIPAL - Sin overflow propio, scroll en html */}
+                            <div className="relative z-10 min-h-screen w-full">
+                              <ChronosShell>
+                                {children}
+                              </ChronosShell>
+                            </div>
+                            
+                            {/* 🤖 AGENTE IA FLOTANTE - Siempre visible con posición fixed global */}
+                            <GrokAIOrb />
+                            
+                            {/* 🎯 FEATURE FLAGS DEBUG PANEL - Solo en desarrollo */}
+                            <FeatureFlagsDebugPanel />
+                            
+                            {/* 🔮 TEXTURA DE RUIDO OBSIDIAN - Efecto táctil premium */}
+                            <NoiseTexture />
+                            
+                            <Toaster />
+                          </ScrollProvider>
                         </SplashScreen>
                       </VoiceWorkerProvider>
                     </AppProvider>

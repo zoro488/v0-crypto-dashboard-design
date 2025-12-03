@@ -28,14 +28,24 @@ html {
   background-color: #000000;
 }
 
-html, body {
-  min-height: 100%;
+html {
+  /* SCROLL UNIFICADO - Solo vertical */
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height para móviles */
   background-color: #000000;
   color: #FFFFFF;
-  /* CRÍTICO: Prevenir scroll horizontal en toda la app */
-  overflow-x: hidden !important;
+  overflow-x: hidden;
+  overflow-y: visible; /* Body no scrollea, solo html */
   max-width: 100vw;
   width: 100%;
+  -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
 }
 
 /* Contenedor principal - Sin scroll horizontal */
@@ -368,24 +378,86 @@ main,
   }
 }
 
-/* Apple-style scrollbar */
+/* ═══════════════════════════════════════════════════════════════════════════
+ * 🎯 CHRONOS SCROLL SYSTEM - Ultra Premium
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 
+ * Scroll unificado con soporte para:
+ * - Mouse wheel (smooth scrolling)
+ * - Trackpad gestures
+ * - Keyboard navigation (Page Up/Down, Home/End, Arrow keys)
+ * - Touch devices
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Scrollbar moderna estilo Apple/Obsidian */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  transition: background 0.2s;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 102, 255, 0.4) 0%,
+    rgba(200, 30, 255, 0.4) 100%
+  );
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 102, 255, 0.7) 0%,
+    rgba(200, 30, 255, 0.7) 100%
+  );
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 102, 255, 0.9) 0%,
+    rgba(200, 30, 255, 0.9) 100%
+  );
+  background-clip: padding-box;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 102, 255, 0.4) rgba(0, 0, 0, 0.2);
+}
+
+/* Scroll suave para toda la app */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Scroll snap para secciones principales (opcional) */
+.scroll-snap-container {
+  scroll-snap-type: y proximity;
+}
+
+.scroll-snap-section {
+  scroll-snap-align: start;
+}
+
+/* Ocultar scrollbar pero mantener funcionalidad */
+.scrollbar-invisible {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-invisible::-webkit-scrollbar {
+  display: none;
 }
 
 /* Typography System - SF Pro inspired */
@@ -812,26 +884,7 @@ main,
   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.5);
 }
 
-/* Custom scrollbar for better UX */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 10px;
-  transition: background 0.2s;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
-}
+/* Custom scrollbar ahora usa el sistema global - ver CHRONOS SCROLL SYSTEM arriba */
 
 /* GPU acceleration class */
 .gpu-accelerated {

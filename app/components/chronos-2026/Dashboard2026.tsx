@@ -81,9 +81,7 @@ function Dashboard2026() {
     // Calcular ventas del mes
     const now = new Date()
     const ventasMes = ventas.filter(v => {
-      const fecha = v.fecha instanceof Date ? v.fecha : 
-                    typeof v.fecha === 'string' ? new Date(v.fecha) :
-                    'toDate' in v.fecha ? v.fecha.toDate() : new Date()
+      const fecha = v.fecha instanceof Date ? v.fecha : new Date(v.fecha as string)
       return fecha.getMonth() === now.getMonth() && fecha.getFullYear() === now.getFullYear()
     })
     const totalVentasMes = ventasMes.reduce((acc, v) => acc + (v.precioTotalVenta || 0), 0)
@@ -123,9 +121,7 @@ function Dashboard2026() {
         type: 'venta',
         title: `Nueva venta: ${v.cliente || 'Cliente'}`,
         description: `${v.cantidad || 1} unidades`,
-        timestamp: v.fecha instanceof Date ? v.fecha : 
-                   typeof v.fecha === 'string' ? new Date(v.fecha) :
-                   'toDate' in v.fecha ? v.fecha.toDate() : new Date(),
+        timestamp: v.fecha instanceof Date ? v.fecha : new Date(v.fecha as string),
         amount: v.precioTotalVenta,
         status: v.estadoPago === 'completo' ? 'completed' : 'pending',
       })
@@ -138,9 +134,7 @@ function Dashboard2026() {
         type: 'cliente',
         title: `Nuevo cliente: ${c.nombre || 'Sin nombre'}`,
         description: c.direccion || 'Sin dirección',
-        timestamp: c.createdAt instanceof Date ? c.createdAt : 
-                   typeof c.createdAt === 'string' ? new Date(c.createdAt) :
-                   c.createdAt && 'toDate' in c.createdAt ? c.createdAt.toDate() : new Date(),
+        timestamp: c.createdAt instanceof Date ? c.createdAt : new Date(c.createdAt as string),
       })
     })
     

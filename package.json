@@ -91,6 +91,7 @@
     "@tanstack/react-table": "latest",
     "@tanstack/react-virtual": "latest",
     "@types/d3": "^7.4.3",
+    "@types/uuid": "^11.0.0",
     "@vercel/analytics": "latest",
     "@vercel/edge-config": "^1.4.3",
     "@vercel/speed-insights": "^1.2.0",
@@ -131,6 +132,7 @@
     "three-stdlib": "^2.34.0",
     "tw-animate-css": "latest",
     "use-sound": "^5.0.0",
+    "uuid": "^13.0.0",
     "zod": "^3.24.1",
     "zustand": "^5.0.2"
   },

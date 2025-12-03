@@ -1,107 +1,59 @@
 /**
  * 🛡️ RESILIENT DATA SERVICE - CHRONOS SYSTEM
  * 
- * Servicio con fallback bidireccional completo:
- * - Intenta Firebase primero (si disponible)
- * - Si Firebase falla → usa localStorage
- * - Siempre guarda en localStorage como backup
- * - Sincroniza datos cuando ambos están disponibles
+ * 🚨 MODO LOCAL FORZADO - Firebase deshabilitado
+ * Servicio que usa SOLO localStorage
  * 
- * @version 1.0.0
+ * @version 2.0.0 - Solo localStorage
  */
 
-import { isFirestoreAvailable } from '../firebase/config'
 import * as localService from '../storage/local-storage-service'
 import { logger } from '../utils/logger'
 import type { BancoId } from '@/app/types'
 
 // ============================================================
-// CONFIGURACIÓN
+// CONFIGURACIÓN - MODO LOCAL FORZADO
 // ============================================================
 
-const MAX_RETRIES = 2
-const RETRY_DELAY = 500
+// 🚨 Firebase SIEMPRE deshabilitado
+const firebaseAvailable = false
 
-// Estado del servicio
-let firebaseAvailable = false
+// Variable para tracking (mantenida por compatibilidad)
 let lastFirebaseCheck = 0
-const FIREBASE_CHECK_INTERVAL = 30000 // 30 segundos
 
 // ============================================================
 // UTILIDADES
 // ============================================================
 
 /**
- * Verifica si Firebase está disponible (con cache)
+ * Verifica si Firebase está disponible - SIEMPRE retorna false
  */
 function checkFirebaseAvailable(): boolean {
-  const now = Date.now()
-  if (now - lastFirebaseCheck > FIREBASE_CHECK_INTERVAL) {
-    firebaseAvailable = isFirestoreAvailable()
-    lastFirebaseCheck = now
-    logger.info(`[ResilientService] Firebase disponible: ${firebaseAvailable}`, { context: 'ResilientService' })
-  }
-  return firebaseAvailable
+  return false // 🚨 SIEMPRE localStorage
 }
 
 /**
- * Delay helper
+ * Delay helper (no usado pero mantenido por compatibilidad)
  */
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 /**
- * Ejecuta operación con fallback y retry
+ * Ejecuta operación - SOLO localStorage
  */
 async function executeWithFallback<T>(
   operationName: string,
-  firebaseOperation: () => Promise<T>,
+  _firebaseOperation: () => Promise<T>,
   localOperation: () => T | Promise<T>,
-  options: { saveToLocal?: boolean; localData?: unknown } = {},
+  _options: { saveToLocal?: boolean; localData?: unknown } = {},
 ): Promise<T> {
-  const { saveToLocal = true } = options
-  
-  // Intentar Firebase si está disponible
-  if (checkFirebaseAvailable()) {
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-      try {
-        const result = await firebaseOperation()
-        
-        // Guardar también en localStorage como backup si se indica
-        if (saveToLocal && options.localData) {
-          try {
-            await localOperation()
-            logger.debug(`[ResilientService] Backup local guardado para ${operationName}`, { context: 'ResilientService' })
-          } catch (localError) {
-            logger.warn(`[ResilientService] No se pudo guardar backup local para ${operationName}`, { context: 'ResilientService' })
-          }
-        }
-        
-        return result
-      } catch (error) {
-        logger.warn(`[ResilientService] Firebase falló (intento ${attempt}/${MAX_RETRIES}) para ${operationName}`, { 
-          context: 'ResilientService',
-          data: { error: error instanceof Error ? error.message : 'Unknown error' },
-        })
-        
-        if (attempt < MAX_RETRIES) {
-          await delay(RETRY_DELAY * attempt)
-        }
-      }
-    }
-    
-    // Firebase falló después de todos los intentos, marcar como no disponible temporalmente
-    firebaseAvailable = false
-    logger.warn(`[ResilientService] Firebase marcado como no disponible, usando localStorage para ${operationName}`, { context: 'ResilientService' })
-  }
-  
-  // Fallback a localStorage
+  // 🚨 SIEMPRE usar localStorage directamente
+  logger.info(`[ResilientService] ${operationName}: Ejecutando en localStorage`, { context: 'ResilientService' })
   try {
     const result = await localOperation()
-    logger.info(`[ResilientService] ${operationName} completado con localStorage`, { context: 'ResilientService' })
     return result
-  } catch (localError) {
-    logger.error(`[ResilientService] Falló localStorage para ${operationName}`, localError, { context: 'ResilientService' })
-    throw localError
+  } catch (error) {
+    logger.error(`[ResilientService] Error en ${operationName}`, error, { context: 'ResilientService' })
+    throw error
   }
 }
 

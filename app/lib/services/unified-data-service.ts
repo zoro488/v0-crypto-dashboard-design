@@ -1,110 +1,46 @@
 /**
  * 🔄 UNIFIED DATA SERVICE - CHRONOS SYSTEM
- * Servicio unificado que automáticamente usa Firebase o localStorage
+ * Servicio unificado que usa SOLO localStorage
  * 
- * - Si Firebase está configurado: intenta Firestore primero
- * - Si Firestore falla o no está disponible: usa localStorage
- * - Fallback bidireccional con retry automático
+ * 🚨 MODO LOCAL FORZADO - Firebase deshabilitado completamente
+ * Este archivo es un stub que redirige todo a localStorage
  * 
- * @version 2.0.0 - Con fallback bidireccional
+ * @version 3.0.0 - Solo localStorage, sin Firebase
  */
 
-import { isFirestoreAvailable } from '../firebase/config'
-import * as firestoreService from '../firebase/firestore-service'
 import * as localService from '../storage/local-storage-service'
 import { logger } from '../utils/logger'
+import type { BancoId } from '@/app/types'
 
-// Flag para modo de operación (con re-check dinámico)
-let useLocalStorage = false
-let lastCheck = 0
-const CHECK_INTERVAL = 30000 // Re-verificar cada 30 segundos
-
-// Función para verificar modo con cache
-function checkStorageMode(): boolean {
-  const now = Date.now()
-  if (now - lastCheck > CHECK_INTERVAL) {
-    useLocalStorage = !isFirestoreAvailable()
-    lastCheck = now
-  }
-  return useLocalStorage
-}
+// 🚨 SIEMPRE usar localStorage - Firebase deshabilitado
+const useLocalStorage = true
 
 // Inicializar modo de operación
 if (typeof window !== 'undefined') {
-  useLocalStorage = !isFirestoreAvailable()
-  lastCheck = Date.now()
-  if (useLocalStorage) {
-    logger.info('📦 Usando almacenamiento LOCAL (localStorage)', { context: 'UnifiedDataService' })
-  } else {
-    logger.info('🔥 Usando almacenamiento FIREBASE (Firestore)', { context: 'UnifiedDataService' })
-  }
+  logger.info('📦 MODO LOCAL FORZADO - Usando solo localStorage', { context: 'UnifiedDataService' })
 }
 
 /**
- * Ejecuta operación con fallback a localStorage si falla Firebase
+ * Ejecuta operación - SOLO localStorage
  */
 async function withFallback<T>(
   operationName: string,
-  firebaseOp: () => Promise<T>,
   localOp: () => T | Promise<T>,
 ): Promise<T> {
-  if (checkStorageMode()) {
-    // Ya estamos en modo localStorage
-    return localOp()
-  }
-  
-  try {
-    return await firebaseOp()
-  } catch (error) {
-    logger.warn(`[UnifiedDataService] Firebase falló para ${operationName}, usando localStorage`, { 
-      context: 'UnifiedDataService',
-      data: { error: error instanceof Error ? error.message : 'Unknown' },
-    })
-    return localOp()
-  }
+  logger.info(`[UnifiedDataService] ${operationName}: Ejecutando en localStorage`, { context: 'UnifiedDataService' })
+  return localOp()
 }
 
 /**
- * Wrapper para suscripciones con fallback
- * MEJORADO: Siempre llama al callback local primero para mostrar datos inmediatamente
+ * Wrapper para suscripciones - SOLO localStorage
  */
 function subscribeWithFallback<T>(
   operationName: string,
-  firestoreSubscribe: (cb: (data: T[]) => void) => () => void,
   localSubscribe: (cb: (data: T[]) => void) => () => void,
   callback: (data: T[]) => void,
 ): () => void {
-  // ✅ SIEMPRE suscribirse a localStorage primero para datos inmediatos
-  const localUnsubscribe = localSubscribe(callback)
-  
-  // Si estamos en modo localStorage, retornar solo esa suscripción
-  if (checkStorageMode()) {
-    logger.info(`[UnifiedDataService] ${operationName}: Usando solo localStorage`, { context: 'UnifiedDataService' })
-    return localUnsubscribe
-  }
-  
-  // Intentar también Firebase (los datos de Firebase sobrescribirán los locales si llegan)
-  let firestoreUnsubscribe: (() => void) | null = null
-  try {
-    firestoreUnsubscribe = firestoreSubscribe((data) => {
-      // Solo usar datos de Firebase si hay datos
-      if (data && data.length > 0) {
-        callback(data)
-      }
-    })
-  } catch (error) {
-    logger.warn(`[UnifiedDataService] Firebase suscripción falló para ${operationName}, usando solo localStorage`, { 
-      context: 'UnifiedDataService',
-    })
-  }
-  
-  // Retornar función que desuscribe de ambos
-  return () => {
-    localUnsubscribe()
-    if (firestoreUnsubscribe) {
-      firestoreUnsubscribe()
-    }
-  }
+  logger.info(`[UnifiedDataService] ${operationName}: Suscripción localStorage`, { context: 'UnifiedDataService' })
+  return localSubscribe(callback)
 }
 
 // ============================================================
@@ -113,22 +49,12 @@ function subscribeWithFallback<T>(
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const suscribirBancos = (callback: (bancos: any[]) => void) => {
-  return subscribeWithFallback(
-    'suscribirBancos',
-    firestoreService.suscribirBancos,
-    localService.localSuscribirBancos,
-    callback,
-  )
+  return subscribeWithFallback('suscribirBancos', localService.localSuscribirBancos, callback)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const obtenerBanco = async (bancoId: string): Promise<any | null> => {
-  return withFallback(
-    'obtenerBanco',
-    () => firestoreService.obtenerBanco(bancoId),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    () => localService.localObtenerBanco(bancoId) as any,
-  )
+  return withFallback('obtenerBanco', () => localService.localObtenerBanco(bancoId))
 }
 
 export const actualizarCapitalBanco = async (
@@ -136,10 +62,8 @@ export const actualizarCapitalBanco = async (
   monto: number,
   tipo: 'ingreso' | 'gasto' | 'transferencia',
 ) => {
-  return withFallback(
-    'actualizarCapitalBanco',
-    () => firestoreService.actualizarCapitalBanco(bancoId, monto, tipo),
-    () => localService.localActualizarCapitalBanco(bancoId, monto, tipo),
+  return withFallback('actualizarCapitalBanco', () => 
+    localService.localActualizarCapitalBanco(bancoId, monto, tipo)
   )
 }
 
@@ -147,70 +71,32 @@ export const actualizarCapitalBanco = async (
 // CLIENTES
 // ============================================================
 
-export const crearCliente = async (data: {
-  nombre: string
-  empresa?: string
-  telefono?: string
-  email?: string
-  direccion?: string
-  deudaTotal?: number
-  totalPagado?: number
-}): Promise<string | null> => {
-  return withFallback(
-    'crearCliente',
-    () => firestoreService.crearCliente(data),
-    () => localService.localCrearCliente(data),
-  )
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const crearCliente = async (data: any): Promise<string> => {
+  return withFallback('crearCliente', () => localService.localCrearCliente(data))
 }
 
-export const actualizarCliente = async (clienteId: string, data: Partial<{
-  nombre: string
-  empresa?: string
-  telefono?: string
-  email?: string
-  direccion?: string
-  deudaTotal?: number
-  totalPagado?: number
-}>): Promise<string | null> => {
-  return withFallback(
-    'actualizarCliente',
-    () => firestoreService.actualizarCliente(clienteId, data),
-    () => localService.localActualizarCliente(clienteId, data),
-  )
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const actualizarCliente = async (clienteId: string, data: any): Promise<void> => {
+  await withFallback('actualizarCliente', () => localService.localActualizarCliente(clienteId, data))
 }
 
-export const eliminarCliente = async (clienteId: string): Promise<boolean> => {
-  return withFallback(
-    'eliminarCliente',
-    () => firestoreService.eliminarCliente(clienteId),
-    () => localService.localEliminarCliente(clienteId),
-  )
+export const eliminarCliente = async (clienteId: string): Promise<void> => {
+  await withFallback('eliminarCliente', () => localService.localEliminarCliente(clienteId))
 }
 
-export const suscribirClientes = (callback: (clientes: unknown[]) => void) => {
-  return subscribeWithFallback(
-    'suscribirClientes',
-    firestoreService.suscribirClientes,
-    localService.localSuscribirClientes,
-    callback,
-  )
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const suscribirClientes = (callback: (clientes: any[]) => void) => {
+  return subscribeWithFallback('suscribirClientes', localService.localSuscribirClientes, callback)
 }
 
-export const cobrarCliente = async (clienteId: string, ventaId: string, monto: number): Promise<void> => {
-  await withFallback(
-    'cobrarCliente',
-    async () => {
-      await firestoreService.cobrarCliente(clienteId, ventaId, monto)
-    },
-    async () => {
-      localService.localCrearAbono({
-        tipo: 'cliente',
-        entidadId: clienteId,
-        monto,
-        bancoDestino: 'boveda_monte',
-        metodo: 'efectivo',
-      })
-    },
+export const cobrarCliente = async (
+  clienteId: string,
+  ventaId: string,
+  monto: number,
+): Promise<void> => {
+  return withFallback('cobrarCliente', () => 
+    localService.localCobrarCliente(clienteId, ventaId, monto)
   )
 }
 
@@ -218,335 +104,180 @@ export const cobrarCliente = async (clienteId: string, ventaId: string, monto: n
 // VENTAS
 // ============================================================
 
-export const crearVenta = async (data: {
-  cliente: string
-  clienteId?: string
-  producto?: string
-  cantidad: number
-  precioVenta?: number
-  precioTotalVenta?: number
-  precioCompra?: number
-  precioFlete?: number
-  flete?: 'Aplica' | 'NoAplica'
-  montoPagado?: number
-  concepto?: string
-  notas?: string
-  fecha?: string | Date
-}): Promise<string | null> => {
-  return withFallback(
-    'crearVenta',
-    () => firestoreService.crearVenta(data),
-    () => localService.localCrearVenta({
-      ...data,
-      fecha: data.fecha instanceof Date ? data.fecha.toISOString() : data.fecha,
-    }),
-  )
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const crearVenta = async (data: any): Promise<string> => {
+  return withFallback('crearVenta', () => localService.localCrearVenta(data))
 }
 
-export const suscribirVentas = (callback: (ventas: unknown[]) => void) => {
-  return subscribeWithFallback(
-    'suscribirVentas',
-    firestoreService.suscribirVentas,
-    localService.localSuscribirVentas,
-    callback,
-  )
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const suscribirVentas = (callback: (ventas: any[]) => void) => {
+  return subscribeWithFallback('suscribirVentas', localService.localSuscribirVentas, callback)
 }
 
-export const actualizarVenta = async (ventaId: string, data: Partial<unknown>): Promise<string | null> => {
-  return withFallback(
-    'actualizarVenta',
-    () => firestoreService.actualizarVenta(ventaId, data),
-    async () => {
-      logger.warn('actualizarVenta no implementada en modo local', { context: 'UnifiedDataService' })
-      return null
-    },
-  )
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const actualizarVenta = async (ventaId: string, data: any): Promise<void> => {
+  await withFallback('actualizarVenta', () => localService.localActualizarVenta(ventaId, data))
 }
 
-export const eliminarVenta = async (ventaId: string): Promise<boolean> => {
-  return withFallback(
-    'eliminarVenta',
-    () => firestoreService.eliminarVenta(ventaId),
-    async () => {
-      logger.warn('eliminarVenta no implementada en modo local', { context: 'UnifiedDataService' })
-      return false
-    },
-  )
+export const eliminarVenta = async (ventaId: string): Promise<void> => {
+  await withFallback('eliminarVenta', () => localService.localEliminarVenta(ventaId))
 }
 
 // ============================================================
 // DISTRIBUIDORES
 // ============================================================
 
-export const crearDistribuidor = async (data: {
-  nombre: string
-  empresa?: string
-  telefono?: string
-  email?: string
-  direccion?: string
-  origen?: string
-}): Promise<string | null> => {
-  return withFallback(
-    'crearDistribuidor',
-    () => firestoreService.crearDistribuidor(data),
-    () => localService.localCrearDistribuidor(data),
-  )
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const crearDistribuidor = async (data: any): Promise<string> => {
+  return withFallback('crearDistribuidor', () => localService.localCrearDistribuidor(data))
 }
 
-export const suscribirDistribuidores = (callback: (distribuidores: unknown[]) => void) => {
-  return subscribeWithFallback(
-    'suscribirDistribuidores',
-    firestoreService.suscribirDistribuidores,
-    localService.localSuscribirDistribuidores,
-    callback,
-  )
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const suscribirDistribuidores = (callback: (distribuidores: any[]) => void) => {
+  return subscribeWithFallback('suscribirDistribuidores', localService.localSuscribirDistribuidores, callback)
 }
 
 export const pagarDistribuidor = async (
   distribuidorId: string,
   ordenCompraId: string,
   monto: number,
-  bancoOrigenId: string,
-) => {
-  return withFallback(
-    'pagarDistribuidor',
-    () => firestoreService.pagarDistribuidor(distribuidorId, ordenCompraId, monto, bancoOrigenId),
-    () => localService.localPagarDistribuidor(distribuidorId, ordenCompraId, monto, bancoOrigenId),
+  bancoOrigenId: BancoId,
+): Promise<void> => {
+  await withFallback('pagarDistribuidor', () => 
+    localService.localPagarDistribuidor(distribuidorId, ordenCompraId, monto, bancoOrigenId)
   )
 }
 
-export const actualizarDistribuidor = async (distribuidorId: string, data: Partial<unknown>): Promise<string | null> => {
-  return withFallback(
-    'actualizarDistribuidor',
-    () => firestoreService.actualizarDistribuidor(distribuidorId, data),
-    async () => {
-      logger.warn('actualizarDistribuidor no implementada en modo local', { context: 'UnifiedDataService' })
-      return null
-    },
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const actualizarDistribuidor = async (distribuidorId: string, data: any): Promise<void> => {
+  await withFallback('actualizarDistribuidor', () => 
+    localService.localActualizarDistribuidor(distribuidorId, data)
   )
 }
 
-export const eliminarDistribuidor = async (distribuidorId: string): Promise<boolean> => {
-  return withFallback(
-    'eliminarDistribuidor',
-    () => firestoreService.eliminarDistribuidor(distribuidorId),
-    async () => {
-      logger.warn('eliminarDistribuidor no implementada en modo local', { context: 'UnifiedDataService' })
-      return false
-    },
-  )
+export const eliminarDistribuidor = async (distribuidorId: string): Promise<void> => {
+  await withFallback('eliminarDistribuidor', () => localService.localEliminarDistribuidor(distribuidorId))
 }
 
 // ============================================================
 // ÓRDENES DE COMPRA
 // ============================================================
 
-export const crearOrdenCompra = async (data: {
-  distribuidor: string
-  distribuidorId?: string
-  producto?: string
-  cantidad: number
-  costoTotal?: number
-  costoPorUnidad?: number
-  pagoDistribuidor?: number
-  bancoOrigen?: string
-  fecha?: string | Date
-  origen?: string
-  notas?: string
-}): Promise<string | null> => {
-  return withFallback(
-    'crearOrdenCompra',
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    () => firestoreService.crearOrdenCompra(data as any),
-    () => localService.localCrearOrdenCompra({
-      ...data,
-      fecha: data.fecha instanceof Date ? data.fecha.toISOString() : data.fecha,
-    }),
-  )
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const crearOrdenCompra = async (data: any): Promise<string> => {
+  return withFallback('crearOrdenCompra', () => localService.localCrearOrdenCompra(data))
 }
 
-export const suscribirOrdenesCompra = (callback: (ordenes: unknown[]) => void) => {
-  return subscribeWithFallback(
-    'suscribirOrdenesCompra',
-    firestoreService.suscribirOrdenesCompra,
-    localService.localSuscribirOrdenesCompra,
-    callback,
-  )
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const suscribirOrdenesCompra = (callback: (ordenes: any[]) => void) => {
+  return subscribeWithFallback('suscribirOrdenesCompra', localService.localSuscribirOrdenesCompra, callback)
 }
 
-/**
- * Obtiene el siguiente ID para una nueva orden de compra
- * Formato: OC0001, OC0002, etc.
- */
-export const obtenerSiguienteIdOrdenCompra = async (): Promise<string> => {
-  try {
-    // Obtener órdenes existentes
-    const ordenes: Array<{ id: string }> = []
-    
-    await new Promise<void>((resolve) => {
-      const unsubscribe = suscribirOrdenesCompra((data) => {
-        ordenes.push(...(data as Array<{ id: string }>))
-        unsubscribe()
-        resolve()
-      })
-      // Timeout de seguridad
-      setTimeout(() => {
-        unsubscribe()
-        resolve()
-      }, 2000)
-    })
-    
-    if (ordenes.length === 0) {
-      return 'OC0001'
-    }
-    
-    // Encontrar el mayor número
-    const numeros = ordenes
-      .map(o => {
-        const match = o.id?.match(/OC(\d+)/)
-        return match ? parseInt(match[1], 10) : 0
-      })
-      .filter(n => !isNaN(n))
-    
-    const maxNum = numeros.length > 0 ? Math.max(...numeros) : 0
-    const siguiente = maxNum + 1
-    
-    return `OC${siguiente.toString().padStart(4, '0')}`
-  } catch (error) {
-    logger.error('Error obteniendo siguiente ID de orden', error, { context: 'UnifiedDataService' })
-    // Fallback: usar timestamp
-    return `OC${Date.now().toString().slice(-4)}`
-  }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const actualizarOrdenCompra = async (ordenId: string, data: any): Promise<void> => {
+  await withFallback('actualizarOrdenCompra', () => localService.localActualizarOrdenCompra(ordenId, data))
 }
 
-export const actualizarOrdenCompra = async (ordenId: string, data: Partial<unknown>): Promise<string | null> => {
-  return withFallback(
-    'actualizarOrdenCompra',
-    () => firestoreService.actualizarOrdenCompra(ordenId, data),
-    async () => {
-      logger.warn('actualizarOrdenCompra no implementada en modo local', { context: 'UnifiedDataService' })
-      return null
-    },
-  )
-}
-
-export const eliminarOrdenCompra = async (ordenId: string): Promise<boolean> => {
-  return withFallback(
-    'eliminarOrdenCompra',
-    () => firestoreService.eliminarOrdenCompra(ordenId),
-    async () => {
-      logger.warn('eliminarOrdenCompra no implementada en modo local', { context: 'UnifiedDataService' })
-      return false
-    },
-  )
+export const eliminarOrdenCompra = async (ordenId: string): Promise<void> => {
+  await withFallback('eliminarOrdenCompra', () => localService.localEliminarOrdenCompra(ordenId))
 }
 
 // ============================================================
-// ALMACÉN / PRODUCTOS
+// PRODUCTOS
 // ============================================================
 
-export const crearProducto = async (data: {
-  nombre: string
-  categoria?: string
-  origen?: string
-  unidad?: string
-  stockInicial?: number
-  valorUnitario?: number
-  stockMinimo?: number
-  descripcion?: string
-}): Promise<string | null> => {
-  return withFallback(
-    'crearProducto',
-    () => firestoreService.crearProducto(data),
-    () => localService.localCrearProducto(data),
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const crearProducto = async (data: any): Promise<string> => {
+  return withFallback('crearProducto', () => localService.localCrearProducto(data))
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const suscribirProductos = (callback: (productos: any[]) => void) => {
+  return subscribeWithFallback('suscribirProductos', localService.localSuscribirAlmacen, callback)
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const actualizarProducto = async (productoId: string, data: any): Promise<void> => {
+  await withFallback('actualizarProducto', () => localService.localActualizarProducto(productoId, data))
+}
+
+export const eliminarProducto = async (productoId: string): Promise<void> => {
+  await withFallback('eliminarProducto', () => localService.localEliminarProducto(productoId))
+}
+
+// ============================================================
+// MOVIMIENTOS
+// ============================================================
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const suscribirMovimientos = (callback: (movimientos: any[]) => void) => {
+  return subscribeWithFallback('suscribirMovimientos', localService.localSuscribirMovimientos, callback)
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const crearMovimiento = async (data: any): Promise<string> => {
+  return withFallback('crearMovimiento', () => localService.localCrearMovimiento(data))
+}
+
+// ============================================================
+// ALMACÉN - ENTRADAS Y SALIDAS
+// ============================================================
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const suscribirEntradasAlmacen = (callback: (entradas: any[]) => void) => {
+  return subscribeWithFallback('suscribirEntradasAlmacen', 
+    localService.localSuscribirEntradasAlmacen || (() => () => {}), 
+    callback
   )
 }
 
-export const suscribirAlmacen = (callback: (productos: unknown[]) => void) => {
-  return subscribeWithFallback(
-    'suscribirAlmacen',
-    firestoreService.suscribirAlmacen,
-    localService.localSuscribirAlmacen,
-    callback,
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const suscribirSalidasAlmacen = (callback: (salidas: any[]) => void) => {
+  return subscribeWithFallback('suscribirSalidasAlmacen', 
+    localService.localSuscribirSalidasAlmacen || (() => () => {}), 
+    callback
   )
 }
 
-// Suscribir a entradas de almacén
-export const suscribirEntradasAlmacen = (callback: (entradas: unknown[]) => void) => {
-  return subscribeWithFallback(
-    'suscribirEntradasAlmacen',
-    firestoreService.suscribirEntradasAlmacen,
-    localService.localSuscribirEntradasAlmacen,
-    callback,
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const crearEntradaAlmacen = async (data: any): Promise<string> => {
+  return withFallback('crearEntradaAlmacen', () => 
+    localService.localCrearEntradaAlmacen ? localService.localCrearEntradaAlmacen(data) : 'local-' + Date.now()
   )
 }
 
-// Suscribir a salidas de almacén
-export const suscribirSalidasAlmacen = (callback: (salidas: unknown[]) => void) => {
-  return subscribeWithFallback(
-    'suscribirSalidasAlmacen',
-    firestoreService.suscribirSalidasAlmacen,
-    localService.localSuscribirSalidasAlmacen,
-    callback,
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const crearSalidaAlmacen = async (data: any): Promise<string> => {
+  return withFallback('crearSalidaAlmacen', () => 
+    localService.localCrearSalidaAlmacen ? localService.localCrearSalidaAlmacen(data) : 'local-' + Date.now()
   )
 }
 
-export const crearEntradaAlmacen = async (data: {
-  productoId: string
-  cantidad: number
-  origen: string
-  costoUnitario?: number
-  ordenCompraId?: string
-  notas?: string
-}): Promise<string | null> => {
-  return withFallback(
-    'crearEntradaAlmacen',
-    () => firestoreService.crearEntradaAlmacen(data),
-    async () => {
-      logger.warn('crearEntradaAlmacen no implementada en modo local', { context: 'UnifiedDataService' })
-      return null
-    },
-  )
-}
+export const obtenerEntradasAlmacen = async () => 
+  localService.localObtenerEntradasAlmacen ? localService.localObtenerEntradasAlmacen() : []
 
-export const crearSalidaAlmacen = async (data: {
-  productoId: string
-  cantidad: number
-  destino: string
-  ventaId?: string
-  motivo?: string
-  notas?: string
-}): Promise<string | null> => {
-  return withFallback(
-    'crearSalidaAlmacen',
-    () => firestoreService.crearSalidaAlmacen(data),
-    async () => {
-      logger.warn('crearSalidaAlmacen no implementada en modo local', { context: 'UnifiedDataService' })
-      return null
-    },
-  )
-}
+export const obtenerSalidasAlmacen = async () => 
+  localService.localObtenerSalidasAlmacen ? localService.localObtenerSalidasAlmacen() : []
 
-export const actualizarProducto = async (productoId: string, data: Partial<unknown>): Promise<string | null> => {
-  return withFallback(
-    'actualizarProducto',
-    () => firestoreService.actualizarProducto(productoId, data),
-    async () => {
-      logger.warn('actualizarProducto no implementada en modo local', { context: 'UnifiedDataService' })
-      return null
-    },
-  )
-}
+// ============================================================
+// UTILIDADES DE ESTADO
+// ============================================================
 
-export const eliminarProducto = async (productoId: string): Promise<boolean> => {
-  return withFallback(
-    'eliminarProducto',
-    () => firestoreService.eliminarProducto(productoId),
-    async () => {
-      logger.warn('eliminarProducto no implementada en modo local', { context: 'UnifiedDataService' })
-      return false
-    },
-  )
+export const getStorageMode = (): 'localStorage' => 'localStorage'
+export const isUsingLocalStorage = (): boolean => true
+
+export const checkStorageStatus = (): { firebase: boolean; localStorage: boolean } => ({
+  firebase: false, // Firebase deshabilitado
+  localStorage: typeof window !== 'undefined' && typeof localStorage !== 'undefined',
+})
+
+// ============================================================
+// ALMACÉN GENERAL
+// ============================================================
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const suscribirAlmacen = (callback: (productos: any[]) => void) => {
+  return subscribeWithFallback('suscribirAlmacen', localService.localSuscribirAlmacen, callback)
 }
 
 // ============================================================
@@ -557,29 +288,26 @@ export interface TransferenciaData {
   bancoOrigenId: string
   bancoDestinoId: string
   monto: number
-  concepto: string
-  referencia?: string
-  notas?: string
+  concepto?: string
+  fecha?: string
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const addTransferencia = async (data: TransferenciaData): Promise<string | null> => {
-  if (useLocalStorage) {
-    try {
-      return localService.localCrearTransferencia(data)
-    } catch (error) {
-      logger.error('Error creando transferencia local', error, { context: 'UnifiedDataService' })
-      throw error
-    }
-  }
-  return firestoreService.addTransferencia(data)
+  return withFallback('addTransferencia', () => 
+    localService.localCrearTransferencia ? localService.localCrearTransferencia({
+      ...data,
+      concepto: data.concepto || `Transferencia de ${data.bancoOrigenId} a ${data.bancoDestinoId}`,
+    }) : 'local-' + Date.now()
+  )
 }
 
 export const crearTransferencia = async (
-  bancoOrigenId: string,
-  bancoDestinoId: string,
+  bancoOrigenId: BancoId,
+  bancoDestinoId: BancoId,
   monto: number,
-  concepto: string,
-) => {
+  concepto?: string,
+): Promise<string | null> => {
   return addTransferencia({ bancoOrigenId, bancoDestinoId, monto, concepto })
 }
 
@@ -588,125 +316,198 @@ export const crearTransferencia = async (
 // ============================================================
 
 export interface AbonoData {
-  tipo: 'distribuidor' | 'cliente'
-  entidadId: string
+  clienteId?: string
+  distribuidorId?: string
   monto: number
-  bancoDestino: string
-  metodo: 'efectivo' | 'transferencia' | 'cheque'
-  referencia?: string
-  notas?: string
+  bancoDestinoId?: string
+  concepto?: string
+  fecha?: string
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const addAbono = async (data: AbonoData): Promise<string | null> => {
-  if (useLocalStorage) {
-    try {
-      return localService.localCrearAbono(data)
-    } catch (error) {
-      logger.error('Error creando abono local', error, { context: 'UnifiedDataService' })
-      throw error
-    }
-  }
-  return firestoreService.addAbono(data)
+  return withFallback('addAbono', () => 
+    localService.localCrearAbono ? localService.localCrearAbono({
+      tipo: data.clienteId ? 'cliente' : 'distribuidor',
+      entidadId: data.clienteId || data.distribuidorId || '',
+      monto: data.monto,
+      bancoDestino: data.bancoDestinoId || 'utilidades',
+      metodo: (data.concepto || 'efectivo') as 'efectivo' | 'transferencia' | 'cheque',
+    }) : 'local-' + Date.now()
+  )
 }
 
 // ============================================================
 // INGRESOS Y GASTOS
 // ============================================================
 
-export const crearIngreso = async (data: {
-  monto: number
-  concepto: string
-  bancoDestino: string
-  categoria?: string
-  referencia?: string
-  notas?: string
-}): Promise<string | null> => {
-  if (useLocalStorage) {
-    try {
-      return localService.localCrearIngreso(data)
-    } catch (error) {
-      logger.error('Error creando ingreso local', error, { context: 'UnifiedDataService' })
-      throw error
-    }
-  }
-  return firestoreService.crearIngreso(data)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const crearIngreso = async (data: any): Promise<string | null> => {
+  return withFallback('crearIngreso', () => 
+    localService.localCrearIngreso ? localService.localCrearIngreso(data) : 'local-' + Date.now()
+  )
 }
 
-export const crearGasto = async (data: {
-  monto: number
-  concepto: string
-  bancoOrigen: string
-  categoria?: string
-  referencia?: string
-  notas?: string
-}): Promise<string | null> => {
-  if (useLocalStorage) {
-    try {
-      return localService.localCrearGasto(data)
-    } catch (error) {
-      logger.error('Error creando gasto local', error, { context: 'UnifiedDataService' })
-      throw error
-    }
-  }
-  return firestoreService.crearGasto(data)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const crearGasto = async (data: any): Promise<string | null> => {
+  return withFallback('crearGasto', () => 
+    localService.localCrearGasto ? localService.localCrearGasto(data) : 'local-' + Date.now()
+  )
 }
 
 // ============================================================
-// UTILIDADES
+// ÓRDENES DE COMPRA - UTILIDADES
 // ============================================================
 
-export const isUsingLocalStorage = (): boolean => useLocalStorage
-
-export const getStorageMode = (): 'firebase' | 'local' => useLocalStorage ? 'local' : 'firebase'
+export const obtenerSiguienteIdOrdenCompra = async (): Promise<string> => {
+  return withFallback('obtenerSiguienteIdOrdenCompra', () => {
+    if (localService.localObtenerSiguienteIdOrdenCompra) {
+      return localService.localObtenerSiguienteIdOrdenCompra()
+    }
+    return `OC${String(Date.now()).slice(-4).padStart(4, '0')}`
+  })
+}
 
 // ============================================================
-// SERVICIO UNIFICADO EXPORTADO
+// ALIAS PARA COMPATIBILIDAD
 // ============================================================
 
-export const unifiedDataService = {
+export const obtenerVentas = async () => localService.localObtenerVentas()
+export const obtenerClientes = async () => localService.localObtenerClientes()
+export const obtenerDistribuidores = async () => localService.localObtenerDistribuidores()
+export const obtenerOrdenesCompra = async () => localService.localObtenerOrdenesCompra()
+export const obtenerProductos = async () => localService.localObtenerProductos()
+export const obtenerMovimientos = async () => localService.localObtenerMovimientos()
+export const obtenerBancos = async () => localService.localObtenerBancos()
+
+// ============================================================
+// EXPORT DEFAULT
+// ============================================================
+
+export default {
   // Bancos
   suscribirBancos,
   obtenerBanco,
+  obtenerBancos,
   actualizarCapitalBanco,
   // Clientes
   crearCliente,
   actualizarCliente,
   eliminarCliente,
   suscribirClientes,
+  obtenerClientes,
   cobrarCliente,
   // Ventas
   crearVenta,
-  suscribirVentas,
   actualizarVenta,
   eliminarVenta,
+  suscribirVentas,
+  obtenerVentas,
   // Distribuidores
   crearDistribuidor,
-  suscribirDistribuidores,
-  pagarDistribuidor,
   actualizarDistribuidor,
   eliminarDistribuidor,
-  // Órdenes de Compra
+  suscribirDistribuidores,
+  obtenerDistribuidores,
+  pagarDistribuidor,
+  // Órdenes
   crearOrdenCompra,
-  suscribirOrdenesCompra,
-  obtenerSiguienteIdOrdenCompra,
   actualizarOrdenCompra,
   eliminarOrdenCompra,
-  // Almacén
+  suscribirOrdenesCompra,
+  obtenerOrdenesCompra,
+  // Productos
   crearProducto,
-  suscribirAlmacen,
-  crearEntradaAlmacen,
-  crearSalidaAlmacen,
   actualizarProducto,
   eliminarProducto,
-  // Transferencias
+  suscribirProductos,
+  obtenerProductos,
+  // Movimientos
+  crearMovimiento,
+  suscribirMovimientos,
+  obtenerMovimientos,
+  // Almacén
+  suscribirEntradasAlmacen,
+  suscribirSalidasAlmacen,
+  crearEntradaAlmacen,
+  crearSalidaAlmacen,
+  obtenerEntradasAlmacen,
+  obtenerSalidasAlmacen,
+  // Estado
+  getStorageMode,
+  isUsingLocalStorage,
+  checkStorageStatus,
+  // Transferencias/Abonos
   addTransferencia,
   crearTransferencia,
-  // Abonos
   addAbono,
-  // Ingresos y Gastos
   crearIngreso,
   crearGasto,
-  // Utilidades
-  isUsingLocalStorage,
+  // Almacén general
+  suscribirAlmacen,
+  obtenerSiguienteIdOrdenCompra,
+}
+
+// Alias para compatibilidad con imports antiguos
+export const unifiedDataService = {
+  // Bancos
+  suscribirBancos,
+  obtenerBanco,
+  obtenerBancos,
+  actualizarCapitalBanco,
+  // Clientes
+  crearCliente,
+  actualizarCliente,
+  eliminarCliente,
+  suscribirClientes,
+  obtenerClientes,
+  cobrarCliente,
+  // Ventas
+  crearVenta,
+  actualizarVenta,
+  eliminarVenta,
+  suscribirVentas,
+  obtenerVentas,
+  // Distribuidores
+  crearDistribuidor,
+  actualizarDistribuidor,
+  eliminarDistribuidor,
+  suscribirDistribuidores,
+  obtenerDistribuidores,
+  pagarDistribuidor,
+  // Órdenes
+  crearOrdenCompra,
+  actualizarOrdenCompra,
+  eliminarOrdenCompra,
+  suscribirOrdenesCompra,
+  obtenerOrdenesCompra,
+  // Productos
+  crearProducto,
+  actualizarProducto,
+  eliminarProducto,
+  suscribirProductos,
+  obtenerProductos,
+  // Movimientos
+  crearMovimiento,
+  suscribirMovimientos,
+  obtenerMovimientos,
+  // Almacén
+  suscribirEntradasAlmacen,
+  suscribirSalidasAlmacen,
+  crearEntradaAlmacen,
+  crearSalidaAlmacen,
+  obtenerEntradasAlmacen,
+  obtenerSalidasAlmacen,
+  suscribirAlmacen,
+  // Estado
   getStorageMode,
+  isUsingLocalStorage,
+  checkStorageStatus,
+  // Transferencias/Abonos
+  addTransferencia,
+  crearTransferencia,
+  addAbono,
+  crearIngreso,
+  crearGasto,
+  obtenerSiguienteIdOrdenCompra,
 }

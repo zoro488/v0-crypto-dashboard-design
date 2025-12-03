@@ -136,6 +136,20 @@ interface LocalProducto {
   updatedAt: string
 }
 
+interface LocalMovimiento {
+  id: string
+  tipo: 'ingreso' | 'gasto' | 'transferencia' | 'abono'
+  monto: number
+  bancoId: string
+  bancoOrigenId?: string
+  bancoDestinoId?: string
+  concepto?: string
+  ventaId?: string
+  ordenCompraId?: string
+  createdAt: string
+  updatedAt: string
+}
+
 // ============================================================
 // TIPOS Y CONSTANTES
 // ============================================================
@@ -147,13 +161,16 @@ const STORAGE_KEYS = {
   DISTRIBUIDORES: 'chronos_distribuidores',
   CLIENTES: 'chronos_clientes',
   PRODUCTOS: 'chronos_productos',
+  ALMACEN: 'chronos_productos', // Alias para productos
   MOVIMIENTOS: 'chronos_movimientos',
   TRANSFERENCIAS: 'chronos_transferencias',
   ABONOS: 'chronos_abonos',
   INGRESOS: 'chronos_ingresos',
   GASTOS: 'chronos_gastos',
-  ALMACEN_ENTRADAS: 'chronos_almacen_entradas',
-  ALMACEN_SALIDAS: 'chronos_almacen_salidas',
+  ENTRADAS_ALMACEN: 'chronos_almacen_entradas',
+  SALIDAS_ALMACEN: 'chronos_almacen_salidas',
+  ALMACEN_ENTRADAS: 'chronos_almacen_entradas', // Alias legacy
+  ALMACEN_SALIDAS: 'chronos_almacen_salidas', // Alias legacy
 } as const
 
 type StorageKey = typeof STORAGE_KEYS[keyof typeof STORAGE_KEYS]
@@ -946,29 +963,34 @@ export const localSuscribirAlmacen = (callback: (productos: LocalProducto[]) => 
 interface LocalEntradaAlmacen {
   id: string
   productoId: string
-  producto: string
+  producto?: string
   cantidad: number
   origen: string
   ordenCompraId?: string
   costoUnitario: number
-  valorTotal: number
+  valorTotal?: number
   fecha: string
-  tipo: string
+  tipo?: string
+  notas?: string
   createdAt: string
+  updatedAt?: string
 }
 
 interface LocalSalidaAlmacen {
   id: string
   productoId: string
-  producto: string
+  producto?: string
   cantidad: number
   destino: string
   ventaId?: string
-  precioVenta: number
-  valorTotal: number
+  precioVenta?: number
+  valorTotal?: number
   fecha: string
-  tipo: string
+  tipo?: string
+  motivo?: string
+  notas?: string
   createdAt: string
+  updatedAt?: string
 }
 
 export const localSuscribirEntradasAlmacen = (callback: (entradas: LocalEntradaAlmacen[]) => void): (() => void) => {
@@ -1297,6 +1319,295 @@ export const localPagarDistribuidor = (
 }
 
 // ============================================================
+// FUNCIONES ADICIONALES DE ACTUALIZAR/ELIMINAR
+// ============================================================
+
+export const localActualizarVenta = (ventaId: string, data: Partial<LocalVenta>): string => {
+  const ventas = getFromStorage<LocalVenta>(STORAGE_KEYS.VENTAS)
+  const index = ventas.findIndex(v => v.id === ventaId)
+  if (index === -1) {
+    throw new Error(`Venta ${ventaId} no encontrada`)
+  }
+  ventas[index] = {
+    ...ventas[index],
+    ...data,
+    updatedAt: new Date().toISOString(),
+  }
+  saveToStorage(STORAGE_KEYS.VENTAS, ventas)
+  logger.info('Venta actualizada localmente', { context: 'LocalStorageService', data: { ventaId } })
+  return ventaId
+}
+
+export const localEliminarVenta = (ventaId: string): boolean => {
+  const ventas = getFromStorage<LocalVenta>(STORAGE_KEYS.VENTAS)
+  const index = ventas.findIndex(v => v.id === ventaId)
+  if (index === -1) return false
+  ventas.splice(index, 1)
+  saveToStorage(STORAGE_KEYS.VENTAS, ventas)
+  logger.info('Venta eliminada localmente', { context: 'LocalStorageService', data: { ventaId } })
+  return true
+}
+
+export const localActualizarDistribuidor = (distribuidorId: string, data: Partial<LocalDistribuidor>): string => {
+  const distribuidores = getFromStorage<LocalDistribuidor>(STORAGE_KEYS.DISTRIBUIDORES)
+  const index = distribuidores.findIndex(d => d.id === distribuidorId)
+  if (index === -1) {
+    throw new Error(`Distribuidor ${distribuidorId} no encontrado`)
+  }
+  distribuidores[index] = {
+    ...distribuidores[index],
+    ...data,
+    updatedAt: new Date().toISOString(),
+  }
+  saveToStorage(STORAGE_KEYS.DISTRIBUIDORES, distribuidores)
+  logger.info('Distribuidor actualizado localmente', { context: 'LocalStorageService', data: { distribuidorId } })
+  return distribuidorId
+}
+
+export const localEliminarDistribuidor = (distribuidorId: string): boolean => {
+  const distribuidores = getFromStorage<LocalDistribuidor>(STORAGE_KEYS.DISTRIBUIDORES)
+  const index = distribuidores.findIndex(d => d.id === distribuidorId)
+  if (index === -1) return false
+  distribuidores.splice(index, 1)
+  saveToStorage(STORAGE_KEYS.DISTRIBUIDORES, distribuidores)
+  logger.info('Distribuidor eliminado localmente', { context: 'LocalStorageService', data: { distribuidorId } })
+  return true
+}
+
+export const localActualizarOrdenCompra = (ordenId: string, data: Partial<LocalOrdenCompra>): string => {
+  const ordenes = getFromStorage<LocalOrdenCompra>(STORAGE_KEYS.ORDENES_COMPRA)
+  const index = ordenes.findIndex(o => o.id === ordenId)
+  if (index === -1) {
+    throw new Error(`Orden de compra ${ordenId} no encontrada`)
+  }
+  ordenes[index] = {
+    ...ordenes[index],
+    ...data,
+    updatedAt: new Date().toISOString(),
+  }
+  saveToStorage(STORAGE_KEYS.ORDENES_COMPRA, ordenes)
+  logger.info('Orden de compra actualizada localmente', { context: 'LocalStorageService', data: { ordenId } })
+  return ordenId
+}
+
+export const localEliminarOrdenCompra = (ordenId: string): boolean => {
+  const ordenes = getFromStorage<LocalOrdenCompra>(STORAGE_KEYS.ORDENES_COMPRA)
+  const index = ordenes.findIndex(o => o.id === ordenId)
+  if (index === -1) return false
+  ordenes.splice(index, 1)
+  saveToStorage(STORAGE_KEYS.ORDENES_COMPRA, ordenes)
+  logger.info('Orden de compra eliminada localmente', { context: 'LocalStorageService', data: { ordenId } })
+  return true
+}
+
+export const localActualizarProducto = (productoId: string, data: Partial<LocalProducto>): string => {
+  const productos = getFromStorage<LocalProducto>(STORAGE_KEYS.ALMACEN)
+  const index = productos.findIndex(p => p.id === productoId)
+  if (index === -1) {
+    throw new Error(`Producto ${productoId} no encontrado`)
+  }
+  productos[index] = {
+    ...productos[index],
+    ...data,
+    updatedAt: new Date().toISOString(),
+  }
+  saveToStorage(STORAGE_KEYS.ALMACEN, productos)
+  logger.info('Producto actualizado localmente', { context: 'LocalStorageService', data: { productoId } })
+  return productoId
+}
+
+export const localEliminarProducto = (productoId: string): boolean => {
+  const productos = getFromStorage<LocalProducto>(STORAGE_KEYS.ALMACEN)
+  const index = productos.findIndex(p => p.id === productoId)
+  if (index === -1) return false
+  productos.splice(index, 1)
+  saveToStorage(STORAGE_KEYS.ALMACEN, productos)
+  logger.info('Producto eliminado localmente', { context: 'LocalStorageService', data: { productoId } })
+  return true
+}
+
+export const localCobrarCliente = (clienteId: string, ventaId: string, monto: number): void => {
+  localCrearAbono({
+    tipo: 'cliente',
+    entidadId: clienteId,
+    monto,
+    bancoDestino: 'boveda_monte',
+    metodo: 'efectivo',
+  })
+  logger.info('Cobro a cliente registrado localmente', {
+    context: 'LocalStorageService',
+    data: { clienteId, ventaId, monto },
+  })
+}
+
+export const localCrearEntradaAlmacen = (data: {
+  productoId: string
+  cantidad: number
+  origen: string
+  costoUnitario?: number
+  ordenCompraId?: string
+  notas?: string
+}): string => {
+  const entradas = getFromStorage<LocalEntradaAlmacen>(STORAGE_KEYS.ENTRADAS_ALMACEN)
+  const id = generateId('ent')
+  const nuevaEntrada: LocalEntradaAlmacen = {
+    id,
+    productoId: data.productoId,
+    cantidad: data.cantidad,
+    origen: data.origen,
+    costoUnitario: data.costoUnitario ?? 0,
+    ordenCompraId: data.ordenCompraId,
+    notas: data.notas ?? '',
+    fecha: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
+  entradas.push(nuevaEntrada)
+  saveToStorage(STORAGE_KEYS.ENTRADAS_ALMACEN, entradas)
+  
+  // Actualizar stock del producto
+  const productos = getFromStorage<LocalProducto>(STORAGE_KEYS.ALMACEN)
+  const prodIndex = productos.findIndex(p => p.id === data.productoId)
+  if (prodIndex !== -1) {
+    productos[prodIndex].stockActual += data.cantidad
+    productos[prodIndex].updatedAt = new Date().toISOString()
+    saveToStorage(STORAGE_KEYS.ALMACEN, productos)
+  }
+  
+  logger.info('Entrada de almacén creada localmente', { context: 'LocalStorageService', data: { id } })
+  return id
+}
+
+export const localCrearSalidaAlmacen = (data: {
+  productoId: string
+  cantidad: number
+  destino: string
+  ventaId?: string
+  motivo?: string
+  notas?: string
+}): string => {
+  const salidas = getFromStorage<LocalSalidaAlmacen>(STORAGE_KEYS.SALIDAS_ALMACEN)
+  const id = generateId('sal')
+  const nuevaSalida: LocalSalidaAlmacen = {
+    id,
+    productoId: data.productoId,
+    cantidad: data.cantidad,
+    destino: data.destino,
+    ventaId: data.ventaId,
+    motivo: data.motivo ?? 'venta',
+    notas: data.notas ?? '',
+    fecha: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
+  salidas.push(nuevaSalida)
+  saveToStorage(STORAGE_KEYS.SALIDAS_ALMACEN, salidas)
+  
+  // Actualizar stock del producto
+  const productos = getFromStorage<LocalProducto>(STORAGE_KEYS.ALMACEN)
+  const prodIndex = productos.findIndex(p => p.id === data.productoId)
+  if (prodIndex !== -1) {
+    productos[prodIndex].stockActual = Math.max(0, productos[prodIndex].stockActual - data.cantidad)
+    productos[prodIndex].updatedAt = new Date().toISOString()
+    saveToStorage(STORAGE_KEYS.ALMACEN, productos)
+  }
+  
+  logger.info('Salida de almacén creada localmente', { context: 'LocalStorageService', data: { id } })
+  return id
+}
+
+// ============================================================
+// FUNCIONES DE OBTENCIÓN (Getters)
+// ============================================================
+
+export const localObtenerVentas = (): LocalVenta[] => {
+  return getFromStorage<LocalVenta>(STORAGE_KEYS.VENTAS)
+}
+
+export const localObtenerClientes = (): LocalCliente[] => {
+  return getFromStorage<LocalCliente>(STORAGE_KEYS.CLIENTES)
+}
+
+export const localObtenerDistribuidores = (): LocalDistribuidor[] => {
+  return getFromStorage<LocalDistribuidor>(STORAGE_KEYS.DISTRIBUIDORES)
+}
+
+export const localObtenerOrdenesCompra = (): LocalOrdenCompra[] => {
+  return getFromStorage<LocalOrdenCompra>(STORAGE_KEYS.ORDENES_COMPRA)
+}
+
+export const localObtenerProductos = (): LocalProducto[] => {
+  return getFromStorage<LocalProducto>(STORAGE_KEYS.ALMACEN)
+}
+
+export const localObtenerMovimientos = (): LocalMovimiento[] => {
+  return getFromStorage<LocalMovimiento>(STORAGE_KEYS.MOVIMIENTOS)
+}
+
+export const localObtenerBancos = (): LocalBanco[] => {
+  const bancos = getFromStorage<LocalBanco>(STORAGE_KEYS.BANCOS)
+  if (bancos.length === 0) {
+    saveToStorage(STORAGE_KEYS.BANCOS, BANCOS_INICIALES)
+    return BANCOS_INICIALES
+  }
+  return bancos
+}
+
+export const localObtenerEntradasAlmacen = (): LocalEntradaAlmacen[] => {
+  return getFromStorage<LocalEntradaAlmacen>(STORAGE_KEYS.ENTRADAS_ALMACEN)
+}
+
+export const localObtenerSalidasAlmacen = (): LocalSalidaAlmacen[] => {
+  return getFromStorage<LocalSalidaAlmacen>(STORAGE_KEYS.SALIDAS_ALMACEN)
+}
+
+export const localSuscribirMovimientos = (callback: (movimientos: LocalMovimiento[]) => void): (() => void) => {
+  return subscribe<LocalMovimiento>(STORAGE_KEYS.MOVIMIENTOS, callback)
+}
+
+export const localCrearMovimiento = (data: {
+  tipo: 'ingreso' | 'gasto' | 'transferencia' | 'abono'
+  monto: number
+  bancoId?: string
+  bancoOrigenId?: string
+  bancoDestinoId?: string
+  concepto?: string
+  ventaId?: string
+  ordenCompraId?: string
+}): string => {
+  const id = 'mov-' + Date.now() + '-' + Math.random().toString(36).substring(7)
+  const nuevoMovimiento: LocalMovimiento = {
+    id,
+    tipo: data.tipo,
+    monto: data.monto,
+    bancoId: data.bancoId || '',
+    bancoOrigenId: data.bancoOrigenId,
+    bancoDestinoId: data.bancoDestinoId,
+    concepto: data.concepto || `Movimiento ${data.tipo}`,
+    ventaId: data.ventaId,
+    ordenCompraId: data.ordenCompraId,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
+  
+  const movimientos = getFromStorage<LocalMovimiento>(STORAGE_KEYS.MOVIMIENTOS)
+  movimientos.push(nuevoMovimiento)
+  saveToStorage(STORAGE_KEYS.MOVIMIENTOS, movimientos)
+  
+  logger.info('Movimiento creado localmente', { context: 'LocalStorageService', data: { id } })
+  return id
+}
+
+export const localObtenerSiguienteIdOrdenCompra = (): string => {
+  const ordenes = getFromStorage<LocalOrdenCompra>(STORAGE_KEYS.ORDENES_COMPRA)
+  const maxId = ordenes.reduce((max, orden) => {
+    const num = parseInt(orden.id.replace(/\D/g, '')) || 0
+    return Math.max(max, num)
+  }, 0)
+  return `OC${String(maxId + 1).padStart(4, '0')}`
+}
+
+// ============================================================
 // EXPORT SERVICIO COMPLETO
 // ============================================================
 
@@ -1304,25 +1615,51 @@ export const localStorageService = {
   // Bancos
   suscribirBancos: localSuscribirBancos,
   obtenerBanco: localObtenerBanco,
+  obtenerBancos: localObtenerBancos,
   actualizarCapitalBanco: localActualizarCapitalBanco,
   // Clientes
   crearCliente: localCrearCliente,
   actualizarCliente: localActualizarCliente,
   eliminarCliente: localEliminarCliente,
   suscribirClientes: localSuscribirClientes,
+  obtenerClientes: localObtenerClientes,
+  cobrarCliente: localCobrarCliente,
   // Ventas
   crearVenta: localCrearVenta,
+  actualizarVenta: localActualizarVenta,
+  eliminarVenta: localEliminarVenta,
   suscribirVentas: localSuscribirVentas,
+  obtenerVentas: localObtenerVentas,
   // Distribuidores
   crearDistribuidor: localCrearDistribuidor,
+  actualizarDistribuidor: localActualizarDistribuidor,
+  eliminarDistribuidor: localEliminarDistribuidor,
   suscribirDistribuidores: localSuscribirDistribuidores,
+  obtenerDistribuidores: localObtenerDistribuidores,
   pagarDistribuidor: localPagarDistribuidor,
   // Órdenes de Compra
   crearOrdenCompra: localCrearOrdenCompra,
+  actualizarOrdenCompra: localActualizarOrdenCompra,
+  eliminarOrdenCompra: localEliminarOrdenCompra,
   suscribirOrdenesCompra: localSuscribirOrdenesCompra,
+  obtenerOrdenesCompra: localObtenerOrdenesCompra,
+  obtenerSiguienteIdOrdenCompra: localObtenerSiguienteIdOrdenCompra,
   // Almacén
   crearProducto: localCrearProducto,
+  actualizarProducto: localActualizarProducto,
+  eliminarProducto: localEliminarProducto,
   suscribirAlmacen: localSuscribirAlmacen,
+  obtenerProductos: localObtenerProductos,
+  suscribirEntradasAlmacen: localSuscribirEntradasAlmacen,
+  suscribirSalidasAlmacen: localSuscribirSalidasAlmacen,
+  crearEntradaAlmacen: localCrearEntradaAlmacen,
+  crearSalidaAlmacen: localCrearSalidaAlmacen,
+  obtenerEntradasAlmacen: localObtenerEntradasAlmacen,
+  obtenerSalidasAlmacen: localObtenerSalidasAlmacen,
+  // Movimientos
+  crearMovimiento: localCrearMovimiento,
+  suscribirMovimientos: localSuscribirMovimientos,
+  obtenerMovimientos: localObtenerMovimientos,
   // Transferencias
   crearTransferencia: localCrearTransferencia,
   // Abonos

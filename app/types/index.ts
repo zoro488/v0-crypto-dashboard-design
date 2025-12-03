@@ -1,21 +1,27 @@
-import { Timestamp } from 'firebase/firestore'
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 🏛️ CHRONOS 2026 — TIPOS BASE
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 
+ * Sistema 100% local — SIN Firebase
+ * Versión: 3.0 - Arquitectura Local con IndexedDB
+ * Fecha: 2025-12-03
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
 
 // Re-exportar tipos del sistema inmersivo 3D
 export * from './immersive'
 
 // ===================================================================
-// 🏛️ TIPOS BASE - CHRONOS SYSTEM
-// Versión: 2.0 - Arquitectura Híbrida Optimizada
-// Fecha: 2025-11-26
-// 
-// Basado en análisis quirúrgico de:
-// - 783 registros CSV existentes
-// - Lógica de negocio real (OC → Ventas → Distribución)
-// - Flujo de datos UI actual
+// TIPO DE TIMESTAMP LOCAL (reemplaza Firebase Timestamp)
 // ===================================================================
 
-// Tipo para timestamps de Firestore
-export type FirestoreTimestamp = Timestamp | Date | string
+// Timestamp local — string ISO o Date
+export type LocalTimestamp = Date | string
+
+// Alias para compatibilidad con código existente que usaba Firebase
+// Ahora acepta Date, string o cualquier objeto con toDate() para migración
+export type FirestoreTimestamp = LocalTimestamp | { toDate(): Date; seconds: number; nanoseconds: number }
 
 // Monedas soportadas
 export type Moneda = 'MXN' | 'USD' | 'USDT'

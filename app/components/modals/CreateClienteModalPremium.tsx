@@ -138,7 +138,8 @@ export function CreateClienteModalPremium({
           context: 'CreateClienteModalPremium',
           data: { clienteId: editData.id },
         })
-        result = await actualizarCliente(editData.id, clienteData)
+        await actualizarCliente(editData.id, clienteData)
+        result = editData.id // Usar el ID existente como resultado
       } else {
         logger.info('Creando cliente', { 
           context: 'CreateClienteModalPremium',

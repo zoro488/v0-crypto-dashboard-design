@@ -12,6 +12,7 @@ import { useAppStore } from '../store/useAppStore'
 import { isFirestoreAvailable } from '../firebase/config'
 import * as unifiedService from '../services/unified-data-service'
 import { logger } from '../utils/logger'
+import type { BancoId } from '@/app/types'
 
 // ============================================================
 // TIPOS
@@ -103,14 +104,9 @@ export function useUnifiedAlmacen() {
 // HOOK PARA OBTENER MODO DE ALMACENAMIENTO
 // ============================================================
 
-export function useStorageMode(): 'firebase' | 'local' {
-  const [mode, setMode] = useState<'firebase' | 'local'>('local')
-
-  useEffect(() => {
-    setMode(unifiedService.getStorageMode())
-  }, [])
-
-  return mode
+export function useStorageMode(): 'localStorage' {
+  // Siempre localStorage - Firebase deshabilitado
+  return 'localStorage'
 }
 
 // ============================================================
@@ -220,7 +216,12 @@ export function useBancosCRUD() {
     concepto: string,
   ) => {
     try {
-      const id = await unifiedService.crearTransferencia(bancoOrigenId, bancoDestinoId, monto, concepto)
+      const id = await unifiedService.crearTransferencia(
+        bancoOrigenId as BancoId, 
+        bancoDestinoId as BancoId, 
+        monto, 
+        concepto
+      )
       triggerDataRefresh()
       return id
     } catch (err) {
