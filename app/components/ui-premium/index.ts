@@ -61,3 +61,65 @@ export type { TooltipPremiumProps, SimpleTooltipProps } from './TooltipPremium'
 // Navigation
 export { TabsPremium, TabsContentPremium } from './TabsPremium'
 export type { TabsPremiumProps } from './TabsPremium'
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 🔮 OBSIDIAN GLASS DESIGN SYSTEM - Componentes Ultra-Premium
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Fondo atmosférico con nebulosas volumétricas
+export { AtmosphericBackground } from './AtmosphericBackground'
+
+// Tarjeta Obsidian Glass con efecto vidrio oscuro pulido
+export { 
+  ObsidianCard, 
+  ObsidianCardHeader, 
+  ObsidianCardContent, 
+  ObsidianCardFooter 
+} from './ObsidianCard'
+
+// Tarjeta KPI con count-up y sparklines
+export { KPICard, KPIGrid } from './KPICard'
+
+// Iconos luminosos con glow volumétrico
+export { LuminousIcon, BadgeLuminous } from './LuminousIcon'
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 🌋 CHRONOS OBSIDIAN OS - Componentes de Alta Gama
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Textura de ruido táctil (aluminio anodizado / cerámica)
+export { NoiseTexture } from './NoiseTexture'
+
+// Sparkline como fondo de tarjeta
+export { SparklineBackground } from './SparklineBackground'
+
+// Modal Bóveda de Cristal ultra-premium
+export { ObsidianModal } from './ObsidianModal'
+
+// Selector de opciones como tarjetas metálicas
+export { MetalCardSelector } from './MetalCardSelector'
+
+// Input monospaced gigante para montos
+export { HeroInput } from './HeroInput'
+
+// Botones premium (Magma, Plasma, Obsidian)
+export { ObsidianButton } from './ObsidianButton'
+
+// Tarjeta Héroe con Sparkline de fondo
+export { HeroMetricCard } from './HeroMetricCard'
+
+// Tarjeta métrica compacta para Bento Grid
+export { BentoMetricCard } from './BentoMetricCard'
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 🌌 MEGA COMPONENTS - Ultra Premium
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Tarjeta KPI con Tilt 3D, CountUp y Sparkline de fondo
+export { PremiumStatCard } from './PremiumStatCard'
+
+// Tabla cuántica estilo Bloomberg terminal
+export { QuantumTable, type ColumnDef } from './QuantumTable'
+
+// Gráfico holográfico de área con luz líquida
+export { HolographicAreaChart } from './HolographicAreaChart'

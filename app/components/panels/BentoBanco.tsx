@@ -46,6 +46,13 @@ import { CreateIngresoModalPremium } from '@/app/components/modals/CreateIngreso
 import { useToast } from '@/app/hooks/use-toast'
 import { logger } from '@/app/lib/utils/logger'
 import { FinancialRiverFlow } from '@/app/components/visualizations/FinancialRiverFlow'
+import type { Movimiento, CorteBancario as CorteBancarioType } from '@/app/types'
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 🌑 OBSIDIAN GLASS PREMIUM COMPONENTS
+// ═══════════════════════════════════════════════════════════════════════════
+import BankVaultPanel from '@/app/components/premium/banks/BankVaultPanel'
+
 import {
   useIngresosBanco,
   useGastos,
@@ -151,6 +158,7 @@ export default function BentoBanco() {
   const [selectedBanco, setSelectedBanco] = useState(BANCOS[0])
   const [searchQuery, setSearchQuery] = useState('')
   const [filterOpen, setFilterOpen] = useState(false)
+  const [showVaultPanel, setShowVaultPanel] = useState(false)
 
   // Sincronizar banco seleccionado con el panel actual del store
   useEffect(() => {
@@ -384,31 +392,97 @@ export default function BentoBanco() {
                 </span>
               </motion.button>
             ))}
+            {/* Toggle Vault Panel Premium */}
+            <motion.button
+              onClick={() => setShowVaultPanel(!showVaultPanel)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`
+                px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ml-4
+                ${showVaultPanel
+                  ? 'bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-lg'
+                  : 'glass text-purple-400 hover:text-white hover:bg-purple-500/10 border border-purple-500/30'
+                }
+              `}
+            >
+              <span className="flex items-center gap-2">
+                <Zap className="w-4 h-4" />
+                {showVaultPanel ? 'Vista Clásica' : 'Vault Premium'}
+              </span>
+            </motion.button>
           </div>
         </div>
 
-        {/* Selected Bank Stats Grid - NUEVO: Histórico Fijo vs Capital Actual */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-          {/* Fila Principal: Histórico Fijo y Capital Actual */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Histórico Fijo (Acumulativo - NUNCA disminuye) */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="glass p-6 rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-transparent relative overflow-hidden"
-            >
-              <div className="absolute top-2 right-2">
-                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-medium uppercase tracking-wider">
-                  Fijo
-                </span>
-              </div>
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-amber-400/80 text-sm font-medium flex items-center gap-2">
-                  <Activity className="w-4 h-4" />
-                  Histórico Acumulado
-                </span>
-              </div>
+        {/* Vista Premium Vault o Stats normales */}
+        {showVaultPanel ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-6"
+          >
+            <BankVaultPanel
+              banco={{
+                ...selectedBanco,
+                capitalActual: saldoActual,
+                historicoIngresos: totalIngresos,
+                historicoGastos: totalGastos,
+              }}
+              movimientos={[
+                ...ingresos.map(i => ({ 
+                  id: i.id || '', 
+                  tipo: 'ingreso' as const, 
+                  monto: i.ingreso || 0, 
+                  fecha: i.fecha?.toString() || '', 
+                  descripcion: i.concepto || '',
+                  origen: selectedBanco.id,
+                  destino: selectedBanco.id,
+                })),
+                ...gastos.map(g => ({ 
+                  id: g.id || '', 
+                  tipo: 'gasto' as const, 
+                  monto: g.gasto || 0, 
+                  fecha: g.fecha?.toString() || '', 
+                  descripcion: g.concepto || g.origen || '',
+                  origen: selectedBanco.id,
+                  destino: selectedBanco.id,
+                })),
+              ] as unknown as Movimiento[]}
+              cortes={cortes.map(c => ({
+                id: c.id || '',
+                bancoId: selectedBanco.id,
+                fecha: (typeof c.fecha === 'string' ? c.fecha : new Date().toISOString()),
+                saldoInicial: 0,
+                saldoFinal: (c as unknown as { saldo?: number }).saldo || 0,
+                estado: 'completado' as const,
+                createdAt: new Date(),
+              })) as unknown as CorteBancarioType[]}
+              themeColor="purple"
+            />
+          </motion.div>
+        ) : (
+          <>
+            {/* Selected Bank Stats Grid - NUEVO: Histórico Fijo vs Capital Actual */}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+              {/* Fila Principal: Histórico Fijo y Capital Actual */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Histórico Fijo (Acumulativo - NUNCA disminuye) */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="glass p-6 rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-transparent relative overflow-hidden"
+                >
+                  <div className="absolute top-2 right-2">
+                    <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-medium uppercase tracking-wider">
+                      Fijo
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-amber-400/80 text-sm font-medium flex items-center gap-2">
+                      <Activity className="w-4 h-4" />
+                      Histórico Acumulado
+                    </span>
+                  </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-white/40 text-xs uppercase mb-1">Total Ingresos</p>
@@ -531,7 +605,9 @@ export default function BentoBanco() {
               <SimpleCurrencyWidget />
             </motion.div>
           )}
-        </motion.div>
+            </motion.div>
+          </>
+        )}
 
         {/* Premium Widgets Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mt-6">

@@ -44,6 +44,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/components/ui/ta
 import { Cliente, Venta } from '@/app/types'
 import { cn } from '@/app/lib/utils'
 import { logger } from '@/app/lib/utils/logger'
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 🌑 OBSIDIAN GLASS PREMIUM COMPONENTS
+// ═══════════════════════════════════════════════════════════════════════════
+import EntityRelationshipManager from '@/app/components/premium/crm/EntityRelationshipManager'
 import { toast } from 'sonner'
 
 // ============================================
@@ -391,6 +396,7 @@ export default function BentoClientesPremium() {
   const [selectedCliente, setSelectedCliente] = useState<ClienteData | null>(null)
   const [showProfile, setShowProfile] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
+  const [showCRMView, setShowCRMView] = useState(false)
 
   // Data hooks - TIEMPO REAL
   const { data: clientesRaw, loading, remove } = useFirestoreCRUD<Cliente>('clientes')
@@ -583,6 +589,14 @@ export default function BentoClientesPremium() {
           </div>
         </div>
         <div className="flex gap-3">
+          {/* Toggle CRM View */}
+          <ButtonTesla
+            onClick={() => setShowCRMView(!showCRMView)}
+            variant={showCRMView ? "primary" : "secondary"}
+          >
+            <Users className="w-4 h-4 mr-2" />
+            {showCRMView ? 'Vista Clásica' : 'CRM Premium'}
+          </ButtonTesla>
           <ButtonTesla
             onClick={() => setShowAbonoModal(true)}
             variant="secondary"
@@ -600,23 +614,45 @@ export default function BentoClientesPremium() {
         </div>
       </motion.div>
 
-      {/* KPIs Premium */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <QuickStatWidget
-          title="Total Ventas"
-          value={totalVentas}
-          prefix="$"
-          change={18.5}
-          icon={DollarSign}
-          color="cyan"
-          sparklineData={trendData.map(d => d.ventas)}
-          delay={0.1}
-        />
-        <QuickStatWidget
-          title="Por Cobrar"
-          value={totalDeuda}
-          prefix="$"
-          change={-5.2}
+      {/* Vista CRM Premium o KPIs clásicos */}
+      {showCRMView ? (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <EntityRelationshipManager
+            clientes={clientesRaw as Cliente[]}
+            distribuidores={[]}
+            ventas={ventas}
+            ordenesCompra={[]}
+            onContactar={(entity, via) => {
+              toast.info(`Contactando a ${entity.nombre} por ${via}`)
+            }}
+            onCobrar={(entity) => {
+              setSelectedCliente(entity as unknown as ClienteData)
+              setShowAbonoModal(true)
+            }}
+          />
+        </motion.div>
+      ) : (
+        <>
+          {/* KPIs Premium */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <QuickStatWidget
+              title="Total Ventas"
+              value={totalVentas}
+              prefix="$"
+              change={18.5}
+              icon={DollarSign}
+              color="cyan"
+              sparklineData={trendData.map(d => d.ventas)}
+              delay={0.1}
+            />
+            <QuickStatWidget
+              title="Por Cobrar"
+              value={totalDeuda}
+              prefix="$"
+              change={-5.2}
           icon={AlertTriangle}
           color="orange"
           sparklineData={trendData.map(d => d.ventas - d.cobros)}
@@ -801,6 +837,8 @@ export default function BentoClientesPremium() {
         emptyMessage="No hay clientes registrados"
         emptyIcon={Users}
       />
+        </>
+      )}
 
       {/* Modals */}
       <CreateClienteModalPremium 

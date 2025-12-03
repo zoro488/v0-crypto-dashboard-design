@@ -5,6 +5,8 @@ import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import Script from 'next/script'
 import './globals.css'
+import './styles/obsidian-glass.css'
+import './styles/chronos-obsidian-os.css'
 import { AppProvider } from '@/app/lib/context/AppContext'
 import { Toaster } from '@/app/components/ui/toaster'
 import { ErrorBoundary } from '@/app/components/ErrorBoundary'
@@ -16,6 +18,8 @@ import { AuthProvider } from '@/app/providers/AuthProvider'
 import { ConvexClientProvider } from '@/app/lib/convex/ConvexProvider'
 import { RollbarProvider } from '@/app/lib/rollbar/RollbarProvider'
 import { FeatureFlagsDebugPanel } from '@/app/components/debug/FeatureFlagsDebugPanel'
+import { NoiseTexture } from '@/app/components/ui-premium/NoiseTexture'
+import { ChronosShell } from '@/app/components/layout/ChronosShell'
 // FloatingAIWidget removido - usar FloatingSplineAIWidget desde page.tsx
 // para evitar widgets duplicados
 
@@ -123,13 +127,18 @@ export default function RootLayout({
                         
                         {/* 📦 CONTENIDO PRINCIPAL - Con z-index superior */}
                         <div className="relative z-10 min-h-screen w-full overflow-auto">
-                          {children}
+                          <ChronosShell>
+                            {children}
+                          </ChronosShell>
                         </div>
                         
                         {/* 🤖 AGENTE IA FLOTANTE - Manejado en page.tsx con FloatingSplineAIWidget */}
                         
                         {/* 🎯 FEATURE FLAGS DEBUG PANEL - Solo en desarrollo */}
                         <FeatureFlagsDebugPanel />
+                        
+                        {/* 🔮 TEXTURA DE RUIDO OBSIDIAN - Efecto táctil premium */}
+                        <NoiseTexture />
                         
                         <Toaster />
                       </SplashScreen>

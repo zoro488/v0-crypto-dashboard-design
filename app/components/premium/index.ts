@@ -181,3 +181,27 @@ export { default as QuickStatWidget } from '../widgets/QuickStatWidget'
 export { default as MiniChartWidget } from '../widgets/MiniChartWidget'
 export { default as ActivityFeedWidget } from '../widgets/ActivityFeedWidget'
 export { default as CurrencyExchangeWidget } from '../widgets/CurrencyExchangeWidget'
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 🌑 OBSIDIAN GLASS PANELS - Sistema de paneles premium
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Sales - Panel de Ventas con flujo de 4 pasos
+export { default as SalesCockpit } from './sales/SalesCockpit'
+export { default as ObsidianDistributionSlider } from './sales/ObsidianDistributionSlider'
+export { default as HolographicProductSearch } from './sales/HolographicProductSearch'
+
+// Warehouse - Panel de Almacén con heatmap
+export { default as WarehouseGrid } from './warehouse/WarehouseGrid'
+
+// Banks - Template reutilizable para bóvedas
+export { default as BankVaultPanel } from './banks/BankVaultPanel'
+
+// CRM - Gestión de Clientes y Distribuidores
+export { default as EntityRelationshipManager } from './crm/EntityRelationshipManager'
+
+// Expenses - Central de Gastos
+export { default as ExpenseCommandCenter } from './expenses/ExpenseCommandCenter'
+
+// Settlements - Terminal de Abonos y Cobranza
+export { default as SettlementTerminal } from './settlements/SettlementTerminal'

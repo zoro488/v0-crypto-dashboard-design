@@ -1,17 +1,23 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════════════════
- * 🚀 CHRONOS DESIGN SYSTEM - TESLA 2025 EDITION
+ * 🚀 CHRONOS DESIGN SYSTEM - 2025 TOP MUNDIAL
  * ═══════════════════════════════════════════════════════════════════════════
  * 
- * Estándares: Apple Vision Pro + Tesla Cybertruck + Grok.com 2025
+ * Diseño nivel mundial 2025 - Saturación reducida 30-40%
+ * Solo 2 colores principales: Azul Cobalto + Magenta
  * 
- * PALETA PRINCIPAL:
+ * PALETA CHRONOS 2025:
  * - Background: #000000 (pure black)
- * - Surface: #1C1C1E (elevated)
- * - Tesla Red: #E31911 (accent único)
- * - Text Primary: #FFFFFF
- * - Text Secondary: #98989D
+ * - Primary: #0066FF (Azul cobalto - saturación reducida)
+ * - Accent: #C81EFF (Magenta premium)
+ * - Success: #00FF57 (solo positivo)
+ * - Danger: #FF0033 (solo negativo)
+ * - Warning: #FF6B00 (alertas)
+ * - Text: #FFFFFF / #A0A0A0
+ * 
+ * Bordes: 16px máximo / Glassmorphism sutil (blur 20px + border rgba(255,255,255,0.08))
+ * KPIs: Inter Bold 48-64px / Labels: 20px / Contraste mínimo 7:1
  * ═══════════════════════════════════════════════════════════════════════════ */
 
 @custom-variant dark (&:is(.dark *));
@@ -68,7 +74,7 @@ main,
 
 :root {
   /* ════════════════════════════════════════════════════════════════════════
-   * 🎨 TESLA 2025 COLOR SYSTEM - Pure Black + Tesla Red
+   * 🎨 CHRONOS 2025 COLOR SYSTEM - Pure Black + Dual Accent
    * ════════════════════════════════════════════════════════════════════════ */
   
   /* Core - Pure Black Base */
@@ -76,13 +82,25 @@ main,
   --foreground: 0 0% 100%;         /* #FFFFFF */
   
   /* Surfaces */
-  --surface: 0 0% 11%;             /* #1C1C1E */
-  --surface-elevated: 0 0% 17%;    /* #2C2C2E */
+  --surface: 240 20% 6%;           /* rgba(20,20,30) */
+  --surface-elevated: 240 15% 10%; /* Elevated */
 
-  /* Tesla Red - ÚNICO ACENTO DE COLOR */
-  --tesla-red: #E31911;
-  --tesla-red-hover: #FF453A;
-  --tesla-red-glow: rgba(227, 25, 17, 0.15);
+  /* CHRONOS 2025 PRIMARY - Azul Cobalto (saturación reducida 40%) */
+  --chronos-primary: #0066FF;
+  --chronos-primary-hover: #0052CC;
+  --chronos-primary-muted: rgba(0, 102, 255, 0.15);
+  --chronos-primary-glow: rgba(0, 102, 255, 0.3);
+  
+  /* CHRONOS 2025 ACCENT - Magenta Premium */
+  --chronos-accent: #C81EFF;
+  --chronos-accent-hover: #A318CC;
+  --chronos-accent-muted: rgba(200, 30, 255, 0.15);
+  --chronos-accent-glow: rgba(200, 30, 255, 0.3);
+
+  /* Legacy Tesla Red (mantener compatibilidad) */
+  --tesla-red: #FF0033;
+  --tesla-red-hover: #CC0029;
+  --tesla-red-glow: rgba(255, 0, 51, 0.15);
 
   /* ════════════════════════════════════════════════════════════════════════
    * 🏦 COLORES DE LOS 7 BANCOS - CHRONOS (Semantic, no decorativos)
@@ -104,11 +122,17 @@ main,
   --color-leftie-bg: rgba(99, 102, 241, 0.15);
   --color-profit-bg: rgba(20, 184, 166, 0.15);
 
-  /* Semantic States - Tesla Red for destructive */
-  --success: #10B981;
-  --warning: #F59E0B;
-  --error: #E31911;
-  --info: #3B82F6;
+  /* Semantic States - CHRONOS 2025 (claridad instantánea) */
+  --success: #00FF57;    /* Verde brillante - SOLO positivo */
+  --warning: #FF6B00;    /* Naranja - SOLO alertas */
+  --error: #FF0033;      /* Rojo intenso - SOLO negativo */
+  --info: #0066FF;       /* Azul cobalto primary */
+  
+  /* Muted versions */
+  --success-muted: rgba(0, 255, 87, 0.15);
+  --warning-muted: rgba(255, 107, 0, 0.15);
+  --error-muted: rgba(255, 0, 51, 0.15);
+  --info-muted: rgba(0, 102, 255, 0.15);
 
   /* UI surfaces - Pure Black */
   --card: 0 0% 0%;
@@ -133,31 +157,36 @@ main,
   --input: 0 0% 15%;
   --ring: 2 89% 49%;               /* Tesla Red for focus */
 
-  /* Premium glassmorphism - Updated */
-  --glass-bg: rgba(0, 0, 0, 0.6);
+  /* CHRONOS 2025 Glassmorphism - Ultra sutil */
+  --glass-bg: rgba(20, 20, 30, 0.6);
   --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-strong: rgba(28, 28, 30, 0.95);
+  --glass-border-hover: rgba(255, 255, 255, 0.12);
+  --glass-strong: rgba(20, 20, 30, 0.95);
   --glass-light: rgba(255, 255, 255, 0.03);
-  --glass-blur: 24px;
+  --glass-blur: 20px;    /* Reducido de 24px a 20px */
 
   /* Spacing system - Apple's 8pt grid */
   --spacing-unit: 8px;
 
-  /* Border radius - Tesla 2025 */
+  /* Border radius - CHRONOS 2025 (máximo 16px para cards) */
   --radius: 0.75rem;
   --radius-sm: 8px;
   --radius-md: 12px;
-  --radius-lg: 20px;
-  --radius-xl: 24px;
-  --radius-2xl: 32px;
+  --radius-lg: 16px;    /* Máximo para cards */
+  --radius-xl: 20px;    /* Modales */
+  --radius-2xl: 24px;   /* Especial */
 
-  /* Shadows - Deep Black */
+  /* Shadows - CHRONOS 2025 Deep Black + Dual Glow */
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 25px 50px rgba(0, 0, 0, 0.6);
-  --shadow-2xl: 0 50px 100px rgba(0, 0, 0, 0.7);
-  --shadow-glow: 0 0 60px rgba(227, 25, 17, 0.15); /* Tesla Red glow */
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
+  --shadow-2xl: 0 32px 64px rgba(0, 0, 0, 0.7);
+  --shadow-glow-primary: 0 0 40px rgba(0, 102, 255, 0.3);    /* Azul cobalto */
+  --shadow-glow-accent: 0 0 40px rgba(200, 30, 255, 0.3);    /* Magenta */
+  --shadow-glow-success: 0 0 40px rgba(0, 255, 87, 0.3);     /* Verde */
+  --shadow-glow-danger: 0 0 40px rgba(255, 0, 51, 0.3);      /* Rojo */
+  --shadow-glow: 0 0 40px rgba(0, 102, 255, 0.2); /* Default primary glow */
   
   /* Transitions - Spring Physics */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);

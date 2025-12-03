@@ -1,0 +1,1065 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+ * 🔮 CHRONOS OBSIDIAN GLASS DESIGN SYSTEM
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 
+ * Experiencia Cinematográfica Ultra-Premium
+ * Inspirado en: Apple Vision Pro, Tesla Cybertruck UI, Blade Runner 2049
+ * 
+ * 4 PILARES:
+ * 1. Materialidad: "Obsidian Glass" - Vidrio oscuro pulido con profundidad
+ * 2. Iluminación: "Bioluminiscencia Controlada" - Glow indirecto orgánico
+ * 3. Arquitectura: "Spatial UI" - Capas Z con profundidad pseudo-3D
+ * 4. Movimiento: "Fluid Dynamics" - Micro-interacciones respiratorias
+ * 
+ * COLORIMETRÍA PROFUNDA:
+ * - Esmeralda Profundo: #047857 / #065f46
+ * - Zafiro Eléctrico: #1e40af / #1e3a8a
+ * - Amatista: #7c3aed / #6d28d9
+ * - Obsidiana: #050507 / #0a0a0f
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * 🎨 OBSIDIAN GLASS COLOR SYSTEM
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* === OBSIDIAN CORE === */
+  --obsidian-void: #020204;           /* El abismo más profundo */
+  --obsidian-bg: #050507;             /* Fondo principal - casi negro con tinte azul */
+  --obsidian-surface: #0a0a0f;        /* Superficies elevadas */
+  --obsidian-elevated: #0f0f14;       /* Elementos flotantes */
+  
+  /* === GLASS MATERIALS === */
+  --glass-obsidian: rgba(10, 10, 15, 0.7);
+  --glass-obsidian-strong: rgba(15, 15, 20, 0.85);
+  --glass-obsidian-light: rgba(20, 20, 30, 0.5);
+  --glass-frost: rgba(255, 255, 255, 0.03);
+  
+  /* === COLORIMETRÍA PROFUNDA (Saturación rica pero oscura) === */
+  
+  /* Esmeralda Profundo - Éxito, Dinero, Crecimiento */
+  --emerald-deep: #047857;
+  --emerald-rich: #065f46;
+  --emerald-glow: rgba(4, 120, 87, 0.4);
+  --emerald-muted: rgba(4, 120, 87, 0.15);
+  
+  /* Zafiro Eléctrico - Datos, Información, Tech */
+  --sapphire-electric: #2563eb;
+  --sapphire-deep: #1e40af;
+  --sapphire-glow: rgba(37, 99, 235, 0.4);
+  --sapphire-muted: rgba(37, 99, 235, 0.15);
+  
+  /* Amatista - Premium, IA, Especial */
+  --amethyst: #7c3aed;
+  --amethyst-deep: #6d28d9;
+  --amethyst-glow: rgba(124, 58, 237, 0.4);
+  --amethyst-muted: rgba(124, 58, 237, 0.15);
+  
+  /* Rubí Oscuro - Alertas, Peligro */
+  --ruby-deep: #be123c;
+  --ruby-glow: rgba(190, 18, 60, 0.4);
+  --ruby-muted: rgba(190, 18, 60, 0.15);
+  
+  /* Ámbar Cálido - Warnings, Atención */
+  --amber-warm: #d97706;
+  --amber-glow: rgba(217, 119, 6, 0.4);
+  --amber-muted: rgba(217, 119, 6, 0.15);
+  
+  /* Cyan Nebulosa - Datos secundarios */
+  --cyan-nebula: #0891b2;
+  --cyan-glow: rgba(8, 145, 178, 0.4);
+  --cyan-muted: rgba(8, 145, 178, 0.15);
+  
+  /* === PREMIUM EDGE GRADIENTS (El secreto del lujo) === */
+  
+  /* Borde biselado - Simula luz golpeando cristal pulido */
+  --edge-light: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.08) 20%,
+    rgba(255, 255, 255, 0.03) 50%,
+    rgba(0, 0, 0, 0.05) 80%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+  
+  /* Borde con glow de color */
+  --edge-sapphire: linear-gradient(
+    135deg,
+    rgba(37, 99, 235, 0.3) 0%,
+    rgba(37, 99, 235, 0.1) 50%,
+    transparent 100%
+  );
+  
+  --edge-emerald: linear-gradient(
+    135deg,
+    rgba(4, 120, 87, 0.3) 0%,
+    rgba(4, 120, 87, 0.1) 50%,
+    transparent 100%
+  );
+  
+  --edge-amethyst: linear-gradient(
+    135deg,
+    rgba(124, 58, 237, 0.3) 0%,
+    rgba(124, 58, 237, 0.1) 50%,
+    transparent 100%
+  );
+  
+  /* === INNER GLOW (Luz desde dentro) === */
+  --inner-glow-sapphire: inset 0 0 30px -10px rgba(37, 99, 235, 0.2);
+  --inner-glow-emerald: inset 0 0 30px -10px rgba(4, 120, 87, 0.2);
+  --inner-glow-amethyst: inset 0 0 30px -10px rgba(124, 58, 237, 0.2);
+  --inner-glow-white: inset 0 0 20px -10px rgba(255, 255, 255, 0.1);
+  
+  /* === SHADOWS VOLUMÉTRICAS === */
+  --shadow-obsidian-sm: 0 4px 12px -2px rgba(0, 0, 0, 0.5);
+  --shadow-obsidian-md: 0 8px 24px -4px rgba(0, 0, 0, 0.6);
+  --shadow-obsidian-lg: 0 16px 48px -8px rgba(0, 0, 0, 0.7);
+  --shadow-obsidian-xl: 0 24px 64px -12px rgba(0, 0, 0, 0.8);
+  
+  /* Sombras con glow de color (para hover) */
+  --shadow-glow-sapphire: 0 20px 50px -15px rgba(37, 99, 235, 0.35);
+  --shadow-glow-emerald: 0 20px 50px -15px rgba(4, 120, 87, 0.35);
+  --shadow-glow-amethyst: 0 20px 50px -15px rgba(124, 58, 237, 0.35);
+  
+  /* === BLUR & SATURATION === */
+  --blur-obsidian: 40px;
+  --blur-frost: 60px;
+  --saturation-boost: 180%;
+  
+  /* === TIMING FUNCTIONS (Fluid Dynamics) === */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
+  --spring-bounce: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+  
+  /* === TRANSITIONS === */
+  --transition-micro: 150ms var(--ease-out-expo);
+  --transition-smooth: 300ms var(--ease-out-expo);
+  --transition-fluid: 500ms var(--ease-out-expo);
+  --transition-dramatic: 800ms var(--ease-out-expo);
+  
+  /* === BORDER RADIUS (Curvas elegantes) === */
+  --radius-soft: 16px;
+  --radius-smooth: 20px;
+  --radius-elegant: 24px;
+  --radius-pill: 9999px;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * 🪨 OBSIDIAN CARD - La tarjeta premium
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.obsidian-card {
+  position: relative;
+  background: var(--glass-obsidian);
+  backdrop-filter: blur(var(--blur-obsidian)) saturate(var(--saturation-boost));
+  -webkit-backdrop-filter: blur(var(--blur-obsidian)) saturate(var(--saturation-boost));
+  border-radius: var(--radius-elegant);
+  padding: 24px;
+  
+  /* Borde premium biselado */
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  
+  /* Sombra volumétrica */
+  box-shadow: 
+    var(--shadow-obsidian-md),
+    var(--inner-glow-white),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  
+  /* Transición fluida para hover */
+  transition: 
+    transform var(--transition-smooth),
+    box-shadow var(--transition-smooth),
+    border-color var(--transition-smooth);
+  
+  /* GPU acceleration */
+  will-change: transform, box-shadow;
+  transform: translateZ(0);
+  
+  /* Overflow para efectos internos */
+  overflow: hidden;
+}
+
+/* Borde biselado superior (efecto luz) */
+.obsidian-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--edge-light);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Textura de ruido sutil (anti-plástico) */
+.obsidian-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.02;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* Hover: Elevación + Glow */
+.obsidian-card:hover {
+  transform: translateY(-4px) scale(1.005);
+  box-shadow: 
+    var(--shadow-obsidian-xl),
+    var(--inner-glow-white),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* Variantes de color para hover glow */
+.obsidian-card--sapphire:hover {
+  box-shadow: 
+    var(--shadow-glow-sapphire),
+    var(--inner-glow-sapphire),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.obsidian-card--emerald:hover {
+  box-shadow: 
+    var(--shadow-glow-emerald),
+    var(--inner-glow-emerald),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.obsidian-card--amethyst:hover {
+  box-shadow: 
+    var(--shadow-glow-amethyst),
+    var(--inner-glow-amethyst),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * 🏝️ FLOATING ISLAND - Header/Navigation flotante
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.floating-island {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  
+  background: var(--glass-obsidian-strong);
+  backdrop-filter: blur(var(--blur-frost)) saturate(200%);
+  -webkit-backdrop-filter: blur(var(--blur-frost)) saturate(200%);
+  
+  border-radius: var(--radius-pill);
+  padding: 8px 16px;
+  
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    var(--shadow-obsidian-lg),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 0 1px rgba(0, 0, 0, 0.5);
+  
+  transition: 
+    transform var(--transition-smooth),
+    box-shadow var(--transition-smooth),
+    background var(--transition-smooth);
+}
+
+.floating-island:hover {
+  box-shadow: 
+    var(--shadow-obsidian-xl),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 1px rgba(0, 0, 0, 0.5),
+    0 0 40px -10px rgba(37, 99, 235, 0.2);
+}
+
+/* Cuando se hace scroll - se compacta sutilmente */
+.floating-island--scrolled {
+  padding: 6px 12px;
+  background: var(--glass-obsidian);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * 💎 PREMIUM KPI CARD - Tarjeta de métrica clave
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.kpi-card {
+  position: relative;
+  background: var(--glass-obsidian);
+  backdrop-filter: blur(var(--blur-obsidian)) saturate(var(--saturation-boost));
+  -webkit-backdrop-filter: blur(var(--blur-obsidian)) saturate(var(--saturation-boost));
+  border-radius: var(--radius-elegant);
+  padding: 28px;
+  
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 
+    var(--shadow-obsidian-md),
+    var(--inner-glow-white);
+  
+  transition: all var(--transition-smooth);
+  will-change: transform, box-shadow;
+  overflow: hidden;
+}
+
+/* Reflejo especular animado */
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.03),
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.03),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: left 0.8s var(--ease-out-expo);
+  pointer-events: none;
+}
+
+.kpi-card:hover::before {
+  left: 150%;
+}
+
+/* Borde superior iluminado */
+.kpi-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+}
+
+.kpi-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* KPI Number styling */
+.kpi-value {
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 700;
+  font-family: var(--font-mono, 'SF Mono', monospace);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.8) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glow behind KPI value */
+.kpi-value-glow {
+  text-shadow: 0 0 40px var(--sapphire-glow);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * 🌟 LUMINOUS ICON - Icono con glow volumétrico
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.luminous-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  
+  /* El icono flota sobre el glow */
+  z-index: 1;
+}
+
+/* Glow detrás del icono */
+.luminous-icon::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 20px;
+  background: var(--icon-glow-color, var(--sapphire-glow));
+  filter: blur(16px);
+  opacity: 0.6;
+  z-index: -1;
+  transition: opacity var(--transition-smooth);
+}
+
+/* Superficie del icono */
+.luminous-icon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 50%
+  );
+  z-index: 0;
+}
+
+.luminous-icon:hover::before {
+  opacity: 0.9;
+  transform: scale(1.2);
+}
+
+/* Variantes de color */
+.luminous-icon--sapphire {
+  --icon-glow-color: var(--sapphire-glow);
+  background: linear-gradient(135deg, var(--sapphire-electric) 0%, var(--sapphire-deep) 100%);
+}
+
+.luminous-icon--emerald {
+  --icon-glow-color: var(--emerald-glow);
+  background: linear-gradient(135deg, var(--emerald-deep) 0%, var(--emerald-rich) 100%);
+}
+
+.luminous-icon--amethyst {
+  --icon-glow-color: var(--amethyst-glow);
+  background: linear-gradient(135deg, var(--amethyst) 0%, var(--amethyst-deep) 100%);
+}
+
+.luminous-icon--amber {
+  --icon-glow-color: var(--amber-glow);
+  background: linear-gradient(135deg, var(--amber-warm) 0%, #b45309 100%);
+}
+
+.luminous-icon--ruby {
+  --icon-glow-color: var(--ruby-glow);
+  background: linear-gradient(135deg, var(--ruby-deep) 0%, #9f1239 100%);
+}
+
+.luminous-icon--cyan {
+  --icon-glow-color: var(--cyan-glow);
+  background: linear-gradient(135deg, var(--cyan-nebula) 0%, #0e7490 100%);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * 🌌 ATMOSPHERIC BACKGROUND - Nebulosas volumétricas
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.atmospheric-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--obsidian-void);
+  pointer-events: none;
+}
+
+/* Capa de nebulosa base */
+.nebula-layer {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.15;
+  will-change: transform;
+}
+
+/* Nebulosa primaria - Azul profundo */
+.nebula--primary {
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(
+    circle,
+    var(--sapphire-deep) 0%,
+    transparent 70%
+  );
+  top: -10%;
+  left: -10%;
+  animation: nebula-drift-1 40s ease-in-out infinite;
+}
+
+/* Nebulosa secundaria - Púrpura */
+.nebula--secondary {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(
+    circle,
+    var(--amethyst-deep) 0%,
+    transparent 70%
+  );
+  bottom: -15%;
+  right: -10%;
+  animation: nebula-drift-2 35s ease-in-out infinite;
+}
+
+/* Nebulosa terciaria - Verde esmeralda sutil */
+.nebula--tertiary {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(
+    circle,
+    var(--emerald-rich) 0%,
+    transparent 70%
+  );
+  top: 40%;
+  left: 50%;
+  opacity: 0.08;
+  animation: nebula-drift-3 45s ease-in-out infinite;
+}
+
+/* Nebulosa de acento - Cyan */
+.nebula--accent {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(
+    circle,
+    var(--cyan-nebula) 0%,
+    transparent 70%
+  );
+  top: 20%;
+  right: 20%;
+  opacity: 0.1;
+  animation: nebula-drift-4 50s ease-in-out infinite;
+}
+
+@keyframes nebula-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(50px, 30px) scale(1.1); }
+  50% { transform: translate(20px, 60px) scale(1.05); }
+  75% { transform: translate(-30px, 20px) scale(0.95); }
+}
+
+@keyframes nebula-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(-40px, -20px) scale(1.05); }
+  50% { transform: translate(-60px, 30px) scale(1.1); }
+  75% { transform: translate(20px, -40px) scale(0.98); }
+}
+
+@keyframes nebula-drift-3 {
+  0%, 100% { transform: translate(-50%, 0) scale(1); opacity: 0.08; }
+  50% { transform: translate(-50%, 40px) scale(1.15); opacity: 0.12; }
+}
+
+@keyframes nebula-drift-4 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-30px, 50px) rotate(180deg); }
+}
+
+/* Grid pattern muy sutil */
+.atmospheric-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 80px 80px;
+  opacity: 0.5;
+}
+
+/* Viñeta cinematográfica */
+.atmospheric-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 50%,
+    transparent 0%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * ✨ SPARKLINE - Línea de tendencia brillante
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.sparkline-container {
+  position: relative;
+  height: 40px;
+  margin-top: 16px;
+  overflow: hidden;
+}
+
+.sparkline {
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  filter: drop-shadow(0 0 8px var(--sparkline-color, var(--sapphire-electric)));
+}
+
+.sparkline--positive {
+  --sparkline-color: var(--emerald-deep);
+  stroke: var(--emerald-deep);
+}
+
+.sparkline--negative {
+  --sparkline-color: var(--ruby-deep);
+  stroke: var(--ruby-deep);
+}
+
+.sparkline--neutral {
+  --sparkline-color: var(--sapphire-electric);
+  stroke: var(--sapphire-electric);
+}
+
+/* Área bajo la línea con gradiente */
+.sparkline-area {
+  fill: url(#sparkline-gradient);
+  opacity: 0.3;
+}
+
+/* Animación de dibujo */
+.sparkline-animate {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: draw-sparkline 1.5s var(--ease-out-expo) forwards;
+}
+
+@keyframes draw-sparkline {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * 🔢 COUNT-UP ANIMATION - Números que cuentan hacia arriba
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.count-up {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+  animation: count-glow 0.5s var(--ease-out-expo);
+}
+
+@keyframes count-glow {
+  0% {
+    opacity: 0.5;
+    filter: blur(4px);
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * 🎛️ PREMIUM BUTTON - Botón con luz líquida interior
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.btn-obsidian {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  letter-spacing: -0.01em;
+  
+  background: var(--glass-obsidian);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  
+  box-shadow: 
+    var(--shadow-obsidian-sm),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  
+  transition: all var(--transition-smooth);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.btn-obsidian::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 50%
+  );
+  opacity: 0;
+  transition: opacity var(--transition-micro);
+}
+
+.btn-obsidian:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    var(--shadow-obsidian-md),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.btn-obsidian:hover::before {
+  opacity: 1;
+}
+
+.btn-obsidian:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-obsidian-sm);
+}
+
+/* Variante primaria - Gradiente de magma/esmeralda */
+.btn-obsidian--primary {
+  background: linear-gradient(
+    135deg,
+    var(--emerald-deep) 0%,
+    var(--sapphire-deep) 100%
+  );
+  border: none;
+  box-shadow: 
+    var(--shadow-obsidian-md),
+    0 8px 24px -8px var(--emerald-glow);
+}
+
+.btn-obsidian--primary:hover {
+  box-shadow: 
+    var(--shadow-obsidian-lg),
+    0 12px 32px -8px var(--emerald-glow);
+}
+
+/* Variante danger - Rojo profundo */
+.btn-obsidian--danger {
+  background: linear-gradient(
+    135deg,
+    var(--ruby-deep) 0%,
+    #881337 100%
+  );
+  border: none;
+  box-shadow: 
+    var(--shadow-obsidian-md),
+    0 8px 24px -8px var(--ruby-glow);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * 📊 DATA VIZ - Estilos para visualizaciones
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.chart-container {
+  position: relative;
+  background: var(--glass-obsidian-light);
+  border-radius: var(--radius-smooth);
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chart-tooltip {
+  background: var(--glass-obsidian-strong);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: var(--shadow-obsidian-lg);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * 🎭 MODAL PREMIUM - Modal con efecto lente de cámara
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  z-index: 200;
+}
+
+.modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 201;
+  
+  width: 90vw;
+  max-width: 500px;
+  max-height: 85vh;
+  
+  background: var(--glass-obsidian-strong);
+  backdrop-filter: blur(var(--blur-frost)) saturate(200%);
+  border-radius: var(--radius-elegant);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  
+  box-shadow: 
+    var(--shadow-obsidian-xl),
+    0 0 0 1px rgba(0, 0, 0, 0.5),
+    0 0 100px -20px rgba(37, 99, 235, 0.2);
+  
+  overflow: hidden;
+}
+
+/* Animación de entrada del modal */
+.modal-enter {
+  animation: modal-scale-in 0.4s var(--ease-out-back) forwards;
+}
+
+@keyframes modal-scale-in {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+    filter: blur(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * 🎴 CREDIT CARD SELECTOR - Selector de cuentas/bancos
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.credit-card {
+  position: relative;
+  padding: 16px;
+  border-radius: 16px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+  overflow: hidden;
+}
+
+.credit-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(
+    circle,
+    var(--card-accent, rgba(255, 255, 255, 0.1)) 0%,
+    transparent 70%
+  );
+  opacity: 0.5;
+}
+
+.credit-card:hover {
+  transform: translateY(-2px) scale(1.02);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: var(--shadow-obsidian-md);
+}
+
+.credit-card--selected {
+  border-color: var(--sapphire-electric);
+  box-shadow: 
+    0 0 0 2px var(--sapphire-electric),
+    var(--shadow-glow-sapphire);
+  transform: translateY(-4px) scale(1.02);
+}
+
+.credit-card--selected::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(37, 99, 235, 0.1) 0%,
+    transparent 50%
+  );
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * 📝 INPUT PREMIUM - Campo de entrada cinematográfico
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.input-obsidian {
+  width: 100%;
+  padding: 16px 20px;
+  border-radius: 14px;
+  
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+  
+  transition: all var(--transition-smooth);
+}
+
+.input-obsidian::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.input-obsidian:focus {
+  outline: none;
+  border-color: var(--sapphire-electric);
+  box-shadow: 
+    0 0 0 3px rgba(37, 99, 235, 0.15),
+    var(--inner-glow-sapphire);
+}
+
+/* Input gigante para montos */
+.input-amount {
+  font-family: var(--font-mono, 'SF Mono', monospace);
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-align: center;
+  padding: 24px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0;
+}
+
+.input-amount:focus {
+  border-bottom-color: var(--sapphire-electric);
+  text-shadow: 0 0 30px var(--sapphire-glow);
+  box-shadow: none;
+}
+
+/* Cursor de luz parpadeante */
+.input-amount:focus::placeholder {
+  animation: cursor-blink 1s ease-in-out infinite;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * 🏷️ BADGE LUMINOSO
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.badge-luminous {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  
+  background: var(--badge-bg, var(--sapphire-muted));
+  color: var(--badge-color, var(--sapphire-electric));
+  border: 1px solid var(--badge-border, rgba(37, 99, 235, 0.3));
+  
+  box-shadow: 0 0 20px -5px var(--badge-glow, var(--sapphire-glow));
+}
+
+.badge-luminous--success {
+  --badge-bg: var(--emerald-muted);
+  --badge-color: var(--emerald-deep);
+  --badge-border: rgba(4, 120, 87, 0.3);
+  --badge-glow: var(--emerald-glow);
+}
+
+.badge-luminous--warning {
+  --badge-bg: var(--amber-muted);
+  --badge-color: var(--amber-warm);
+  --badge-border: rgba(217, 119, 6, 0.3);
+  --badge-glow: var(--amber-glow);
+}
+
+.badge-luminous--danger {
+  --badge-bg: var(--ruby-muted);
+  --badge-color: var(--ruby-deep);
+  --badge-border: rgba(190, 18, 60, 0.3);
+  --badge-glow: var(--ruby-glow);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * 🌊 UTILITY CLASSES
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+/* Glow text */
+.text-glow-sapphire { text-shadow: 0 0 30px var(--sapphire-glow); }
+.text-glow-emerald { text-shadow: 0 0 30px var(--emerald-glow); }
+.text-glow-amethyst { text-shadow: 0 0 30px var(--amethyst-glow); }
+
+/* Gradient text */
+.text-gradient-obsidian {
+  background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.6) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Breathing animation */
+.animate-breathe {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+/* Pulse glow */
+.animate-pulse-glow {
+  animation: pulse-glow-obsidian 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow-obsidian {
+  0%, 100% { 
+    box-shadow: 0 0 20px -5px var(--sapphire-glow);
+    opacity: 0.8;
+  }
+  50% { 
+    box-shadow: 0 0 40px -5px var(--sapphire-glow);
+    opacity: 1;
+  }
+}
+
+/* Float animation */
+.animate-float-slow {
+  animation: float-obsidian 6s ease-in-out infinite;
+}
+
+@keyframes float-obsidian {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Shimmer effect */
+.shimmer-obsidian {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-obsidian::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
+  animation: shimmer-move 3s ease-in-out infinite;
+}
+
+@keyframes shimmer-move {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}

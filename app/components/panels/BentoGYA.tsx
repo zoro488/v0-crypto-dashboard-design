@@ -67,10 +67,16 @@ import { CreateAbonoModalPremium } from '@/app/components/modals/CreateAbonoModa
 import { useToast } from '@/app/hooks/use-toast'
 import { BANCOS } from '@/app/lib/constants'
 import { cn } from '@/app/lib/utils'
+import type { BancoId, GastoAbono } from '@/app/types'
 import { 
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 🌑 OBSIDIAN GLASS PREMIUM COMPONENTS
+// ═══════════════════════════════════════════════════════════════════════════
+import ExpenseCommandCenter from '@/app/components/premium/expenses/ExpenseCommandCenter'
 
 // ============================================
 // TIPOS
@@ -199,6 +205,7 @@ export default memo(function BentoGYA() {
   const [bancoFiltro, setBancoFiltro] = useState('todos')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedTimeRange, setSelectedTimeRange] = useState<'day' | 'week' | 'month'>('month')
+  const [showExpenseCenter, setShowExpenseCenter] = useState(false)
   
   // Modales
   const [showGastoModal, setShowGastoModal] = useState(false)
@@ -420,6 +427,22 @@ export default memo(function BentoGYA() {
             Actualizar
           </Button>
 
+          {/* Toggle Expense Command Center */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowExpenseCenter(!showExpenseCenter)}
+            className={cn(
+              "transition-all",
+              showExpenseCenter 
+                ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0"
+                : "border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+            )}
+          >
+            <Sparkles className="w-4 h-4 mr-2" />
+            {showExpenseCenter ? 'Vista Clásica' : 'Command Center'}
+          </Button>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button className="bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600">
@@ -449,30 +472,58 @@ export default memo(function BentoGYA() {
         </div>
       </motion.div>
 
-      {/* ════════════════════════════════════════════════════════════════════
-          KPI CARDS
-          ════════════════════════════════════════════════════════════════════ */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        {/* Total Gastos */}
+      {/* Vista Expense Command Center o KPIs clásicos */}
+      {showExpenseCenter ? (
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1 }}
-          className="relative group"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
-          <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 hover:border-red-500/50 transition-colors">
-            <TrendingDown className="w-8 h-8 text-red-400 mb-4" />
-            <div className="text-3xl font-bold text-white mb-2">
-              {formatearMonto(metrics.totalGastos)}
-            </div>
-            <p className="text-sm text-zinc-400">Gastos Totales</p>
-            <div className="flex items-center gap-1 mt-2 text-xs text-red-400">
-              <ArrowDownRight className="w-3 h-3" />
-              <span>{metrics.numGastos} registros</span>
-            </div>
-          </div>
+          <ExpenseCommandCenter
+            gastos={movimientos.filter(m => m.tipo === 'gasto').map(g => ({
+              id: g.id || '',
+              tipo: 'gasto' as const,
+              valor: g.monto || 0,
+              concepto: g.concepto || g.origen || '',
+              fecha: typeof g.fecha === 'string' ? g.fecha : new Date().toISOString(),
+              origen: (g.bancoId || 'profit') as BancoId,
+              destino: (g.bancoId || 'profit') as BancoId,
+              bancoId: (g.bancoId || 'profit') as BancoId,
+              createdAt: new Date(),
+            })) as GastoAbono[]}
+            onCreateGasto={async (gasto) => {
+              toast({
+                title: 'Gasto registrado',
+                description: `Gasto de $${gasto.valor} registrado correctamente`,
+              })
+            }}
+          />
         </motion.div>
+      ) : (
+        <>
+          {/* ════════════════════════════════════════════════════════════════════
+              KPI CARDS
+              ════════════════════════════════════════════════════════════════════ */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            {/* Total Gastos */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1 }}
+              className="relative group"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
+              <div className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-6 hover:border-red-500/50 transition-colors">
+                <TrendingDown className="w-8 h-8 text-red-400 mb-4" />
+                <div className="text-3xl font-bold text-white mb-2">
+                  {formatearMonto(metrics.totalGastos)}
+                </div>
+                <p className="text-sm text-zinc-400">Gastos Totales</p>
+                <div className="flex items-center gap-1 mt-2 text-xs text-red-400">
+                  <ArrowDownRight className="w-3 h-3" />
+                  <span>{metrics.numGastos} registros</span>
+                </div>
+              </div>
+            </motion.div>
 
         {/* Total Abonos */}
         <motion.div
@@ -981,6 +1032,8 @@ export default memo(function BentoGYA() {
           </div>
         </div>
       </motion.div>
+        </>
+      )}
 
       {/* ════════════════════════════════════════════════════════════════════
           MODALES

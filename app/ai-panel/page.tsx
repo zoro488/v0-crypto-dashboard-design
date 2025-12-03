@@ -1,12 +1,18 @@
 'use client'
 
 /**
- * 🤖 Página del Panel IA Inmersivo
- * Experiencia completa con robot 3D interactivo
+ * 🤖 Página del Panel IA - Neural Hub Principal
+ * Centro de comando con partículas GPU y paneles satélite
  */
 
-import { ImmersiveAIPanel } from '@/app/components/3d/ImmersiveAIPanel'
+import dynamic from 'next/dynamic'
+
+// Importar dinámicamente para evitar SSR con WebGL
+const AINeuralHub = dynamic(
+  () => import('@/app/components/ai/AINeuralHub'),
+  { ssr: false }
+)
 
 export default function AIPanelPage() {
-  return <ImmersiveAIPanel />
+  return <AINeuralHub />
 }

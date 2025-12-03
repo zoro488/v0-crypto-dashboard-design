@@ -110,3 +110,22 @@ export { FloatingAIOrb } from './FloatingAIOrb'
 
 // Los shaders se importan como side-effect en ZeroAvatar
 // export { ZeroEyeMaterial } from './shaders/ZeroEyeShader'
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// NEURAL CORE GPU - SISTEMA DE PARTÍCULAS ULTRA AVANZADO
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Núcleo neural con 100k+ partículas GPU
+export { default as NeuralCore3D, NeuralCoreRenderer } from './NeuralCore3D'
+
+// Fondo de fluido cuántico con shaders GLSL
+export { default as FluidBackground, FluidBackgroundAdvanced } from './FluidBackground'
+
+// Gráfico de barras holográfico 3D
+export { default as HolographicBarChart, SimpleHolographicChart } from './HolographicBarChart'
+
+// Partículas de singularidad
+export { default as SingularityParticles } from './SingularityParticles'
+
+// Shaders GLSL avanzados
+export * from './shaders/NeuralCoreShaders'

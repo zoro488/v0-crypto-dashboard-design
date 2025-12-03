@@ -21,6 +21,9 @@ import {
 // Nuevo Dashboard Premium con animación CHRONOS
 const ChronosDashboard = lazy(() => import('@/app/components/panels/ChronosDashboard'))
 
+// 🔮 Nuevo Dashboard Obsidian Glass Ultra-Premium
+const ObsidianDashboard = lazy(() => import('@/app/components/panels/ObsidianDashboard'))
+
 // Paneles Premium - TODOS los paneles usan versiones Premium con componentes 3D avanzados
 const BentoOrdenesCompraPremium = lazy(() => import('@/app/components/panels/BentoOrdenesCompraPremium'))
 const BentoBanco = lazy(() => import('@/app/components/panels/BentoBanco'))
@@ -176,10 +179,13 @@ export default function Chronos() {
     }
   }, [currentPanel])
 
+  // 🔮 Activar Obsidian Glass Dashboard (Ultra-Premium Experience)
+  const useObsidianDashboard = true
+
   const renderPanel = () => {
     switch (currentPanel) {
       case 'dashboard':
-        return <ChronosDashboard />
+        return useObsidianDashboard ? <ObsidianDashboard /> : <ChronosDashboard />
       case 'ordenes':
         return <BentoOrdenesCompraPremium />
       case 'ventas':
@@ -208,7 +214,7 @@ export default function Chronos() {
       case 'ia':
         return <BentoIAElevated />
       default:
-        return <ChronosDashboard />
+        return useObsidianDashboard ? <ObsidianDashboard /> : <ChronosDashboard />
     }
   }
 

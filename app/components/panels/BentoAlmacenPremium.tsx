@@ -63,6 +63,12 @@ import {
   GradientText,
   VARIANT_COLORS, 
 } from '@/app/components/3d/PremiumPanelComponents'
+import type { Producto, MovimientoAlmacen as MovimientoAlmacenType } from '@/app/types'
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 🌑 OBSIDIAN GLASS PREMIUM COMPONENTS
+// ═══════════════════════════════════════════════════════════════════════════
+import WarehouseGrid from '@/app/components/premium/warehouse/WarehouseGrid'
 
 // ============================================================================
 // ANIMACIONES SPRING ULTRA-PREMIUM (Apple/Tesla style)
@@ -1084,6 +1090,7 @@ export function BentoAlmacenPremium() {
   const [showEntradaModal, setShowEntradaModal] = useState(false)
   const [showSalidaModal, setShowSalidaModal] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [showWarehouseGrid, setShowWarehouseGrid] = useState(false)
   
   // Hooks de datos - TIEMPO REAL
   const { data: productos = [], loading: loadingProductos, isConnected } = useRealtimeAlmacen()
@@ -1229,6 +1236,21 @@ export function BentoAlmacenPremium() {
             
             {/* Acciones */}
             <div className="flex items-center gap-3">
+              {/* Toggle WarehouseGrid Premium */}
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  onClick={() => { setShowWarehouseGrid(!showWarehouseGrid); haptic.light() }}
+                  variant={showWarehouseGrid ? "default" : "outline"}
+                  className={showWarehouseGrid 
+                    ? "bg-gradient-to-r from-purple-600 to-cyan-500 text-white border-0"
+                    : "border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+                  }
+                >
+                  <Sparkles size={16} className="mr-2" />
+                  {showWarehouseGrid ? "Vista Clásica" : "Heatmap Grid"}
+                </Button>
+              </motion.div>
+
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
                   onClick={() => { setShowEntradaModal(true); haptic.light() }}
@@ -1376,28 +1398,49 @@ export function BentoAlmacenPremium() {
           </motion.div>
         </motion.header>
         {/* ============================================
-            CONTENIDO DE TABS
+            CONTENIDO DE TABS O WAREHOUSE GRID
             ============================================ */}
-        <AnimatePresence mode="wait">
+        {showWarehouseGrid ? (
           <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -30, filter: 'blur(10px)' }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
           >
-            {activeTab === 'entradas' && (
-              <TabEntradas entradas={entradas as MovimientoAlmacen[]} loading={loadingEntradas} />
-            )}
-            {activeTab === 'stock' && (
-              <TabStock productos={productos as ProductoAlmacen[]} loading={loadingProductos} />
-            )}
-            {activeTab === 'salidas' && (
-              <TabSalidas salidas={salidas as MovimientoAlmacen[]} loading={loadingSalidas} />
-            )}
-            {activeTab === 'rf' && <TabRF />}
+            <WarehouseGrid
+              products={productos as unknown as Producto[]}
+              movements={[...entradas, ...salidas] as unknown as MovimientoAlmacenType[]}
+              onQuickEntry={(productId, cantidad) => {
+                console.log('Quick entry:', productId, cantidad)
+                haptic.medium()
+              }}
+              onQuickExit={(productId, cantidad) => {
+                console.log('Quick exit:', productId, cantidad)
+                haptic.medium()
+              }}
+            />
           </motion.div>
-        </AnimatePresence>
+        ) : (
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: -30, filter: 'blur(10px)' }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {activeTab === 'entradas' && (
+                <TabEntradas entradas={entradas as MovimientoAlmacen[]} loading={loadingEntradas} />
+              )}
+              {activeTab === 'stock' && (
+                <TabStock productos={productos as ProductoAlmacen[]} loading={loadingProductos} />
+              )}
+              {activeTab === 'salidas' && (
+                <TabSalidas salidas={salidas as MovimientoAlmacen[]} loading={loadingSalidas} />
+              )}
+              {activeTab === 'rf' && <TabRF />}
+            </motion.div>
+          </AnimatePresence>
+        )}
       </div>
       
       {/* Modales */}

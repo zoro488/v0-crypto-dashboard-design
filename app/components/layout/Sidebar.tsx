@@ -1,6 +1,14 @@
 'use client'
 
-import { motion } from 'framer-motion'
+/**
+ * 🎨 CHRONOS 2025 Sidebar
+ * 
+ * Sidebar colapsable estilo Linear/Vercel (280px → 72px)
+ * Iconos blancos puros con glow sutil en activo
+ * Solo 2 colores principales: #0066FF y #C81EFF
+ */
+
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -10,20 +18,24 @@ import {
   UserCheck,
   BarChart3,
   ChevronDown,
+  ChevronLeft,
   Building2,
   DollarSign,
   Truck,
   PiggyBank,
   Wallet,
   Loader2,
+  Menu,
 } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 import { Badge } from '@/app/components/ui/badge'
 import { ScrollArea } from '@/app/components/ui/scroll-area'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/components/ui/collapsible'
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import type { Banco } from '@/app/types'
 import { useBancosData } from '@/app/lib/firebase/firestore-hooks.service'
+import { CHRONOS_2025 } from '@/app/lib/chronos-2025-tokens'
+import { cn } from '@/app/lib/utils'
 
 interface SidebarProps {
   collapsed: boolean
@@ -31,21 +43,29 @@ interface SidebarProps {
   onPanelChange: (panel: string) => void
   selectedBanco: Banco
   onBancoChange: (banco: Banco) => void
+  onToggleCollapse?: () => void
 }
 
-const MENU_ITEMS = [{ id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: 'NEW' }]
+const MENU_ITEMS = [{ id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: null }]
 
 const OPERACIONES = [
-  { id: 'ordenes', label: 'Órdenes de Compra', icon: ShoppingCart, badge: '23' },
-  { id: 'ventas', label: 'Ventas', icon: TrendingUp, badge: '47' },
+  { id: 'ordenes', label: 'Órdenes de Compra', icon: ShoppingCart, badge: null },
+  { id: 'ventas', label: 'Ventas', icon: TrendingUp, badge: null },
   { id: 'almacen', label: 'Almacén', icon: Warehouse, badge: null },
 ]
 
 const GESTION = [
   { id: 'distribuidores', label: 'Distribuidores', icon: Users, badge: null },
   { id: 'clientes', label: 'Clientes', icon: UserCheck, badge: null },
-  { id: 'reportes', label: 'Reportes', icon: BarChart3, badge: 'AI' },
+  { id: 'reportes', label: 'Reportes', icon: BarChart3, badge: null },
 ]
+
+// Spring animation config Chronos 2025
+const SPRING_CONFIG = {
+  type: 'spring' as const,
+  stiffness: 280,
+  damping: 30,
+}
 
 export default function Sidebar({
   collapsed,
@@ -53,15 +73,46 @@ export default function Sidebar({
   onPanelChange,
   selectedBanco,
   onBancoChange,
+  onToggleCollapse,
 }: SidebarProps) {
   const [bancosOpen, setBancosOpen] = useState(true)
 
   return (
     <motion.aside
-      animate={{ width: collapsed ? 80 : 288 }}
-      transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-      className="fixed left-0 top-18 h-[calc(100vh-72px)] bg-black/30 backdrop-blur-xl border-r border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] z-20"
+      animate={{ width: collapsed ? 72 : 280 }}
+      transition={SPRING_CONFIG}
+      className={cn(
+        'fixed left-0 top-[72px] h-[calc(100vh-72px)] z-20',
+        // Glassmorphism sutil Chronos 2025
+        'bg-[rgba(0,0,0,0.8)] backdrop-blur-[24px]',
+        'border-r border-[rgba(255,255,255,0.05)]',
+        'shadow-[0_0_40px_rgba(0,0,0,0.5)]'
+      )}
     >
+      {/* Toggle Button - Estilo Linear/Vercel */}
+      {onToggleCollapse && (
+        <motion.button
+          onClick={onToggleCollapse}
+          className={cn(
+            'absolute -right-3 top-6 z-50',
+            'w-6 h-6 rounded-full',
+            'bg-[#0066FF] border-2 border-black',
+            'flex items-center justify-center',
+            'shadow-[0_0_20px_rgba(0,102,255,0.4)]',
+            'hover:bg-[#0052CC] transition-colors'
+          )}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          <motion.div
+            animate={{ rotate: collapsed ? 180 : 0 }}
+            transition={SPRING_CONFIG}
+          >
+            <ChevronLeft className="w-3.5 h-3.5 text-white" strokeWidth={2} />
+          </motion.div>
+        </motion.button>
+      )}
+
       <ScrollArea className="h-full">
         <div className="p-4 space-y-6">
           {/* Dashboard */}
@@ -78,37 +129,44 @@ export default function Sidebar({
           </div>
 
           {/* Operaciones */}
-          {!collapsed && (
-            <div className="space-y-1">
-              <p className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Operaciones</p>
-              {OPERACIONES.map((item) => (
-                <SidebarItem
-                  key={item.id}
-                  {...item}
-                  collapsed={collapsed}
-                  active={currentPanel === item.id}
-                  onClick={() => onPanelChange(item.id)}
-                />
-              ))}
-            </div>
-          )}
+          <div className="space-y-1">
+            {!collapsed && (
+              <p className="px-3 py-2 text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-[0.1em]">
+                Operaciones
+              </p>
+            )}
+            {OPERACIONES.map((item) => (
+              <SidebarItem
+                key={item.id}
+                {...item}
+                collapsed={collapsed}
+                active={currentPanel === item.id}
+                onClick={() => onPanelChange(item.id)}
+              />
+            ))}
+          </div>
 
           {/* Bancos */}
-          <Collapsible open={bancosOpen} onOpenChange={setBancosOpen}>
+          <Collapsible open={bancosOpen && !collapsed} onOpenChange={setBancosOpen}>
             <CollapsibleTrigger asChild>
               <Button
                 variant="ghost"
-                className={`w-full justify-between text-slate-400 hover:text-white hover:bg-white/5 ${
-                  collapsed ? 'px-2' : 'px-3'
-                }`}
-              >
-                {!collapsed && (
-                  <>
-                    <span className="text-xs font-semibold uppercase tracking-wider">Bancos</span>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${bancosOpen ? 'rotate-180' : ''}`} />
-                  </>
+                className={cn(
+                  'w-full text-[#A0A0A0] hover:text-white hover:bg-[rgba(255,255,255,0.03)]',
+                  collapsed ? 'justify-center px-2' : 'justify-between px-3'
                 )}
-                {collapsed && <Building2 className="h-5 w-5" />}
+              >
+                {!collapsed ? (
+                  <>
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.1em]">Bancos</span>
+                    <ChevronDown className={cn(
+                      'h-4 w-4 transition-transform text-[#6B6B6B]',
+                      bancosOpen && 'rotate-180'
+                    )} />
+                  </>
+                ) : (
+                  <Building2 className="h-5 w-5 text-white" strokeWidth={1.8} />
+                )}
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="space-y-1">
@@ -122,44 +180,43 @@ export default function Sidebar({
           </Collapsible>
 
           {/* Gestión */}
-          {!collapsed && (
-            <div className="space-y-1">
-              <p className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Gestión</p>
-              {GESTION.map((item) => (
-                <SidebarItem
-                  key={item.id}
-                  {...item}
-                  collapsed={collapsed}
-                  active={currentPanel === item.id}
-                  onClick={() => onPanelChange(item.id)}
-                />
-              ))}
-            </div>
-          )}
+          <div className="space-y-1">
+            {!collapsed && (
+              <p className="px-3 py-2 text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-[0.1em]">
+                Gestión
+              </p>
+            )}
+            {GESTION.map((item) => (
+              <SidebarItem
+                key={item.id}
+                {...item}
+                collapsed={collapsed}
+                active={currentPanel === item.id}
+                onClick={() => onPanelChange(item.id)}
+              />
+            ))}
+          </div>
         </div>
 
-        {/* Footer */}
-        {!collapsed && (
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10 bg-black/20 backdrop-blur-xl">
-            <div className="text-xs text-slate-400 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-apple">v3.0.0 Ultra</span>
-                <div className="flex items-center gap-1">
-                  <span className="h-2 w-2 rounded-full bg-green-500 animate-ripple" />
-                  <span>En línea</span>
+        {/* Footer - Solo cuando está expandido */}
+        <AnimatePresence>
+          {!collapsed && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute bottom-0 left-0 right-0 p-4 border-t border-[rgba(255,255,255,0.05)] bg-black/40"
+            >
+              <div className="flex items-center justify-between text-[12px] text-[#6B6B6B]">
+                <span>v3.0.0</span>
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-[#00FF57] shadow-[0_0_8px_#00FF57]" />
+                  <span>Online</span>
                 </div>
               </div>
-              <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
-                  initial={{ width: '0%' }}
-                  animate={{ width: '75%' }}
-                  transition={{ duration: 1, delay: 0.5 }}
-                />
-              </div>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </ScrollArea>
     </motion.aside>
   )
@@ -168,7 +225,7 @@ export default function Sidebar({
 interface SidebarItemProps {
   id: string
   label: string
-  icon: any
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>
   badge?: string | null
   collapsed: boolean
   active: boolean
@@ -177,24 +234,37 @@ interface SidebarItemProps {
 
 function SidebarItem({ label, icon: Icon, badge, collapsed, active, onClick }: SidebarItemProps) {
   return (
-    <motion.div whileHover={{ x: collapsed ? 0 : 4 }} whileTap={{ scale: 0.98 }}>
+    <motion.div 
+      whileHover={{ x: collapsed ? 0 : 4 }} 
+      whileTap={{ scale: 0.98 }}
+      transition={SPRING_CONFIG}
+    >
       <Button
-        variant={active ? 'default' : 'ghost'}
-        className={`w-full justify-start gap-3 transition-all duration-300 ${
+        variant="ghost"
+        className={cn(
+          'w-full gap-3 transition-all duration-300 rounded-[12px]',
+          collapsed ? 'justify-center px-2' : 'justify-start px-3',
           active
-            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/30'
-            : 'text-slate-400 hover:text-white hover:bg-white/5'
-        } ${collapsed ? 'px-2' : 'px-3'}`}
+            ? 'bg-[#0066FF] text-white shadow-[0_0_20px_rgba(0,102,255,0.3)]'
+            : 'text-[#A0A0A0] hover:text-white hover:bg-[rgba(255,255,255,0.03)]'
+        )}
         onClick={onClick}
       >
-        <Icon className="h-5 w-5 flex-shrink-0" />
+        {/* Icono blanco puro, stroke 1.8, glow en activo */}
+        <Icon 
+          className={cn(
+            'h-5 w-5 flex-shrink-0',
+            active && 'drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]'
+          )} 
+          strokeWidth={1.8}
+        />
         {!collapsed && (
           <>
-            <span className="flex-1 text-left text-apple">{label}</span>
+            <span className="flex-1 text-left text-[14px] font-medium">{label}</span>
             {badge && (
               <Badge
-                variant={badge === 'AI' ? 'default' : 'secondary'}
-                className={`${badge === 'AI' ? 'bg-gradient-to-r from-purple-600 to-pink-600 animate-gradient-flow' : ''} text-[10px]`}
+                variant="secondary"
+                className="text-[10px] bg-[rgba(255,255,255,0.1)] text-white border-none"
               >
                 {badge}
               </Badge>
@@ -239,52 +309,74 @@ function BancoSelector({ collapsed, selectedBanco, onBancoChange, onViewBanco }:
   if (loading) {
     return (
       <div className="flex items-center justify-center py-4">
-        <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
+        <Loader2 className="h-5 w-5 animate-spin text-[#6B6B6B]" />
       </div>
     )
   }
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 mt-2">
       {bancos.map((banco) => (
-        <Button
+        <motion.button
           key={banco.id}
-          variant="ghost"
-          className={`w-full ${collapsed ? 'px-2' : 'px-3'} py-6 ${
+          whileHover={{ x: collapsed ? 0 : 4 }}
+          whileTap={{ scale: 0.98 }}
+          transition={SPRING_CONFIG}
+          className={cn(
+            'w-full rounded-[12px] py-3 transition-all duration-300',
+            collapsed ? 'px-2' : 'px-3',
             selectedBanco.id === banco.id
-              ? 'bg-white/10 text-white'
-              : 'text-slate-400 hover:text-white hover:bg-white/5'
-          }`}
+              ? 'bg-[rgba(0,102,255,0.1)] border border-[rgba(0,102,255,0.3)]'
+              : 'hover:bg-[rgba(255,255,255,0.03)]'
+          )}
           onClick={() => {
             onBancoChange(banco)
             onViewBanco()
           }}
         >
-          <div
-            className={`h-8 w-8 rounded-lg bg-gradient-to-br ${banco.color} flex items-center justify-center flex-shrink-0`}
-          >
-            {banco.icon === 'building' && <Building2 className="h-4 w-4 text-white" />}
-            {banco.icon === 'flag' && <DollarSign className="h-4 w-4 text-white" />}
-            {banco.icon === 'diamond' && <PiggyBank className="h-4 w-4 text-white" />}
-            {banco.icon === 'truck' && <Truck className="h-4 w-4 text-white" />}
-            {banco.icon === 'store' && <Building2 className="h-4 w-4 text-white" />}
-            {banco.icon === 'briefcase' && <Wallet className="h-4 w-4 text-white" />}
-            {banco.icon === 'trending-up' && <TrendingUp className="h-4 w-4 text-white" />}
-          </div>
-          {!collapsed && (
-            <div className="flex-1 text-left ml-3">
-              <p className="text-sm font-medium">{banco.nombre}</p>
-              <p className={`text-xs ${banco.capitalActual < 0 ? 'text-red-400' : 'text-green-400'}`}>
-                {banco.moneda === 'USD' ? '$' : '$'}
-                {banco.capitalActual.toLocaleString('es-MX')}
-                {banco.moneda === 'USD' && ' USD'}
-              </p>
+          <div className={cn('flex items-center', collapsed ? 'justify-center' : 'gap-3')}>
+            {/* Icono del banco - blanco puro */}
+            <div
+              className={cn(
+                'h-8 w-8 rounded-[10px] flex items-center justify-center flex-shrink-0',
+                'bg-gradient-to-br',
+                banco.color
+              )}
+            >
+              {banco.icon === 'building' && <Building2 className="h-4 w-4 text-white" strokeWidth={1.8} />}
+              {banco.icon === 'flag' && <DollarSign className="h-4 w-4 text-white" strokeWidth={1.8} />}
+              {banco.icon === 'diamond' && <PiggyBank className="h-4 w-4 text-white" strokeWidth={1.8} />}
+              {banco.icon === 'truck' && <Truck className="h-4 w-4 text-white" strokeWidth={1.8} />}
+              {banco.icon === 'store' && <Building2 className="h-4 w-4 text-white" strokeWidth={1.8} />}
+              {banco.icon === 'briefcase' && <Wallet className="h-4 w-4 text-white" strokeWidth={1.8} />}
+              {banco.icon === 'trending-up' && <TrendingUp className="h-4 w-4 text-white" strokeWidth={1.8} />}
             </div>
-          )}
-          {!collapsed && (
-            <div className={`h-2 w-2 rounded-full ${banco.estado === 'activo' ? 'bg-green-500' : 'bg-red-500'}`} />
-          )}
-        </Button>
+            
+            {!collapsed && (
+              <>
+                <div className="flex-1 text-left min-w-0">
+                  <p className="text-[13px] font-medium text-white truncate">{banco.nombre}</p>
+                  <p className={cn(
+                    'text-[12px] font-mono',
+                    banco.capitalActual < 0 ? 'text-[#FF0033]' : 'text-[#00FF57]'
+                  )}>
+                    {banco.moneda === 'USD' ? '$' : '$'}
+                    {banco.capitalActual.toLocaleString('es-MX')}
+                    {banco.moneda === 'USD' && ' USD'}
+                  </p>
+                </div>
+                
+                {/* Status indicator */}
+                <div className={cn(
+                  'h-2 w-2 rounded-full flex-shrink-0',
+                  banco.estado === 'activo' 
+                    ? 'bg-[#00FF57] shadow-[0_0_6px_#00FF57]' 
+                    : 'bg-[#FF0033] shadow-[0_0_6px_#FF0033]'
+                )} />
+              </>
+            )}
+          </div>
+        </motion.button>
       ))}
     </div>
   )

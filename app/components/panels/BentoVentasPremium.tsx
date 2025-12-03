@@ -47,6 +47,13 @@ import {
 import { SafeChartContainer, SAFE_ANIMATION_PROPS, SAFE_PIE_PROPS } from '@/app/components/ui/SafeChartContainer'
 import { logger } from '@/app/lib/utils/logger'
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 🌑 OBSIDIAN GLASS PREMIUM COMPONENTS
+// ═══════════════════════════════════════════════════════════════════════════
+import SalesCockpit from '@/app/components/premium/sales/SalesCockpit'
+import ObsidianDistributionSlider from '@/app/components/premium/sales/ObsidianDistributionSlider'
+import HolographicProductSearch from '@/app/components/premium/sales/HolographicProductSearch'
+
 // ============================================================================
 // INTERFACES
 // ============================================================================
@@ -332,6 +339,7 @@ const StatCard = ({
 // ============================================================================
 export default memo(function BentoVentasPremium() {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isCockpitOpen, setIsCockpitOpen] = useState(false)
   const [selectedVenta, setSelectedVenta] = useState<VentaData | null>(null)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [selectedTimeRange, setSelectedTimeRange] = useState<'day' | 'week' | 'month'>('week')
@@ -536,13 +544,23 @@ export default memo(function BentoVentasPremium() {
             <p className="text-zinc-400 text-sm">Gestión avanzada de ventas y cobros</p>
           </div>
         </div>
-        <ButtonTesla
-          variant="primary"
-          onClick={() => setIsModalOpen(true)}
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Nueva Venta
-        </ButtonTesla>
+        <div className="flex items-center gap-3">
+          {/* Botón Cockpit Premium */}
+          <ButtonTesla
+            variant="secondary"
+            onClick={() => setIsCockpitOpen(true)}
+          >
+            <Sparkles className="w-4 h-4 mr-2" />
+            Cockpit
+          </ButtonTesla>
+          <ButtonTesla
+            variant="primary"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Nueva Venta
+          </ButtonTesla>
+        </div>
       </motion.div>
 
       {/* KPI Widgets */}
@@ -808,6 +826,18 @@ export default memo(function BentoVentasPremium() {
 
       {/* Modales */}
       <CreateVentaModalPremium open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+
+      {/* Sales Cockpit Premium Modal */}
+      <SalesCockpit
+        isOpen={isCockpitOpen}
+        onClose={() => setIsCockpitOpen(false)}
+        onConfirm={async (saleData) => {
+          logger.info('Venta creada desde Cockpit', { context: 'BentoVentasPremium', data: saleData })
+          setIsCockpitOpen(false)
+        }}
+        products={[]}
+        clients={[]}
+      />
       
       <VentaProfileModal
         venta={selectedVenta}

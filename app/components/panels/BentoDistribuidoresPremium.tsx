@@ -33,6 +33,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/components/ui/ta
 import { Distribuidor, OrdenCompra } from '@/app/types'
 import { cn } from '@/app/lib/utils'
 import { logger } from '@/app/lib/utils/logger'
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 🌑 OBSIDIAN GLASS PREMIUM COMPONENTS
+// ═══════════════════════════════════════════════════════════════════════════
+import EntityRelationshipManager from '@/app/components/premium/crm/EntityRelationshipManager'
 import { toast } from 'sonner'
 
 // ============================================
