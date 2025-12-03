@@ -10,6 +10,16 @@ import { NextResponse, type NextRequest } from 'next/server'
 // Rutas públicas (no requieren auth)
 const PUBLIC_ROUTES = ['/login', '/api']
 
+// Archivos públicos que deben ser accesibles sin autenticación
+const PUBLIC_FILES = [
+  '/manifest.json',
+  '/favicon.ico',
+  '/robots.txt',
+  '/sitemap.xml',
+  '/sw.js',
+  '/workbox-',
+]
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
@@ -18,10 +28,16 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // Permitir archivos públicos específicos (manifest, favicon, etc.)
+  if (PUBLIC_FILES.some(file => pathname.startsWith(file))) {
+    return NextResponse.next()
+  }
+
   // Permitir archivos estáticos
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/static') ||
+    pathname.startsWith('/icon-') || // PWA icons
     pathname.includes('.') // archivos con extensión
   ) {
     return NextResponse.next()
