@@ -3,13 +3,14 @@
 import { useState, Suspense, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Lock, Mail, Eye, EyeOff, ArrowRight, Check, Sparkles } from 'lucide-react'
+import { Lock, Mail, Eye, EyeOff, ArrowRight, Check, Sparkles, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import * as THREE from 'three'
 import React from 'react'
 import dynamic from 'next/dynamic'
 import { ChronosLogo } from '@/app/components/ui/ChronosLogo'
+import { login } from '@/app/_actions/usuarios'
 
 // Logo 3D con partículas de diamante/cromo (carga dinámica para SSR)
 const DiamondChromeLogo = dynamic(
@@ -663,28 +664,44 @@ function MiniConfetti({ show }: { show: boolean }) {
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email || !password) return
     
     setIsLoading(true)
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    setError(null)
     
-    setIsLoading(false)
-    setIsSuccess(true)
-    setShowConfetti(true)
-    
-    document.cookie = 'session=demo-session; path=/; max-age=86400'
-    
-    setTimeout(() => {
-      router.push('/')
-    }, 1200)
+    try {
+      const result = await login({ email, password })
+      
+      if (result.error) {
+        setError(result.error)
+        setIsLoading(false)
+        return
+      }
+      
+      setIsLoading(false)
+      setIsSuccess(true)
+      setShowConfetti(true)
+      
+      // Redirigir a la página solicitada o al dashboard
+      const redirectTo = searchParams.get('redirect') || '/dashboard'
+      setTimeout(() => {
+        router.push(redirectTo)
+        router.refresh()
+      }, 1200)
+    } catch (err) {
+      setError('Error al iniciar sesión. Intenta de nuevo.')
+      setIsLoading(false)
+    }
   }
   
   return (
@@ -804,6 +821,21 @@ export default function LoginPage() {
             
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Error Message */}
+              <AnimatePresence>
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm"
+                  >
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    {error}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <GlowInput
                 icon={Mail}
                 type="email"

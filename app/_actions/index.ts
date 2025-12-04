@@ -30,6 +30,121 @@ export {
   getCapitalTotal,
 } from './bancos'
 
-// Re-export types
-export type { CreateVentaInput, UpdateVentaInput, AbonoVentaInput } from './ventas'
-export type { CreateClienteInput, UpdateClienteInput } from './clientes'
+// Distribuidores
+export {
+  createDistribuidor,
+  updateDistribuidor,
+  deleteDistribuidor,
+  getDistribuidores,
+  getDistribuidor,
+  getDistribuidoresStats,
+  pagarDistribuidor,
+  getHistorialPagosDistribuidor,
+} from './distribuidores'
+
+// Órdenes de Compra
+export {
+  createOrden,
+  pagarOrden,
+  getOrdenes,
+  getOrden,
+  getOrdenesStats,
+  cancelarOrden,
+} from './ordenes'
+
+// Movimientos
+export {
+  createMovimiento,
+  getMovimientos,
+  getMovimientoById,
+  getMovimientosByBanco,
+  getMovimientosResumen,
+  getMovimientosRecientes,
+  cancelarMovimiento,
+  getMovimientosStats,
+} from './movimientos'
+
+// Almacén
+export {
+  createProducto,
+  updateProducto,
+  getProductos,
+  getProductoById,
+  buscarProductos,
+  ajustarInventario,
+  getProductosBajoStock,
+  getAlmacenStats,
+  deleteProducto,
+} from './almacen'
+
+// Usuarios
+export {
+  login,
+  logout,
+  register,
+  getCurrentUser,
+  getUsuarios,
+  getUsuarioById,
+  updateUsuario,
+  deleteUsuario,
+  cambiarPassword,
+} from './usuarios'
+
+// Reportes
+export {
+  getDashboardResumen,
+  getReporteVentas,
+  getReporteBancos,
+  getReporteClientes,
+  getReporteDistribuidores,
+  getReporteAlmacen,
+  getResumenFinanciero,
+} from './reportes'
+
+// ═══════════════════════════════════════════════════════════════
+// RE-EXPORT TYPES & SCHEMAS (desde archivo separado sin 'use server')
+// ═══════════════════════════════════════════════════════════════
+
+export type {
+  CreateVentaInput,
+  UpdateVentaInput,
+  AbonoVentaInput,
+  CreateClienteInput,
+  UpdateClienteInput,
+  CreateDistribuidorInput,
+  UpdateDistribuidorInput,
+  CreateOrdenInput,
+  PagoOrdenInput,
+  CambiarEstadoOrdenInput,
+  CreateMovimientoInput,
+  FiltrosMovimiento,
+  CreateProductoInput,
+  UpdateProductoInput,
+  AjustarInventarioInput,
+  LoginInput,
+  RegisterInput,
+  UpdateUsuarioInput,
+  FiltrosReporte,
+} from './types'
+
+// Re-export schemas para validación en cliente
+export {
+  CreateVentaSchema,
+  UpdateVentaSchema,
+  AbonoVentaSchema,
+  CreateClienteSchema,
+  UpdateClienteSchema,
+  CreateDistribuidorSchema,
+  UpdateDistribuidorSchema,
+  CreateOrdenSchema,
+  PagoOrdenSchema,
+  CreateMovimientoSchema,
+  FiltrosMovimientoSchema,
+  CreateProductoSchema,
+  UpdateProductoSchema,
+  AjustarInventarioSchema,
+  LoginSchema,
+  RegisterSchema,
+  UpdateUsuarioSchema,
+  FiltrosReporteSchema,
+} from './types'

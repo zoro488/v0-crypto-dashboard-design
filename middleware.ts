@@ -2,13 +2,42 @@
  * 🔒 Middleware Elite - CHRONOS 2026
  * 
  * Middleware optimizado con:
+ * - Autenticación basada en cookies
  * - Rate limiting por IP
  * - Security headers (CSP, HSTS, etc.)
  * - Request logging
- * - Geolocation headers
+ * - Protección de rutas
  */
 
 import { NextResponse, type NextRequest } from 'next/server'
+
+// ═══════════════════════════════════════════════════════════════
+// CONFIGURACIÓN DE RUTAS
+// ═══════════════════════════════════════════════════════════════
+
+// Rutas que requieren autenticación
+const PROTECTED_ROUTES = [
+  '/dashboard',
+  '/ventas',
+  '/clientes',
+  '/bancos',
+  '/distribuidores',
+  '/ordenes',
+  '/movimientos',
+  '/almacen',
+  '/configuracion',
+  '/reportes',
+  '/usuarios',
+]
+
+// Rutas públicas (no requieren auth)
+const PUBLIC_ROUTES = [
+  '/login',
+  '/register',
+  '/demo',
+  '/showcase-premium',
+  '/api/health',
+]
 
 // ═══════════════════════════════════════════════════════════════
 // RATE LIMITING (Simple in-memory - para producción usar Redis)
@@ -71,6 +100,27 @@ export function middleware(request: NextRequest) {
              request.headers.get('x-real-ip') ?? 
              'unknown'
 
+  // 0. Verificar autenticación para rutas protegidas
+  const isProtectedRoute = PROTECTED_ROUTES.some(route => pathname.startsWith(route))
+  const isPublicRoute = PUBLIC_ROUTES.some(route => pathname.startsWith(route))
+  const isApiRoute = pathname.startsWith('/api/')
+  
+  // Obtener sesión de cookies
+  const sessionCookie = request.cookies.get('chronos_session')
+  const isAuthenticated = !!sessionCookie?.value
+
+  // Redirigir a login si no está autenticado y es ruta protegida
+  if (isProtectedRoute && !isAuthenticated) {
+    const loginUrl = new URL('/login', request.url)
+    loginUrl.searchParams.set('redirect', pathname)
+    return NextResponse.redirect(loginUrl)
+  }
+
+  // Redirigir a dashboard si ya está autenticado y va a login
+  if (pathname === '/login' && isAuthenticated) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
   // 1. Rate limiting para APIs
   if (pathname.startsWith('/api/')) {
     if (!checkRateLimit(ip)) {
@@ -122,8 +172,8 @@ export function middleware(request: NextRequest) {
     response.headers.set('Cache-Control', 'no-store, must-revalidate')
   }
 
-  // 6. Request ID para debugging
-  const requestId = crypto.randomUUID()
+  // 6. Request ID para debugging (usando globalThis.crypto disponible en Edge Runtime)
+  const requestId = globalThis.crypto.randomUUID()
   response.headers.set('X-Request-ID', requestId)
 
   return response

@@ -1,46 +1,18 @@
 'use server'
 
-import { z } from 'zod'
 import { db } from '@/database'
 import { ventas, movimientos, bancos, clientes } from '@/database/schema'
 import { revalidatePath } from 'next/cache'
 import { nanoid } from 'nanoid'
 import { eq, sql } from 'drizzle-orm'
-
-// ═══════════════════════════════════════════════════════════════
-// SCHEMAS DE VALIDACIÓN ZOD
-// ═══════════════════════════════════════════════════════════════
-
-const CreateVentaSchema = z.object({
-  clienteId: z.string().min(1, 'Cliente requerido'),
-  cantidad: z.number().positive('Cantidad debe ser positiva'),
-  precioVentaUnidad: z.number().positive('Precio venta requerido'),
-  precioCompraUnidad: z.number().positive('Precio compra requerido'),
-  precioFlete: z.number().nonnegative().default(0),
-  observaciones: z.string().optional(),
-})
-
-const UpdateVentaSchema = z.object({
-  id: z.string().min(1),
-  montoPagado: z.number().nonnegative().optional(),
-  estadoPago: z.enum(['pendiente', 'parcial', 'completo']).optional(),
-  observaciones: z.string().optional(),
-})
-
-const AbonoVentaSchema = z.object({
-  ventaId: z.string().min(1, 'Venta requerida'),
-  monto: z.number().positive('Monto debe ser positivo'),
-  bancoDestinoId: z.string().min(1, 'Banco destino requerido'),
-  concepto: z.string().optional(),
-})
-
-// ═══════════════════════════════════════════════════════════════
-// TIPOS INFERIDOS
-// ═══════════════════════════════════════════════════════════════
-
-export type CreateVentaInput = z.infer<typeof CreateVentaSchema>
-export type UpdateVentaInput = z.infer<typeof UpdateVentaSchema>
-export type AbonoVentaInput = z.infer<typeof AbonoVentaSchema>
+import { 
+  CreateVentaSchema,
+  UpdateVentaSchema,
+  AbonoVentaSchema,
+  type CreateVentaInput,
+  type UpdateVentaInput,
+  type AbonoVentaInput
+} from './types'
 
 // ═══════════════════════════════════════════════════════════════
 // SERVER ACTIONS

@@ -1,36 +1,67 @@
 import { db } from '@/database'
-import { bancos, clientes, distribuidores, usuarios } from '@/database/schema'
+import { bancos, clientes, distribuidores, usuarios, ventas, movimientos, almacen } from '@/database/schema'
 import { nanoid } from 'nanoid'
 import { BANCOS_CONFIG, BANCOS_ORDENADOS } from '@/app/_lib/constants/bancos'
+import { sql } from 'drizzle-orm'
 
 /**
  * Script de seed para inicializar la base de datos con datos de prueba
  * Ejecutar con: pnpm tsx scripts/seed.ts
  */
 
+// Hash simple para demo (en producción usar bcrypt)
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(password + 'chronos_salt_2025')
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
 async function seed() {
   console.log('🌱 Iniciando seed de la base de datos...')
 
   try {
-    // 1. Crear usuario admin
+    // 1. Crear usuario admin con password hasheado
     console.log('📝 Creando usuario admin...')
+    const adminPasswordHash = await hashPassword('chronos2025')
     await db.insert(usuarios).values({
       id: 'admin-1',
       email: 'admin@chronos.com',
-      password: 'chronos2025', // En producción usar hash
+      password: adminPasswordHash,
       nombre: 'Administrador',
       role: 'admin',
     }).onConflictDoNothing()
 
-    // 2. Crear los 7 bancos/bóvedas
+    // Usuario operador
+    const operadorPasswordHash = await hashPassword('operador123')
+    await db.insert(usuarios).values({
+      id: 'operador-1',
+      email: 'operador@chronos.com',
+      password: operadorPasswordHash,
+      nombre: 'Operador Sistema',
+      role: 'operator',
+    }).onConflictDoNothing()
+
+    // 2. Crear los 7 bancos/bóvedas con capital inicial
     console.log('🏦 Creando bancos/bóvedas...')
+    const capitalesIniciales: Record<string, number> = {
+      'boveda_monte': 150000,
+      'boveda_usa': 85000,
+      'profit': 42000,
+      'leftie': 28500,
+      'azteca': 15000,
+      'flete_sur': 12500,
+      'utilidades': 67000,
+    }
+
     for (const banco of BANCOS_ORDENADOS) {
       await db.insert(bancos).values({
         id: banco.id,
         nombre: banco.nombre,
         tipo: banco.tipo,
-        capitalActual: 0,
-        historicoIngresos: 0,
+        capitalActual: capitalesIniciales[banco.id] || 0,
+        historicoIngresos: capitalesIniciales[banco.id] || 0,
         historicoGastos: 0,
         color: banco.color,
         icono: banco.icono,
@@ -82,12 +113,35 @@ async function seed() {
       }).onConflictDoNothing()
     }
 
+    // 5. Crear productos de almacén
+    console.log('📦 Creando productos de almacén...')
+    const productosData = [
+      { nombre: 'Producto A', descripcion: 'Producto premium tipo A', cantidad: 150, precioCompra: 500, precioVenta: 750, minimo: 20 },
+      { nombre: 'Producto B', descripcion: 'Producto estándar tipo B', cantidad: 80, precioCompra: 350, precioVenta: 525, minimo: 15 },
+      { nombre: 'Producto C', descripcion: 'Producto económico tipo C', cantidad: 200, precioCompra: 200, precioVenta: 320, minimo: 30 },
+      { nombre: 'Producto D', descripcion: 'Producto especial tipo D', cantidad: 45, precioCompra: 800, precioVenta: 1200, minimo: 10 },
+      { nombre: 'Producto E', descripcion: 'Producto importado tipo E', cantidad: 25, precioCompra: 1500, precioVenta: 2200, minimo: 5 },
+    ]
+
+    for (const prod of productosData) {
+      await db.insert(almacen).values({
+        id: nanoid(),
+        ...prod,
+        ubicacion: 'Almacén Principal',
+      }).onConflictDoNothing()
+    }
+
     console.log('✅ Seed completado exitosamente!')
     console.log('📊 Resumen:')
-    console.log('   - 1 usuario admin')
-    console.log('   - 7 bancos/bóvedas')
+    console.log('   - 2 usuarios (admin + operador)')
+    console.log('   - 7 bancos/bóvedas con capital inicial')
     console.log('   - 10 clientes')
     console.log('   - 5 distribuidores')
+    console.log('   - 5 productos en almacén')
+    console.log('')
+    console.log('🔐 Credenciales:')
+    console.log('   Admin: admin@chronos.com / chronos2025')
+    console.log('   Operador: operador@chronos.com / operador123')
 
   } catch (error) {
     console.error('❌ Error en seed:', error)

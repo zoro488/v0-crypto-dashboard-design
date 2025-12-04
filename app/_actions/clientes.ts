@@ -1,42 +1,16 @@
 'use server'
 
-import { z } from 'zod'
 import { db } from '@/database'
 import { clientes } from '@/database/schema'
 import { revalidatePath } from 'next/cache'
 import { nanoid } from 'nanoid'
 import { eq } from 'drizzle-orm'
-
-// ═══════════════════════════════════════════════════════════════
-// SCHEMAS DE VALIDACIÓN ZOD
-// ═══════════════════════════════════════════════════════════════
-
-const CreateClienteSchema = z.object({
-  nombre: z.string().min(2, 'Nombre debe tener al menos 2 caracteres'),
-  email: z.string().email('Email inválido').optional().or(z.literal('')),
-  telefono: z.string().optional(),
-  direccion: z.string().optional(),
-  rfc: z.string().optional(),
-  limiteCredito: z.number().nonnegative().default(0),
-})
-
-const UpdateClienteSchema = z.object({
-  id: z.string().min(1),
-  nombre: z.string().min(2).optional(),
-  email: z.string().email().optional().or(z.literal('')),
-  telefono: z.string().optional(),
-  direccion: z.string().optional(),
-  rfc: z.string().optional(),
-  limiteCredito: z.number().nonnegative().optional(),
-  estado: z.enum(['activo', 'inactivo', 'suspendido']).optional(),
-})
-
-// ═══════════════════════════════════════════════════════════════
-// TIPOS INFERIDOS
-// ═══════════════════════════════════════════════════════════════
-
-export type CreateClienteInput = z.infer<typeof CreateClienteSchema>
-export type UpdateClienteInput = z.infer<typeof UpdateClienteSchema>
+import { 
+  CreateClienteSchema,
+  UpdateClienteSchema,
+  type CreateClienteInput,
+  type UpdateClienteInput
+} from './types'
 
 // ═══════════════════════════════════════════════════════════════
 // SERVER ACTIONS
