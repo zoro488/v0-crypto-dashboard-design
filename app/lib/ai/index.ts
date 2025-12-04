@@ -1,38 +1,84 @@
 /**
- * 🎯 AI Services Index
- * Exporta todos los servicios de AI del sistema CHRONOS
+ * 🎯 AI Services Index - CHRONOS System
+ * 
+ * Exporta todos los servicios de AI del sistema:
+ * - AIOrchestrator: Motor unificado multi-provider
+ * - useAI: Hook React para chat y voz
+ * - Voice Services: Deepgram STT + ElevenLabs TTS
+ * 
+ * @version 2.0.0
+ * @author CHRONOS Team
  */
 
-// Re-exports se harán cuando los módulos estén disponibles
-// Por ahora exportamos tipos placeholder
+// =====================================================================
+// CORE ORCHESTRATOR
+// =====================================================================
 
-export type AIProvider = 'github' | 'openai' | 'anthropic' | 'xai' | 'google';
+export {
+  aiOrchestrator,
+  AIOrchestrator,
+  AI_MODELS,
+  DEFAULT_MODEL,
+  type AIProvider,
+  type AIMessage,
+  type AICompletionOptions,
+  type AIResponse,
+  type VoiceOptions,
+} from './orchestrator'
 
-export interface AIMessage {
-  role: 'system' | 'user' | 'assistant';
-  content: string;
-}
+// =====================================================================
+// REACT HOOKS
+// =====================================================================
 
-export interface AICompletionOptions {
-  model?: string;
-  temperature?: number;
-  maxTokens?: number;
-  stream?: boolean;
-}
+export {
+  useAI,
+  useAICompletion,
+  type UseAIOptions,
+  type UseAIReturn,
+  type ChatMessage,
+} from './useAI'
 
-// Placeholder exports - se implementarán con los módulos reales
+// =====================================================================
+// VOICE SERVICES
+// =====================================================================
+
+export {
+  // Deepgram STT
+  DeepgramSTTClient,
+  WebSpeechFallback,
+  createDeepgramClient,
+  type DeepgramConfig,
+  type DeepgramState,
+  type TranscriptionEvent,
+  
+  // ElevenLabs TTS  
+  ElevenLabsTTSClient,
+  createElevenLabsClient,
+  detectEmotion,
+  formatWithEmotionTags,
+  VOICE_IDS,
+  type ElevenLabsConfig,
+  type ElevenLabsState,
+  type ElevenLabsVoice,
+  type VoiceEmotion,
+  type VoiceMapping,
+  
+  // React Hooks
+  useVoice,
+  useVoiceRecognition,
+  useTextToSpeech,
+  type UseVoiceConfig,
+  type UseVoiceReturn,
+} from './voice'
+
+// =====================================================================
+// LEGACY EXPORTS (backwards compatibility)
+// =====================================================================
+
 export const GITHUB_MODELS = {
   AI21_JAMBA: 'ai21-labs/AI21-Jamba-1.5-Large',
   GPT4O: 'openai/gpt-4o',
   GPT4O_MINI: 'openai/gpt-4o-mini',
   CLAUDE_SONNET: 'anthropic/claude-3.5-sonnet',
   PHI4: 'microsoft/Phi-4',
-} as const
-
-export const AI_MODELS = {
-  GROK_2: 'grok-2-1212',
-  GPT_4O: 'gpt-4o',
-  GPT_4O_MINI: 'gpt-4o-mini',
-  CLAUDE_SONNET: 'claude-3-5-sonnet-20241022',
-  GEMINI_PRO: 'gemini-1.5-pro',
 } as const

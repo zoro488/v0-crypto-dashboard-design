@@ -8,6 +8,7 @@ import './globals.css'
 import './styles/obsidian-glass.css'
 import './styles/chronos-obsidian-os.css'
 import './styles/chronos-2026-ultra.css'
+import './styles/chronos-quantum-2026.css' // 🌌 QUANTUM 2026 - Sin cyan, Violeta Real + Oro Líquido + Rosa Eléctrico
 import { AppProvider } from '@/app/lib/context/AppContext'
 import { Toaster } from '@/app/components/ui/toaster'
 import { ErrorBoundary } from '@/app/components/ErrorBoundary'

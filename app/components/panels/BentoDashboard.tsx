@@ -59,11 +59,13 @@ import {
 import { SafeChartContainer, SAFE_ANIMATION_PROPS } from '@/app/components/ui/SafeChartContainer'
 import { useState, useEffect, useMemo, memo, useCallback } from 'react'
 import { 
-  useRealtimeVentas, 
-  useRealtimeOrdenesCompra, 
-  useRealtimeAlmacen, 
-  useRealtimeBancos, 
-} from '@/app/hooks/useRealtimeCollection'
+  useLocalVentas,
+  useLocalOrdenesCompra,
+  useLocalBancos,
+  useLocalKPIs,
+  useInitializeData,
+  useDataStore,
+} from '@/app/lib/store/useDataStore'
 import { CreateOrdenCompraModalPremium } from '@/app/components/modals/CreateOrdenCompraModalPremium'
 import { CreateVentaModalPremium } from '@/app/components/modals/CreateVentaModalPremium'
 import { CreateTransferenciaModalPremium } from '@/app/components/modals/CreateTransferenciaModalPremium'
@@ -140,16 +142,32 @@ const CustomTooltip = memo(function CustomTooltip({ active, payload, label }: Cu
 })
 
 export default memo(function BentoDashboard() {
-  // 📦 Hooks en TIEMPO REAL - onSnapshot
-  const { data: bancosData, loading: loadingBancos, isConnected: bancosConnected } = useRealtimeBancos()
-  const { data: ventasRaw, loading: loadingVentas, isConnected: ventasConnected } = useRealtimeVentas()
-  const { data: ordenesCompraRaw, loading: loadingOC, isConnected: ocConnected } = useRealtimeOrdenesCompra()
-  const { data: productosRaw, loading: loadingProductos } = useRealtimeAlmacen()
+  // ═══════════════════════════════════════════════════════════════════════════
+  // USAR STORE LOCAL EN LUGAR DE FIREBASE
+  // ═══════════════════════════════════════════════════════════════════════════
+  const { data: bancosData, loading: loadingBancos, isConnected: bancosConnected, totalCapital } = useLocalBancos()
+  const { data: ventasRaw, loading: loadingVentas, isConnected: ventasConnected } = useLocalVentas()
+  const { data: ordenesCompraRaw, loading: loadingOC, isConnected: ocConnected, ordenesConStock } = useLocalOrdenesCompra()
+  const { initialized, inicializarDatosPrueba } = useInitializeData()
+  const kpis = useLocalKPIs()
   
-  // Log para verificar conexiones en tiempo real
+  // Productos del store (simplificado)
+  const productosRaw = ordenesConStock || []
+  const loadingProductos = false
+  
+  // Inicializar datos de prueba si no hay datos
+  // DESACTIVADO - Usuario quiere sistema limpio
+  // useEffect(() => {
+  //   if (!initialized && ventasRaw.length === 0 && bancosData.length > 0) {
+  //     logger.info('[BentoDashboard] Inicializando datos de prueba', { context: 'BentoDashboard' })
+  //     inicializarDatosPrueba()
+  //   }
+  // }, [initialized, ventasRaw.length, bancosData.length, inicializarDatosPrueba])
+  
+  // Log para verificar conexiones
   useEffect(() => {
     if (ventasConnected && ocConnected && bancosConnected) {
-      logger.info('TIEMPO REAL ACTIVO', { 
+      logger.info('STORE LOCAL ACTIVO', { 
         context: 'BentoDashboard', 
         data: { ventas: ventasRaw.length, ordenesCompra: ordenesCompraRaw.length, bancos: bancosData.length } 
       })
@@ -158,20 +176,20 @@ export default memo(function BentoDashboard() {
 
   // Transformar datos de bancos
   const bancos = useMemo(() => {
-    return (bancosData || []).map((b: Record<string, unknown>) => ({
-      id: (b.id as string) || '',
-      nombre: (b.nombre as string) || 'Sin nombre',
-      saldo: typeof b.saldo === 'number' ? b.saldo : (typeof b.capitalActual === 'number' ? b.capitalActual : 0),
-      capitalActual: typeof b.capitalActual === 'number' ? b.capitalActual : 0,
-      historicoIngresos: typeof b.historicoIngresos === 'number' ? b.historicoIngresos : 0,
-      historicoGastos: typeof b.historicoGastos === 'number' ? b.historicoGastos : 0,
+    return (bancosData || []).map((b) => ({
+      id: b.id || '',
+      nombre: b.nombre || 'Sin nombre',
+      saldo: b.capitalActual || 0,
+      capitalActual: b.capitalActual || 0,
+      historicoIngresos: b.historicoIngresos || 0,
+      historicoGastos: b.historicoGastos || 0,
     }))
   }, [bancosData])
 
-  // Casting seguro
-  const ventas = ventasRaw as VentaData[] | undefined
-  const ordenesCompra = ordenesCompraRaw as OrdenCompraData[] | undefined
-  const productos = productosRaw as ProductoData[] | undefined
+  // Casting seguro usando unknown
+  const ventas = ventasRaw as unknown as VentaData[] | undefined
+  const ordenesCompra = ordenesCompraRaw as unknown as OrdenCompraData[] | undefined
+  const productos = productosRaw as unknown as ProductoData[] | undefined
 
   const [mounted, setMounted] = useState(false)
   const [showChronos, setShowChronos] = useState(true)
@@ -190,32 +208,27 @@ export default memo(function BentoDashboard() {
   }, [])
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // CÁLCULOS OPTIMIZADOS CON useMemo - Solo se recalculan cuando cambian datos
+  // CÁLCULOS OPTIMIZADOS CON useMemo - Usando KPIs del store local
   // ═══════════════════════════════════════════════════════════════════════════
   
   const metrics = useMemo(() => {
-    const capitalTotal = bancos?.reduce((acc, b) => acc + (b?.saldo || 0), 0) || 0
-    const ventasMes = ventas?.reduce((acc, v) => acc + (v?.montoTotal ?? 0), 0) ?? 0
-    const stockActual = productos?.reduce((acc, p) => acc + (p?.stock ?? 0), 0) ?? 0
+    const capitalTotal = kpis.totalCapital || (bancos?.reduce((acc, b) => acc + (b?.saldo || 0), 0) ?? 0)
+    const ventasMes = kpis.totalVentas || (ventas?.reduce((acc, v) => acc + (v?.montoTotal ?? 0), 0) ?? 0)
+    const stockActual = ordenesConStock?.reduce((acc, oc) => acc + ((oc as unknown as ProductoData)?.stock ?? 0), 0) ?? 0
     const ordenesActivas = ordenesCompra?.filter((oc) => oc?.estado === 'pendiente')?.length ?? 0
-    // Ventas del día actual
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const ventasDelDia = ventas?.filter(v => {
-      if (!v?.fecha) return false
-      let fecha: Date
-      if (typeof v.fecha === 'object' && 'seconds' in v.fecha) {
-        fecha = new Date(v.fecha.seconds * 1000)
-      } else if (v.fecha instanceof Date) {
-        fecha = v.fecha
-      } else {
-        fecha = new Date(v.fecha)
-      }
-      return fecha >= today
-    }).reduce((acc, v) => acc + (v?.montoTotal ?? 0), 0) ?? 0
+    const ventasDelDia = kpis.ventasHoy || 0
     
-    return { capitalTotal, ventasMes, stockActual, ordenesActivas, ventasDelDia }
-  }, [bancos, ventas, productos, ordenesCompra])
+    return { 
+      capitalTotal, 
+      ventasMes, 
+      stockActual, 
+      ordenesActivas, 
+      ventasDelDia,
+      totalCobrado: kpis.totalCobrado || 0,
+      totalPendiente: kpis.totalPendiente || 0,
+      gananciaMes: kpis.gananciaMes || 0,
+    }
+  }, [bancos, ventas, ordenesCompra, ordenesConStock, kpis])
 
   // Helper para formatear fecha de Firestore
   const formatVentaDate = (fecha: VentaData['fecha']): string => {

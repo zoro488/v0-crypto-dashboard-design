@@ -37,6 +37,12 @@ const Dashboard2026Ultra = lazy(() => import('@/app/components/chronos-2026-ultr
 // 🎨 BentoDashboard - Dashboard Principal con Visualizaciones 3D Interactivas
 const BentoDashboard = lazy(() => import('@/app/components/panels/BentoDashboard'))
 
+// 🌌 CHRONOS INFINITY - Dashboard Ultra Premium 3D con efectos holográficos
+const BentoDashboardInfinity = lazy(() => import('@/app/components/panels/BentoDashboardInfinity'))
+
+// 🔮 CHRONOS QUANTUM 2026 - EL DISEÑO MÁS PREMIUM SIN CYAN - Violeta Real + Oro Líquido + Rosa Plasma
+const BentoDashboardQuantum = lazy(() => import('@/app/components/panels/BentoDashboardQuantum'))
+
 // Paneles Premium - TODOS los paneles usan versiones Premium con componentes 3D avanzados
 const BentoOrdenesCompraPremium = lazy(() => import('@/app/components/panels/BentoOrdenesCompraPremium'))
 const BentoBanco = lazy(() => import('@/app/components/panels/BentoBanco'))
@@ -216,7 +222,11 @@ export default function Chronos() {
   // 🚀 CHRONOS 2026 - El dashboard más avanzado (activar para experiencia completa 2026)
   // 🔥 CHRONOS 2026 ULTRA - EL DISEÑO MÁS AVANZADO Y PREMIUM DEL MUNDO 2025-2026
   // 🎨 BentoDashboard - Dashboard con Visualizaciones 3D Interactivas (NUEVO)
-  const useBentoDashboard = true // ⭐ DASHBOARD CON GRÁFICOS 3D INTERACTIVOS
+  // 🌌 CHRONOS INFINITY - Dashboard Ultra Premium 3D con efectos holográficos
+  // 🔮 CHRONOS QUANTUM 2026 - SIN CYAN, Violeta Real + Oro Líquido + Rosa Plasma ⭐ ACTIVO
+  const useQuantumDashboard = true // ⭐ QUANTUM 2026 - SIN CYAN - EL MÁS PREMIUM
+  const useInfinityDashboard = false // Dashboard INFINITY (legacy con cyan)
+  const useBentoDashboard = false // Dashboard con gráficos 3D (legacy)
   const useChronos2026Ultra = false // DISEÑO PREMIUM MUNDIAL
   const useChronos2026 = false // Fallback legacy
   const useObsidianDashboard = false // Fallback a Obsidian si 2026 está desactivado
@@ -224,6 +234,10 @@ export default function Chronos() {
   const renderPanel = () => {
     switch (currentPanel) {
       case 'dashboard':
+        // 🔮 CHRONOS QUANTUM 2026 - SIN CYAN - Violeta Real + Oro Líquido + Rosa Plasma
+        if (useQuantumDashboard) return <BentoDashboardQuantum />
+        // 🌌 CHRONOS INFINITY - Dashboard Ultra Premium 3D con efectos holográficos
+        if (useInfinityDashboard) return <BentoDashboardInfinity />
         // 🎨 BentoDashboard - Dashboard con Gráficos 3D Interactivos
         if (useBentoDashboard) return <BentoDashboard />
         // 🔥 CHRONOS 2026 ULTRA - EL DISEÑO MÁS AVANZADO DEL MUNDO

@@ -34,7 +34,7 @@ import {
   haptic,
 } from '@/app/components/ui/microinteractions'
 import { useState, useMemo, useCallback, memo, useEffect } from 'react'
-import { useRealtimeVentas } from '@/app/hooks/useRealtimeCollection'
+import { useLocalVentas, useLocalClientes, useLocalOrdenesCompra, useLocalKPIs, useInitializeData } from '@/app/lib/store/useDataStore'
 import { CreateVentaModalPremium } from '@/app/components/modals/CreateVentaModalPremium'
 import { SalesFlowDiagram } from '@/app/components/visualizations/SalesFlowDiagram'
 import { PremiumDataTable, Column, TableAction } from '@/app/components/ui/PremiumDataTable'
@@ -345,13 +345,28 @@ export default memo(function BentoVentasPremium() {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [selectedTimeRange, setSelectedTimeRange] = useState<'day' | 'week' | 'month'>('week')
 
-  const { data: ventasDataRaw, loading, error, isConnected } = useRealtimeVentas()
-  const ventasData = ventasDataRaw as VentaData[]
+  // ═══════════════════════════════════════════════════════════════════════════
+  // USAR STORE LOCAL EN LUGAR DE FIREBASE
+  // ═══════════════════════════════════════════════════════════════════════════
+  const { data: ventasDataRaw, loading, isConnected } = useLocalVentas()
+  const { data: clientes } = useLocalClientes()
+  const { data: ordenesCompra, ordenesConStock } = useLocalOrdenesCompra()
+  const { initialized, inicializarDatosPrueba } = useInitializeData()
+  const ventasData = ventasDataRaw as unknown as VentaData[]
   
-  // Log para verificar tiempo real
+  // Inicializar datos de prueba si no hay datos
+  // DESACTIVADO - Usuario quiere sistema limpio
+  // useEffect(() => {
+  //   if (!initialized && ventasData.length === 0 && clientes.length === 0) {
+  //     logger.info('[BentoVentasPremium] Inicializando datos de prueba', { context: 'BentoVentasPremium' })
+  //     inicializarDatosPrueba()
+  //   }
+  // }, [initialized, ventasData.length, clientes.length, inicializarDatosPrueba])
+  
+  // Log para verificar conexión
   useEffect(() => {
     if (isConnected) {
-      logger.info(`[BentoVentasPremium] Conectado en tiempo real: ${ventasData.length} ventas`, { context: 'BentoVentasPremium' })
+      logger.info(`[BentoVentasPremium] Store local conectado: ${ventasData.length} ventas`, { context: 'BentoVentasPremium' })
     }
   }, [ventasData.length, isConnected])
 
@@ -537,13 +552,14 @@ export default memo(function BentoVentasPremium() {
 
   return (
     <div className="min-h-screen bg-black p-6 space-y-6">
-      {error && (
+      {/* Banner de estado de datos */}
+      {!initialized && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4"
+          className="bg-violet-500/10 border border-violet-500/20 rounded-lg p-4"
         >
-          <p className="text-yellow-400 text-sm">{error}</p>
+          <p className="text-violet-400 text-sm">💾 Sistema funcionando con almacenamiento local (sin Firebase)</p>
         </motion.div>
       )}
 

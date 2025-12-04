@@ -163,3 +163,120 @@ export const performanceMonitor = new PerformanceMonitor()
 
 // Export type for external use
 export type { PerformanceMetrics }
+
+// =====================================================================
+// UTILIDADES DE OPTIMIZACIÓN ADICIONALES
+// =====================================================================
+
+/**
+ * Debounce optimizado con cancel
+ */
+export function debounce<T extends (...args: Parameters<T>) => void>(
+  fn: T,
+  wait: number
+): T & { cancel: () => void } {
+  let timeoutId: NodeJS.Timeout | null = null
+
+  const debounced = ((...args: Parameters<T>) => {
+    if (timeoutId) clearTimeout(timeoutId)
+    timeoutId = setTimeout(() => fn(...args), wait)
+  }) as T & { cancel: () => void }
+
+  debounced.cancel = () => {
+    if (timeoutId) clearTimeout(timeoutId)
+  }
+
+  return debounced
+}
+
+/**
+ * Throttle optimizado
+ */
+export function throttle<T extends (...args: Parameters<T>) => void>(
+  fn: T,
+  wait: number
+): T {
+  let lastTime = 0
+
+  return ((...args: Parameters<T>) => {
+    const now = Date.now()
+    if (now - lastTime >= wait) {
+      lastTime = now
+      fn(...args)
+    }
+  }) as T
+}
+
+/**
+ * Memoización con cache LRU
+ */
+export function memoize<T extends (...args: Parameters<T>) => ReturnType<T>>(
+  fn: T,
+  maxSize = 100
+): T {
+  const cache = new Map<string, ReturnType<T>>()
+  const keys: string[] = []
+
+  return ((...args: Parameters<T>): ReturnType<T> => {
+    const key = JSON.stringify(args)
+    
+    if (cache.has(key)) {
+      return cache.get(key)!
+    }
+
+    const result = fn(...args)
+
+    if (keys.length >= maxSize) {
+      const oldKey = keys.shift()
+      if (oldKey) cache.delete(oldKey)
+    }
+
+    cache.set(key, result)
+    keys.push(key)
+
+    return result
+  }) as T
+}
+
+/**
+ * Deduplica requests en vuelo
+ */
+const pendingRequests = new Map<string, Promise<unknown>>()
+
+export async function deduplicatedFetch<T>(
+  key: string,
+  fetcher: () => Promise<T>
+): Promise<T> {
+  const pending = pendingRequests.get(key)
+  if (pending) return pending as Promise<T>
+
+  const promise = fetcher().finally(() => {
+    pendingRequests.delete(key)
+  })
+
+  pendingRequests.set(key, promise)
+  return promise
+}
+
+/**
+ * Batch updates en un solo frame
+ */
+export function batchUpdates<T>(
+  callback: (items: T[]) => void,
+  wait = 16
+): (item: T) => void {
+  let batch: T[] = []
+  let timeoutId: NodeJS.Timeout | null = null
+
+  return (item: T) => {
+    batch.push(item)
+
+    if (!timeoutId) {
+      timeoutId = setTimeout(() => {
+        callback(batch)
+        batch = []
+        timeoutId = null
+      }, wait)
+    }
+  }
+}

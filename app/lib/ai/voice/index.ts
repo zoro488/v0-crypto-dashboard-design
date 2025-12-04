@@ -2,14 +2,53 @@
  * 🎤 Voice AI Services - CHRONOS System
  * 
  * Servicios para interacción por voz:
- * - STT (Speech-to-Text) con AssemblyAI/Whisper
- * - TTS (Text-to-Speech) con ElevenLabs/OpenAI
+ * - STT (Speech-to-Text) con Deepgram Nova-2 + Web Speech fallback
+ * - TTS (Text-to-Speech) con ElevenLabs Turbo v2.5 + Web Speech fallback
  * - Voice Agent para comandos conversacionales
+ * - Error handling militar-grade con Sentry
  * 
- * @version 1.0.0
+ * @version 2.0.0
+ * @author CHRONOS Team
  */
 
 import { logger } from '@/app/lib/utils/logger'
+
+// =====================================================================
+// RE-EXPORTS DE MÓDULOS ESPECIALIZADOS
+// =====================================================================
+
+// Deepgram STT Client
+export {
+  DeepgramSTTClient,
+  WebSpeechFallback,
+  createDeepgramClient,
+  type DeepgramConfig,
+  type DeepgramState,
+  type TranscriptionEvent,
+} from './deepgram'
+
+// ElevenLabs TTS Client
+export {
+  ElevenLabsTTSClient,
+  createElevenLabsClient,
+  detectEmotion,
+  formatWithEmotionTags,
+  VOICE_IDS,
+  type ElevenLabsConfig,
+  type ElevenLabsState,
+  type ElevenLabsVoice,
+  type VoiceEmotion,
+  type VoiceMapping,
+} from './elevenlabs'
+
+// React Hooks
+export {
+  useVoice,
+  useVoiceRecognition,
+  useTextToSpeech,
+  type UseVoiceConfig,
+  type UseVoiceReturn,
+} from './useVoice'
 
 // =====================================================================
 // TIPOS
