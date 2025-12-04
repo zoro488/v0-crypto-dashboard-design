@@ -28,17 +28,35 @@ const tipoConfig = {
     color: 'text-green-400',
     bg: 'bg-green-500/10',
   },
-  egreso: {
-    label: 'Egreso',
+  gasto: {
+    label: 'Gasto',
     icon: ArrowDownRight,
     color: 'text-red-400',
     bg: 'bg-red-500/10',
   },
-  transferencia: {
-    label: 'Transferencia',
+  transferencia_entrada: {
+    label: 'Entrada',
     icon: ArrowRightLeft,
     color: 'text-blue-400',
     bg: 'bg-blue-500/10',
+  },
+  transferencia_salida: {
+    label: 'Salida',
+    icon: ArrowRightLeft,
+    color: 'text-orange-400',
+    bg: 'bg-orange-500/10',
+  },
+  abono: {
+    label: 'Abono',
+    icon: ArrowUpRight,
+    color: 'text-emerald-400',
+    bg: 'bg-emerald-500/10',
+  },
+  pago: {
+    label: 'Pago',
+    icon: ArrowDownRight,
+    color: 'text-rose-400',
+    bg: 'bg-rose-500/10',
   },
 }
 

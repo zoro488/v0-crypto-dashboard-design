@@ -1,4 +1,4 @@
-# Particle Nebula
+# AI Voice Assistance Orb
 
 This project has been exported from [Spline](https://spline.design/).
 
