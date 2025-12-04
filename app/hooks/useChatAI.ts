@@ -3,14 +3,13 @@
  * 
  * Sistema conversacional en tiempo real con soporte para:
  * - Streaming de respuestas
- * - Historial persistente (Convex)
+ * - Historial persistente (TODO: migrar de Convex a Drizzle)
  * - Tool calling
  * - Contexto de sistema dinámico
  * - Memoria de conversación
  */
 
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
-import { useChatMessages, useChatMutations } from './useConvex'
 
 // Tipos para el chat
 export interface ChatMessage {
@@ -52,19 +51,37 @@ export function useChatAI(options: UseChatAIOptions = {}) {
   const [streamingContent, setStreamingContent] = useState('')
   const abortControllerRef = useRef<AbortController | null>(null)
 
-  // Convex para persistencia
-  const convexMessages = useChatMessages(userId, maxHistoryLength)
-  const { addMessage: addConvexMessage, clearHistory: clearConvexHistory } = useChatMutations()
+  // TODO: Migrar persistencia de Convex a Drizzle
+  // Por ahora, los mensajes solo viven en memoria
+  const convexMessages: Array<{
+    _id: string
+    role: string
+    content: string
+    timestamp: number
+    toolCalls?: Array<{
+      name: string
+      arguments: string | Record<string, unknown>
+      result?: unknown
+    }>
+  }> = []
+  
+  const addConvexMessage = async (_msg: Record<string, unknown>) => {
+    // TODO: Implementar con Drizzle
+  }
+  
+  const clearConvexHistory = async () => {
+    // TODO: Implementar con Drizzle
+  }
 
-  // Sincronizar con Convex cuando los mensajes cambian
+  // Sincronizar mensajes (ahora vacío hasta migrar a Drizzle)
   useEffect(() => {
     if (convexMessages && convexMessages.length > 0 && messages.length === 0) {
-      const formattedMessages: ChatMessage[] = convexMessages.map(m => ({
+      const formattedMessages: ChatMessage[] = convexMessages.map((m: { _id: string; role: string; content: string; timestamp: number; toolCalls?: Array<{ name: string; arguments: string | Record<string, unknown>; result?: unknown }> }) => ({
         id: m._id as string,
-        role: m.role,
+        role: m.role as ChatMessage['role'],
         content: m.content,
         timestamp: new Date(m.timestamp),
-        toolCalls: m.toolCalls?.map(tc => ({
+        toolCalls: m.toolCalls?.map((tc: { name: string; arguments: string | Record<string, unknown>; result?: unknown }) => ({
           name: tc.name,
           arguments: typeof tc.arguments === 'string' 
             ? JSON.parse(tc.arguments) as Record<string, unknown>
@@ -215,12 +232,12 @@ export function useChatAI(options: UseChatAIOptions = {}) {
     setMessages([])
     if (persistHistory) {
       try {
-        await clearConvexHistory({ userId })
+        await clearConvexHistory()
       } catch (e) {
         console.warn('Error limpiando historial:', e)
       }
     }
-  }, [userId, persistHistory, clearConvexHistory])
+  }, [persistHistory, clearConvexHistory])
 
   // Estadísticas útiles
   const stats = useMemo(() => ({
