@@ -377,11 +377,10 @@ export async function DELETE(request: NextRequest) {
           .where(eq(bancos.id, 'utilidades'))
       }
       
-      // Actualizar saldo del cliente
+      // Actualizar saldo del cliente (solo saldo pendiente, ya que el schema no tiene totalCompras)
       await db.update(clientes)
         .set({
           saldoPendiente: sql`saldo_pendiente - ${ventaActual.montoRestante || 0}`,
-          totalCompras: sql`total_compras - ${ventaActual.precioTotalVenta || 0}`,
           updatedAt: now,
         })
         .where(eq(clientes.id, ventaActual.clienteId))

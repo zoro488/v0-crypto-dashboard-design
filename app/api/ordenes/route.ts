@@ -286,20 +286,9 @@ export async function DELETE(request: NextRequest) {
     const orden = ordenExistente[0]
     const now = new Date()
     
-    // 1. Revertir STOCK - Reducir la cantidad que se había ingresado
-    if (orden.productoId) {
-      await db
-        .update(almacen)
-        .set({
-          cantidad: sql`${almacen.cantidad} - ${orden.cantidad}`,
-          updatedAt: now,
-        })
-        .where(eq(almacen.id, orden.productoId))
-    }
-    
-    // 2. Revertir CAPITAL BANCARIO - Devolver el dinero pagado
-    const montoPagado = Number(orden.montoTotal) - Number(orden.montoRestante || 0)
-    if (montoPagado > 0 && orden.bancoId) {
+    // 1. Revertir CAPITAL BANCARIO - Devolver el dinero pagado al banco origen
+    const montoPagado = Number(orden.montoPagado || 0)
+    if (montoPagado > 0 && orden.bancoOrigenId) {
       await db
         .update(bancos)
         .set({
@@ -307,21 +296,22 @@ export async function DELETE(request: NextRequest) {
           historicoGastos: sql`${bancos.historicoGastos} - ${montoPagado}`,
           updatedAt: now,
         })
-        .where(eq(bancos.id, orden.bancoId))
+        .where(eq(bancos.id, orden.bancoOrigenId))
     }
     
-    // 3. Revertir DEUDA DISTRIBUIDOR - Reducir deuda pendiente
-    if (orden.distribuidorId && Number(orden.montoRestante) > 0) {
+    // 2. Revertir DEUDA DISTRIBUIDOR - Reducir deuda pendiente
+    const deudaPendiente = Number(orden.montoRestante || 0)
+    if (orden.distribuidorId && deudaPendiente > 0) {
       await db
         .update(distribuidores)
         .set({
-          saldoPendiente: sql`${distribuidores.saldoPendiente} - ${orden.montoRestante}`,
+          saldoPendiente: sql`${distribuidores.saldoPendiente} - ${deudaPendiente}`,
           updatedAt: now,
         })
         .where(eq(distribuidores.id, orden.distribuidorId))
     }
     
-    // 4. Eliminar la orden
+    // 3. Eliminar la orden
     await db
       .delete(ordenesCompra)
       .where(eq(ordenesCompra.id, id))
@@ -330,9 +320,8 @@ export async function DELETE(request: NextRequest) {
       success: true, 
       mensaje: 'Orden eliminada y cambios revertidos',
       revertido: {
-        stock: orden.cantidad,
         capitalRecuperado: montoPagado,
-        deudaReducida: orden.montoRestante
+        deudaReducida: deudaPendiente
       }
     })
     
