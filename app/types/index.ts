@@ -153,7 +153,7 @@ export interface OrdenCompra {
   deuda: number                // costoTotal - pagoDistribuidor
   bancoOrigen?: BancoId        // De dónde salió el pago
   // Estado
-  estado: 'pendiente' | 'parcial' | 'pagado' | 'cancelado'
+  estado: 'pendiente' | 'parcial' | 'completo' | 'cancelado'
   // Keywords para búsqueda
   keywords: string[]
   notas?: string

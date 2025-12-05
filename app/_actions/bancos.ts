@@ -286,3 +286,25 @@ export async function getCapitalTotal() {
     return { error: 'Error al obtener capital' }
   }
 }
+
+/**
+ * Obtener movimientos de un banco específico
+ */
+export async function getMovimientosBanco(bancoId: string, limit = 100) {
+  try {
+    const result = await db.query.movimientos.findMany({
+      where: eq(movimientos.bancoId, bancoId),
+      orderBy: [desc(movimientos.fecha)],
+      limit,
+      with: {
+        cliente: true,
+        venta: true,
+      },
+    })
+    
+    return { success: true, data: result }
+  } catch (error) {
+    console.error('Error obteniendo movimientos del banco:', error)
+    return { error: 'Error al obtener movimientos' }
+  }
+}

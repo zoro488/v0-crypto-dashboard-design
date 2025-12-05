@@ -1,30 +1,10 @@
 import { Suspense } from 'react'
-import { getClientes, getClientesStats } from '@/app/_actions/clientes'
 import { ClientesClient } from './_components/ClientesClient'
 import { LoadingSpinner } from '@/app/_components/ui/LoadingSpinner'
 
 export const metadata = {
   title: 'Clientes | CHRONOS',
   description: 'Gestión de clientes y cartera',
-}
-
-export const dynamic = 'force-dynamic'
-
-async function ClientesData() {
-  const [clientesResult, statsResult] = await Promise.all([
-    getClientes(),
-    getClientesStats(),
-  ])
-
-  const clientes = clientesResult.success ? clientesResult.data : []
-  const stats = statsResult.success ? statsResult.data : null
-
-  return (
-    <ClientesClient 
-      initialClientes={clientes ?? []}
-      initialStats={stats}
-    />
-  )
 }
 
 export default function ClientesPage() {
@@ -40,7 +20,7 @@ export default function ClientesPage() {
       </header>
 
       <Suspense fallback={<LoadingSpinner />}>
-        <ClientesData />
+        <ClientesClient />
       </Suspense>
     </div>
   )

@@ -1,6 +1,4 @@
 import { Suspense } from 'react'
-import { getVentas, getVentasStats } from '@/app/_actions/ventas'
-import { getBancos } from '@/app/_actions/bancos'
 import { VentasClient } from './_components/VentasClient'
 import { LoadingSpinner } from '@/app/_components/ui/LoadingSpinner'
 
@@ -10,26 +8,6 @@ export const metadata = {
 }
 
 export const dynamic = 'force-dynamic'
-
-async function VentasData() {
-  const [ventasResult, statsResult, bancosResult] = await Promise.all([
-    getVentas(),
-    getVentasStats(),
-    getBancos(),
-  ])
-
-  const ventas = ventasResult.success ? ventasResult.data : []
-  const stats = statsResult.success ? statsResult.data : null
-  const bancos = bancosResult.success ? bancosResult.data : []
-
-  return (
-    <VentasClient 
-      initialVentas={ventas ?? []}
-      initialStats={stats}
-      bancos={bancos ?? []}
-    />
-  )
-}
 
 export default function VentasPage() {
   return (
@@ -44,7 +22,7 @@ export default function VentasPage() {
       </header>
 
       <Suspense fallback={<LoadingSpinner />}>
-        <VentasData />
+        <VentasClient />
       </Suspense>
     </div>
   )

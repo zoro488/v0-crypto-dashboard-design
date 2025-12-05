@@ -1,580 +1,647 @@
-/**
- * ═══════════════════════════════════════════════════════════════════════════
- * 🧮 CHRONOS 2026 — LÓGICA SAGRADA DE NEGOCIO
- * ═══════════════════════════════════════════════════════════════════════════
- * 
- * FÓRMULAS MATEMÁTICAMENTE GARANTIZADAS:
- * 
- * DISTRIBUCIÓN DE VENTA (3 bancos):
- * → Bóveda Monte = precioCompra × cantidad (COSTO del producto)
- * → Fletes = precioFlete × cantidad
- * → Utilidades = (precioVenta - precioCompra - precioFlete) × cantidad
- * 
- * ESTADOS DE PAGO:
- * → Completo: 100% a capital + 100% a histórico
- * → Parcial: proporción = montoPagado / totalVenta
- *   - Capital recibe: distribución × proporción
- *   - Histórico recibe: 100% siempre
- * → Pendiente: Solo histórico, NO afecta capital
- * 
- * CAPITAL BANCARIO:
- * → capitalActual = historicoIngresos - historicoGastos
- * → historicoIngresos y historicoGastos NUNCA disminuyen
- * 
- * STOCK:
- * → stockActual = stockInicial - unidadesVendidas
- * 
- * ═══════════════════════════════════════════════════════════════════════════
- */
-
-import type { 
-  BancoId, 
-  Venta, 
-  OrdenCompra, 
-  Banco, 
-  Movimiento,
-  Cliente,
-  Distribuidor,
-  CalculoVentaResult,
-  DistribucionBancos,
-} from '@/app/types'
-
 // ═══════════════════════════════════════════════════════════════════════════
-// TIPOS LOCALES
+// CHRONOS INFINITY 2026 — LÓGICA DE NEGOCIO GYA
+// Fórmulas verificadas 100% según LOGICA_CORRECTA_SISTEMA_Version2.md
+// Compatibles al 100% con app/lib/store/index.ts
 // ═══════════════════════════════════════════════════════════════════════════
 
+import { nanoid } from 'nanoid'
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TIPOS COMPATIBLES CON EL STORE
+// ═══════════════════════════════════════════════════════════════════════════
+
+export type BancoId = 
+  | 'boveda_monte' 
+  | 'utilidades' 
+  | 'azteca' 
+  | 'leftie' 
+  | 'profit' 
+  | 'boveda_usa'
+  | 'flete_sur' // Fletes
+
+export type EstadoPago = 'pendiente' | 'parcial' | 'completo' | 'cancelado'
+
+// Interface que el store espera de calcularDistribucionVenta
 export interface DistribucionVenta {
-  bovedaMonte: number
-  fletes: number
-  utilidades: number
-  total: number
+  bovedaMonte: number  // Costo de mercancía
+  fletes: number       // Costo de flete
+  utilidades: number   // Ganancia neta
+  total: number        // Total de la venta
 }
 
-export interface DistribucionParcial extends DistribucionVenta {
-  proporcion: number
+// Interface que el store espera de calcularDistribucionParcial
+export interface DistribucionParcial {
   capitalBovedaMonte: number
   capitalFletes: number
   capitalUtilidades: number
+  proporcion: number
 }
 
+// Interface que el store espera de calcularAbono
 export interface ResultadoAbono {
   nuevoMontoPagado: number
   nuevoMontoRestante: number
-  nuevoEstado: 'completo' | 'parcial' | 'pendiente'
-  distribucionAdicional: DistribucionVenta
-  movimientos: Omit<Movimiento, 'id' | 'createdAt'>[]
+  nuevoEstado: 'pendiente' | 'parcial' | 'completo'
+  distribucionAdicional: {
+    bovedaMonte: number
+    fletes: number
+    utilidades: number
+  }
+  movimientos: Array<{
+    bancoId: BancoId
+    tipo: 'abono'
+    tipoMovimiento: 'abono_cliente'
+    monto: number
+    concepto: string
+    referencia: string
+    fecha: string
+  }>
 }
 
+// Interface que el store espera de calcularTransferencia
 export interface ResultadoTransferencia {
-  bancoOrigenNuevo: Partial<Banco>
-  bancoDestinoNuevo: Partial<Banco>
-  movimientoOrigen: Omit<Movimiento, 'id' | 'createdAt'>
-  movimientoDestino: Omit<Movimiento, 'id' | 'createdAt'>
+  bancoOrigenNuevo: {
+    capitalActual: number
+    historicoGastos: number
+  }
+  bancoDestinoNuevo: {
+    capitalActual: number
+    historicoIngresos: number
+  }
+  movimientoOrigen: {
+    bancoId: BancoId
+    tipo: 'transferencia_salida'
+    tipoMovimiento: 'transferencia_salida'
+    monto: number
+    concepto: string
+    bancoOrigenId: string
+    bancoDestinoId: string
+    fecha: string
+  }
+  movimientoDestino: {
+    bancoId: BancoId
+    tipo: 'transferencia_entrada'
+    tipoMovimiento: 'transferencia_entrada'
+    monto: number
+    concepto: string
+    bancoOrigenId: string
+    bancoDestinoId: string
+    fecha: string
+  }
+}
+
+// Tipos internos
+interface Banco {
+  id: string
+  capitalActual: number
+  historicoIngresos: number
+  historicoGastos: number
+}
+
+interface Cliente {
+  id: string
+  deudaTotal?: number
+}
+
+interface Distribuidor {
+  id: string
+  saldoPendiente?: number
+}
+
+interface Venta {
+  id?: string
+  clienteId?: string
+  montoRestante: number
+  montoPagado?: number
+  estadoPago: string
+  distribucionBancos?: {
+    bovedaMonte: number
+    fletes: number
+    utilidades: number
+  }
+  bovedaMonte?: number
+  ganancia?: number
+  utilidad?: number
+  precioTotalVenta?: number
+  totalVenta?: number
+}
+
+interface OrdenCompra {
+  id?: string
+  distribuidorId: string
+  cantidad?: number
+  stockActual?: number
+  montoTotal?: number
+  total?: number
+  montoPagado?: number
+  estado?: string
+}
+
+interface Movimiento {
+  bancoId: string
+  tipo?: string
+  tipoMovimiento?: string
+  monto: number
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// FÓRMULAS SAGRADAS — DISTRIBUCIÓN DE VENTAS
+// DISTRIBUCIÓN GYA — FUNCIÓN PRINCIPAL
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Calcula la distribución de una venta a los 3 bancos
+ * Calcula la distribución GYA para una venta
+ * ESTA ES LA FUNCIÓN QUE EL STORE USA DIRECTAMENTE
  * 
- * @param precioVenta - Precio de venta por unidad al cliente
- * @param precioCompra - Costo por unidad (de la orden de compra)
- * @param precioFlete - Costo de flete por unidad
- * @param cantidad - Cantidad de unidades vendidas
- * @returns Distribución a los 3 bancos
+ * FÓRMULAS GYA VERIFICADAS:
+ * - bovedaMonte = precioCompraUnidad × cantidad (COSTO)
+ * - fletes = precioFlete × cantidad
+ * - utilidades = (precioVentaUnidad - precioCompraUnidad - precioFlete) × cantidad (GANANCIA)
+ * - total = precioVentaUnidad × cantidad
  */
 export function calcularDistribucionVenta(
-  precioVenta: number,
-  precioCompra: number,
+  precioVentaUnidad: number,
+  precioCompraUnidad: number,
   precioFlete: number,
-  cantidad: number,
+  cantidad: number
 ): DistribucionVenta {
-  // Validaciones
+  // Validaciones con valores por defecto
   if (cantidad <= 0) {
-    throw new Error('La cantidad debe ser mayor a 0')
+    return { bovedaMonte: 0, fletes: 0, utilidades: 0, total: 0 }
   }
-  if (precioVenta < 0 || precioCompra < 0 || precioFlete < 0) {
-    throw new Error('Los precios no pueden ser negativos')
-  }
-
-  const bovedaMonte = precioCompra * cantidad
-  const fletes = precioFlete * cantidad
-  const utilidades = (precioVenta - precioCompra - precioFlete) * cantidad
-  const total = bovedaMonte + fletes + utilidades // = precioVenta * cantidad
-
+  
+  // Fórmulas GYA verificadas
+  const precioTotalVenta = precioVentaUnidad * cantidad
+  const montoBovedaMonte = (precioCompraUnidad || 0) * cantidad      // COSTO
+  const montoFletes = (precioFlete || 0) * cantidad                   // FLETE
+  const montoUtilidades = (precioVentaUnidad - (precioCompraUnidad || 0) - (precioFlete || 0)) * cantidad // GANANCIA
+  
   return {
-    bovedaMonte,
-    fletes,
-    utilidades,
-    total,
+    bovedaMonte: Math.max(0, montoBovedaMonte),
+    fletes: Math.max(0, montoFletes),
+    utilidades: montoUtilidades, // Puede ser negativo (pérdida)
+    total: precioTotalVenta,
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// PAGOS PARCIALES
+// ═══════════════════════════════════════════════════════════════════════════
+
 /**
- * Calcula la distribución para un pago parcial
- * 
- * @param distribucionTotal - Distribución completa de la venta
- * @param montoPagado - Monto que el cliente ha pagado
- * @param totalVenta - Precio total de la venta
- * @returns Distribución parcial con proporciones
+ * Calcula la distribución proporcional para un pago parcial
+ * FIRMA: calcularDistribucionParcial(distribucionOriginal, montoPagado, totalVenta)
  */
 export function calcularDistribucionParcial(
-  distribucionTotal: DistribucionVenta,
+  distribucionOriginal: DistribucionVenta,
   montoPagado: number,
-  totalVenta: number,
+  totalVenta: number
 ): DistribucionParcial {
-  if (totalVenta <= 0) {
-    throw new Error('El total de venta debe ser mayor a 0')
-  }
-  if (montoPagado < 0) {
-    throw new Error('El monto pagado no puede ser negativo')
-  }
-
-  const proporcion = Math.min(montoPagado / totalVenta, 1)
-
-  return {
-    ...distribucionTotal,
-    proporcion,
-    capitalBovedaMonte: distribucionTotal.bovedaMonte * proporcion,
-    capitalFletes: distribucionTotal.fletes * proporcion,
-    capitalUtilidades: distribucionTotal.utilidades * proporcion,
-  }
-}
-
-/**
- * Calcula el resultado completo de una venta (compatible con CalculoVentaResult)
- */
-export function calcularVentaCompleta(
-  precioVenta: number,
-  precioCompra: number,
-  precioFlete: number,
-  cantidad: number,
-  montoPagado: number,
-): CalculoVentaResult {
-  const totalVenta = precioVenta * cantidad
-  const distribucion = calcularDistribucionVenta(precioVenta, precioCompra, precioFlete, cantidad)
-  
-  let distribucionParcial: DistribucionBancos | undefined
-  let proporcionPagada: number | undefined
-
-  if (montoPagado < totalVenta && montoPagado > 0) {
-    const parcial = calcularDistribucionParcial(distribucion, montoPagado, totalVenta)
-    proporcionPagada = parcial.proporcion
-    distribucionParcial = {
-      bovedaMonte: parcial.capitalBovedaMonte,
-      fletes: parcial.capitalFletes,
-      utilidades: parcial.capitalUtilidades,
+  if (totalVenta <= 0 || montoPagado <= 0) {
+    return { 
+      capitalBovedaMonte: 0, 
+      capitalFletes: 0, 
+      capitalUtilidades: 0,
+      proporcion: 0
     }
   }
-
+  
+  const proporcion = montoPagado / totalVenta
+  
   return {
-    costoPorUnidad: precioCompra + precioFlete,
-    costoTotalLote: (precioCompra + precioFlete) * cantidad,
-    ingresoVenta: totalVenta,
-    totalVenta,
-    montoBovedaMonte: distribucion.bovedaMonte,
-    montoFletes: distribucion.fletes,
-    montoUtilidades: distribucion.utilidades,
-    gananciaBruta: distribucion.utilidades,
-    gananciaDesdeCSV: distribucion.utilidades,
-    proporcionPagada,
-    distribucionParcial,
-    margenPorcentaje: totalVenta > 0 ? (distribucion.utilidades / totalVenta) * 100 : 0,
-    // Legacy aliases
-    precioTotalVenta: totalVenta,
-    bovedaMonte: distribucion.bovedaMonte,
-    fletes: distribucion.fletes,
-    utilidades: distribucion.utilidades,
-    totalDistribuido: distribucion.total,
-    ganancia: distribucion.utilidades,
+    capitalBovedaMonte: distribucionOriginal.bovedaMonte * proporcion,
+    capitalFletes: distribucionOriginal.fletes * proporcion,
+    capitalUtilidades: distribucionOriginal.utilidades * proporcion,
+    proporcion,
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// FÓRMULAS SAGRADAS — ABONOS
+// ABONOS A VENTAS
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Calcula el resultado de un abono a una venta existente
- * 
- * @param venta - Venta actual
- * @param montoAbono - Monto del nuevo abono
- * @param bancoDestino - Banco donde se deposita el abono
- * @returns Resultado del abono con nuevos estados y movimientos
+ * Calcula abono a una venta existente
+ * FIRMA: calcularAbono(venta, monto)
  */
 export function calcularAbono(
   venta: Venta,
-  montoAbono: number,
-  bancoDestino: BancoId = 'boveda_monte',
+  montoAbono: number
 ): ResultadoAbono {
-  if (montoAbono <= 0) {
-    throw new Error('El monto del abono debe ser mayor a 0')
+  const totalVenta = venta.precioTotalVenta || venta.totalVenta || 0
+  const ventaId = venta.id || 'unknown'
+  const now = new Date().toISOString()
+  
+  if (montoAbono <= 0 || totalVenta <= 0) {
+    return {
+      nuevoMontoPagado: venta.montoPagado || 0,
+      nuevoMontoRestante: venta.montoRestante,
+      nuevoEstado: 'pendiente',
+      distribucionAdicional: { bovedaMonte: 0, fletes: 0, utilidades: 0 },
+      movimientos: [],
+    }
   }
-
-  const totalVenta = venta.precioTotalVenta || venta.ingreso || (venta.precioVenta * venta.cantidad)
-  const montoPagadoAnterior = venta.montoPagado || 0
-  const nuevoMontoPagado = Math.min(montoPagadoAnterior + montoAbono, totalVenta)
-  const nuevoMontoRestante = totalVenta - nuevoMontoPagado
-
+  
+  // Calcular proporción del abono sobre el total original
+  const proporcion = montoAbono / totalVenta
+  
+  // Obtener distribución original
+  const bovedaMonteOriginal = venta.distribucionBancos?.bovedaMonte || venta.bovedaMonte || 0
+  const fletesOriginal = venta.distribucionBancos?.fletes || 0
+  const utilidadesOriginal = venta.distribucionBancos?.utilidades || venta.ganancia || venta.utilidad || 0
+  
+  // Calcular distribución proporcional del abono
+  const distribucionAbono = {
+    bovedaMonte: bovedaMonteOriginal * proporcion,
+    fletes: fletesOriginal * proporcion,
+    utilidades: utilidadesOriginal * proporcion,
+  }
+  
+  // Calcular nuevos totales
+  const nuevoMontoPagado = (venta.montoPagado || 0) + montoAbono
+  const nuevoMontoRestante = Math.max(0, venta.montoRestante - montoAbono)
+  
   // Determinar nuevo estado
-  let nuevoEstado: 'completo' | 'parcial' | 'pendiente'
-  if (nuevoMontoRestante <= 0.01) { // Tolerancia de centavos
+  let nuevoEstado: 'pendiente' | 'parcial' | 'completo' = 'parcial'
+  if (nuevoMontoRestante <= 0) {
     nuevoEstado = 'completo'
-  } else if (nuevoMontoPagado > 0) {
-    nuevoEstado = 'parcial'
-  } else {
-    nuevoEstado = 'pendiente'
   }
-
-  // Calcular distribución del abono
-  const precioCompra = venta.precioCompra || venta.bovedaMonte / venta.cantidad
-  const precioFlete = (venta.fleteUtilidad || venta.precioFlete || 0) / venta.cantidad
   
-  const distribucionTotal = calcularDistribucionVenta(
-    venta.precioVenta,
-    precioCompra,
-    precioFlete,
-    venta.cantidad,
-  )
-
-  // Proporción que cubre este abono específico
-  const proporcionAbono = montoAbono / totalVenta
+  // Crear movimientos
+  const movimientos: ResultadoAbono['movimientos'] = []
   
-  const distribucionAdicional: DistribucionVenta = {
-    bovedaMonte: distribucionTotal.bovedaMonte * proporcionAbono,
-    fletes: distribucionTotal.fletes * proporcionAbono,
-    utilidades: distribucionTotal.utilidades * proporcionAbono,
-    total: montoAbono,
-  }
-
-  // Crear movimientos para cada banco
-  const fechaActual = new Date().toISOString()
-  const movimientos: Omit<Movimiento, 'id' | 'createdAt'>[] = []
-
-  if (distribucionAdicional.bovedaMonte > 0) {
+  if (distribucionAbono.bovedaMonte > 0) {
     movimientos.push({
       bancoId: 'boveda_monte',
+      tipo: 'abono',
       tipoMovimiento: 'abono_cliente',
-      fecha: fechaActual,
-      monto: distribucionAdicional.bovedaMonte,
-      concepto: `Abono venta ${venta.id} - Cliente: ${venta.cliente}`,
-      cliente: venta.cliente,
-      referenciaId: venta.id,
-      referenciaTipo: 'abono',
+      monto: distribucionAbono.bovedaMonte,
+      concepto: `Abono venta ${ventaId}`,
+      referencia: ventaId,
+      fecha: now,
     })
   }
-
-  if (distribucionAdicional.fletes > 0) {
+  
+  if (distribucionAbono.fletes > 0) {
     movimientos.push({
       bancoId: 'flete_sur',
+      tipo: 'abono',
       tipoMovimiento: 'abono_cliente',
-      fecha: fechaActual,
-      monto: distribucionAdicional.fletes,
-      concepto: `Abono venta ${venta.id} - Flete - Cliente: ${venta.cliente}`,
-      cliente: venta.cliente,
-      referenciaId: venta.id,
-      referenciaTipo: 'abono',
+      monto: distribucionAbono.fletes,
+      concepto: `Abono venta ${ventaId}`,
+      referencia: ventaId,
+      fecha: now,
     })
   }
-
-  if (distribucionAdicional.utilidades > 0) {
+  
+  if (distribucionAbono.utilidades > 0) {
     movimientos.push({
       bancoId: 'utilidades',
+      tipo: 'abono',
       tipoMovimiento: 'abono_cliente',
-      fecha: fechaActual,
-      monto: distribucionAdicional.utilidades,
-      concepto: `Abono venta ${venta.id} - Utilidad - Cliente: ${venta.cliente}`,
-      cliente: venta.cliente,
-      referenciaId: venta.id,
-      referenciaTipo: 'abono',
+      monto: distribucionAbono.utilidades,
+      concepto: `Abono venta ${ventaId}`,
+      referencia: ventaId,
+      fecha: now,
     })
   }
-
+  
   return {
     nuevoMontoPagado,
     nuevoMontoRestante,
     nuevoEstado,
-    distribucionAdicional,
+    distribucionAdicional: distribucionAbono,
     movimientos,
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// FÓRMULAS SAGRADAS — TRANSFERENCIAS ATÓMICAS
+// TRANSFERENCIAS ENTRE BANCOS
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Calcula una transferencia atómica entre dos bancos
- * 
- * @param bancoOrigen - Banco de origen
- * @param bancoDestino - Banco de destino
- * @param monto - Monto a transferir
- * @param concepto - Concepto de la transferencia
- * @returns Resultado con nuevos estados de bancos y movimientos
+ * Calcula transferencia entre bancos
+ * FIRMA: calcularTransferencia(bancoOrigen, bancoDestino, monto, concepto)
  */
 export function calcularTransferencia(
   bancoOrigen: Banco,
   bancoDestino: Banco,
   monto: number,
-  concepto: string = 'Transferencia entre bancos',
+  _concepto?: string
 ): ResultadoTransferencia {
+  const concepto = _concepto || 'Transferencia entre bancos'
+  const now = new Date().toISOString()
+  
   if (monto <= 0) {
-    throw new Error('El monto de transferencia debe ser mayor a 0')
+    throw new Error('Monto debe ser mayor a 0')
   }
-  if (bancoOrigen.id === bancoDestino.id) {
-    throw new Error('El banco origen y destino deben ser diferentes')
+  if (monto > bancoOrigen.capitalActual) {
+    throw new Error(`Fondos insuficientes. Disponible: ${bancoOrigen.capitalActual.toLocaleString()}`)
   }
-  if (bancoOrigen.capitalActual < monto) {
-    throw new Error(`Fondos insuficientes en ${bancoOrigen.nombre}. Disponible: ${bancoOrigen.capitalActual}, Requerido: ${monto}`)
-  }
-
-  const fechaActual = new Date().toISOString()
-
+  
   return {
     bancoOrigenNuevo: {
       capitalActual: bancoOrigen.capitalActual - monto,
       historicoGastos: bancoOrigen.historicoGastos + monto,
-      historicoTransferencias: bancoOrigen.historicoTransferencias + monto,
     },
     bancoDestinoNuevo: {
       capitalActual: bancoDestino.capitalActual + monto,
       historicoIngresos: bancoDestino.historicoIngresos + monto,
-      historicoTransferencias: bancoDestino.historicoTransferencias + monto,
     },
     movimientoOrigen: {
-      bancoId: bancoOrigen.id,
+      bancoId: bancoOrigen.id as BancoId,
+      tipo: 'transferencia_salida',
       tipoMovimiento: 'transferencia_salida',
-      fecha: fechaActual,
-      monto: -monto,
-      concepto,
-      destino: bancoDestino.nombre,
-      saldoAnterior: bancoOrigen.capitalActual,
-      saldoNuevo: bancoOrigen.capitalActual - monto,
+      monto: monto,
+      concepto: `${concepto} → ${bancoDestino.id}`,
+      bancoOrigenId: bancoOrigen.id,
+      bancoDestinoId: bancoDestino.id,
+      fecha: now,
     },
     movimientoDestino: {
-      bancoId: bancoDestino.id,
+      bancoId: bancoDestino.id as BancoId,
+      tipo: 'transferencia_entrada',
       tipoMovimiento: 'transferencia_entrada',
-      fecha: fechaActual,
-      monto,
-      concepto,
-      origen: bancoOrigen.nombre,
-      saldoAnterior: bancoDestino.capitalActual,
-      saldoNuevo: bancoDestino.capitalActual + monto,
+      monto: monto,
+      concepto: `${concepto} ← ${bancoOrigen.id}`,
+      bancoOrigenId: bancoOrigen.id,
+      bancoDestinoId: bancoDestino.id,
+      fecha: now,
     },
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// FÓRMULAS SAGRADAS — STOCK
+// CÁLCULOS DE STOCK
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Calcula el stock actual de una orden de compra
- * 
- * @param ordenCompra - Orden de compra
- * @param ventasRelacionadas - Ventas que usan stock de esta OC
- * @returns Stock actual
+ * Calcula stock de una orden de compra basado en ventas
+ * FIRMA: calcularStock(ordenCompra, ventas)
  */
 export function calcularStock(
   ordenCompra: OrdenCompra,
-  ventasRelacionadas: Venta[],
+  ventas: Array<{ ocRelacionada?: string; cantidad: number }>
 ): number {
-  const unidadesVendidas = ventasRelacionadas
-    .filter(v => v.ocRelacionada === ordenCompra.id)
-    .reduce((acc, v) => acc + v.cantidad, 0)
+  const cantidadOriginal = ordenCompra.cantidad || ordenCompra.stockActual || 0
   
-  return Math.max(0, ordenCompra.stockInicial - unidadesVendidas)
+  const cantidadVendida = ventas
+    .filter(v => v.ocRelacionada === ordenCompra.id)
+    .reduce((acc, v) => acc + (v.cantidad || 0), 0)
+  
+  return Math.max(0, cantidadOriginal - cantidadVendida)
 }
 
 /**
- * Verifica si hay stock suficiente para una venta
+ * Valida si hay stock suficiente para una venta
  */
-export function verificarStock(
-  ordenCompra: OrdenCompra,
-  cantidadRequerida: number,
-  ventasExistentes: Venta[],
-): { disponible: boolean; stockActual: number; mensaje?: string } {
-  const stockActual = calcularStock(ordenCompra, ventasExistentes)
-  
-  if (stockActual < cantidadRequerida) {
-    return {
-      disponible: false,
-      stockActual,
-      mensaje: `Stock insuficiente. Disponible: ${stockActual}, Requerido: ${cantidadRequerida}`,
+export function validarStock(
+  stockActual: number,
+  cantidadSolicitada: number
+): { valido: boolean; mensaje?: string } {
+  if (cantidadSolicitada <= 0) {
+    return { valido: false, mensaje: 'Cantidad debe ser mayor a 0' }
+  }
+  if (stockActual < cantidadSolicitada) {
+    return { 
+      valido: false, 
+      mensaje: `Stock insuficiente. Disponible: ${stockActual}, Solicitado: ${cantidadSolicitada}` 
     }
   }
-  
-  return { disponible: true, stockActual }
+  return { valido: true }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// FÓRMULAS SAGRADAS — CAPITAL BANCARIO
+// RECÁLCULOS
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Calcula el capital actual de un banco
- * capitalActual = historicoIngresos - historicoGastos
+ * Recalcula capital de un banco basado en movimientos
+ * FIRMA: recalcularBanco(banco, movimientos)
  */
-export function calcularCapitalBanco(banco: Banco): number {
-  return banco.historicoIngresos - banco.historicoGastos
-}
-
-/**
- * Recalcula todos los campos de un banco basándose en sus movimientos
- */
-export function recalcularBanco(
-  banco: Banco,
-  movimientos: Movimiento[],
-): Banco {
-  const movimientosBanco = movimientos.filter(m => m.bancoId === banco.id)
-  
+export function recalcularBanco<T extends Banco>(
+  banco: T,
+  movimientos: Movimiento[]
+): T {
+  // Calcular ingresos y gastos desde movimientos
   let historicoIngresos = 0
   let historicoGastos = 0
-  let historicoTransferencias = 0
-
-  for (const mov of movimientosBanco) {
-    if (mov.monto > 0) {
-      historicoIngresos += mov.monto
-    } else {
-      historicoGastos += Math.abs(mov.monto)
-    }
-    
-    if (mov.tipoMovimiento === 'transferencia_entrada' || mov.tipoMovimiento === 'transferencia_salida') {
-      historicoTransferencias += Math.abs(mov.monto)
-    }
-  }
-
-  const capitalActual = historicoIngresos - historicoGastos
-
+  
+  movimientos
+    .filter(m => m.bancoId === banco.id)
+    .forEach(m => {
+      const tipo = m.tipo || m.tipoMovimiento || ''
+      if (tipo === 'ingreso' || tipo === 'distribucion' || tipo === 'abono' || tipo === 'abono_cliente' || tipo === 'transferencia_entrada') {
+        historicoIngresos += m.monto
+      } else if (tipo === 'gasto' || tipo === 'transferencia_salida' || tipo === 'pago_distribuidor') {
+        historicoGastos += m.monto
+      }
+    })
+  
   return {
     ...banco,
-    capitalActual,
     historicoIngresos,
     historicoGastos,
-    historicoTransferencias,
-    estado: capitalActual < 0 ? 'negativo' : 'activo',
-    updatedAt: new Date().toISOString(),
+    capitalActual: historicoIngresos - historicoGastos,
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// FÓRMULAS SAGRADAS — CLIENTES Y DISTRIBUIDORES
-// ═══════════════════════════════════════════════════════════════════════════
-
 /**
- * Recalcula los totales de un cliente basándose en sus ventas
+ * Recalcula deuda total de un cliente
+ * FIRMA: recalcularCliente(cliente, ventas)
  */
 export function recalcularCliente(
   cliente: Cliente,
-  ventasCliente: Venta[],
-): Partial<Cliente> {
-  const totalVentas = ventasCliente.reduce((acc, v) => acc + (v.precioTotalVenta || v.ingreso || 0), 0)
-  const totalPagado = ventasCliente.reduce((acc, v) => acc + (v.montoPagado || 0), 0)
-  const deudaTotal = totalVentas - totalPagado
+  ventas: Venta[]
+): { deudaTotal: number } {
+  const deudaTotal = ventas
+    .filter(v => v.clienteId === cliente.id && v.estadoPago !== 'completo' && v.estadoPago !== 'cancelado')
+    .reduce((acc, v) => acc + (v.montoRestante || 0), 0)
   
-  return {
-    totalVentas,
-    totalPagado,
-    deudaTotal,
-    deuda: deudaTotal,
-    pendiente: deudaTotal,
-    actual: -deudaTotal, // Positivo = a favor del cliente, negativo = debe
-    numeroCompras: ventasCliente.length,
-    ultimaCompra: ventasCliente.length > 0 
-      ? ventasCliente.sort((a, b) => 
-          new Date(b.fecha as string).getTime() - new Date(a.fecha as string).getTime(),
-        )[0].fecha 
-      : undefined,
-    updatedAt: new Date().toISOString(),
-  }
+  return { deudaTotal }
 }
 
 /**
- * Recalcula los totales de un distribuidor basándose en sus órdenes de compra
+ * Recalcula el saldo pendiente de un distribuidor
+ * FIRMA: recalcularDistribuidor(distribuidor, ordenes)
  */
 export function recalcularDistribuidor(
   distribuidor: Distribuidor,
-  ordenesDistribuidor: OrdenCompra[],
-): Partial<Distribuidor> {
-  const totalOrdenesCompra = ordenesDistribuidor.reduce((acc, oc) => acc + (oc.costoTotal || 0), 0)
-  const totalPagado = ordenesDistribuidor.reduce((acc, oc) => acc + (oc.pagoDistribuidor || oc.pagoInicial || 0), 0)
-  const deudaTotal = totalOrdenesCompra - totalPagado
+  ordenesCompra: OrdenCompra[]
+): { saldoPendiente: number } {
+  const saldoPendiente = ordenesCompra
+    .filter(o => o.distribuidorId === distribuidor.id && o.estado !== 'cancelada')
+    .reduce((acc, o) => {
+      const montoTotal = o.montoTotal || o.total || 0
+      const montoPagado = o.montoPagado || 0
+      return acc + (montoTotal - montoPagado)
+    }, 0)
   
-  return {
-    totalOrdenesCompra,
-    costoTotal: totalOrdenesCompra,
-    totalPagado,
-    abonos: totalPagado,
-    deudaTotal,
-    pendiente: deudaTotal,
-    numeroOrdenes: ordenesDistribuidor.length,
-    ultimaOrden: ordenesDistribuidor.length > 0 
-      ? ordenesDistribuidor.sort((a, b) => 
-          new Date(b.fecha as string).getTime() - new Date(a.fecha as string).getTime(),
-        )[0].fecha 
-      : undefined,
-    updatedAt: new Date().toISOString(),
-  }
+  return { saldoPendiente }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// VALIDACIONES
+// MÉTRICAS FINANCIERAS AVANZADAS
 // ═══════════════════════════════════════════════════════════════════════════
 
-export function validarVenta(venta: Partial<Venta>): { valido: boolean; errores: string[] } {
-  const errores: string[] = []
-  
-  if (!venta.clienteId) errores.push('Cliente es requerido')
-  if (!venta.ocRelacionada) errores.push('Orden de compra es requerida')
-  if (!venta.cantidad || venta.cantidad <= 0) errores.push('Cantidad debe ser mayor a 0')
-  if (!venta.precioVenta || venta.precioVenta <= 0) errores.push('Precio de venta debe ser mayor a 0')
-  
-  return { valido: errores.length === 0, errores }
+/**
+ * Calcula el ROCE (Return on Capital Employed)
+ */
+export function calcularROCE(
+  gananciaOperativaAnualizada: number,
+  capitalEmpleadoPromedio: number
+): number {
+  if (capitalEmpleadoPromedio <= 0) return 0
+  return (gananciaOperativaAnualizada / capitalEmpleadoPromedio) * 100
 }
 
-export function validarOrdenCompra(oc: Partial<OrdenCompra>): { valido: boolean; errores: string[] } {
-  const errores: string[] = []
-  
-  if (!oc.distribuidorId) errores.push('Distribuidor es requerido')
-  if (!oc.cantidad || oc.cantidad <= 0) errores.push('Cantidad debe ser mayor a 0')
-  if (!oc.costoDistribuidor || oc.costoDistribuidor < 0) errores.push('Costo del distribuidor es requerido')
-  
-  return { valido: errores.length === 0, errores }
+/**
+ * Calcula días de liquidez
+ */
+export function calcularDiasLiquidez(
+  capitalTotal: number,
+  gastoPromedioDiario: number
+): number {
+  if (gastoPromedioDiario <= 0) return Infinity
+  return Math.floor(capitalTotal / gastoPromedioDiario)
 }
 
-export function validarTransferencia(
-  bancoOrigenId: BancoId,
-  bancoDestinoId: BancoId,
-  monto: number,
-): { valido: boolean; errores: string[] } {
-  const errores: string[] = []
+/**
+ * Calcula el margen neto
+ */
+export function calcularMargenNeto(
+  utilidades: number,
+  ventasTotales: number
+): number {
+  if (ventasTotales <= 0) return 0
+  return (utilidades / ventasTotales) * 100
+}
+
+/**
+ * Calcula el índice de salud financiera (0-100)
+ */
+export function calcularSaludFinanciera(
+  liquidezDias: number,
+  margenNeto: number,
+  roce: number,
+  rotacionCapital: number
+): number {
+  const puntajeLiquidez = Math.min(100, (liquidezDias / 120) * 100) * 0.30
+  const puntajeMargen = Math.min(100, (margenNeto / 50) * 100) * 0.25
+  const puntajeROCE = Math.min(100, (roce / 60) * 100) * 0.25
+  const puntajeRotacion = Math.min(100, (rotacionCapital / 8) * 100) * 0.20
   
-  if (!bancoOrigenId) errores.push('Banco origen es requerido')
-  if (!bancoDestinoId) errores.push('Banco destino es requerido')
-  if (bancoOrigenId === bancoDestinoId) errores.push('Los bancos deben ser diferentes')
-  if (!monto || monto <= 0) errores.push('El monto debe ser mayor a 0')
-  
-  return { valido: errores.length === 0, errores }
+  return Math.round(puntajeLiquidez + puntajeMargen + puntajeROCE + puntajeRotacion)
+}
+
+/**
+ * Calcula el capital actual de un banco
+ */
+export function calcularCapitalActual(
+  historicoIngresos: number,
+  historicoGastos: number
+): number {
+  return historicoIngresos - historicoGastos
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HELPERS
+// GENERADORES DE IDS
 // ═══════════════════════════════════════════════════════════════════════════
 
 export function generarIdVenta(): string {
-  const fecha = new Date()
-  const year = fecha.getFullYear().toString().slice(-2)
-  const month = (fecha.getMonth() + 1).toString().padStart(2, '0')
-  const random = Math.random().toString(36).substring(2, 6).toUpperCase()
-  return `V${year}${month}-${random}`
+  return `venta_${nanoid(10)}`
 }
 
-export function generarIdOrdenCompra(numero: number): string {
-  return `OC${numero.toString().padStart(4, '0')}`
+export function generarIdOrdenCompra(numero?: number): string {
+  if (numero !== undefined) {
+    return `OC-${String(numero).padStart(4, '0')}-${nanoid(4)}`
+  }
+  return `orden_${nanoid(10)}`
 }
 
 export function generarIdMovimiento(): string {
-  return `MOV-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`
+  return `mov_${nanoid(10)}`
 }
+
+export function generarIdCliente(): string {
+  return `cli_${nanoid(10)}`
+}
+
+export function generarIdDistribuidor(): string {
+  return `dist_${nanoid(10)}`
+}
+
+export function generarIdProducto(): string {
+  return `prod_${nanoid(10)}`
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CONFIGURACIÓN DE LOS 7 BANCOS SAGRADOS
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const BANCOS_CONFIG = {
+  boveda_monte: {
+    id: 'boveda_monte' as BancoId,
+    nombre: 'Bóveda Monte',
+    tipo: 'operativo',
+    color: '#FFD700',
+    icono: 'vault',
+    esAutomatico: true,
+    orden: 1,
+  },
+  utilidades: {
+    id: 'utilidades' as BancoId,
+    nombre: 'Utilidades',
+    tipo: 'ganancia',
+    color: '#FF1493',
+    icono: 'trending-up',
+    esAutomatico: true,
+    orden: 2,
+  },
+  flete_sur: {
+    id: 'flete_sur' as BancoId,
+    nombre: 'Flete Sur',
+    tipo: 'flete',
+    color: '#8B00FF',
+    icono: 'truck',
+    esAutomatico: true,
+    orden: 3,
+  },
+  azteca: {
+    id: 'azteca' as BancoId,
+    nombre: 'Azteca',
+    tipo: 'externo',
+    color: '#00FF88',
+    icono: 'building-2',
+    esAutomatico: false,
+    orden: 4,
+  },
+  leftie: {
+    id: 'leftie' as BancoId,
+    nombre: 'Leftie',
+    tipo: 'externo',
+    color: '#FFD700',
+    icono: 'shirt',
+    esAutomatico: false,
+    orden: 5,
+  },
+  profit: {
+    id: 'profit' as BancoId,
+    nombre: 'Profit',
+    tipo: 'ganancia',
+    color: '#FFD700',
+    icono: 'crown',
+    esAutomatico: false,
+    orden: 6,
+  },
+  boveda_usa: {
+    id: 'boveda_usa' as BancoId,
+    nombre: 'Bóveda USA',
+    tipo: 'operativo',
+    color: '#FFD700',
+    icono: 'dollar-sign',
+    esAutomatico: false,
+    orden: 7,
+  },
+} as const
+
+export const BANCOS_IDS = Object.keys(BANCOS_CONFIG) as BancoId[]

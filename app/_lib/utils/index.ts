@@ -90,6 +90,20 @@ export function formatPercent(
 }
 
 /**
+ * Formatea un número con separadores de miles
+ */
+export function formatNumber(
+  value: number,
+  options: { decimals?: number; locale?: string } = {}
+): string {
+  const { decimals = 0, locale = 'es-MX' } = options
+  return value.toLocaleString(locale, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  })
+}
+
+/**
  * Calcula el porcentaje de un valor respecto a un total
  */
 export function calculatePercent(value: number, total: number): number {

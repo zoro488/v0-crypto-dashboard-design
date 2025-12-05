@@ -1,4 +1,4 @@
-# 🏦 FlowDistributor - Sistema de Gestión Financiera
+@# 🏦 FlowDistributor - Sistema de Gestión Financiera
 
 [![Production Ready](https://img.shields.io/badge/status-PRODUCTION%20READY-success)](/)
 [![Version](https://img.shields.io/badge/version-3.0.0-blue)](/)

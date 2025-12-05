@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import Link from 'next/link'
 import { 
   ArrowUpRight,
   ArrowDownRight,
@@ -20,11 +21,14 @@ import {
   History,
   Eye,
   EyeOff,
+  ExternalLink,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { formatCurrency, cn } from '@/app/_lib/utils'
 import { BANCOS_CONFIG } from '@/app/_lib/constants/bancos'
+import { TransferenciaModal, GastoModal, IngresoModal } from '@/app/_components/modals'
 import type { Banco } from '@/database/schema'
+import type { BancoId } from '@/app/types'
 
 interface BancosClientProps {
   initialBancos: Banco[]
@@ -51,9 +55,10 @@ export function BancosClient({
 }: BancosClientProps) {
   const [bancos] = useState(initialBancos)
   const [showAmounts, setShowAmounts] = useState(true)
-  const [selectedBanco, setSelectedBanco] = useState<string | null>(null)
+  const [selectedBanco, setSelectedBanco] = useState<BancoId | null>(null)
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
   const [isGastoModalOpen, setIsGastoModalOpen] = useState(false)
+  const [isIngresoModalOpen, setIsIngresoModalOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
   const summaryCards = [
@@ -86,6 +91,24 @@ export function BancosClient({
 
   return (
     <div className="space-y-6">
+      {/* Modales */}
+      <TransferenciaModal
+        isOpen={isTransferModalOpen}
+        onClose={() => setIsTransferModalOpen(false)}
+      />
+      
+      <GastoModal
+        isOpen={isGastoModalOpen}
+        onClose={() => setIsGastoModalOpen(false)}
+        bancoPreseleccionado={selectedBanco || undefined}
+      />
+      
+      <IngresoModal
+        isOpen={isIngresoModalOpen}
+        onClose={() => setIsIngresoModalOpen(false)}
+        bancoPreseleccionado={selectedBanco || undefined}
+      />
+      
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {summaryCards.map((card, index) => (
@@ -146,11 +169,18 @@ export function BancosClient({
             Transferir
           </button>
           <button 
+            onClick={() => setIsIngresoModalOpen(true)}
+            className="h-10 px-4 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Ingreso
+          </button>
+          <button 
             onClick={() => setIsGastoModalOpen(true)}
             className="h-10 px-4 rounded-lg bg-gradient-to-r from-red-500 to-rose-600 text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2"
           >
             <Minus className="h-4 w-4" />
-            Registrar Gasto
+            Gasto
           </button>
         </div>
       </div>
@@ -173,7 +203,7 @@ export function BancosClient({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ delay: index * 0.05 }}
-                onClick={() => setSelectedBanco(isSelected ? null : banco.id)}
+                onClick={() => setSelectedBanco(isSelected ? null : banco.id as BancoId)}
                 className={cn(
                   'group relative rounded-2xl border p-6 cursor-pointer transition-all',
                   isSelected 
@@ -256,6 +286,14 @@ export function BancosClient({
 
                 {/* Quick Actions */}
                 <div className="absolute top-4 right-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Link
+                    href={`/bancos/${banco.id}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+                    title="Ver detalle"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </Link>
                   <button 
                     onClick={(e) => {
                       e.stopPropagation()
@@ -266,6 +304,13 @@ export function BancosClient({
                     <History className="h-4 w-4" />
                   </button>
                 </div>
+
+                {/* Link overlay */}
+                <Link
+                  href={`/bancos/${banco.id}`}
+                  className="absolute inset-0 z-10"
+                  onClick={(e) => e.stopPropagation()}
+                />
               </motion.div>
             )
           })}

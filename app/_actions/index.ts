@@ -25,6 +25,7 @@ export {
 export {
   getBancos,
   getBancoById,
+  getMovimientosBanco,
   transferirEntreBancos,
   registrarGasto,
   getCapitalTotal,

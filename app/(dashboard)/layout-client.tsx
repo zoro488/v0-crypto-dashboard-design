@@ -1,10 +1,29 @@
 'use client'
 
+// ═══════════════════════════════════════════════════════════════
+// CHRONOS INFINITY 2026 — DASHBOARD LAYOUT CLIENT
+// Layout principal con sidebar magnético y efectos premium
+// ═══════════════════════════════════════════════════════════════
+
 import * as React from 'react'
-import { Sidebar } from '@/app/_components/layout/Sidebar'
-import { CommandMenu } from '@/app/_components/layout/CommandMenu'
+import { AnimatePresence, motion } from 'framer-motion'
+import dynamic from 'next/dynamic'
 import { Toaster } from 'sonner'
 import { QueryProvider } from '@/app/_components/providers/QueryProvider'
+
+// Lazy load componentes pesados
+const PremiumSidebar = dynamic(
+  () => import('@/app/_components/layout/PremiumSidebar').then(m => m.PremiumSidebar),
+  { ssr: false }
+)
+const CommandMenu = dynamic(
+  () => import('@/app/_components/ui/CommandMenu').then(m => m.CommandMenu),
+  { ssr: false }
+)
+const CursorEffects = dynamic(
+  () => import('@/app/_components/ui/CursorEffects').then(m => m.CursorEffects),
+  { ssr: false }
+)
 
 interface DashboardLayoutClientProps {
   children: React.ReactNode
@@ -12,30 +31,70 @@ interface DashboardLayoutClientProps {
 
 export function DashboardLayoutClient({ children }: DashboardLayoutClientProps) {
   const [commandOpen, setCommandOpen] = React.useState(false)
+  const [sidebarExpanded, setSidebarExpanded] = React.useState(false)
+
+  // Global keyboard shortcuts
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // ⌘K or Ctrl+K - Command Menu
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setCommandOpen(true)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   return (
     <QueryProvider>
+      {/* Cursor Effects Layer */}
+      <CursorEffects />
+      
       <div className="flex h-screen bg-black text-white overflow-hidden">
-        {/* Sidebar */}
-        <Sidebar onCommandOpen={() => setCommandOpen(true)} />
+        {/* Premium Sidebar */}
+        <PremiumSidebar 
+          expanded={sidebarExpanded}
+          onExpandedChange={setSidebarExpanded}
+          onCommandOpen={() => setCommandOpen(true)} 
+        />
         
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto">
-          <div className="min-h-full">
+        {/* Main Content with padding for sidebar */}
+        <main 
+          className="flex-1 overflow-y-auto transition-all duration-300"
+          style={{ 
+            marginLeft: sidebarExpanded ? 256 : 72,
+          }}
+        >
+          <motion.div 
+            className="min-h-full"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
             {children}
-          </div>
+          </motion.div>
         </main>
 
-        {/* Command Menu (Global) */}
-        <CommandMenu open={commandOpen} onOpenChange={setCommandOpen} />
+        {/* Command Menu Portal */}
+        <AnimatePresence>
+          {commandOpen && (
+            <CommandMenu onClose={() => setCommandOpen(false)} />
+          )}
+        </AnimatePresence>
         
-        {/* Toast Notifications */}
+        {/* Toast Notifications - Premium Style */}
         <Toaster 
           position="bottom-right" 
           theme="dark"
           toastOptions={{
-            className: 'bg-zinc-900 border-zinc-800 text-white',
+            className: 'glass-panel border border-violet-500/20 text-white',
             duration: 4000,
+            style: {
+              background: 'rgba(0, 0, 0, 0.8)',
+              backdropFilter: 'blur(20px)',
+            },
           }}
         />
       </div>

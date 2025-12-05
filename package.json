@@ -108,6 +108,7 @@
     "firebase": "^11.0.2",
     "flags": "^4.0.2",
     "framer-motion": "latest",
+    "fuse.js": "^7.1.0",
     "hypertune": "^2.10.1",
     "immer": "latest",
     "lenis": "^1.3.15",

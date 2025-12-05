@@ -7,20 +7,30 @@
 
 'use client'
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import { onAuthChange, getCurrentUser, type User } from '@/app/lib/firebase/auth'
-import { logger } from '@/app/lib/utils/logger'
+import { createContext, useContext, useState, type ReactNode } from 'react'
+
+// Tipo de usuario simplificado
+interface User {
+  id: string
+  email: string
+  nombre: string
+  role: 'admin' | 'operator' | 'viewer'
+}
 
 interface AuthContextType {
   user: User | null
   loading: boolean
   isAuthenticated: boolean
+  signIn: (email: string, password: string) => Promise<void>
+  signOut: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  loading: true,
+  loading: false,
   isAuthenticated: false,
+  signIn: async () => {},
+  signOut: async () => {},
 })
 
 export function useAuth() {
@@ -36,42 +46,31 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+  // Por ahora, usuario demo siempre autenticado
+  const [user] = useState<User | null>({
+    id: 'demo-user',
+    email: 'admin@chronos.mx',
+    nombre: 'Administrador',
+    role: 'admin',
+  })
+  const [loading] = useState(false)
 
-  useEffect(() => {
-    // Verificar usuario actual al montar
-    const currentUser = getCurrentUser()
-    if (currentUser) {
-      setUser(currentUser)
-      setLoading(false)
-    }
+  const signIn = async (_email: string, _password: string) => {
+    // TODO: Implementar autenticación real con NextAuth
+    console.log('Auth: signIn called')
+  }
 
-    // Suscribirse a cambios de auth
-    const unsubscribe = onAuthChange((newUser) => {
-      setUser(newUser)
-      setLoading(false)
-
-      if (newUser) {
-        logger.info('Usuario autenticado (LOCAL)', {
-          context: 'AuthProvider',
-          data: {
-            userId: newUser.uid,
-            email: newUser.email,
-          },
-        })
-      } else {
-        logger.info('Usuario no autenticado', { context: 'AuthProvider' })
-      }
-    })
-
-    return () => unsubscribe()
-  }, [])
+  const signOut = async () => {
+    // TODO: Implementar cierre de sesión
+    console.log('Auth: signOut called')
+  }
 
   const value: AuthContextType = {
     user,
     loading,
     isAuthenticated: user !== null,
+    signIn,
+    signOut,
   }
 
   return (

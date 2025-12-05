@@ -1,28 +1,13 @@
 'use client'
 
 import { useEffect, useState, useCallback, useRef } from 'react'
-import { db } from '@/database'
-import type { 
-  Cliente, 
-  Venta, 
-  Distribuidor, 
-  Banco, 
-  Movimiento 
-} from '@/database/schema'
+import { useChronosStore } from '@/app/lib/store'
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
 // ═══════════════════════════════════════════════════════════════
 
-type TableName = 'clientes' | 'ventas' | 'distribuidores' | 'bancos' | 'movimientos'
-
-type TableData = {
-  clientes: Cliente
-  ventas: Venta
-  distribuidores: Distribuidor
-  bancos: Banco
-  movimientos: Movimiento
-}
+type TableName = 'clientes' | 'ventas' | 'distribuidores' | 'bancos' | 'movimientos' | 'ordenesCompra'
 
 interface UseDBOptions<T> {
   realtime?: boolean
@@ -39,79 +24,68 @@ interface UseDBResult<T> {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// HOOK: useDB - Datos con polling para simular realtime
+// HOOK: useDB - Ahora usa Zustand store en lugar de acceso directo a DB
+// Esto permite funcionar en el navegador sin problemas
 // ═══════════════════════════════════════════════════════════════
 
-export function useDB<K extends TableName>(
-  tableName: K,
-  options: UseDBOptions<TableData[K]> = {}
-): UseDBResult<TableData[K]> {
+export function useDB<T = unknown>(
+  tableName: TableName,
+  options: UseDBOptions<T> = {}
+): UseDBResult<T> {
   const { 
-    realtime = false, 
-    pollInterval = 5000, 
     initialData = [],
     enabled = true,
   } = options
 
-  const [data, setData] = useState<TableData[K][]>(initialData)
+  // Obtener datos del store de Zustand - actualizaciones en tiempo real
+  const storeData = useChronosStore((state) => {
+    switch (tableName) {
+      case 'clientes':
+        return state.clientes
+      case 'ventas':
+        return state.ventas
+      case 'distribuidores':
+        return state.distribuidores
+      case 'bancos':
+        return Object.values(state.bancos)
+      case 'movimientos':
+        return state.movimientos
+      case 'ordenesCompra':
+        return state.ordenesCompra
+      default:
+        return []
+    }
+  })
+
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
-  const mountedRef = useRef(true)
+  const [error] = useState<Error | null>(null)
 
-  const fetchData = useCallback(async () => {
-    if (!enabled) return
-
-    try {
-      // Dynamic table access - the schema defines these properly
-      const tableQuery = (db.query as Record<string, { findMany: () => Promise<unknown[]> }>)[tableName]
-      if (!tableQuery) {
-        throw new Error(`Table ${tableName} not found in schema`)
-      }
-      const result = await tableQuery.findMany()
-      
-      if (mountedRef.current) {
-        setData(result as TableData[K][])
-        setError(null)
-      }
-    } catch (err) {
-      if (mountedRef.current) {
-        setError(err instanceof Error ? err : new Error('Error fetching data'))
-      }
-    } finally {
-      if (mountedRef.current) {
-        setLoading(false)
-      }
-    }
-  }, [tableName, enabled])
-
+  // El store ya tiene los datos - solo simulamos el loading inicial
   useEffect(() => {
-    mountedRef.current = true
-    fetchData()
-
-    // Polling para simular realtime
-    let intervalId: NodeJS.Timeout | null = null
-    if (realtime && enabled) {
-      intervalId = setInterval(fetchData, pollInterval)
+    if (enabled) {
+      // Pequeño delay para simular carga inicial
+      const timeout = setTimeout(() => setLoading(false), 100)
+      return () => clearTimeout(timeout)
     }
+  }, [enabled])
 
-    return () => {
-      mountedRef.current = false
-      if (intervalId) {
-        clearInterval(intervalId)
-      }
-    }
-  }, [fetchData, realtime, pollInterval, enabled])
+  const refetch = useCallback(async () => {
+    // Con Zustand, no hay necesidad de refetch - los datos son reactivos
+    // Pero mantenemos la función por compatibilidad
+    setLoading(true)
+    setTimeout(() => setLoading(false), 50)
+  }, [])
 
   return {
-    data,
+    data: enabled ? (storeData as T[]) : (initialData as T[]),
     loading,
     error,
-    refetch: fetchData,
+    refetch,
   }
 }
 
 // ═══════════════════════════════════════════════════════════════
-// HOOK: useRealtime - WebSocket para updates en tiempo real
+// HOOK: useRealtime - Ya no necesita WebSocket, Zustand es reactivo
 // ═══════════════════════════════════════════════════════════════
 
 interface UseRealtimeOptions {
@@ -120,57 +94,15 @@ interface UseRealtimeOptions {
 }
 
 export function useRealtime(
-  channel: string,
+  _channel: string,
   options: UseRealtimeOptions = {}
 ) {
-  const { onUpdate, onError } = options
-  const [connected, setConnected] = useState(false)
-  const wsRef = useRef<WebSocket | null>(null)
+  // Con Zustand, los datos son reactivos automáticamente
+  // Este hook se mantiene por compatibilidad pero ya no usa WebSocket
+  const [connected] = useState(true)
 
-  useEffect(() => {
-    // En desarrollo, usar polling en lugar de WebSocket
-    if (process.env.NODE_ENV === 'development') {
-      setConnected(true)
-      return
-    }
-
-    const wsUrl = process.env.NEXT_PUBLIC_WS_URL
-    if (!wsUrl) {
-      console.warn('WebSocket URL not configured')
-      return
-    }
-
-    try {
-      const ws = new WebSocket(`${wsUrl}?channel=${channel}`)
-      wsRef.current = ws
-
-      ws.onopen = () => setConnected(true)
-      ws.onclose = () => setConnected(false)
-      ws.onerror = (event) => {
-        onError?.(new Error('WebSocket error'))
-        console.error('WebSocket error:', event)
-      }
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data)
-          onUpdate?.(data)
-        } catch (err) {
-          console.error('Error parsing WebSocket message:', err)
-        }
-      }
-
-      return () => {
-        ws.close()
-      }
-    } catch (err) {
-      onError?.(err instanceof Error ? err : new Error('WebSocket connection failed'))
-    }
-  }, [channel, onUpdate, onError])
-
-  const send = useCallback((data: unknown) => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify(data))
-    }
+  const send = useCallback((_data: unknown) => {
+    // No-op: Zustand maneja las actualizaciones
   }, [])
 
   return { connected, send }
