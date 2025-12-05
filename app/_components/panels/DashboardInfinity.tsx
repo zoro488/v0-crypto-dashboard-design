@@ -3,6 +3,7 @@
 // ═══════════════════════════════════════════════════════════════
 // CHRONOS INFINITY 2026 — DASHBOARD INFINITY
 // Panel principal con 7 orbes 3D representando los bancos
+// Conectado a Zustand Store para funcionar sin servidor
 // ═══════════════════════════════════════════════════════════════
 
 import { Suspense, useState, useMemo } from 'react'
@@ -17,7 +18,7 @@ import { motion } from 'framer-motion'
 import { PremiumOrb } from '@/app/_components/3d/PremiumOrb'
 import { NeuralGridFloor } from '@/app/_components/3d/NeuralGridFloor'
 import { QuantumDust } from '@/app/_components/3d/QuantumDust'
-import { useDB } from '@/app/_hooks/useDB'
+import { useChronosStore } from '@/app/lib/store'
 import { BANCOS_CONFIG, type BancoId } from '@/app/_lib/constants/bancos'
 import { formatCurrency } from '@/app/_lib/utils/formatters'
 import type { Banco } from '@/app/types'
@@ -44,40 +45,25 @@ interface DashboardStats {
 }
 
 function BankOrbs3D({ onBancoClick }: { onBancoClick: (id: BancoId) => void }) {
-  const { data: bancos, loading } = useDB<Banco>('bancos')
+  // Usar Zustand store en lugar de API
+  const storeBancos = useChronosStore(state => state.bancos)
   
   const bancosData = useMemo(() => {
-    return bancos.map((banco: Banco) => {
-      const config = BANCOS_CONFIG[banco.id as BancoId]
+    return Object.entries(storeBancos).map(([bancoId, banco]) => {
+      const config = BANCOS_CONFIG[bancoId as BancoId]
       const intensity = Math.min(banco.capitalActual / 100000, 1) // Normalizar intensidad
       
       return {
-        id: banco.id as BancoId,
-        position: BANCO_POSITIONS[banco.id as BancoId],
+        id: bancoId as BancoId,
+        position: BANCO_POSITIONS[bancoId as BancoId] || [0, 0, 0] as [number, number, number],
         color: config?.color || '#8B00FF',
         glowColor: '#FFD700',
         capital: banco.capitalActual,
         nombre: config?.nombre || banco.nombre,
-        intensity,
+        intensity: Math.max(intensity, 0.3), // Mínimo 0.3 para visibilidad
       }
     })
-  }, [bancos])
-
-  if (loading) {
-    return (
-      <group>
-        {Object.entries(BANCO_POSITIONS).map(([id, pos]) => (
-          <PremiumOrb
-            key={id}
-            position={pos}
-            color="#333333"
-            intensity={0.2}
-            size={0.8}
-          />
-        ))}
-      </group>
-    )
-  }
+  }, [storeBancos])
 
   return (
     <group>
@@ -194,9 +180,16 @@ function StatsCard({ title, value, change, icon }: {
 
 export default function DashboardInfinity() {
   const [selectedBanco, setSelectedBanco] = useState<BancoId | null>(null)
-  const { data: bancos } = useDB<Banco>('bancos')
-  const { data: ventas } = useDB<{ fecha: string | Date }>('ventas')
-  const { data: clientes } = useDB<{ estado: string }>('clientes')
+  
+  // Usar Zustand store
+  const storeBancos = useChronosStore(state => state.bancos)
+  const storeVentas = useChronosStore(state => state.ventas)
+  const storeClientes = useChronosStore(state => state.clientes)
+  
+  // Convertir bancos del store a array
+  const bancos = useMemo(() => {
+    return Object.values(storeBancos)
+  }, [storeBancos])
   
   // Calcular estadísticas
   const stats: DashboardStats = useMemo(() => {
@@ -206,12 +199,20 @@ export default function DashboardInfinity() {
     
     const hoy = new Date()
     hoy.setHours(0, 0, 0, 0)
-    const ventasHoy = ventas.filter(v => {
-      const fechaVenta = new Date(v.fecha)
+    const ventasHoy = storeVentas.filter(v => {
+      // Manejar fecha como string o FirestoreTimestamp
+      let fechaVenta: Date
+      if (typeof v.fecha === 'string') {
+        fechaVenta = new Date(v.fecha)
+      } else if (v.fecha && typeof v.fecha === 'object' && 'toDate' in v.fecha) {
+        fechaVenta = v.fecha.toDate()
+      } else {
+        fechaVenta = new Date()
+      }
       return fechaVenta >= hoy
     }).length
     
-    const clientesActivos = clientes.filter(c => c.estado === 'activo').length
+    const clientesActivos = storeClientes.filter(c => c.estado === 'activo').length
     
     const bancoMayorCapital = bancos.reduce((max, b) => 
       b.capitalActual > (max?.capitalActual || 0) ? b : max
@@ -225,7 +226,7 @@ export default function DashboardInfinity() {
       clientesActivos,
       bancoMayorCapital,
     }
-  }, [bancos, ventas, clientes])
+  }, [bancos, storeVentas, storeClientes])
 
   return (
     <div className="relative w-full h-full min-h-screen bg-black overflow-hidden">

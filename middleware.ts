@@ -108,16 +108,20 @@ export function middleware(request: NextRequest) {
   // Obtener sesión de cookies
   const sessionCookie = request.cookies.get('chronos_session')
   const isAuthenticated = !!sessionCookie?.value
+  
+  // 🔧 DESARROLLO: Bypass de autenticación en modo desarrollo
+  const isDevelopment = process.env.NODE_ENV === 'development'
+  const skipAuthInDev = isDevelopment // Cambiar a false para probar auth en dev
 
   // Redirigir a login si no está autenticado y es ruta protegida
-  if (isProtectedRoute && !isAuthenticated) {
+  if (isProtectedRoute && !isAuthenticated && !skipAuthInDev) {
     const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(loginUrl)
   }
 
   // Redirigir a dashboard si ya está autenticado y va a login
-  if (pathname === '/login' && isAuthenticated) {
+  if (pathname === '/login' && (isAuthenticated || skipAuthInDev)) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 

@@ -1,5 +1,4 @@
 import { Suspense } from 'react'
-import { getCapitalTotal, getBancos, getVentasStats } from '@/app/_actions'
 import { DashboardClient } from './_components/DashboardClient'
 
 // Force dynamic rendering for real-time data
@@ -8,42 +7,32 @@ export const dynamic = 'force-dynamic'
 // Loading skeleton
 function DashboardSkeleton() {
   return (
-    <div className="p-8 space-y-8 animate-pulse">
-      <div className="h-10 w-64 bg-zinc-900 rounded-lg" />
+    <div className="min-h-screen bg-black p-8 animate-pulse">
+      {/* Header skeleton */}
+      <div className="h-16 w-80 bg-gradient-to-r from-violet-500/20 to-gold-500/20 rounded-xl mb-8" />
       
-      {/* Stats Grid Skeleton */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Stats grid skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-32 bg-zinc-900 rounded-2xl" />
+          <div key={i} className="h-36 bg-white/5 rounded-2xl border border-violet-500/10" />
         ))}
       </div>
       
-      {/* Main Grid Skeleton */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 h-96 bg-zinc-900 rounded-2xl" />
-        <div className="h-96 bg-zinc-900 rounded-2xl" />
+      {/* 3D Canvas skeleton */}
+      <div className="h-[600px] bg-gradient-to-b from-violet-900/10 to-black rounded-3xl flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-violet-500/30 border-t-violet-500 rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-violet-400/50">Cargando CHRONOS INFINITY...</p>
+        </div>
       </div>
     </div>
   )
 }
 
-export default async function DashboardPage() {
-  // Fetch all data in parallel on the server
-  const [capitalResult, bancosResult, statsResult] = await Promise.all([
-    getCapitalTotal(),
-    getBancos(),
-    getVentasStats(),
-  ])
-
-  const initialData = {
-    capital: capitalResult.success ? capitalResult.data : { capitalTotal: 0, ingresosHistoricos: 0, gastosHistoricos: 0 },
-    bancos: bancosResult.success ? bancosResult.data : [],
-    stats: statsResult.success ? statsResult.data : null,
-  }
-
+export default function DashboardPage() {
   return (
     <Suspense fallback={<DashboardSkeleton />}>
-      <DashboardClient initialData={initialData} />
+      <DashboardClient />
     </Suspense>
   )
 }

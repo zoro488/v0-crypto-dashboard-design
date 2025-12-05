@@ -5,7 +5,7 @@
 // Dashboard principal con 7 orbes bancarios 3D
 // ═══════════════════════════════════════════════════════════════
 
-import { Suspense, useState, useMemo, useRef } from 'react'
+import { Suspense, useState, useMemo, useRef, useEffect, Component, ReactNode } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { 
   PerspectiveCamera, 
@@ -31,12 +31,50 @@ import {
   Building2,
   Eye,
   BarChart3,
+  AlertTriangle,
 } from 'lucide-react'
 import { cn } from '@/app/_lib/utils'
 import { formatCurrency, formatPercent } from '@/app/_lib/utils/formatters'
 import { BANCOS_CONFIG, type BancoId, BANCOS_ORDENADOS } from '@/app/_lib/constants/bancos'
 import type { Banco } from '@/database/schema'
 import * as THREE from 'three'
+
+// ═══════════════════════════════════════════════════════════════
+// ERROR BOUNDARY FOR 3D CANVAS
+// ═══════════════════════════════════════════════════════════════
+
+interface ErrorBoundaryState {
+  hasError: boolean
+  error?: Error
+}
+
+class Canvas3DErrorBoundary extends Component<{ children: ReactNode; fallback?: ReactNode }, ErrorBoundaryState> {
+  constructor(props: { children: ReactNode; fallback?: ReactNode }) {
+    super(props)
+    this.state = { hasError: false }
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error }
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.warn('[DashboardPremium] 3D Canvas error:', error.message)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || (
+        <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-violet-500/5 to-purple-500/5">
+          <AlertTriangle className="h-12 w-12 text-yellow-500/50 mb-4" />
+          <p className="text-gray-400 text-sm">Visualización 3D no disponible</p>
+          <p className="text-gray-500 text-xs mt-1">Los datos se muestran en la lista lateral</p>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════
 // 3D BANK ORB
@@ -224,14 +262,14 @@ function DashboardScene({ bancos, hoveredBanco, onHoverBanco }: DashboardScenePr
         )
       })}
       
-      {/* Post-processing */}
+      {/* Post-processing - Simplified for stability */}
       <EffectComposer>
         <Bloom 
-          intensity={0.5}
-          luminanceThreshold={0.2}
+          intensity={0.3}
+          luminanceThreshold={0.4}
           luminanceSmoothing={0.9}
+          mipmapBlur
         />
-        <ChromaticAberration offset={[0.0005, 0.0005]} />
       </EffectComposer>
     </>
   )
@@ -482,15 +520,29 @@ export function DashboardPremium({ capital, bancos, stats }: DashboardPremiumPro
             transition={{ delay: 0.4 }}
             className="lg:col-span-3 relative h-[500px] rounded-3xl overflow-hidden bg-gradient-to-br from-violet-500/5 to-purple-500/5 border border-violet-500/20"
           >
-            <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }}>
-              <Suspense fallback={null}>
-                <DashboardScene 
-                  bancos={bancos}
-                  hoveredBanco={hoveredBanco}
-                  onHoverBanco={setHoveredBanco}
-                />
-              </Suspense>
-            </Canvas>
+            <Canvas3DErrorBoundary>
+              <Canvas 
+                shadows 
+                dpr={[1, 1.5]} 
+                gl={{ 
+                  antialias: true, 
+                  alpha: true,
+                  powerPreference: 'high-performance',
+                  failIfMajorPerformanceCaveat: false,
+                }}
+                onCreated={({ gl }) => {
+                  gl.setClearColor(0x000000, 0)
+                }}
+              >
+                <Suspense fallback={null}>
+                  <DashboardScene 
+                    bancos={bancos}
+                    hoveredBanco={hoveredBanco}
+                    onHoverBanco={setHoveredBanco}
+                  />
+                </Suspense>
+              </Canvas>
+            </Canvas3DErrorBoundary>
             
             {/* Instructions overlay */}
             <div className="absolute bottom-4 left-4 flex items-center gap-4 text-xs text-gray-500">
