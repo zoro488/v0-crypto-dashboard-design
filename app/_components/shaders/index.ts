@@ -54,3 +54,14 @@ export type { SacredGeometryShaderMaterial } from './SacredGeometryShader'
 
 export { DataFlowShader } from './DataFlowShader'
 export type { DataFlowShaderMaterial } from './DataFlowShader'
+
+// ─────────────────────────────────────────────────────────────────
+// LIQUID ORB SHADER — FBM + WORLEY + SIMPLEX HYBRID
+// Capital-reactive, 195+ FPS, 7 presets por banco
+// ─────────────────────────────────────────────────────────────────
+export { 
+  LiquidOrbShader, 
+  ORB_PRESETS,
+  createLiquidOrbMaterial,
+} from './LiquidOrbShader'
+export type { LiquidOrbUniforms, OrbPreset } from './LiquidOrbShader'

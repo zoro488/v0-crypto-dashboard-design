@@ -1,7 +1,19 @@
 // ═══════════════════════════════════════════════════════════════
-// CHRONOS INFINITY 2026 — CONFIGURACIÓN DE BANCOS / BÓVEDAS
-// Los 7 bancos del sistema con sus configuraciones y personalidades
-// Paleta: #000000 / #8B00FF / #FFD700 / #FF1493 (CYAN PROHIBIDO)
+// CHRONOS INFINITY 2026 — SEED BANCOS
+// Datos iniciales de los 7 bancos del sistema
+// 
+// DISTRIBUCIÓN AUTOMÁTICA DE VENTAS (GYA - INMUTABLE):
+// - boveda_monte = precioCompra × cantidad (COSTO)
+// - flete_sur = precioFlete × cantidad (TRANSPORTE)
+// - utilidades = (precioVenta - precioCompra - precioFlete) × cantidad (GANANCIA)
+// ═══════════════════════════════════════════════════════════════
+
+import { db } from '@/database'
+import { bancos } from '@/database/schema'
+import { logger } from '@/app/_lib/utils/logger'
+
+// ═══════════════════════════════════════════════════════════════
+// TIPOS
 // ═══════════════════════════════════════════════════════════════
 
 export type BancoId = 
@@ -13,13 +25,26 @@ export type BancoId =
   | 'flete_sur'
   | 'utilidades'
 
-// ═══════════════════════════════════════════════════════════════
-// PERSONALIDAD DEL ORBE 3D
-// ═══════════════════════════════════════════════════════════════
+export interface BancoSeedData {
+  id: BancoId
+  nombre: string
+  tipo: 'operativo' | 'inversion' | 'ahorro'
+  capitalActual: number
+  historicoIngresos: number
+  historicoGastos: number
+  color: string
+  icono: string
+  orden: number
+  activo: boolean
+  // Metadatos de personalidad para el orbe 3D
+  personality: OrbPersonality
+}
 
 export interface OrbPersonality {
   apodo: string           // Nombre del personaje
   descripcion: string     // Descripción breve
+  colorPrimario: string   // Color principal del orbe
+  colorSecundario: string // Color secundario
   animacion: string       // Tipo de animación principal
   sonido: string          // Descripción del sonido característico
   velocidadRespiracion: number // 0.5 = muy lento, 1.0 = normal, 1.5 = rápido
@@ -27,37 +52,31 @@ export interface OrbPersonality {
   frecuenciaNoise: number      // 2.0 = suave, 4.0 = turbulento
 }
 
-export interface BancoConfig {
-  id: BancoId
-  nombre: string
-  descripcion: string
-  tipo: 'operativo' | 'inversion' | 'ahorro'
-  color: string           // Color principal (CHRONOS palette)
-  colorSecondary: string  // Color secundario para shaders
-  colorGradient: string   // Gradient para UI
-  icono: string
-  orden: number
-  personality: OrbPersonality
-}
+// ═══════════════════════════════════════════════════════════════
+// LOS 7 BANCOS OFICIALES CON PERSONALIDADES
+// ═══════════════════════════════════════════════════════════════
 
-export const BANCOS_CONFIG: Record<BancoId, BancoConfig> = {
+export const BANCOS_SEED: BancoSeedData[] = [
   // ═══════════════════════════════════════════════════════════
-  // BÓVEDA MONTE — El Guardián Eterno
+  // 1. BÓVEDA MONTE — El Guardián Eterno
   // Recibe: precioCompra × cantidad (costo de inventario)
   // ═══════════════════════════════════════════════════════════
-  boveda_monte: {
+  {
     id: 'boveda_monte',
     nombre: 'Bóveda Monte',
-    descripcion: 'Capital de compras y costos de inventario',
     tipo: 'operativo',
-    color: '#FFD700',           // Oro puro
-    colorSecondary: '#B8860B',  // Oro oscuro
-    colorGradient: 'from-amber-500 to-yellow-600',
+    capitalActual: 400000,
+    historicoIngresos: 2500000,
+    historicoGastos: 2100000,
+    color: '#FFD700', // ORO
     icono: 'Vault',
     orden: 1,
+    activo: true,
     personality: {
       apodo: 'El Guardián Eterno',
       descripcion: 'Oro líquido cayendo desde la cima, derramando riqueza',
+      colorPrimario: '#FFD700',      // Oro puro
+      colorSecundario: '#B8860B',    // Oro oscuro
       animacion: 'oro_cayendo',
       sonido: 'Respiración grave y profunda, como montaña durmiente',
       velocidadRespiracion: 0.8,
@@ -67,21 +86,25 @@ export const BANCOS_CONFIG: Record<BancoId, BancoConfig> = {
   },
 
   // ═══════════════════════════════════════════════════════════
-  // BÓVEDA USA — El Extranjero Elegante
+  // 2. BÓVEDA USA — El Extranjero Elegante
+  // Capital en dólares para operaciones internacionales
   // ═══════════════════════════════════════════════════════════
-  boveda_usa: {
+  {
     id: 'boveda_usa',
     nombre: 'Bóveda USA',
-    descripcion: 'Capital en dólares para importaciones',
     tipo: 'operativo',
-    color: '#FFD700',           // Oro
-    colorSecondary: '#228B22',  // Verde dólar
-    colorGradient: 'from-amber-500 to-emerald-600',
+    capitalActual: 200000,
+    historicoIngresos: 800000,
+    historicoGastos: 600000,
+    color: '#228B22', // Verde dólar
     icono: 'DollarSign',
     orden: 2,
+    activo: true,
     personality: {
       apodo: 'El Extranjero Elegante',
       descripcion: 'Oro con destellos verdes, bandera ondeando sutilmente',
+      colorPrimario: '#FFD700',      // Oro
+      colorSecundario: '#228B22',    // Verde bosque
       animacion: 'billetes_flotando',
       sonido: 'Himno lejano, monedas cayendo suavemente',
       velocidadRespiracion: 0.9,
@@ -91,21 +114,25 @@ export const BANCOS_CONFIG: Record<BancoId, BancoConfig> = {
   },
 
   // ═══════════════════════════════════════════════════════════
-  // PROFIT — El Visionario (EMPERADOR - Centro de todo)
+  // 3. PROFIT — El Visionario (EMPERADOR - Centro de todo)
+  // Ganancias acumuladas para reinversión estratégica
   // ═══════════════════════════════════════════════════════════
-  profit: {
+  {
     id: 'profit',
     nombre: 'Profit',
-    descripcion: 'Ganancias acumuladas para reinversión',
     tipo: 'inversion',
-    color: '#8B00FF',           // Violeta imperial
-    colorSecondary: '#FFD700',  // Oro
-    colorGradient: 'from-violet-600 to-purple-700',
+    capitalActual: 120000,
+    historicoIngresos: 500000,
+    historicoGastos: 380000,
+    color: '#8B00FF', // Violeta imperial
     icono: 'TrendingUp',
     orden: 3,
+    activo: true,
     personality: {
       apodo: 'El Visionario',
       descripcion: 'El emperador del sistema, violeta con destellos dorados',
+      colorPrimario: '#8B00FF',      // Violeta imperial
+      colorSecundario: '#FFD700',    // Oro
       animacion: 'fuegos_artificiales',
       sonido: 'Fanfarria triunfal, trompetas doradas',
       velocidadRespiracion: 1.1,
@@ -115,21 +142,25 @@ export const BANCOS_CONFIG: Record<BancoId, BancoConfig> = {
   },
 
   // ═══════════════════════════════════════════════════════════
-  // LEFTIE — El Rey Noble
+  // 4. LEFTIE — El Rey Noble
+  // Fondo de reserva y emergencias
   // ═══════════════════════════════════════════════════════════
-  leftie: {
+  {
     id: 'leftie',
     nombre: 'Leftie',
-    descripcion: 'Fondo de reserva y emergencias',
     tipo: 'ahorro',
-    color: '#FFD700',           // Oro brillante
-    colorSecondary: '#FFF8DC',  // Cornsilk
-    colorGradient: 'from-yellow-400 to-amber-500',
+    capitalActual: 80000,
+    historicoIngresos: 300000,
+    historicoGastos: 220000,
+    color: '#FFD700', // Oro brillante
     icono: 'Crown',
     orden: 4,
+    activo: true,
     personality: {
       apodo: 'El Rey Noble',
       descripcion: 'Corona dorada flotante, cetro de luz',
+      colorPrimario: '#FFD700',      // Oro brillante
+      colorSecundario: '#FFF8DC',    // Cornsilk
       animacion: 'corona_flotando',
       sonido: 'Campanas de palacio, eco majestuoso',
       velocidadRespiracion: 1.0,
@@ -139,21 +170,25 @@ export const BANCOS_CONFIG: Record<BancoId, BancoConfig> = {
   },
 
   // ═══════════════════════════════════════════════════════════
-  // AZTECA — El Sabio Anciano
+  // 5. AZTECA — El Sabio Anciano
+  // Cuenta bancaria principal
   // ═══════════════════════════════════════════════════════════
-  azteca: {
+  {
     id: 'azteca',
     nombre: 'Azteca',
-    descripcion: 'Cuenta bancaria principal Azteca',
     tipo: 'operativo',
-    color: '#8B0000',           // Rojo sangre
-    colorSecondary: '#FFD700',  // Oro
-    colorGradient: 'from-red-700 to-red-900',
+    capitalActual: 150000,
+    historicoIngresos: 1200000,
+    historicoGastos: 1050000,
+    color: '#8B0000', // Rojo sangre ancestral
     icono: 'Pyramid',
     orden: 5,
+    activo: true,
     personality: {
       apodo: 'El Sabio Anciano',
       descripcion: 'Grietas doradas en superficie roja, sangre de imperio',
+      colorPrimario: '#8B0000',      // Rojo sangre
+      colorSecundario: '#FFD700',    // Oro
       animacion: 'grietas_brillantes',
       sonido: 'Tambores ancestrales, viento del desierto',
       velocidadRespiracion: 0.6,
@@ -163,22 +198,25 @@ export const BANCOS_CONFIG: Record<BancoId, BancoConfig> = {
   },
 
   // ═══════════════════════════════════════════════════════════
-  // FLETE SUR — El Guerrero Veloz
+  // 6. FLETE SUR — El Guerrero Veloz
   // Recibe: precioFlete × cantidad (transporte)
   // ═══════════════════════════════════════════════════════════
-  flete_sur: {
+  {
     id: 'flete_sur',
     nombre: 'Flete Sur',
-    descripcion: 'Fondos destinados a logística y transporte',
     tipo: 'operativo',
-    color: '#8B00FF',           // Violeta plasma
-    colorSecondary: '#4B0082',  // Índigo
-    colorGradient: 'from-violet-500 to-indigo-700',
+    capitalActual: 0,  // Empieza en 0, se llena con fletes
+    historicoIngresos: 180000,
+    historicoGastos: 180000,
+    color: '#8B00FF', // Violeta plasma
     icono: 'Truck',
     orden: 6,
+    activo: true,
     personality: {
       apodo: 'El Guerrero Veloz',
       descripcion: 'Líneas de velocidad violeta, plasma eléctrico',
+      colorPrimario: '#8B00FF',      // Violeta plasma
+      colorSecundario: '#4B0082',    // Índigo profundo
       animacion: 'lineas_velocidad',
       sonido: 'Motor turbo, relámpagos cercanos',
       velocidadRespiracion: 1.2,
@@ -188,22 +226,25 @@ export const BANCOS_CONFIG: Record<BancoId, BancoConfig> = {
   },
 
   // ═══════════════════════════════════════════════════════════
-  // UTILIDADES — La Diva Celebrante
+  // 7. UTILIDADES — La Diva Celebrante
   // Recibe: (precioVenta - precioCompra - precioFlete) × cantidad
   // ═══════════════════════════════════════════════════════════
-  utilidades: {
+  {
     id: 'utilidades',
     nombre: 'Utilidades',
-    descripcion: 'Ganancias netas después de costos',
     tipo: 'inversion',
-    color: '#FF1493',           // Rosa eléctrico
-    colorSecondary: '#FFD700',  // Oro
-    colorGradient: 'from-pink-500 to-rose-600',
+    capitalActual: 0,  // Empieza en 0, acumula ganancias netas
+    historicoIngresos: 450000,
+    historicoGastos: 450000,
+    color: '#FF1493', // Rosa eléctrico
     icono: 'Sparkles',
     orden: 7,
+    activo: true,
     personality: {
       apodo: 'La Diva Celebrante',
       descripcion: 'Rosa eléctrico con explosiones doradas, fiesta eterna',
+      colorPrimario: '#FF1493',      // Rosa eléctrico
+      colorSecundario: '#FFD700',    // Oro
       animacion: 'explosion_particulas',
       sonido: 'Champagne descorchando, aplausos, confeti',
       velocidadRespiracion: 1.5,
@@ -211,34 +252,92 @@ export const BANCOS_CONFIG: Record<BancoId, BancoConfig> = {
       frecuenciaNoise: 4.0,
     },
   },
+]
+
+// ═══════════════════════════════════════════════════════════════
+// FUNCIÓN DE SEED
+// ═══════════════════════════════════════════════════════════════
+
+export async function seedBancos(): Promise<void> {
+  try {
+    logger.info('🏦 Iniciando seed de bancos...', { context: 'seed-bancos' })
+    
+    for (const banco of BANCOS_SEED) {
+      await db.insert(bancos).values({
+        id: banco.id,
+        nombre: banco.nombre,
+        tipo: banco.tipo,
+        capitalActual: banco.capitalActual,
+        historicoIngresos: banco.historicoIngresos,
+        historicoGastos: banco.historicoGastos,
+        color: banco.color,
+        icono: banco.icono,
+        orden: banco.orden,
+        activo: banco.activo,
+      }).onConflictDoUpdate({
+        target: bancos.id,
+        set: {
+          capitalActual: banco.capitalActual,
+          historicoIngresos: banco.historicoIngresos,
+          historicoGastos: banco.historicoGastos,
+        },
+      })
+      
+      logger.info(`✅ Banco ${banco.nombre} (${banco.personality.apodo}) insertado`, {
+        context: 'seed-bancos',
+        data: { id: banco.id, capital: banco.capitalActual },
+      })
+    }
+    
+    logger.info('🎉 Seed de bancos completado exitosamente', { context: 'seed-bancos' })
+  } catch (error) {
+    logger.error('❌ Error en seed de bancos', error, { context: 'seed-bancos' })
+    throw error
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
-// HELPERS Y EXPORTS
+// HELPERS
 // ═══════════════════════════════════════════════════════════════
 
-// Array ordenado para iteración
-export const BANCOS_ORDENADOS = Object.values(BANCOS_CONFIG).sort((a, b) => a.orden - b.orden)
-
-// Helper para obtener config por ID
-export function getBancoConfig(id: BancoId): BancoConfig {
-  return BANCOS_CONFIG[id]
+/**
+ * Obtener personalidad de orbe por ID de banco
+ */
+export function getOrbPersonality(bancoId: BancoId): OrbPersonality | undefined {
+  const banco = BANCOS_SEED.find(b => b.id === bancoId)
+  return banco?.personality
 }
 
-// Obtener personalidad de orbe por ID
-export function getOrbPersonality(id: BancoId): OrbPersonality {
-  return BANCOS_CONFIG[id].personality
+/**
+ * Obtener todos los bancos con sus personalidades
+ */
+export function getAllBancosWithPersonalities(): BancoSeedData[] {
+  return BANCOS_SEED
 }
 
-// Tipos de banco para filtros
-export const TIPOS_BANCO = ['operativo', 'inversion', 'ahorro'] as const
-export type TipoBanco = typeof TIPOS_BANCO[number]
+/**
+ * Obtener banco por ID
+ */
+export function getBancoById(bancoId: BancoId): BancoSeedData | undefined {
+  return BANCOS_SEED.find(b => b.id === bancoId)
+}
 
-// Colores por tipo (actualizados a paleta CHRONOS)
-export const COLORES_TIPO_BANCO: Record<TipoBanco, string> = {
-  operativo: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-  inversion: 'bg-violet-500/20 text-violet-400 border-violet-500/30',
-  ahorro: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+/**
+ * Obtener los 3 bancos que reciben distribución automática de ventas
+ */
+export function getBancosDistribucion(): BancoSeedData[] {
+  return BANCOS_SEED.filter(b => 
+    b.id === 'boveda_monte' || 
+    b.id === 'flete_sur' || 
+    b.id === 'utilidades'
+  )
+}
+
+/**
+ * Calcular capital total del sistema
+ */
+export function getCapitalTotal(): number {
+  return BANCOS_SEED.reduce((sum, banco) => sum + banco.capitalActual, 0)
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -258,12 +357,4 @@ export const CHRONOS_COLORS = {
   CORNSILK: '#FFF8DC',
 } as const
 
-// ═══════════════════════════════════════════════════════════════
-// DISTRIBUCIÓN DE VENTAS (GYA - INMUTABLE)
-// ═══════════════════════════════════════════════════════════════
-
-export const BANCOS_DISTRIBUCION = {
-  COSTO: 'boveda_monte' as BancoId,       // precioCompra × cantidad
-  TRANSPORTE: 'flete_sur' as BancoId,     // precioFlete × cantidad
-  GANANCIA: 'utilidades' as BancoId,      // (precioVenta - precioCompra - precioFlete) × cantidad
-} as const
+export default BANCOS_SEED
