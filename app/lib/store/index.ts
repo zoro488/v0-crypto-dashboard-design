@@ -27,6 +27,7 @@ import type {
   Movimiento,
   Producto,
   PanelId,
+  MetodoPago,
 } from '@/app/types'
 import { BANCOS_CONFIG } from '../constants/bancos'
 import {
@@ -127,6 +128,46 @@ const indexedDBStorage = {
 // TIPOS DEL STORE
 // ═══════════════════════════════════════════════════════════════════════════
 
+/**
+ * Tipo de entrada para crear ventas
+ * Los campos calculados (ingreso, totalVenta, etc.) se generan automáticamente
+ */
+export interface CrearVentaInput {
+  cliente: string
+  clienteId?: string
+  cantidad: number
+  precioVenta: number
+  precioCompra?: number
+  flete: 'Aplica' | 'NoAplica'
+  fleteUtilidad?: number
+  ocRelacionada?: string
+  estadoPago: 'completo' | 'parcial' | 'pendiente'
+  estatus: 'Pagado' | 'Pendiente' | 'Parcial'
+  montoPagado: number
+  montoRestante: number
+  fecha: string
+  notas?: string
+  metodoPago?: MetodoPago
+}
+
+/**
+ * Tipo de entrada para crear órdenes de compra
+ * Los campos calculados (costoPorUnidad, costoTotal, deuda, etc.) se generan automáticamente
+ */
+export interface CrearOrdenCompraInput {
+  distribuidor: string
+  distribuidorId?: string
+  origen?: string
+  producto?: string
+  cantidad: number
+  costoDistribuidor: number
+  costoTransporte?: number
+  bancoOrigen?: BancoId
+  pagoInicial?: number
+  fecha: string
+  notas?: string
+}
+
 interface ChronosState {
   // ═══════════════════════════════════════════════════════════════════════
   // DATOS DE NEGOCIO
@@ -159,7 +200,7 @@ interface ChronosState {
   // ═══════════════════════════════════════════════════════════════════════
   // ACCIONES — VENTAS
   // ═══════════════════════════════════════════════════════════════════════
-  crearVenta: (venta: Omit<Venta, 'id' | 'createdAt' | 'updatedAt' | 'distribucionBancos'>) => string
+  crearVenta: (venta: CrearVentaInput) => string
   actualizarVenta: (id: string, cambios: Partial<Venta>) => void
   eliminarVenta: (id: string) => void
   abonarVenta: (ventaId: string, monto: number) => void
@@ -167,7 +208,7 @@ interface ChronosState {
   // ═══════════════════════════════════════════════════════════════════════
   // ACCIONES — ÓRDENES DE COMPRA
   // ═══════════════════════════════════════════════════════════════════════
-  crearOrdenCompra: (oc: Omit<OrdenCompra, 'id' | 'createdAt' | 'updatedAt'>) => string
+  crearOrdenCompra: (oc: CrearOrdenCompraInput) => string
   actualizarOrdenCompra: (id: string, cambios: Partial<OrdenCompra>) => void
   eliminarOrdenCompra: (id: string) => void
   abonarOrdenCompra: (ocId: string, monto: number, bancoOrigen: BancoId) => void
@@ -276,14 +317,14 @@ export const useChronosStore = create<ChronosState>()(
         // ═══════════════════════════════════════════════════════════════════
         // ACCIONES — VENTAS
         // ═══════════════════════════════════════════════════════════════════
-        crearVenta: (ventaData) => {
+        crearVenta: (ventaData: CrearVentaInput) => {
           const id = generarIdVenta()
           const now = new Date().toISOString()
           const state = get()
           
           // Obtener datos de la OC para el cálculo
-          const oc = state.ordenesCompra.find(o => o.id === ventaData.ocRelacionada)
-          const precioCompra = oc?.costoPorUnidad || 0
+          const oc = ventaData.ocRelacionada ? state.ordenesCompra.find(o => o.id === ventaData.ocRelacionada) : null
+          const precioCompra = ventaData.precioCompra || oc?.costoPorUnidad || 0
           const precioFlete = ventaData.flete === 'Aplica' ? (ventaData.fleteUtilidad || 0) / ventaData.cantidad : 0
           
           // Calcular distribución
@@ -304,12 +345,20 @@ export const useChronosStore = create<ChronosState>()(
           else if (montoPagado > 0) estadoPago = 'parcial'
           
           const nuevaVenta: Venta = {
-            ...ventaData,
             id,
+            fecha: ventaData.fecha,
+            ocRelacionada: ventaData.ocRelacionada || '',
+            clienteId: ventaData.clienteId || '',
+            cliente: ventaData.cliente,
+            cantidad: ventaData.cantidad,
+            precioVenta: ventaData.precioVenta,
             precioCompra,
             ingreso: totalVenta,
             totalVenta,
             precioTotalVenta: totalVenta,
+            flete: ventaData.flete,
+            fleteUtilidad: ventaData.fleteUtilidad || 0,
+            precioFlete: precioFlete,
             bovedaMonte: distribucion.bovedaMonte,
             utilidad: distribucion.utilidades,
             ganancia: distribucion.utilidades,
@@ -323,6 +372,8 @@ export const useChronosStore = create<ChronosState>()(
             montoPagado,
             montoRestante,
             adeudo: montoRestante,
+            metodoPago: ventaData.metodoPago,
+            notas: ventaData.notas,
             keywords: [ventaData.cliente.toLowerCase(), id.toLowerCase()],
             createdAt: now,
             updatedAt: now,
@@ -534,7 +585,7 @@ export const useChronosStore = create<ChronosState>()(
             // Agregar movimientos
             const nuevosMovimientos = [
               ...state.movimientos,
-              ...resultado.movimientos.map(m => ({
+              ...resultado.movimientos.map((m) => ({
                 ...m,
                 id: generarIdMovimiento(),
                 createdAt: now,
@@ -569,19 +620,26 @@ export const useChronosStore = create<ChronosState>()(
         // ═══════════════════════════════════════════════════════════════════
         // ACCIONES — ÓRDENES DE COMPRA
         // ═══════════════════════════════════════════════════════════════════
-        crearOrdenCompra: (ocData) => {
+        crearOrdenCompra: (ocData: CrearOrdenCompraInput) => {
           const numeroActual = get().ordenesCompra.length + 1
           const id = generarIdOrdenCompra(numeroActual)
           const now = new Date().toISOString()
           
-          const costoPorUnidad = (ocData.costoDistribuidor || 0) + (ocData.costoTransporte || 0)
+          const costoPorUnidad = ocData.costoDistribuidor + (ocData.costoTransporte || 0)
           const costoTotal = costoPorUnidad * ocData.cantidad
-          const pagoInicial = ocData.pagoInicial || ocData.pagoDistribuidor || 0
+          const pagoInicial = ocData.pagoInicial || 0
           const deuda = costoTotal - pagoInicial
           
           const nuevaOC: OrdenCompra = {
-            ...ocData,
             id,
+            fecha: ocData.fecha || now,
+            distribuidor: ocData.distribuidor,
+            distribuidorId: ocData.distribuidorId || '',
+            origen: ocData.origen || ocData.distribuidor,
+            producto: ocData.producto,
+            cantidad: ocData.cantidad,
+            costoDistribuidor: ocData.costoDistribuidor,
+            costoTransporte: ocData.costoTransporte || 0,
             costoPorUnidad,
             costoTotal,
             stockActual: ocData.cantidad,
@@ -589,8 +647,10 @@ export const useChronosStore = create<ChronosState>()(
             pagoDistribuidor: pagoInicial,
             pagoInicial,
             deuda,
-            estado: deuda <= 0 ? 'pagado' : pagoInicial > 0 ? 'parcial' : 'pendiente',
+            bancoOrigen: ocData.bancoOrigen,
+            estado: deuda <= 0 ? 'completo' : pagoInicial > 0 ? 'parcial' : 'pendiente',
             keywords: [ocData.distribuidor.toLowerCase(), id.toLowerCase()],
+            notas: ocData.notas,
             createdAt: now,
             updatedAt: now,
           }
@@ -687,7 +747,7 @@ export const useChronosStore = create<ChronosState>()(
                   pagoDistribuidor: nuevoPago,
                   pagoInicial: nuevoPago,
                   deuda: nuevaDeuda,
-                  estado: nuevaDeuda <= 0 ? 'pagado' as const : 'parcial' as const,
+                  estado: nuevaDeuda <= 0 ? 'completo' as const : 'parcial' as const,
                   updatedAt: now,
                 }
               }

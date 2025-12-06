@@ -1,411 +1,247 @@
 'use client'
 
-import { useAppStore } from '@/app/lib/store/useAppStore'
-import ChronosHeader from '@/app/components/layout/ChronosHeader'
-// GrokAIOrb movido a layout.tsx para posición fixed global
-import { FirestoreSetupAlert } from '@/app/components/ui/FirestoreSetupAlert'
-import { CommandMenu } from '@/app/components/CommandMenu'
-import { SystemShowcase } from '@/app/components/ui/SystemShowcase'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useEffect, lazy, Suspense } from 'react'
-import { useOptimizedPerformance } from '@/app/lib/hooks/useOptimizedPerformance'
-import { ScrollProgress, ScrollReveal } from '@/app/components/ui/ScrollReveal'
-import { QuickStats3D } from '@/app/components/ui/QuickStats3D'
-import { useFirestoreCRUD } from '@/app/hooks/useFirestoreCRUD'
-import type { Venta, Cliente, OrdenCompra, Banco } from '@/app/types'
-import dynamic from 'next/dynamic'
+import { motion } from 'framer-motion'
+import { useSystemData } from '@/app/_hooks'
 import { 
-  ShoppingCart, Users, FileText, 
-  TrendingUp, Wallet,
+  DollarSign, 
+  Users, 
+  ShoppingCart, 
+  TrendingUp, 
+  Package, 
+  Truck,
+  ArrowUpRight,
+  ArrowDownRight,
 } from 'lucide-react'
 
-// 🤖 NOTA: GrokAIOrb (widget IA único) está en layout.tsx para posición fixed global
-// Se eliminó AIPremiumWidget duplicado para evitar 3 widgets IA
+// ═══════════════════════════════════════════════════════════════
+// CHRONOS INFINITY 2026 - Dashboard Principal
+// ═══════════════════════════════════════════════════════════════
 
-// Nuevo Dashboard Premium con animación CHRONOS
-const ChronosDashboard = lazy(() => import('@/app/components/panels/ChronosDashboard'))
+export default function HomePage() {
+  const { bancos, ventas, clientes, distribuidores, productos, loading, stats } = useSystemData()
 
-// 🔮 Nuevo Dashboard Obsidian Glass Ultra-Premium
-const ObsidianDashboard = lazy(() => import('@/app/components/panels/ObsidianDashboard'))
-
-// 🚀 CHRONOS 2026 - Dashboard Ultra-Premium con tendencias 2026
-const Dashboard2026 = lazy(() => import('@/app/components/chronos-2026/Dashboard2026'))
-
-// 🔥 CHRONOS 2026 ULTRA - EL DISEÑO MÁS AVANZADO Y PREMIUM DEL MUNDO
-const Dashboard2026Ultra = lazy(() => import('@/app/components/chronos-2026-ultra/Dashboard2026Ultra'))
-
-// 🎨 BentoDashboard - Dashboard Principal con Visualizaciones 3D Interactivas
-const BentoDashboard = lazy(() => import('@/app/components/panels/BentoDashboard'))
-
-// 🌌 CHRONOS INFINITY - Dashboard Ultra Premium 3D con efectos holográficos
-const BentoDashboardInfinity = lazy(() => import('@/app/components/panels/BentoDashboardInfinity'))
-
-// 🔮 CHRONOS QUANTUM 2026 - EL DISEÑO MÁS PREMIUM SIN CYAN - Violeta Real + Oro Líquido + Rosa Plasma
-const BentoDashboardQuantum = lazy(() => import('@/app/components/panels/BentoDashboardQuantum'))
-
-// Paneles Premium - TODOS los paneles usan versiones Premium con componentes 3D avanzados
-const BentoOrdenesCompraPremium = lazy(() => import('@/app/components/panels/BentoOrdenesCompraPremium'))
-const BentoBanco = lazy(() => import('@/app/components/panels/BentoBanco'))
-const BentoVentasPremium = lazy(() => import('@/app/components/panels/BentoVentasPremium'))
-const BentoAlmacenPremium = lazy(() => import('@/app/components/panels/BentoAlmacenPremium'))
-const BentoReportesPremium = lazy(() => import('@/app/components/panels/BentoReportesPremium'))
-const BentoClientesPremium = lazy(() => import('@/app/components/panels/BentoClientesPremium'))
-const BentoDistribuidoresPremium = lazy(() => import('@/app/components/panels/BentoDistribuidoresPremium'))
-
-// Panel IA Immersive Premium con NexBot 3D, Chat y Voz
-const BentoIAImmersive = lazy(() => import('@/app/components/panels/BentoIAImmersive'))
-
-// Panel GYA (Gastos y Abonos) - Gestión centralizada de egresos e ingresos
-const BentoGYA = lazy(() => import('@/app/components/panels/BentoGYA'))
-
-const PanelLoader = () => (
-  <div className="flex items-center justify-center min-h-[60vh]">
-    <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5 }}
-      className="relative"
-    >
-      {/* Orbe 3D Premium de carga con colores CHRONOS */}
-      <motion.div 
-        className="w-24 h-24 rounded-full"
-        style={{
-          border: '3px solid transparent',
-          background: 'linear-gradient(#000, #000) padding-box, linear-gradient(135deg, #00F5FF, #FF00AA, #8B5CF6) border-box',
-        }}
-        animate={{ rotate: 360 }}
-        transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-      />
-      <motion.div 
-        className="absolute inset-3 w-18 h-18 rounded-full"
-        style={{
-          border: '2px solid transparent',
-          background: 'linear-gradient(#000, #000) padding-box, linear-gradient(135deg, #FF00AA, #8B5CF6, #00F5FF) border-box',
-        }}
-        animate={{ rotate: -360 }}
-        transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
-      />
-      <motion.div 
-        className="absolute inset-0 w-24 h-24 rounded-full"
-        style={{
-          background: 'radial-gradient(circle, rgba(0,245,255,0.3) 0%, rgba(255,0,170,0.2) 50%, transparent 70%)',
-          filter: 'blur(15px)',
-        }}
-        animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.5, 0.8, 0.5],
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-      />
-      <motion.div
-        className="absolute inset-0 flex items-center justify-center"
-        animate={{ scale: [0.8, 1, 0.8] }}
-        transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-      >
-        <span 
-          className="text-lg font-bold"
-          style={{
-            background: 'linear-gradient(135deg, #00F5FF 0%, #FF00AA 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
         >
-          C
-        </span>
-      </motion.div>
-      <motion.p
-        className="absolute -bottom-12 left-1/2 -translate-x-1/2 text-sm whitespace-nowrap font-medium tracking-[0.2em] uppercase"
-        style={{ color: 'rgba(0,245,255,0.6)' }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-      >
-        Cargando...
-      </motion.p>
-    </motion.div>
-  </div>
-)
+          <div className="w-16 h-16 border-4 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-violet-500 to-pink-500 bg-clip-text text-transparent">
+            CHRONOS INFINITY
+          </h2>
+          <p className="text-gray-500 mt-2">Cargando sistema...</p>
+        </motion.div>
+      </div>
+    )
+  }
 
-export default function Chronos() {
-  const { currentPanel, setCurrentPanel } = useAppStore()
-  const _showStats = true
-
-  // Cargar datos para estadísticas
-  const { data: ventas = [] } = useFirestoreCRUD<Venta>('ventas')
-  const { data: clientes = [] } = useFirestoreCRUD<Cliente>('clientes')
-  const { data: ordenes = [] } = useFirestoreCRUD<OrdenCompra>('ordenes_compra')
-  const { data: bancos = [] } = useFirestoreCRUD<Banco>('bancos')
-
-  useOptimizedPerformance()
-
-  // Calcular estadísticas
-  const totalVentas = ventas.reduce((acc, v) => acc + (v.precioTotalVenta || 0), 0)
-  const totalClientes = clientes.length
-  const totalOrdenes = ordenes.length
-  const capitalTotal = bancos.reduce((acc, b) => acc + (b.capitalActual || 0), 0)
-  const ventasMes = ventas.filter(v => {
-    const fecha = v.fecha instanceof Date ? v.fecha : new Date(v.fecha as string)
-    const hoy = new Date()
-    return fecha.getMonth() === hoy.getMonth() && fecha.getFullYear() === hoy.getFullYear()
-  }).length
-
-  const stats = [
+  const kpis = [
     {
-      id: 'ventas',
-      label: 'Ventas Totales',
-      value: `$${(totalVentas / 1000).toFixed(0)}k`,
-      icon: <ShoppingCart className="w-6 h-6 text-green-400" />,
-      color: '#10b981',
-      trend: 12.5,
-      onClick: () => setCurrentPanel('ventas'),
-    },
-    {
-      id: 'clientes',
-      label: 'Clientes',
-      value: totalClientes,
-      icon: <Users className="w-6 h-6 text-blue-400" />,
-      color: '#3b82f6',
-      trend: 8.3,
-      onClick: () => setCurrentPanel('clientes'),
-    },
-    {
-      id: 'ordenes',
-      label: 'Órdenes',
-      value: totalOrdenes,
-      icon: <FileText className="w-6 h-6 text-purple-400" />,
-      color: '#8b5cf6',
-      trend: -2.1,
-      onClick: () => setCurrentPanel('ordenes'),
-    },
-    {
-      id: 'capital',
       label: 'Capital Total',
-      value: `$${(capitalTotal / 1000).toFixed(0)}k`,
-      icon: <Wallet className="w-6 h-6 text-cyan-400" />,
-      color: '#06b6d4',
-      trend: 15.7,
-      onClick: () => setCurrentPanel('bancos'),
+      value: stats.capitalTotal,
+      icon: DollarSign,
+      color: 'from-yellow-500 to-orange-500',
+      change: 12.5,
     },
     {
-      id: 'ventas-mes',
-      label: 'Ventas Este Mes',
-      value: ventasMes,
-      icon: <TrendingUp className="w-6 h-6 text-amber-400" />,
-      color: '#f59e0b',
-      trend: 23.4,
-      onClick: () => setCurrentPanel('reportes'),
+      label: 'Ventas Totales',
+      value: stats.ventasTotales,
+      icon: ShoppingCart,
+      color: 'from-violet-500 to-purple-500',
+      change: 8.3,
+    },
+    {
+      label: 'Pendiente Cobrar',
+      value: stats.ventasPendientes,
+      icon: TrendingUp,
+      color: 'from-pink-500 to-rose-500',
+      change: -3.2,
+    },
+    {
+      label: 'Clientes Activos',
+      value: stats.totalClientes,
+      icon: Users,
+      color: 'from-emerald-500 to-green-500',
+      change: 5.1,
+    },
+    {
+      label: 'Distribuidores',
+      value: stats.totalDistribuidores,
+      icon: Truck,
+      color: 'from-blue-500 to-cyan-500',
+      change: 0,
+    },
+    {
+      label: 'Productos',
+      value: stats.totalProductos,
+      icon: Package,
+      color: 'from-amber-500 to-yellow-500',
+      change: 2.4,
     },
   ]
 
-  useEffect(() => {
-    document.documentElement.style.scrollBehavior = 'smooth'
-    document.body.classList.add('gpu-accelerated')
-    
-    // Añadir estilos de escalado global
-    document.documentElement.style.setProperty('--viewport-scale', '1')
-
-    // Pre-cargar fuentes
-    if (document.fonts) {
-      document.fonts.load('600 1em "Inter"')
-    }
-
-    return () => {
-      document.documentElement.style.scrollBehavior = 'auto'
-    }
-  }, [currentPanel])
-
-  // 🔮 Activar Obsidian Glass Dashboard (Ultra-Premium Experience)
-  // 🚀 CHRONOS 2026 - El dashboard más avanzado (activar para experiencia completa 2026)
-  // 🔥 CHRONOS 2026 ULTRA - EL DISEÑO MÁS AVANZADO Y PREMIUM DEL MUNDO 2025-2026
-  // 🎨 BentoDashboard - Dashboard con Visualizaciones 3D Interactivas (NUEVO)
-  // 🌌 CHRONOS INFINITY - Dashboard Ultra Premium 3D con efectos holográficos
-  // 🔮 CHRONOS QUANTUM 2026 - SIN CYAN, Violeta Real + Oro Líquido + Rosa Plasma ⭐ ACTIVO
-  const useQuantumDashboard = true // ⭐ QUANTUM 2026 - SIN CYAN - EL MÁS PREMIUM
-  const useInfinityDashboard = false // Dashboard INFINITY (legacy con cyan)
-  const useBentoDashboard = false // Dashboard con gráficos 3D (legacy)
-  const useChronos2026Ultra = false // DISEÑO PREMIUM MUNDIAL
-  const useChronos2026 = false // Fallback legacy
-  const useObsidianDashboard = false // Fallback a Obsidian si 2026 está desactivado
-
-  const renderPanel = () => {
-    switch (currentPanel) {
-      case 'dashboard':
-        // 🔮 CHRONOS QUANTUM 2026 - SIN CYAN - Violeta Real + Oro Líquido + Rosa Plasma
-        if (useQuantumDashboard) return <BentoDashboardQuantum />
-        // 🌌 CHRONOS INFINITY - Dashboard Ultra Premium 3D con efectos holográficos
-        if (useInfinityDashboard) return <BentoDashboardInfinity />
-        // 🎨 BentoDashboard - Dashboard con Gráficos 3D Interactivos
-        if (useBentoDashboard) return <BentoDashboard />
-        // 🔥 CHRONOS 2026 ULTRA - EL DISEÑO MÁS AVANZADO DEL MUNDO
-        if (useChronos2026Ultra) return <Dashboard2026Ultra />
-        if (useChronos2026) return <Dashboard2026 />
-        return useObsidianDashboard ? <ObsidianDashboard /> : <ChronosDashboard />
-      case 'ordenes':
-        return <BentoOrdenesCompraPremium />
-      case 'ventas':
-        return <BentoVentasPremium />
-      case 'distribuidores':
-        return <BentoDistribuidoresPremium />
-      case 'clientes':
-        return <BentoClientesPremium />
-      case 'bancos':
-      case 'boveda_monte':
-      case 'boveda_usa':
-      case 'utilidades':
-      case 'flete_sur':
-      case 'azteca':
-      case 'leftie':
-      case 'profit':
-        return <BentoBanco />
-      case 'almacen':
-        return <BentoAlmacenPremium />
-      case 'gya':
-      case 'gastos':
-      case 'abonos':
-        return <BentoGYA />
-      case 'reportes':
-        return <BentoReportesPremium />
-      case 'ia':
-        return <BentoIAImmersive />
-      default:
-        return useObsidianDashboard ? <ObsidianDashboard /> : <ChronosDashboard />
-    }
-  }
-
   return (
-    <div id="root" className="min-h-screen bg-black relative w-full">
-      <ScrollProgress />
+    <div className="min-h-screen bg-black text-white p-6">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8"
+      >
+        <h1 className="text-5xl font-bold bg-gradient-to-r from-violet-500 via-pink-500 to-yellow-500 bg-clip-text text-transparent">
+          CHRONOS INFINITY
+        </h1>
+        <p className="text-gray-400 mt-2">
+          {new Date().toLocaleDateString('es-MX', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}
+        </p>
+      </motion.div>
 
-      <FirestoreSetupAlert />
-
-      {/* Enhanced ambient background with ultra-premium effects */}
-      <div className="fixed inset-0 pointer-events-none z-[1]">
-        {/* Gradient mesh background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-black to-slate-950" />
-        
-        {/* Animated orbs */}
-        <motion.div 
-          className="absolute top-[5%] left-[5%] w-[700px] h-[700px] bg-cyan-500/8 rounded-full blur-[150px] will-change-transform"
-          animate={{
-            scale: [1, 1.2, 1],
-            x: [0, 80, 0],
-            y: [0, 50, 0],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
-        <motion.div
-          className="absolute bottom-[10%] right-[5%] w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-[150px] will-change-transform"
-          animate={{
-            scale: [1, 1.3, 1],
-            x: [0, -60, 0],
-            y: [0, -70, 0],
-          }}
-          transition={{
-            duration: 30,
-            repeat: Infinity,
-            ease: 'easeInOut',
-            delay: 2,
-          }}
-        />
-        <motion.div
-          className="absolute top-[40%] left-[40%] w-[500px] h-[500px] bg-blue-500/6 rounded-full blur-[130px] will-change-transform"
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 180, 360],
-          }}
-          transition={{
-            duration: 35,
-            repeat: Infinity,
-            ease: 'easeInOut',
-            delay: 4,
-          }}
-        />
-        <motion.div
-          className="absolute bottom-[30%] left-[20%] w-[400px] h-[400px] bg-pink-500/5 rounded-full blur-[120px] will-change-transform"
-          animate={{
-            scale: [1, 1.15, 1],
-            x: [0, 40, 0],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: 'easeInOut',
-            delay: 6,
-          }}
-        />
-        
-        {/* Grid pattern overlay */}
-        <div 
-          className="absolute inset-0 opacity-[0.02]"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
-            `,
-            backgroundSize: '50px 50px',
-          }}
-        />
-        
-        {/* Vignette effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50" />
+      {/* KPI Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {kpis.map((kpi, index) => (
+          <motion.div
+            key={kpi.label}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900/80 to-black border border-white/10 p-6 backdrop-blur-xl"
+          >
+            {/* Glow effect */}
+            <div className={`absolute inset-0 bg-gradient-to-r ${kpi.color} opacity-5`} />
+            
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <div className={`p-3 rounded-xl bg-gradient-to-r ${kpi.color}`}>
+                  <kpi.icon className="w-6 h-6 text-white" />
+                </div>
+                {kpi.change !== 0 && (
+                  <div className={`flex items-center gap-1 text-sm ${kpi.change > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    {kpi.change > 0 ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
+                    {Math.abs(kpi.change)}%
+                  </div>
+                )}
+              </div>
+              
+              <p className="text-gray-400 text-sm mb-1">{kpi.label}</p>
+              <p className="text-3xl font-bold">
+                {typeof kpi.value === 'number' && (kpi.label.includes('Capital') || kpi.label.includes('Ventas') || kpi.label.includes('Pendiente'))
+                  ? `$${kpi.value.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`
+                  : kpi.value.toLocaleString('es-MX')}
+              </p>
+            </div>
+          </motion.div>
+        ))}
       </div>
 
-      <div className="relative z-10">
-        {/* Nuevo Header Ultra Premium */}
-        <ChronosHeader />
-
-        <main className="pt-20 px-4 md:px-6 lg:px-8 pb-8">
-          {/* Quick Stats 3D */}
-          {_showStats && (
+      {/* Bancos Grid */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6 }}
+        className="rounded-2xl bg-gradient-to-br from-gray-900/80 to-black border border-white/10 p-6 backdrop-blur-xl mb-8"
+      >
+        <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">
+          Sistema Bancario
+        </h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
+          {bancos.map((banco, index) => (
             <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="mb-8"
+              key={banco.id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1 * index }}
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-white/10 p-4 cursor-pointer group"
             >
-              <ScrollReveal>
-                <QuickStats3D stats={stats} />
-              </ScrollReveal>
+              {/* Glow on hover */}
+              <div className="absolute inset-0 bg-gradient-to-r from-violet-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+              
+              <div className="relative z-10 text-center">
+                <div 
+                  className="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center"
+                  style={{ backgroundColor: banco.color }}
+                >
+                  <DollarSign className="w-6 h-6 text-white" />
+                </div>
+                <p className="text-xs text-gray-400 mb-1 truncate">{banco.nombre}</p>
+                <p className="text-lg font-bold text-white">
+                  ${banco.capitalActual?.toLocaleString('es-MX', { maximumFractionDigits: 0 }) || '0'}
+                </p>
+              </div>
             </motion.div>
-          )}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentPanel}
-              initial={{ opacity: 0, y: 30, scale: 0.97, filter: 'blur(12px)' }}
-              animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -30, scale: 0.97, filter: 'blur(12px)' }}
-              transition={{
-                duration: 0.6,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              className="will-change-transform"
-            >
-              <ScrollReveal>
-                <Suspense fallback={<PanelLoader />}>{renderPanel()}</Suspense>
-              </ScrollReveal>
-            </motion.div>
-          </AnimatePresence>
-        </main>
-      </div>
+          ))}
+        </div>
+      </motion.div>
 
-      {/* 🤖 GrokAIOrb está en layout.tsx para posición fixed global - ÚNICO WIDGET IA */}
-
-      {/* Command Menu - Cmd+K para búsqueda rápida */}
-      <CommandMenu />
-
-      {/* System Showcase - Demostración Completa Interactiva */}
-      <SystemShowcase onComplete={() => {
-        // Demo completada
-      }} />
+      {/* Ventas Recientes */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8 }}
+        className="rounded-2xl bg-gradient-to-br from-gray-900/80 to-black border border-white/10 p-6 backdrop-blur-xl"
+      >
+        <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+          Últimas Ventas
+        </h2>
+        
+        {ventas.length === 0 ? (
+          <p className="text-gray-500 text-center py-8">No hay ventas registradas</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="text-left text-gray-400 text-sm border-b border-white/10">
+                  <th className="pb-3">Cliente</th>
+                  <th className="pb-3">Cantidad</th>
+                  <th className="pb-3">Total</th>
+                  <th className="pb-3">Estado</th>
+                  <th className="pb-3">Fecha</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ventas.slice(0, 5).map((venta, index) => (
+                  <motion.tr
+                    key={venta.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 * index }}
+                    className="border-b border-white/5 hover:bg-white/5 transition-colors"
+                  >
+                    <td className="py-3">{venta.cliente?.nombre || 'N/A'}</td>
+                    <td className="py-3">{venta.cantidad}</td>
+                    <td className="py-3 font-semibold text-yellow-400">
+                      ${venta.precioTotalVenta?.toLocaleString('es-MX') || '0'}
+                    </td>
+                    <td className="py-3">
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        venta.estadoPago === 'completo' 
+                          ? 'bg-emerald-500/20 text-emerald-400'
+                          : venta.estadoPago === 'parcial'
+                          ? 'bg-yellow-500/20 text-yellow-400'
+                          : 'bg-rose-500/20 text-rose-400'
+                      }`}>
+                        {venta.estadoPago}
+                      </span>
+                    </td>
+                    <td className="py-3 text-gray-400">
+                      {venta.fecha ? new Date(venta.fecha).toLocaleDateString('es-MX') : 'N/A'}
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </motion.div>
     </div>
   )
 }

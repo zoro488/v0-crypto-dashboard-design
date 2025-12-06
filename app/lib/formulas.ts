@@ -65,7 +65,7 @@ export interface ResultadoOrdenCompra {
   costoTotal: number
   pagoInicial: number
   deuda: number
-  estado: 'pendiente' | 'parcial' | 'pagado'
+  estado: 'pendiente' | 'parcial' | 'completo'
   stockInicial: number
 }
 
@@ -238,9 +238,9 @@ export function calcularOrdenCompra(datos: DatosOrdenCompra): ResultadoOrdenComp
   const costoTotal = costoPorUnidad * cantidad
   const deuda = costoTotal - pagoInicial
   
-  let estado: 'pendiente' | 'parcial' | 'pagado' = 'pendiente'
+  let estado: 'pendiente' | 'parcial' | 'completo' = 'pendiente'
   if (deuda <= 0) {
-    estado = 'pagado'
+    estado = 'completo'
   } else if (pagoInicial > 0) {
     estado = 'parcial'
   }

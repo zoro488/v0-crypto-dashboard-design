@@ -27,8 +27,8 @@ export const BANCO_IDS = [
 
 export const MONEDAS = ['MXN', 'USD', 'COP'] as const
 export const METODOS_PAGO = ['efectivo', 'transferencia', 'deposito', 'mixto'] as const
-export const ESTADOS_VENTA = ['pendiente', 'parcial', 'pagado', 'cancelado'] as const
-export const ESTADOS_ORDEN = ['pendiente', 'parcial', 'pagado', 'cancelado', 'completada'] as const
+export const ESTADOS_VENTA = ['pendiente', 'parcial', 'completo', 'cancelado'] as const
+export const ESTADOS_ORDEN = ['pendiente', 'parcial', 'completo', 'cancelado'] as const
 export const ESTADOS_CLIENTE = ['activo', 'inactivo', 'vip', 'moroso'] as const
 
 // ============================================

@@ -680,7 +680,7 @@ export const useDataStore = create<DataState>()(
           const now = new Date().toISOString()
           const nuevoPago = (oc.pagoDistribuidor || 0) + monto
           const nuevaDeuda = Math.max(0, (oc.deuda || 0) - monto)
-          const nuevoEstado = nuevaDeuda === 0 ? 'pagado' : 'parcial'
+          const nuevoEstado = nuevaDeuda === 0 ? 'completo' : 'parcial'
           
           set((state) => {
             const nuevasOC = state.ordenesCompra.map(o =>
@@ -690,7 +690,7 @@ export const useDataStore = create<DataState>()(
                     pagoDistribuidor: nuevoPago,
                     pagoInicial: nuevoPago,
                     deuda: nuevaDeuda,
-                    estado: nuevoEstado as 'pendiente' | 'parcial' | 'pagado' | 'cancelado',
+                    estado: nuevoEstado as 'pendiente' | 'parcial' | 'completo' | 'cancelado',
                     updatedAt: now,
                   }
                 : o
@@ -1016,7 +1016,7 @@ export const useDataStore = create<DataState>()(
               pagoInicial: 630000,
               deuda: 0,
               bancoOrigen: 'boveda_monte',
-              estado: 'pagado',
+              estado: 'completo',
               keywords: ['pacman', 'oc0001'],
               createdAt: now,
               updatedAt: now,

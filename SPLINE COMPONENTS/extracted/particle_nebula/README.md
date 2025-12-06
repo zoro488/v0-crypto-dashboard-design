@@ -1,4 +1,4 @@
-# particle-nebula
+# Particle Nebula
 
 This project has been exported from [Spline](https://spline.design/).
 
@@ -18,6 +18,14 @@ npm run dev
 
 ## Deployment
 
-You can use [Vercel](https://vercel.com/) or your server provider of choice to host the website.
+The project needs to be built before it could be deployed to your server. Build the project with:
 
+```
+npm run build
+```
+
+The `dist` folder is ready to be deployed.
+
+> [!NOTE]
+> If you're deploying to a subdirectory (like `example.com/app/`), you might need to change the `wasmPath` prop in `App.jsx` accordingly.
 
